@@ -32,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -42,6 +43,7 @@ import com.example.a01_compose_study.R
 @Composable
 fun BottomMenuBar(isVisible: Boolean, customDialogVisibleOnClick: () -> Unit) {
 
+    // 추후 코드 정리 필요
     val color = if (isVisible) {
         Color.DarkGray
     } else {
@@ -51,7 +53,6 @@ fun BottomMenuBar(isVisible: Boolean, customDialogVisibleOnClick: () -> Unit) {
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Bottom,
     ) {
-
         Row(
             modifier = Modifier.run {
                 fillMaxWidth()
@@ -66,13 +67,15 @@ fun BottomMenuBar(isVisible: Boolean, customDialogVisibleOnClick: () -> Unit) {
             IconButton(onClick = { customDialogVisibleOnClick() }) {
                 Icon(
                     Icons.Default.Info, contentDescription = null,
-                    modifier = Modifier.size(30.dp)
+                    modifier = Modifier.size(30.dp),
+                    tint = Color.White
                 )
             }
             IconButton(onClick = { /* 처리 로직 추가 */ }) {
                 Icon(
                     Icons.Default.MoreVert, contentDescription = null,
-                    modifier = Modifier.size(30.dp)
+                    modifier = Modifier.size(30.dp),
+                    tint = Color.White
                 )
             }
             Row(
@@ -96,7 +99,8 @@ fun BottomMenuBar(isVisible: Boolean, customDialogVisibleOnClick: () -> Unit) {
                 Text(
                     text = "21.0",
                     fontWeight = FontWeight.Bold,
-                    fontSize = 23.sp
+                    fontSize = 23.sp,
+                    color = Color.White
                 )
 
                 IconButton(onClick = { /* 처리 로직 추가 */ }) {
@@ -109,7 +113,7 @@ fun BottomMenuBar(isVisible: Boolean, customDialogVisibleOnClick: () -> Unit) {
             }
             Spacer(modifier = Modifier.width(10.dp))
             IconButton(onClick = { /* 처리 로직 추가 */ }) {
-                Canvas(modifier = Modifier.fillMaxSize()) {
+                Canvas(modifier = Modifier.size(50.dp)) {
                     // Draw a filled rectangle
                     drawRoundRect(
                         color = Color(0xFFE95252),
@@ -124,7 +128,7 @@ fun BottomMenuBar(isVisible: Boolean, customDialogVisibleOnClick: () -> Unit) {
                 )
             }
             IconButton(onClick = { /* 처리 로직 추가 */ }) {
-                Canvas(modifier = Modifier.fillMaxSize()) {
+                Canvas(modifier = Modifier.size(50.dp)) {
                     // Draw a filled rectangle
                     drawRoundRect(
                         color = Color(0xFFBC25F3),
@@ -140,7 +144,7 @@ fun BottomMenuBar(isVisible: Boolean, customDialogVisibleOnClick: () -> Unit) {
             }
             IconButton(onClick = { /* 처리 로직 추가 */ }) {
 
-                Canvas(modifier = Modifier.fillMaxSize()) {
+                Canvas(modifier = Modifier.size(50.dp)) {
                     // Draw a filled rectangle
                     drawRoundRect(
                         color = Color(0xFF2FCE0C),
@@ -155,14 +159,24 @@ fun BottomMenuBar(isVisible: Boolean, customDialogVisibleOnClick: () -> Unit) {
                 )
             }
             IconButton(onClick = { /* 처리 로직 추가 */ }) {
+                Canvas(modifier = Modifier.size(50.dp)) {
+                    // Draw a filled rectangle
+                    drawRoundRect(
+                        color = Color.Gray,
+                        size = size,
+                        cornerRadius = CornerRadius(10.dp.toPx(), 10.dp.toPx()),
+                        style = Stroke(1.dp.toPx())
+                    )
+                }
                 Icon(
                     Icons.Default.Menu,
                     contentDescription = null,
-                    modifier = Modifier.size(30.dp)
+                    modifier = Modifier.size(30.dp),
+                    tint = Color.White
                 )
             }
             IconButton(onClick = { /* 처리 로직 추가 */ }) {
-                Canvas(modifier = Modifier.fillMaxSize()) {
+                Canvas(modifier = Modifier.size(50.dp)) {
                     // Draw a filled rectangle
                     drawRoundRect(
                         color = Color(0x9ED6CECD),
@@ -207,6 +221,7 @@ fun BottomMenuBar(isVisible: Boolean, customDialogVisibleOnClick: () -> Unit) {
                         text = "2",
                         fontWeight = FontWeight.Bold,
                         fontSize = 25.sp,
+                        color = Color.White
                     )
                 }
                 IconButton(onClick = { /* 처리 로직 추가 */ }) {
@@ -220,10 +235,18 @@ fun BottomMenuBar(isVisible: Boolean, customDialogVisibleOnClick: () -> Unit) {
             IconButton(onClick = { /* 처리 로직 추가 */ }) {
                 Icon(
                     Icons.Default.Person, contentDescription = null,
-                    modifier = Modifier.size(30.dp)
+                    modifier = Modifier.size(30.dp),
+                    tint = Color.White
                 )
             }
-            Spacer(modifier = Modifier.width(10.dp))
+            IconButton(onClick = { /* 처리 로직 추가 */ }) {
+                Icon(
+                    Icons.Default.Person, contentDescription = null,
+                    modifier = Modifier.size(30.dp),
+                    tint = Color.White
+                )
+            }
+            Spacer(modifier = Modifier.width(20.dp))
         }
     }
 }
