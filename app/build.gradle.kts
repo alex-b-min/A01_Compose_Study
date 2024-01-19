@@ -64,6 +64,7 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.0.2")
     debugImplementation("androidx.compose.ui:ui-tooling:1.0.2")
+    implementation ("com.airbnb.android:lottie-compose:6.1.0")
 
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0")
@@ -81,4 +82,6 @@ dependencies {
 
     // Kotlin Extensions and Coroutines support for Room
     implementation("androidx.room:room-ktx:2.3.0")
+
+    implementation("androidx.constraintlayout:constraintlayout-compose:1.0.0-rc01")
 }

@@ -41,7 +41,12 @@ import com.example.a01_compose_study.R
 
 
 @Composable
-fun BottomMenuBar(isVisible: Boolean, customDialogVisibleOnClick: () -> Unit) {
+fun BottomMenuBar(
+    isVisible: Boolean,
+    oneScreenOnClick: () -> Unit,
+    twoScreenOnClick: () -> Unit,
+    examScreenOnClick: () -> Unit
+    ) {
 
     // 추후 코드 정리 필요
     val color = if (isVisible) {
@@ -57,21 +62,21 @@ fun BottomMenuBar(isVisible: Boolean, customDialogVisibleOnClick: () -> Unit) {
             modifier = Modifier.run {
                 fillMaxWidth()
                     .background(color = color)
-                    .fillMaxHeight(0.15f)
+                    .fillMaxHeight(0.10f)
 //                    .padding(top = 30.dp)
             },
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Spacer(modifier = Modifier.width(20.dp))
-            IconButton(onClick = { customDialogVisibleOnClick() }) {
+            IconButton(onClick = { oneScreenOnClick() }) {
                 Icon(
                     Icons.Default.Info, contentDescription = null,
                     modifier = Modifier.size(30.dp),
                     tint = Color.White
                 )
             }
-            IconButton(onClick = { /* 처리 로직 추가 */ }) {
+            IconButton(onClick = { twoScreenOnClick() }) {
                 Icon(
                     Icons.Default.MoreVert, contentDescription = null,
                     modifier = Modifier.size(30.dp),
@@ -87,7 +92,7 @@ fun BottomMenuBar(isVisible: Boolean, customDialogVisibleOnClick: () -> Unit) {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                IconButton(onClick = { /* 처리 로직 추가 */ }) {
+                IconButton(onClick = { examScreenOnClick() }) {
                     Icon(
                         Icons.Default.KeyboardArrowLeft,
                         contentDescription = null,
