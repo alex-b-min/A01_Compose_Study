@@ -1,7 +1,5 @@
 package com.example.a01_compose_study.presentation.main.component
 
-import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.slideInVertically
@@ -43,31 +41,39 @@ import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieClipSpec
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
-import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieAnimatable
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.a01_compose_study.R
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.main.MainUiState
 import com.example.a01_compose_study.presentation.util.TextModifier.normalize
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
-@SuppressLint("UnrememberedMutableState", "UnrememberedAnimatable")
 @Composable
 fun CustomSizeAlertDialog(
     uiState: MainUiState.TwoScreen,
     contentColor: Color,
     onDismiss: () -> Unit,
 ) {
-    val composition by rememberLottieComposition(spec = LottieCompositionSpec.RawRes(R.raw.loop))
+    var visible by remember { mutableStateOf(false) }
+
     val scope = rememberCoroutineScope()
 
-    val progress by animateLottieCompositionAsState(composition = composition) // Progress(진행도)를 직접 구해 사용하는 방식 ==> 재생시키기만을 위해서라면 이것을 사용해도 무방
-    val lottieAnimatable =
-        rememberLottieAnimatable() // 의도한 타이밍에 실행시키거나, 원하는 지점으로 이동시켜 실행하기 위해 사용되는 방식 ==> 구체적인 재생을 위해서 사용
+    // Lottie 애니메이션 실행의 매개체라고 생각하면 쉽다.
+    val composition by rememberLottieComposition(spec = LottieCompositionSpec.RawRes(R.raw.loop))
+
+    // Progress(진행도)를 직접 구해 사용하는 방식 ==> 재생시키기만을 위해서라면 이것을 사용해도 무방(간단)
+//    val progress by animateLottieCompositionAsState(composition = composition) // Progress(진행도)를 직접 구해 사용하는 방식 ==> 재생시키기만을 위해서라면 이것을 사용해도 무방
+
+    // 의도한 타이밍에 실행시키거나, 원하는 지점으로 이동시켜 실행하기 위해 사용되는 방식 ==> 구체적인 재생을 위해서 사용
+    val lottieAnimatable = rememberLottieAnimatable() // 의도한 타이밍에 실행시키거나, 원하는 지점으로 이동시켜 실행하기 위해 사용되는 방식 ==> 구체적인 재생을 위해서 사용
+    // 현재 실행되고 있는 애니메이션의 프레임 값을 알 수 있음, 참고로 animateLottieCompositionAsState()의 값이나 rememberLottieAnimatable()의 progress의 값만을 허용함.
     val currentFrame =
-        composition?.getFrameForProgress(progress) // 현재 실행되고 있는 애니메이션의 프레임 값을 알 수 있음, 참고로 rememberLottieAnimatable을 통해서만 현재 프레임을 얻어올 수 있음.
+        composition?.getFrameForProgress(lottieAnimatable.progress) // 현재 실행되고 있는 애니메이션의 프레임 값을 알 수 있음, 참고로 rememberLottieAnimatable을 통해서만 현재 프레임을 얻어올 수 있음.
+
+    // 현재 프레임에 따라 글자 투명도(Alpha)가 변하도록 설정한 변수
     val textAlpha = currentFrame?.let { //현재 프레임에 따라 글자 투명도(Alpha)가 변하도록 설정한 변수
         when (it) {
             in 0F..10F -> 0F
@@ -77,18 +83,23 @@ fun CustomSizeAlertDialog(
         }
     } ?: 0F
 
+    // 화면 크기(세로) 변경 애니메이션 상태 관리 변수
     var targetFillMaxHeight by remember { mutableStateOf(Animatable(0f)) }
 
-    // isVisible의 값에 따라 일회성으로 한번 호출하여 사용하기 위해 LaunchedEffect를 사용
-    LaunchedEffect(uiState.isVisible) {
-        //uiState로부터의 screenSizeType을 얻어 해당 화면 크기 설정
+    // LaunchedEffect의 key가 composition인 이유는 composition이 제대로 설정된 후에 디테일한 애니메이션 설정을 하는 animate()를 정상적으로 설정할 수 있기 때문이다.
+    LaunchedEffect(composition) {
+        // visible의 값을 false -> true 변경
+        visible = true
+
+        // uiState로부터의 screenSizeType을 얻어 해당 화면 크기 설정
         targetFillMaxHeight = when (uiState.screenSizeType) {
             is ScreenSizeType.Small -> Animatable(0.2f)
             is ScreenSizeType.Middle -> Animatable(0.4f)
             is ScreenSizeType.Large -> Animatable(0.6f)
         }
         /**
-         * Frame 값을 알 수 있도록 실행되는 애니메이션 설정(LottieAnimatable)
+         * 디테일 하게 애니메이션 설정을 할 수 있게 끔 도와주는 rememberLottieAnimatable()
+         * 디테일 하게 설정 가능한 것은 아래와 같음
          */
         lottieAnimatable.animate(
             composition = composition, // 어떤 애니메이션을 실행할 지 결정
@@ -99,7 +110,7 @@ fun CustomSizeAlertDialog(
     }
 
     AnimatedVisibility(
-        visible = uiState.isVisible,
+        visible = visible,
         enter = slideInVertically(initialOffsetY = { it }),
         exit = slideOutVertically(targetOffsetY = { it })
     ) {
@@ -131,7 +142,11 @@ fun CustomSizeAlertDialog(
                         horizontalAlignment = Alignment.End
                     ) {
                         IconButton(onClick = {
-                            onDismiss()
+                            scope.launch {
+                                visible = false
+                                delay(500)
+                                onDismiss()
+                            }
                         }) {
                             Icon(
                                 imageVector = Icons.Default.Close,
@@ -184,22 +199,27 @@ fun CustomSizeAlertDialog(
                     ) {
                         /**
                          * 애니메이션 한번 재생
-                         */
-                        LottieAnimation(
-                            composition = composition,
-                            contentScale = ContentScale.FillHeight,
-                            progress = progress
-                        )
-                        /**
-                         * 애니메이션 프레임 값 얻을 수 있음
+                         * progress 설정에 animateLottieCompositionAsState() 값을 이용하여 설정
                          */
 //                        LottieAnimation(
 //                            composition = composition,
-//                            progress = lottieAnimatable.progress,
-//                            contentScale = ContentScale.Crop
+//                            contentScale = ContentScale.FillHeight,
+//                            progress = progress
 //                        )
                         /**
+                         * 애니메이션을 디테일 하게 재생
+                         * progress에 rememberLottieAnimatable().animate()를 통해 디테일한 설정을 한 것을 재생함
+                         * [참고] 아래의 LottieAnimation()은 애니메이션 재생을 시키는 코드이고 원하는 타이밍에 애니메이션을 Skip을 하고 싶다면 아래의 코드를 이용하면 된다.
+                         * [EX] lottieAnimatable.snapTo(compositon, 1f)
+                         */
+                        LottieAnimation(
+                            composition = composition,
+                            progress = lottieAnimatable.progress,
+                            contentScale = ContentScale.FillHeight
+                        )
+                        /**
                          * 애니메이션 무한 반복
+                         * progress 설정 없이 iterations 매개변수에 LottieConstants.IterateForever를 설정하여 무한반복 시킴
                          */
 //                        LottieAnimation(
 //                            composition = composition,
@@ -217,7 +237,11 @@ fun CustomSizeAlertDialog(
                                 .alpha(textAlpha)
                                 .padding(bottom = 10.dp),
                             color = contentColor,
-                            fontSize = 30.sp
+                            fontSize = when (targetFillMaxHeight.value) {
+                                0.2f -> 25.sp
+                                0.4f -> 45.sp
+                                else -> 63.sp
+                            }
                         )
                     }
                 }

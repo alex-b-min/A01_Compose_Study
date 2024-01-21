@@ -24,7 +24,6 @@ class MainViewModel @Inject constructor() : ViewModel() {
             is MainEvent.OneScreenOpen -> {
                 _uiState.update { uiState ->
                     MainUiState.OneScreen(
-                        isVisible = true,
                         text = event.text
                     )
                 }
@@ -33,7 +32,6 @@ class MainViewModel @Inject constructor() : ViewModel() {
             is MainEvent.TwoScreenOpen -> {
                 _uiState.update { uiState ->
                     MainUiState.TwoScreen(
-                        isVisible = true,
                         text = event.text,
                         screenSizeType = event.screenSizeType
                     )
