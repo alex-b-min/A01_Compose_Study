@@ -35,23 +35,16 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.airbnb.lottie.compose.LottieAnimation
-import com.airbnb.lottie.compose.LottieClipSpec
-import com.airbnb.lottie.compose.LottieCompositionSpec
-import com.airbnb.lottie.compose.LottieConstants
-import com.airbnb.lottie.compose.rememberLottieAnimatable
-import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.a01_compose_study.R
+import com.example.a01_compose_study.presentation.lottie.LottieAnimationHandler
 import com.example.a01_compose_study.presentation.main.MainUiState
 import com.example.a01_compose_study.presentation.util.TextModifier.normalize
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-
 
 @Composable
 fun CustomAlertDialog(
@@ -63,44 +56,15 @@ fun CustomAlertDialog(
 
     val scope = rememberCoroutineScope()
 
-    // Lottie 애니메이션 실행의 매개체라고 생각하면 쉽다.
-    val composition by rememberLottieComposition(spec = LottieCompositionSpec.RawRes(R.raw.loop))
-
-    // Progress(진행도)를 직접 구해 사용하는 방식 ==> 재생시키기만을 위해서라면 이것을 사용해도 무방(간단)
-//    val progress by animateLottieCompositionAsState(composition = composition)
-
-    // 의도한 타이밍에 실행시키거나, 원하는 지점으로 이동시켜 실행하기 위해 사용되는 방식 ==> 구체적인 재생을 위해서 사용
-    val lottieAnimatable = rememberLottieAnimatable()
-    // 현재 실행되고 있는 애니메이션의 프레임 값을 알 수 있음, 참고로 animateLottieCompositionAsState()의 값이나 rememberLottieAnimatable()의 progress의 값만을 허용함.
-    val currentFrame = composition?.getFrameForProgress(lottieAnimatable.progress)
-
-    // 현재 프레임에 따라 글자 투명도(Alpha)가 변하도록 설정한 변수
-    val textAlpha = currentFrame?.let {
-        when (it) {
-            in 0F..10F -> 0F
-            in 10F..20F -> it.normalize(10F, 20F)
-            in 20F..40F -> 1F - (it.normalize(20F, 40F) * 0.5F)
-            else -> 0F
-        }
-    } ?: 0F
+    var textAlpha: Float by remember { mutableStateOf(0f) }
 
     // 화면 크기(세로) 변경 애니메이션 상태 관리 변수
     val targetFillMaxHeight by remember { mutableStateOf(Animatable(0.2f)) }
 
-    // LaunchedEffect의 key가 composition인 이유는 composition이 제대로 설정된 후에 디테일한 애니메이션 설정을 하는 animate()를 정상적으로 설정할 수 있기 때문이다.
-    LaunchedEffect(composition) {
+    //화면이 띄워질 때 Unit을 통해 한번만 실행 되도록 하는 작업을 아래와 같이 작성함
+    LaunchedEffect(Unit) {
         // visible의 값을 false -> true 변경
         visible = true
-        /**
-         * 디테일 하게 애니메이션 설정을 할 수 있게 끔 도와주는 rememberLottieAnimatable()
-         * 디테일 하게 설정 가능한 것은 아래와 같음
-         */
-        lottieAnimatable.animate(
-            composition = composition, // 어떤 애니메이션을 실행할 지 결정
-            clipSpec = LottieClipSpec.Frame(0, 80), // Lottie 애니메이션의 재생 범위 정의(Frame 단위)
-            initialProgress = 0f, // 어디서 부터 시작할 지 초기 진행도 설정
-            iterations = LottieConstants.IterateForever, // 몇 번 반복 할 지를 설정
-        )
     }
 
     Box(
@@ -191,35 +155,19 @@ fun CustomAlertDialog(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.BottomCenter
                     ) {
-                        /**
-                         * 애니메이션 한번 재생
-                         * progress 설정에 animateLottieCompositionAsState() 값을 이용하여 설정
-                         */
-//                        LottieAnimation(
-//                            composition = composition,
-//                            contentScale = ContentScale.FillHeight,
-//                            progress = progress,
-//                        )
-                        /**
-                         * 애니메이션을 디테일 하게 재생
-                         * progress에 rememberLottieAnimatable().animate()를 통해 디테일한 설정을 한 것을 재생함
-                         * [참고] 아래의 LottieAnimation()은 애니메이션 재생을 시키는 코드이고 원하는 타이밍에 애니메이션을 Skip을 하고 싶다면 아래의 코드를 이용하면 된다.
-                         * [EX] lottieAnimatable.snapTo(compositon, 1f)
-                         */
-                        LottieAnimation(
-                            composition = composition,
-                            progress = lottieAnimatable.progress,
-                            contentScale = ContentScale.FillHeight
-                        )
-                        /**
-                         * 애니메이션 무한 반복
-                         * progress 설정 없이 iterations 매개변수에 LottieConstants.IterateForever를 설정하여 무한반복 시킴
-                         */
-//                        LottieAnimation(
-//                            composition = composition,
-//                            contentScale = ContentScale.FillHeight,
-//                            iterations = LottieConstants.IterateForever
-//                        )
+                        LottieAnimationHandler(
+                            rawResId = R.raw.loop,
+                            infiniteLoop = true,
+                            onFrameChanged = { currentFrame ->
+                                textAlpha = currentFrame.let {
+                                    when (it) {
+                                        in 0F..10F -> 0F
+                                        in 10F..20F -> it.normalize(10F, 20F)
+                                        in 20F..40F -> 1F - (it.normalize(20F, 40F) * 0.5F)
+                                        else -> 0F
+                                    }
+                                } ?: 0F
+                            })
                     }
                     Box(
                         modifier = Modifier.fillMaxSize(),
