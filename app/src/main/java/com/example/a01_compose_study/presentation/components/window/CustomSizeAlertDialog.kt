@@ -1,4 +1,4 @@
-package com.example.a01_compose_study.presentation.main.component
+package com.example.a01_compose_study.presentation.components.window
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.a01_compose_study.R
 import com.example.a01_compose_study.domain.util.ScreenSizeType
-import com.example.a01_compose_study.presentation.lottie.LottieAnimationHandler
+import com.example.a01_compose_study.presentation.components.lottie.LottieAnimationHandler
 import com.example.a01_compose_study.presentation.main.MainUiState
 import com.example.a01_compose_study.presentation.util.TextModifier.normalize
 import kotlinx.coroutines.delay

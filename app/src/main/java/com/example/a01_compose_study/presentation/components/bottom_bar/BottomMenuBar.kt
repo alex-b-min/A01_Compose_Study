@@ -1,4 +1,4 @@
-package com.example.a01_compose_study.presentation.main.component
+package com.example.a01_compose_study.presentation.components.bottom_bar
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background

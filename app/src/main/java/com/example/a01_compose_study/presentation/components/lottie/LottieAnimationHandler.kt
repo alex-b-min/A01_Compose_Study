@@ -1,4 +1,4 @@
-package com.example.a01_compose_study.presentation.lottie
+package com.example.a01_compose_study.presentation.components.lottie
 
 import androidx.annotation.RawRes
 import androidx.compose.runtime.Composable

@@ -7,10 +7,9 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.a01_compose_study.presentation.main.screen.MainScreen
+import com.example.a01_compose_study.presentation.main.route.MainScreen
 import com.example.a01_compose_study.ui.theme.A01_Compose_StudyTheme
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.HiltAndroidApp
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {

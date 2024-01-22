@@ -1,4 +1,4 @@
-package com.example.a01_compose_study.presentation.main.screen
+package com.example.a01_compose_study.presentation.main.route
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,9 +15,9 @@ import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.main.MainEvent
 import com.example.a01_compose_study.presentation.main.MainUiState
 import com.example.a01_compose_study.presentation.main.MainViewModel
-import com.example.a01_compose_study.presentation.main.component.BottomMenuBar
-import com.example.a01_compose_study.presentation.main.component.CustomAlertDialog
-import com.example.a01_compose_study.presentation.main.component.CustomSizeAlertDialog
+import com.example.a01_compose_study.presentation.components.bottom_bar.BottomMenuBar
+import com.example.a01_compose_study.presentation.components.window.CustomAlertDialog
+import com.example.a01_compose_study.presentation.components.window.CustomSizeAlertDialog
 
 @Composable
 fun MainScreen(
