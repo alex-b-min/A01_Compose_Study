@@ -111,6 +111,7 @@ fun CustomSizeAlertDialog(
 
     AnimatedVisibility(
         visible = visible,
+        modifier = Modifier.fillMaxWidth(),
         enter = slideInVertically(initialOffsetY = { it }),
         exit = slideOutVertically(targetOffsetY = { it })
     ) {
