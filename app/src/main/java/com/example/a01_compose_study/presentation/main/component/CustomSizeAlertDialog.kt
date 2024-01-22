@@ -35,6 +35,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.tooling.preview.Devices
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.airbnb.lottie.compose.LottieAnimation
@@ -68,7 +70,8 @@ fun CustomSizeAlertDialog(
 //    val progress by animateLottieCompositionAsState(composition = composition) // Progress(진행도)를 직접 구해 사용하는 방식 ==> 재생시키기만을 위해서라면 이것을 사용해도 무방
 
     // 의도한 타이밍에 실행시키거나, 원하는 지점으로 이동시켜 실행하기 위해 사용되는 방식 ==> 구체적인 재생을 위해서 사용
-    val lottieAnimatable = rememberLottieAnimatable() // 의도한 타이밍에 실행시키거나, 원하는 지점으로 이동시켜 실행하기 위해 사용되는 방식 ==> 구체적인 재생을 위해서 사용
+    val lottieAnimatable =
+        rememberLottieAnimatable() // 의도한 타이밍에 실행시키거나, 원하는 지점으로 이동시켜 실행하기 위해 사용되는 방식 ==> 구체적인 재생을 위해서 사용
     // 현재 실행되고 있는 애니메이션의 프레임 값을 알 수 있음, 참고로 animateLottieCompositionAsState()의 값이나 rememberLottieAnimatable()의 progress의 값만을 허용함.
     val currentFrame =
         composition?.getFrameForProgress(lottieAnimatable.progress) // 현재 실행되고 있는 애니메이션의 프레임 값을 알 수 있음, 참고로 rememberLottieAnimatable을 통해서만 현재 프레임을 얻어올 수 있음.
@@ -249,4 +252,17 @@ fun CustomSizeAlertDialog(
             }
         }
     }
+}
+
+@Preview(device = Devices.TABLET)
+@Composable
+fun CustomSizeAlertDialogPreview() {
+    CustomSizeAlertDialog(
+        uiState = MainUiState.TwoScreen(
+            text = "string",
+            screenSizeType = ScreenSizeType.Middle
+        ),
+        contentColor = Color.Magenta,
+        onDismiss = {
+        })
 }
