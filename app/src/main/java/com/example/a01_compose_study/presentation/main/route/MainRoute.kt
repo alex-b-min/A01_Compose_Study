@@ -20,7 +20,7 @@ import com.example.a01_compose_study.presentation.components.window.CustomAlertD
 import com.example.a01_compose_study.presentation.components.window.CustomSizeAlertDialog
 
 @Composable
-fun MainScreen(
+fun MainRoute(
     viewModel: MainViewModel = hiltViewModel(),
 ) {
     var visible by remember { mutableStateOf(false) }
