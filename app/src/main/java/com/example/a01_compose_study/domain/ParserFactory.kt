@@ -1,9 +1,6 @@
 package com.example.a01_compose_study.domain
 
 import com.example.a01_compose_study.data.DialogueMode
-import com.example.a01_compose_study.data.Intentions
-import com.example.a01_compose_study.data.VRResult
-import com.example.a01_compose_study.domain.model.ParseBundle
 import com.example.a01_compose_study.domain.util.CustomLogger
 
 class ParserFactory {
