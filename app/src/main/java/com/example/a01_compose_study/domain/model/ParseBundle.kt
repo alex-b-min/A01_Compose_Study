@@ -23,7 +23,7 @@ class ParseBundle<T>(var type: ParseDomainType) : Parcelable {
 
     constructor(parcel: Parcel) : this(TODO("type")) {
         dialogue = parcel.readString()
-        prompt = parcel.readString()
+        prompt = gitparcel.readString()
         promptId = parcel.readInt()
         isStartRecog = parcel.readByte() != 0.toByte()
         isBack = parcel.readByte() != 0.toByte()
