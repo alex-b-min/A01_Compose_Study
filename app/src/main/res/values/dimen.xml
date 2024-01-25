@@ -1,0 +1,152 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+
+
+    <!-- Chrome -->
+    <dimen name="chrome_common_fg_text_start_margin">46dp</dimen>
+    <dimen name="chrome_common_fg_text_end_margin">46dp</dimen>
+    <dimen name="chrome_common_fg_text_side_margin">13dp</dimen>
+    <dimen name="chrome_common_fg_text_layout_gone_size">70dp</dimen>
+    <dimen name="chrome_common_fg_display_text_lineSpacingExtra">5dp</dimen>
+    <dimen name="chrome_common_fg_text_size">24dp</dimen>
+    <dimen name="chrome_common_fg_chrome_size">70dp</dimen>
+    <dimen name="chrome_common_fg_chips_size">174dp</dimen>
+
+    <!-- Confirm -->
+    <dimen name="confirm_btn_margin_side">33.3dp</dimen>
+    <dimen name="confirm_btn_height">60dp</dimen>
+    <dimen name="confirm_btn_space">13.3dp</dimen>
+    <dimen name="confirm_btn_margin_bottom">67.3dp</dimen>
+    <dimen name="confirm_display_text_margin_top">46.7dp</dimen>
+    <dimen name="confirm_stt_text_margin_top">23.3dp</dimen>
+    <dimen name="confirm_navi_display_text_margin_top">46.7dp</dimen>
+    <dimen name="confirm_stt_text_margin_bottom">43.3dp</dimen>
+    <dimen name="confirm_chrome_text_side_margin">48dp</dimen>
+    <dimen name="confirm_navi_text_side_margin">33.3dp</dimen>
+    <dimen name="confirm_navi_info_text_size">18.7sp</dimen>
+    <dimen name="confirm_navi_charge_text_size">16sp</dimen>
+    <dimen name="confirm_navi_charge_text_side_margin">6.7dp</dimen>
+    <dimen name="confirm_navi_charge_height">24dp</dimen>
+
+    <!-- PBV -->
+    <dimen name="agent_window_x">10.7dp</dimen>
+    <dimen name="agent_window_y">10.7dp</dimen>
+    <dimen name="agent_min_height">153.3dp</dimen>
+    <dimen name="agent_mid_height">264dp</dimen>
+    <dimen name="agent_max_height">420.1dp</dimen>
+    <dimen name="agent_width">426.7dp</dimen>
+    <dimen name="agent_touch_area_width">853dp</dimen>
+    <dimen name="agent_touch_area_height">420dp</dimen>
+    <dimen name="agent_top_margin">28.7dp</dimen>
+    <dimen name="agent_start_margin">46.7dp</dimen>
+
+    <dimen name="row_start_margin">50dp</dimen>
+
+    <dimen name="icon_width">42dp</dimen>
+    <dimen name="padding_16">16.7dp</dimen>
+
+    <dimen name="dp_5_3">5.3dp</dimen>
+    <dimen name="dp_5_4">5.4dp</dimen>
+    <dimen name="dp_6_7">6.7dp</dimen>
+    <dimen name="dp_9_3">9.3dp</dimen>
+    <dimen name="dp_10">10dp</dimen>
+    <dimen name="dp_10_7">10.7dp</dimen>
+    <dimen name="dp_13_3">13.3dp</dimen>
+    <dimen name="dp_15">15dp</dimen>
+    <dimen name="dp_16">16dp</dimen>
+    <dimen name="dp_16_7">16.7dp</dimen>
+    <dimen name="dp_20">20dp</dimen>
+    <dimen name="dp_21_3">21.3dp</dimen>
+    <dimen name="dp_23_3">23.3dp</dimen>
+    <dimen name="dp_24">24dp</dimen>
+    <dimen name="dp_26">26dp</dimen>
+    <dimen name="dp_28">28dp</dimen>
+    <dimen name="dp_28_7">28.7dp</dimen>
+    <dimen name="dp_30">30dp</dimen>
+    <dimen name="dp_31_3">31.3dp</dimen>
+    <dimen name="dp_32">32dp</dimen>
+    <dimen name="dp_33">33dp</dimen>
+    <dimen name="dp_33_3">33.3dp</dimen>
+    <dimen name="dp_36_7">36.7dp</dimen>
+    <dimen name="dp_40">40dp</dimen>
+    <dimen name="dp_60">60dp</dimen>
+    <dimen name="dp_66_7">66.7dp</dimen>
+    <dimen name="dp_68_7">68.7dp</dimen>
+    <dimen name="dp_80">80dp</dimen>
+    <dimen name="dp_147_7">147.7dp</dimen>
+    <dimen name="dp_130">130dp</dimen>
+    <dimen name="dp_316">316dp</dimen>
+    <dimen name="dp_360">360dp</dimen>
+    <dimen name="fading_edge">116dp</dimen>
+    <dimen name="btn_large_w">360dp</dimen>
+
+    <dimen name="agent_close_icon_size">44dp</dimen>
+    <dimen name="agent_display_text_layout_margin_bottom">30dp</dimen>
+    <dimen name="agent_display_stt_text_height">67dp</dimen>
+    <dimen name="agent_display_listening_passive_text_top_margin">27dp</dimen>
+
+    <dimen name="agent_weather_icon_width">114.7dp</dimen>
+    <dimen name="agent_weather_icon_height">64dp</dimen>
+    <dimen name="agent_weather_icon_margin_top">54.7dp</dimen>
+    <dimen name="agent_weather_icon_margin_bottom">34.7dp</dimen>
+    <dimen name="agent_weather_icon_margin_start">91.3dp</dimen>
+
+    <dimen name="agent_weather_current_temp_text_size">36sp</dimen>
+    <dimen name="agent_weather_current_temp_margin_top">52dp</dimen>
+    <dimen name="agent_weather_minmax_temp_text_size">21.3sp</dimen>
+    <dimen name="agent_weather_dot_m_size">9.3dp</dimen>
+    <dimen name="agent_weather_dot_s_size">4.7dp</dimen>
+    <dimen name="agent_weather_temp_margin_start">20dp</dimen>
+    <dimen name="agent_weather_temp_dot_m_space">3.3dp</dimen>
+    <dimen name="agent_weather_temp_dot_m_margin_top">7dp</dimen>
+    <dimen name="agent_weather_temp_dot_s_space">3.3dp</dimen>
+    <dimen name="agent_weather_temp_dot_s_margin_top">4.7dp</dimen>
+    <dimen name="agent_weather_slash_width">6dp</dimen>
+    <dimen name="agent_weather_slash_height">15.3dp</dimen>
+
+    <dimen name="agent_weather_day_minmax_text_size">24sp</dimen>
+    <dimen name="agent_weather_day_slash_width">6.3dp</dimen>
+    <dimen name="agent_weather_day_slash_height">16.7dp</dimen>
+    <dimen name="agent_weather_day_rain_width">10.7dp</dimen>
+    <dimen name="agent_weather_day_rain_height">15.3dp</dimen>
+    <dimen name="agent_weather_day_rain_margin_top">9.3dp</dimen>
+
+    <dimen name="agent_weather_carwash_icon_size">25.3dp</dimen>
+    <dimen name="agent_weather_carwash_icon_margin_top">58dp</dimen>
+    <dimen name="agent_weather_carwash_icon_margin_start">159.3dp</dimen>
+    <dimen name="agent_weather_carwash_text_margin_start">12.6dp</dimen>
+    <dimen name="agent_weather_carwash_text_size">24sp</dimen>
+    <dimen name="agent_weather_carwash_title_margin_start">182dp</dimen>
+    <dimen name="agent_weather_carwash_title_margin_top">10dp</dimen>
+    <dimen name="agent_weather_carwash_title_size">18.7sp</dimen>
+    <dimen name="agent_weather_finedust_icon_size">21.3dp</dimen>
+    <dimen name="agent_weather_week_list_margin_top">53.3dp</dimen>
+    <dimen name="agent_weather_week_list_margin_side">52dp</dimen>
+    <dimen name="agent_weather_week_item_day_width">34dp</dimen>
+    <dimen name="agent_weather_week_item_day_text_size">20dp</dimen>
+    <dimen name="agent_weather_week_item_icon_width">66.7dp</dimen>
+    <dimen name="agent_weather_week_item_icon_height">40dp</dimen>
+    <dimen name="agent_weather_week_item_space">9.3dp</dimen>
+    <dimen name="agent_bg_radius">6dp</dimen>
+
+    <!-- Guidance -->
+    <dimen name="agent_guidance_refresh_button_height">50.7dp</dimen>
+
+    <!-- Navigation -->
+    <dimen name="agent_navigation_waypoint_guide_top">28.7dp</dimen>
+    <dimen name="agent_poi_list_fading_edge">85dp</dimen>
+    <dimen name="agent_route_list_fading_edge">116dp</dimen>
+    <dimen name="navi_list_item_start_guide">66.7dp</dimen>
+    <dimen name="navi_list_item_end_guide">36.7dp</dimen>
+    <dimen name="navi_list_item_bottom_guide">9.3dp</dimen>
+    <dimen name="navi_list_poi_seq_margin_top">6dp</dimen>
+    <dimen name="navi_list_poi_name_margin_top">6.7dp</dimen>
+
+    <!-- Communication -->
+    <dimen name="comm_category_icon_size">17.3dp</dimen>
+    <dimen name="comm_category_icon_margin_start">7.3dp</dimen>
+
+    <dimen name="weather_location_text_margin_top">13.3dp</dimen>
+
+
+</resources>

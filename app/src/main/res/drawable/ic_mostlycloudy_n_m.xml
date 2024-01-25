@@ -1,0 +1,38 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="172dp"
+    android:height="96dp"
+    android:viewportWidth="172"
+    android:viewportHeight="96">
+    <path
+        android:fillColor="#C8D9EC"
+        android:fillType="evenOdd"
+        android:pathData="M109.783 33.213c-0.009 -0.21 -0.014 -0.422 -0.014 -0.635 0 -7.5 6.143 -13.578 13.721 -13.578 6.825 0 12.486 4.931 13.544 11.39a8.286 8.286 0 0 1 2.921 -0.528c3.69 0 6.813 2.402 7.859 5.712a5.534 5.534 0 0 1 1.746 -0.28c3.031 0 5.488 2.43 5.488 5.43 0 3 -2.457 5.431 -5.488 5.431H108.671c-3.637 0 -6.586 -2.918 -6.586 -6.517 0 -3.6 2.949 -6.517 6.586 -6.517 0.379 0 0.751 0.031 1.112 0.092z" />
+    <path
+        android:fillAlpha="0.2"
+        android:fillColor="#FFFFFF"
+        android:pathData="M113 42A24 24 0 0 1 65 42A24 24 0 0 1 113 42Z" />
+    <path
+        android:fillType="evenOdd"
+        android:pathData="M107.566 46.055A15.954 15.954 0 0 1 96 51c-8.837 0 -16 -7.164 -16 -16 0 -4.548 1.898 -8.653 4.945 -11.566C76.4 25.29 70 32.898 70 42c0 10.493 8.507 19 19 19 9.102 0 16.708 -6.4 18.566 -14.945z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:endX="86.454"
+                android:endY="69.924"
+                android:startX="62.283"
+                android:startY="38.643"
+                android:tileMode="clamp">
+                <item
+                    android:color="#FFF05F"
+                    android:offset="0" />
+                <item
+                    android:color="#FFDF4F"
+                    android:offset="1" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillType="evenOdd"
+        android:pathData="M95 31c0 1.004 -0.494 2.498 -1.5 3.5 -0.998 0.994 -2.504 1.5 -3.5 1.5 1.004 0 2.498 0.494 3.5 1.5 0.994 0.998 1.5 2.504 1.5 3.5 0 -1.004 0.494 -2.498 1.5 -3.5 0.998 -0.994 2.504 -1.5 3.5 -1.5 -1.004 0 -2.498 -0.494 -3.5 -1.5 -0.994 -0.998 -1.5 -2.504 -1.5 -3.5zM90.897 81.671H26.25v-0.023a9.361 9.361 0 0 1 -0.651 0.023c-5.155 0 -9.334 -4.23 -9.334 -9.45 0 -5.009 3.85 -9.108 8.718 -9.429a16.869 16.869 0 0 1 -0.036 -1.094c0 -8.896 6.998 -16.107 15.63 -16.107 1.523 0 2.996 0.224 4.389 0.643C48.199 40.7 54.065 37 60.765 37c8.938 0 16.392 6.584 18.089 15.327a11.036 11.036 0 0 1 2.533 -0.293c6.234 0 11.287 5.192 11.287 11.597 0 0.786 -0.076 1.554 -0.22 2.297 3.59 0.717 6.298 3.936 6.298 7.797 0 4.24 -3.266 7.705 -7.38 7.934v0.012h-0.475z" />
+</vector>
