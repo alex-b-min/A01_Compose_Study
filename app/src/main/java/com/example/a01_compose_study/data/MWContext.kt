@@ -2,9 +2,8 @@ package com.example.a01_compose_study.data
 
 import com.example.a01_compose_study.domain.ParseDomainType
 import com.example.a01_compose_study.domain.VRResultListener
-import com.example.a01_compose_study.domain.model.ParseBundle
+import com.example.a01_compose_study.domain.util.ParseBundle
 import com.example.a01_compose_study.domain.util.CustomLogger
-import org.xml.sax.helpers.ParserFactory
 
 class MWContext(
     val dialogueMode: DialogueMode,

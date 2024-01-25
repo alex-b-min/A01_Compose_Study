@@ -1,6 +1,6 @@
 package com.example.a01_compose_study.ui.help
 
-import com.example.a01_compose_study.domain.model.ParseBundle
+import com.example.a01_compose_study.domain.util.ParseBundle
 
 sealed class HelpEvent {
     object CancelHelp : HelpEvent()
