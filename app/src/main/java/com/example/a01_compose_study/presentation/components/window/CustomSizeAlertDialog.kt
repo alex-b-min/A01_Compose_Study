@@ -131,7 +131,7 @@ fun CustomSizeAlertDialog(
                             Icon(
                                 imageVector = Icons.Default.Close,
                                 contentDescription = null,
-                                tint = contentColor
+                                tint = if (uiState.isError) Color.Red else contentColor
                             )
                         }
                     }
@@ -153,7 +153,7 @@ fun CustomSizeAlertDialog(
                             Icon(
                                 imageVector = Icons.Default.KeyboardArrowUp,
                                 contentDescription = null,
-                                tint = contentColor
+                                tint = if (uiState.isError) Color.Red else contentColor
                             )
                         }
                         IconButton(onClick = {
@@ -169,7 +169,7 @@ fun CustomSizeAlertDialog(
                             Icon(
                                 imageVector = Icons.Default.KeyboardArrowDown,
                                 contentDescription = null,
-                                tint = contentColor
+                                tint = if (uiState.isError) Color.Red else contentColor
                             )
                         }
                     }
@@ -177,41 +177,68 @@ fun CustomSizeAlertDialog(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.BottomCenter
                     ) {
-                        // Lottie Animation 배경 재생
-                        //TODO(에러에 대한 배경색 처리도 해야함)
-                        LottieAssetAnimationHandler(
-                            modifier = Modifier.fillMaxSize(),
-                            lottieJsonAssetPath = "bg_glow/09_tsd_frame_glow_l_lt.json",
-                            infiniteLoop = true
-                        )
-                        // Lottie Animation 음성 인식 재생
-                        LottieRawAnimationHandler(
-                            modifier = Modifier.fillMaxSize(),
-                            rawResId = R.raw.loop,
-                            infiniteLoop = true,
-                            onFrameChanged = { currentFrame ->
-                                // 현재 프레임에 따라 글자 투명도(Alpha)가 변하도록 설정
-                                textAlpha = currentFrame.let {
-                                    when (it) {
-                                        in 0F..10F -> 0F
-                                        in 10F..20F -> it.normalize(10F, 20F)
-                                        in 20F..40F -> 1F - (it.normalize(20F, 40F) * 0.5F)
-                                        else -> 0F
-                                    }
-                                } ?: 0F
-                            }
-                        )
+                        //error에 따른 애니메이션 재생 분기
+                        if (uiState.isError) {
+                            // Lottie Animation 배경 재생
+                            LottieAssetAnimationHandler(
+                                modifier = Modifier.fillMaxSize(),
+                                lottieJsonAssetPath = "bg_glow/frame_error_glow_l_lt.json",
+                                lottieImageAssetFolder = "bg_glow/images/error",
+                                infiniteLoop = true
+                            )
+                            LottieRawAnimationHandler(
+                                modifier = Modifier.fillMaxSize(),
+                                rawResId = R.raw.error_loop,
+                                infiniteLoop = true,
+                                onFrameChanged = { currentFrame ->
+                                    // 현재 프레임에 따라 글자 투명도(Alpha)가 변하도록 설정
+                                    textAlpha = currentFrame.let {
+                                        when (it) {
+                                            in 0F..10F -> 0F
+                                            in 10F..20F -> it.normalize(10F, 20F)
+                                            in 20F..40F -> 1F - (it.normalize(20F, 40F) * 0.5F)
+                                            else -> 0F
+                                        }
+                                    } ?: 0F
+                                }
+                            )
+                        } else {
+                            // Lottie Animation 배경 재생
+                            LottieAssetAnimationHandler(
+                                modifier = Modifier.fillMaxSize(),
+                                lottieJsonAssetPath = "bg_glow/09_tsd_frame_glow_l_lt.json",
+                                lottieImageAssetFolder = "bg_glow/images/default",
+                                infiniteLoop = true
+                            )
+                            LottieRawAnimationHandler(
+                                modifier = Modifier.fillMaxSize(),
+                                rawResId = R.raw.loop,
+                                infiniteLoop = true,
+                                onFrameChanged = { currentFrame ->
+                                    // 현재 프레임에 따라 글자 투명도(Alpha)가 변하도록 설정
+                                    textAlpha = currentFrame.let {
+                                        when (it) {
+                                            in 0F..10F -> 0F
+                                            in 10F..20F -> it.normalize(10F, 20F)
+                                            in 20F..40F -> 1F - (it.normalize(20F, 40F) * 0.5F)
+                                            else -> 0F
+                                        }
+                                    } ?: 0F
+                                }
+                            )
+                        }
                     }
+
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = uiState.text,
+                            text = if (uiState.isError) "Error" else uiState.text,
                             modifier = Modifier
                                 .alpha(textAlpha)
                                 .padding(bottom = 10.dp),
-                            color = contentColor,
+                            color = if (uiState.isError) Color.Red else contentColor,
                             fontSize = when (targetFillMaxHeight.value) {
                                 0.2f -> 15.sp
                                 0.4f -> 25.sp

@@ -39,7 +39,7 @@ fun MainRoute(
             is MainUiState.HelpWindow -> {
                 CustomSizeAlertDialog(
                     uiState = uiState as MainUiState.HelpWindow,
-                    contentColor = Color.Black,
+                    contentColor = Color.Green,
                     onDismiss = {
                         viewModel.onEvent(MainEvent.CloseWindowEvent)
                     })
@@ -96,6 +96,7 @@ fun MainRoute(
                 onClick = {
                     viewModel.onEvent(
                         event = MainEvent.OpenHelpWindowEvent(
+                            isError = false,
                             text = "HelpWindow",
                             screenSizeType = ScreenSizeType.Large
                         )
@@ -117,6 +118,13 @@ fun MainRoute(
                 modifier = Modifier.fillMaxSize(0.1f),
                 contentText = "Error",
                 onClick = {
+                    viewModel.onEvent(
+                        event = MainEvent.OpenHelpWindowEvent(
+                            isError = true,
+                            text = "HelpWindow",
+                            screenSizeType = ScreenSizeType.Large
+                        )
+                    )
                 }
             )
         }

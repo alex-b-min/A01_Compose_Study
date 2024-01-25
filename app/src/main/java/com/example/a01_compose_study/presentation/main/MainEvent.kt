@@ -6,6 +6,7 @@ sealed class MainEvent {
     object CloseWindowEvent : MainEvent()
 
     data class OpenHelpWindowEvent(
+        val isError: Boolean,
         val text: String,
         val screenSizeType: ScreenSizeType
     ) : MainEvent()
