@@ -8,7 +8,8 @@ sealed class MainUiState {
     object NoneWindow: MainUiState()
 
     data class HelpWindow(
-        val text: String,
+        val visible: Boolean,
+        val text: String = "",
         val screenSizeType: ScreenSizeType = ScreenSizeType.Small
     ) : MainUiState()
 

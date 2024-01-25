@@ -24,12 +24,21 @@ class MainViewModel @Inject constructor() : ViewModel() {
             is MainEvent.OpenHelpWindowEvent -> {
                 _uiState.update { uiState ->
                     MainUiState.HelpWindow(
+                        visible = true,
                         text = event.text,
                         screenSizeType = event.screenSizeType
                     )
                 }
             }
             // TODO(다른 시나리오 Window를 열었을 때 해당 Window를 띄우도록 해야함)
+        }
+    }
+
+    fun closeHelpWindow() {
+        _uiState.update {
+            MainUiState.HelpWindow(
+                visible = false
+            )
         }
     }
 }
