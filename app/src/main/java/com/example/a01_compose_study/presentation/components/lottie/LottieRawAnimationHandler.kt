@@ -4,6 +4,7 @@ import androidx.annotation.RawRes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieClipSpec
@@ -13,7 +14,8 @@ import com.airbnb.lottie.compose.rememberLottieAnimatable
 import com.airbnb.lottie.compose.rememberLottieComposition
 
 @Composable
-fun LottieAnimationHandler(
+fun LottieRawAnimationHandler(
+    modifier: Modifier,
     @RawRes rawResId: Int,
     infiniteLoop: Boolean = true,
     onFrameChanged: (Float) -> Unit,
