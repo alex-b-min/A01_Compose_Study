@@ -8,7 +8,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.drawToBitmap
-import com.ftd.ivi.cerence.util.CustomLogger
+import com.example.a01_compose_study.domain.util.CustomLogger
 
 @Composable
 fun CaptureBitmap(

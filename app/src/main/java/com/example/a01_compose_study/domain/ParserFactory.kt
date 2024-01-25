@@ -9,7 +9,8 @@ import com.example.a01_compose_study.domain.util.CustomLogger
 class ParserFactory {
 
 
-//    fun dataParsing(vrResult: VRResult, dialogueMode: DialogueMode? = null): ParseBundle<out Any>? {
+    fun dataParsing(vrResult: VRResult, dialogueMode: DialogueMode? = null): Unit {
+        TODO("데이터 파싱 로직 구")
 //        //val type = getDomainType(vrResult.intention, vrResult.domain, dialogueMode)
 //        val type = getDomainTypeByLoader(vrResult)
 //        val analyzer = createParser(type, dialogueMode)
@@ -36,14 +37,15 @@ class ParserFactory {
 //            }
 //        }
 //        return bundle
-//    }
+    }
 
-//    private fun createParser(
-//        domainType: ParseDomainType,
-//        dialogueMode: DialogueMode?
-//    ): BaseParser<out Any>? {
-//        CustomLogger.i("createAnalyzer")
-//
+    private fun createParser(
+        domainType: ParseDomainType,
+        dialogueMode: DialogueMode?
+    ): Unit {
+        TODO("타입에 따라 적절한 파서 생성")
+        CustomLogger.i("createAnalyzer")
+
 //        return when (domainType) {
 //            ParseDomainType.NAVI -> NavigationParser(dialogueMode)
 //            ParseDomainType.CALL -> CallParser()
@@ -64,7 +66,7 @@ class ParserFactory {
 //                }
 //            }
 //        }
-//    }
+    }
 
 //    private fun getDomainTypeByLoader(vrResult: VRResult): ParseDomainType {
 //        return IntentionLoader.findDomain(vrResult)

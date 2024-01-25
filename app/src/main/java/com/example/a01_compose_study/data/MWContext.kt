@@ -73,22 +73,23 @@ class MWContext(
     }
 
     fun onVRResult(vrResult: VRResult) {
-        CustomLogger.i("onVRResult ${dialogueMode} VRResult")
-        this.vrResult = vrResult
-        this.procState = ProcState.READY
-        bundle = com.example.a01_compose_study.domain.ParserFactory()
-            .dataParsing(vrResult, dialogueMode)
-        bundle?.let {
-            it.contextId = this.contextId
-            if (it.type == ParseDomainType.UNSUPPORTED_DOMAIN) {
-                resultListener.onVRError(HVRError.ERROR_HMI)
-            } else {
-                resultListener.onReceiveBundle(it)
-            }
-
-        } ?: run {
-            resultListener.onBundleParsingErr()
-        }
+        TODO("발화 후 결과값에 대한 로직 처")
+//        CustomLogger.i("onVRResult ${dialogueMode} VRResult")
+//        this.vrResult = vrResult
+//        this.procState = ProcState.READY
+//        bundle = com.example.a01_compose_study.domain.ParserFactory()리
+//            .dataParsing(vrResult, dialogueMode)
+//        bundle?.let {
+//            it.contextId = this.contextId
+//            if (it.type == ParseDomainType.UNSUPPORTED_DOMAIN) {
+//                resultListener.onVRError(HVRError.ERROR_HMI)
+//            } else {
+//                resultListener.onReceiveBundle(it)
+//            }
+//
+//        } ?: run {
+//            resultListener.onBundleParsingErr()
+//        }
     }
 
     override fun toString(): String {

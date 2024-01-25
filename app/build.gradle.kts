@@ -20,6 +20,9 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        buildConfigField("Boolean", "ACTIVITY_MODE", "false")
+        buildConfigField("Boolean", "isDevelopMode", "false")
     }
 
     buildTypes {
@@ -39,6 +42,7 @@ android {
         jvmTarget = JavaVersion.VERSION_17.toString()
     }
     buildFeatures {
+        viewBinding = true
         compose = true
     }
     composeOptions {
@@ -58,7 +62,6 @@ dependencies {
     implementation("androidx.activity:activity-compose:1.3.1")
     implementation("androidx.compose.foundation:foundation-android:1.5.4")
     implementation ("androidx.lifecycle:lifecycle-runtime-compose:2.6.0")
-    testImplementation("junit:junit:4.+")
     testImplementation("junit:junit:4.12")
     androidTestImplementation("androidx.test.ext:junit:1.1.3")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
@@ -83,6 +86,6 @@ dependencies {
     // Kotlin Extensions and Coroutines support for Room
     implementation("androidx.room:room-ktx:2.3.0")
 
-    implementation("androidx.constraintlayout:constraintlayout-compose:1.0.0-rc01")
-
+    // Gson Converter
+    implementation ("com.google.code.gson:gson:2.9.0")
 }

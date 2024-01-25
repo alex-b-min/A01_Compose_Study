@@ -21,17 +21,17 @@ class ParseBundle<T>(var type: ParseDomainType) : Parcelable {
     var phrase = ""
     var isBundleConsumed = false
 
-    constructor(parcel: Parcel) : this(TODO("type")) {
-        dialogue = parcel.readString()
-        prompt = gitparcel.readString()
-        promptId = parcel.readInt()
-        isStartRecog = parcel.readByte() != 0.toByte()
-        isBack = parcel.readByte() != 0.toByte()
-        isExit = parcel.readByte() != 0.toByte()
-        contextId = parcel.readValue(Int::class.java.classLoader) as? Int
-        phrase = parcel.readString()
-        isBundleConsumed = parcel.readByte() != 0.toByte()
-    }
+//    constructor(parcel: Parcel) : this(TODO("type")) {
+//        dialogue = parcel.readString()
+//        prompt = gitparcel.readString()
+//        promptId = parcel.readInt()
+//        isStartRecog = parcel.readByte() != 0.toByte()
+//        isBack = parcel.readByte() != 0.toByte()
+//        isExit = parcel.readByte() != 0.toByte()
+//        contextId = parcel.readValue(Int::class.java.classLoader) as? Int
+//        phrase = parcel.readString()
+//        isBundleConsumed = parcel.readByte() != 0.toByte()
+//    }
 
     fun print() {
         CustomLogger.i("AnalyzeType[$type]  Dialogue[$dialogue] Prompt[$prompt]")
@@ -54,13 +54,13 @@ class ParseBundle<T>(var type: ParseDomainType) : Parcelable {
         return 0
     }
 
-    companion object CREATOR : Parcelable.Creator<ParseBundle> {
-        override fun createFromParcel(parcel: Parcel): ParseBundle {
-            return ParseBundle(parcel)
-        }
-
-        override fun newArray(size: Int): Array<ParseBundle?> {
-            return arrayOfNulls(size)
-        }
-    }
+//    companion object CREATOR : Parcelable.Creator<ParseBundle> {
+//        override fun createFromParcel(parcel: Parcel): ParseBundle {
+//            return ParseBundle(parcel)
+//        }
+//
+//        override fun newArray(size: Int): Array<ParseBundle?> {
+//            return arrayOfNulls(size)
+//        }
+//    }
 }

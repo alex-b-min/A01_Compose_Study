@@ -22,7 +22,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
-import com.ftd.ivi.cerence.util.CustomLogger
+import com.example.a01_compose_study.domain.util.CustomLogger
 
 sealed class AutoSizeConstraint(open val min: TextUnit = TextUnit.Unspecified) {
     data class Width(override val min: TextUnit = TextUnit.Unspecified) : AutoSizeConstraint(min)

@@ -1,7 +1,11 @@
 package com.example.a01_compose_study.data
 
 import com.example.a01_compose_study.domain.model.ContentResult
+import com.ftd.ivi.cerence.data.model.server.cerence.VrResult
 import com.ftd.ivi.cerence.data.model.server.kakao.weather.Instruction
+import com.ftd.ivi.cerence.data.model.server.kakao.weather.VrActionResult
+import com.google.gson.annotations.Expose
+import com.google.gson.annotations.SerializedName
 
 
 class VRResult {
