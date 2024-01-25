@@ -48,7 +48,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun CustomAlertDialog(
-    uiState: MainUiState.OneScreen,
+    uiState: MainUiState.HelpWindow,
     contentColor: Color,
     onDismiss: () -> Unit,
 ) {
@@ -196,7 +196,7 @@ fun CustomAlertDialog(
 @Composable
 fun CustomAlertDialogPreview() {
     CustomAlertDialog(
-        uiState = MainUiState.OneScreen("OneScreen"),
+        uiState = MainUiState.HelpWindow("HelpWindow"),
         contentColor = Color.White,
         onDismiss = {
         })

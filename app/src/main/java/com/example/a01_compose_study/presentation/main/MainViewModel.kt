@@ -10,33 +10,26 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor() : ViewModel() {
 
-    private val _uiState = MutableStateFlow<MainUiState>(MainUiState.DoneScreen)
+    private val _uiState = MutableStateFlow<MainUiState>(MainUiState.NoneWindow)
     val uiState: StateFlow<MainUiState> = _uiState
 
     fun onEvent(event: MainEvent) {
         when (event) {
-            is MainEvent.Close -> {
+            is MainEvent.CloseWindowEvent -> {
                 _uiState.update { uiState ->
-                    MainUiState.DoneScreen
+                    MainUiState.NoneWindow
                 }
             }
 
-            is MainEvent.OneScreenOpen -> {
+            is MainEvent.OpenHelpWindowEvent -> {
                 _uiState.update { uiState ->
-                    MainUiState.OneScreen(
-                        text = event.text
-                    )
-                }
-            }
-
-            is MainEvent.TwoScreenOpen -> {
-                _uiState.update { uiState ->
-                    MainUiState.TwoScreen(
+                    MainUiState.HelpWindow(
                         text = event.text,
                         screenSizeType = event.screenSizeType
                     )
                 }
             }
+            // TODO(다른 시나리오 Window를 열었을 때 해당 Window를 띄우도록 해야함)
         }
     }
 }

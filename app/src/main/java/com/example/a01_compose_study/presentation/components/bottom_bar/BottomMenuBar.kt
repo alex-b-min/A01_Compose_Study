@@ -45,10 +45,8 @@ import com.example.a01_compose_study.R
 @Composable
 fun BottomMenuBar(
     isVisible: Boolean,
-    oneScreenOnClick: () -> Unit,
-    twoScreenOnClick: () -> Unit,
-    examScreenOnClick: () -> Unit
-    ) {
+    helpWindowOnClick: () -> Unit
+) {
 
     // 추후 코드 정리 필요
     val color = if (isVisible) {
@@ -65,20 +63,19 @@ fun BottomMenuBar(
                 fillMaxWidth()
                     .background(color = color)
                     .fillMaxHeight(0.10f)
-//                    .padding(top = 30.dp)
             },
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Spacer(modifier = Modifier.width(20.dp))
-            IconButton(onClick = { oneScreenOnClick() }) {
+            IconButton(onClick = { helpWindowOnClick() }) {
                 Icon(
                     Icons.Default.Info, contentDescription = null,
                     modifier = Modifier.size(30.dp),
                     tint = Color.White
                 )
             }
-            IconButton(onClick = { twoScreenOnClick() }) {
+            IconButton(onClick = { }) {
                 Icon(
                     Icons.Default.MoreVert, contentDescription = null,
                     modifier = Modifier.size(30.dp),
@@ -94,7 +91,9 @@ fun BottomMenuBar(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                IconButton(onClick = { examScreenOnClick() }) {
+                IconButton(onClick = {
+
+                }) {
                     Icon(
                         Icons.Default.KeyboardArrowLeft,
                         contentDescription = null,
@@ -261,6 +260,8 @@ fun BottomMenuBar(
 @Preview(device = Devices.TABLET)
 @Composable
 fun BottomMenuBarPreview() {
-    BottomMenuBar(isVisible = true, oneScreenOnClick = { /*TODO*/ }, twoScreenOnClick = { /*TODO*/ }) {
-    }
+    BottomMenuBar(
+        isVisible = true,
+        helpWindowOnClick = { /*TODO*/ }
+    )
 }

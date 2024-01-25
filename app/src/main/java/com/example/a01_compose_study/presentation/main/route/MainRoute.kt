@@ -16,7 +16,6 @@ import com.example.a01_compose_study.presentation.main.MainEvent
 import com.example.a01_compose_study.presentation.main.MainUiState
 import com.example.a01_compose_study.presentation.main.MainViewModel
 import com.example.a01_compose_study.presentation.components.bottom_bar.BottomMenuBar
-import com.example.a01_compose_study.presentation.components.window.CustomAlertDialog
 import com.example.a01_compose_study.presentation.components.window.CustomSizeAlertDialog
 
 @Composable
@@ -31,47 +30,57 @@ fun MainRoute(
         modifier = Modifier.fillMaxSize()
     ) {
         when (uiState) {
-            is MainUiState.DoneScreen -> {
+            is MainUiState.NoneWindow -> {
             }
 
-            is MainUiState.OneScreen -> {
-                CustomAlertDialog(
-                    uiState = uiState as MainUiState.OneScreen,
-                    contentColor = Color.White,
-                    onDismiss = {
-                        viewModel.onEvent(MainEvent.Close)
-                    })
-            }
-
-            is MainUiState.TwoScreen -> {
+            is MainUiState.HelpWindow -> {
                 CustomSizeAlertDialog(
-                    uiState = uiState as MainUiState.TwoScreen,
+                    uiState = uiState as MainUiState.HelpWindow,
                     contentColor = Color(0xFFCDDC39),
                     onDismiss = {
-                        viewModel.onEvent(MainEvent.Close)
+                        viewModel.onEvent(MainEvent.CloseWindowEvent)
                     })
+            }
+
+            is MainUiState.AnnounceWindow -> {
+
+            }
+
+            is MainUiState.MainMenuWindow -> {
+
+            }
+
+            is MainUiState.CallWindow -> {
+
+            }
+
+            is MainUiState.NavigationWindow -> {
+
+            }
+
+            is MainUiState.RadioWindow -> {
+
+            }
+
+            is MainUiState.WeatherWindow -> {
+
+            }
+
+            is MainUiState.SendMessageWindow -> {
+
             }
         }
 
         BottomMenuBar(
             isVisible = true,
-            oneScreenOnClick = {
+            helpWindowOnClick = {
                 viewModel.onEvent(
-                    event = MainEvent.OneScreenOpen(
-                        text = "OneScreen"
-                    )
-                )
-            },
-            twoScreenOnClick = {
-                viewModel.onEvent(
-                    event = MainEvent.TwoScreenOpen(
-                        text = "TwoScreen",
+                    event = MainEvent.OpenHelpWindowEvent(
+                        text = "HelpWindow",
                         screenSizeType = ScreenSizeType.Large
                     )
                 )
-            },
-            examScreenOnClick = {
-                visible = true
-            })
+            }
+        )
     }
 }

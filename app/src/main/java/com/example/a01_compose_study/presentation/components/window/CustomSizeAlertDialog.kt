@@ -48,7 +48,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun CustomSizeAlertDialog(
-    uiState: MainUiState.TwoScreen,
+    uiState: MainUiState.HelpWindow,
     contentColor: Color,
     onDismiss: () -> Unit,
 ) {
@@ -166,7 +166,7 @@ fun CustomSizeAlertDialog(
                         //Lottie Animation 재생
                         LottieAnimationHandler(
                             rawResId = R.raw.loop,
-                            infiniteLoop = false,
+                            infiniteLoop = true,
                             onFrameChanged = { currentFrame ->
                                 // 현재 프레임에 따라 글자 투명도(Alpha)가 변하도록 설정
                                 textAlpha = currentFrame.let {
@@ -206,7 +206,7 @@ fun CustomSizeAlertDialog(
 @Composable
 fun CustomSizeAlertDialogPreview() {
     CustomSizeAlertDialog(
-        uiState = MainUiState.TwoScreen(
+        uiState = MainUiState.HelpWindow(
             text = "string",
             screenSizeType = ScreenSizeType.Middle
         ),
