@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.sp
 import com.example.a01_compose_study.R
 import com.example.a01_compose_study.domain.ScreenType
 import com.example.a01_compose_study.domain.SealedDomainType
+import com.example.a01_compose_study.domain.model.HelpItemData
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.components.lottie.LottieAssetAnimationHandler
 import com.example.a01_compose_study.presentation.components.lottie.LottieRawAnimationHandler
@@ -274,23 +275,24 @@ fun HelpDummyScreen(
     }
 }
 
-@Preview(device = Devices.TABLET)
-@Composable
-fun VRWindow2Preview() {
-    com.example.a01_compose_study.presentation.window.vr_window.HelpDummyScreen(
-        mainUiState = MainUiState.HelpWindow(
-            domainType = SealedDomainType.Help,
-            screenType = ScreenType.HelpList,
-            visible = true,
-            text = "string",
-            screenSizeType = ScreenSizeType.Middle
-        ),
-        contentColor = Color.Magenta,
-        onDismiss = {
-
-        },
-        onBackButton = {
-
-        }
-    )
-}
+//@Preview(device = Devices.TABLET)
+//@Composable
+//fun VRWindow2Preview() {
+//HelpDummyScreen(
+//        mainUiState = MainUiState.HelpWindow(
+//            domainType = SealedDomainType.Help,
+//            screenType = ScreenType.HelpList,
+//            data = ainUiState.data as List<HelpItemData>,
+//            visible = true,
+//            text = "string",
+//            screenSizeType = ScreenSizeType.Middle
+//        ),
+//        contentColor = Color.Magenta,
+//        onDismiss = {
+//
+//        },
+//        onBackButton = {
+//
+//        }
+//    )
+//}
