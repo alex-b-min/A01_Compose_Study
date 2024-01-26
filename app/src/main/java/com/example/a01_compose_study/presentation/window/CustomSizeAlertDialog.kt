@@ -1,4 +1,4 @@
-package com.example.a01_compose_study.presentation.components.window
+package com.example.a01_compose_study.presentation.window
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
