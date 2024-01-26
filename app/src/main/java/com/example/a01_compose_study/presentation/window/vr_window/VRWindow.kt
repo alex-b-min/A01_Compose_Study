@@ -48,7 +48,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun VRWindow(
-    uiState: MainUiState.HelpWindow,
+    uiState: MainUiState.VRWindow,
     contentColor: Color,
     onDismiss: () -> Unit,
 ) {
@@ -256,7 +256,7 @@ fun VRWindow(
 @Composable
 fun CustomSizeAlertDialogPreview() {
     VRWindow(
-        uiState = MainUiState.HelpWindow(
+        uiState = MainUiState.VRWindow(
             visible = true,
             text = "string",
             screenSizeType = ScreenSizeType.Middle
