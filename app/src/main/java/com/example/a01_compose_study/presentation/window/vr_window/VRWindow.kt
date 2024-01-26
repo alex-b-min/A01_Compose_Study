@@ -1,4 +1,4 @@
-package com.example.a01_compose_study.presentation.components.window
+package com.example.a01_compose_study.presentation.window.vr_window
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
@@ -47,8 +47,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
-fun CustomSizeAlertDialog(
-    uiState: MainUiState.HelpWindow,
+fun VRWindow(
+    uiState: MainUiState.VRWindow,
     contentColor: Color,
     onDismiss: () -> Unit,
 ) {
@@ -255,8 +255,8 @@ fun CustomSizeAlertDialog(
 @Preview(device = Devices.TABLET)
 @Composable
 fun CustomSizeAlertDialogPreview() {
-    CustomSizeAlertDialog(
-        uiState = MainUiState.HelpWindow(
+    VRWindow(
+        uiState = MainUiState.VRWindow(
             visible = true,
             text = "string",
             screenSizeType = ScreenSizeType.Middle

@@ -5,6 +5,12 @@ import com.example.a01_compose_study.domain.util.ScreenSizeType
 sealed class MainEvent {
     object CloseWindowEvent : MainEvent()
 
+    data class OpenVRWindowEvent(
+        val isError: Boolean,
+        val text: String,
+        val screenSizeType: ScreenSizeType
+    ) : MainEvent()
+
     data class OpenHelpWindowEvent(
         val isError: Boolean,
         val text: String,

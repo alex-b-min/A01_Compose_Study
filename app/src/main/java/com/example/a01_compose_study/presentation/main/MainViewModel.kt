@@ -21,13 +21,13 @@ class MainViewModel @Inject constructor() : ViewModel() {
                 }
             }
 
-            is MainEvent.OpenHelpWindowEvent -> {
+            is MainEvent.OpenVRWindowEvent -> {
                 _uiState.update { uiState ->
                     /**
                      * TODO 여기서 데이터와 관련된 비즈니스 로직을 실행하고 그 결과값(success/true)을 isError 인자에 넣어준다.
                      * 하지만 현재, 데이터 발행이 없기에 이벤트가 발생될 때 직접 생성하는 방식으로 성공과 에러를 발생시키도록 한다.
                      */
-                    MainUiState.HelpWindow(
+                    MainUiState.VRWindow(
                         visible = true,
                         isError = event.isError,
                         text = event.text,
@@ -35,15 +35,20 @@ class MainViewModel @Inject constructor() : ViewModel() {
                     )
                 }
             }
+
+            is MainEvent.OpenHelpWindowEvent -> {
+
+            }
+
             // TODO(다른 시나리오 Window를 열었을 때 해당 Window를 띄우도록 해야함)
         }
     }
 
-    fun closeHelpWindow() {
+    fun closeVRWindow() {
         // 현재의 error 상태에 따른 glow 애니메이션창을 내려야하기 때문에 isError에 uiState.isError로 설정
-        if (_uiState.value is MainUiState.HelpWindow) {
+        if (_uiState.value is MainUiState.VRWindow) {
             _uiState.update { uiState ->
-                (uiState as? MainUiState.HelpWindow)?.copy(
+                (uiState as? MainUiState.VRWindow)?.copy(
                     visible = false,
                     isError = uiState.isError
                 ) ?: uiState

@@ -5,6 +5,13 @@ import com.example.a01_compose_study.domain.util.ScreenSizeType
 sealed class MainUiState {
 
     // TODO(각 시나리오 별 윈도우 정의, 추후 시나리오 별 필요한 데이터를 정의해야 함)
+    data class VRWindow(
+        val visible: Boolean,
+        val isError: Boolean = false,
+        val text: String = "",
+        val screenSizeType: ScreenSizeType = ScreenSizeType.Small
+    ): MainUiState()
+
     object NoneWindow: MainUiState()
 
     data class HelpWindow(

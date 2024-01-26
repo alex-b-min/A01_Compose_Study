@@ -15,7 +15,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.components.button.PttButton
-import com.example.a01_compose_study.presentation.components.window.CustomSizeAlertDialog
+import com.example.a01_compose_study.presentation.window.vr_window.VRWindow
 import com.example.a01_compose_study.presentation.main.MainEvent
 import com.example.a01_compose_study.presentation.main.MainUiState
 import com.example.a01_compose_study.presentation.main.MainViewModel
@@ -33,16 +33,20 @@ fun MainRoute(
         modifier = Modifier.fillMaxSize()
     ) {
         when (uiState) {
-            is MainUiState.NoneWindow -> {
-            }
-
-            is MainUiState.HelpWindow -> {
-                CustomSizeAlertDialog(
-                    uiState = uiState as MainUiState.HelpWindow,
+            is MainUiState.VRWindow -> {
+                VRWindow(
+                    uiState = uiState as MainUiState.VRWindow,
                     contentColor = Color.Green,
                     onDismiss = {
                         viewModel.onEvent(MainEvent.CloseWindowEvent)
                     })
+            }
+
+            is MainUiState.NoneWindow -> {
+            }
+
+            is MainUiState.HelpWindow -> {
+
             }
 
             is MainUiState.AnnounceWindow -> {
@@ -74,17 +78,6 @@ fun MainRoute(
             }
         }
 
-//        BottomMenuBar(
-//            isVisible = true,
-//            helpWindowOnClick = {
-//                viewModel.onEvent(
-//                    event = MainEvent.OpenHelpWindowEvent(
-//                        text = "HelpWindow",
-//                        screenSizeType = ScreenSizeType.Large
-//                    )
-//                )
-//            }
-//        )
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -95,9 +88,9 @@ fun MainRoute(
                 contentText = "Open",
                 onClick = {
                     viewModel.onEvent(
-                        event = MainEvent.OpenHelpWindowEvent(
+                        event = MainEvent.OpenVRWindowEvent(
                             isError = false,
-                            text = "HelpWindow",
+                            text = "VRWindow",
                             screenSizeType = ScreenSizeType.Large
                         )
                     )
@@ -108,7 +101,7 @@ fun MainRoute(
                 contentText = "Close",
                 onClick = {
                     scope.launch {
-                        viewModel.closeHelpWindow()
+                        viewModel.closeVRWindow()
                         delay(500)
                         viewModel.onEvent(MainEvent.CloseWindowEvent)
                     }
@@ -119,9 +112,9 @@ fun MainRoute(
                 contentText = "Error",
                 onClick = {
                     viewModel.onEvent(
-                        event = MainEvent.OpenHelpWindowEvent(
+                        event = MainEvent.OpenVRWindowEvent(
                             isError = true,
-                            text = "HelpWindow",
+                            text = "VRWindow",
                             screenSizeType = ScreenSizeType.Large
                         )
                     )
