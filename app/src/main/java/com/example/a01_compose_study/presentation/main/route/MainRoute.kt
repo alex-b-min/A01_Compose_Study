@@ -15,7 +15,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.components.button.PttButton
-import com.example.a01_compose_study.presentation.window.CustomSizeAlertDialog
+import com.example.a01_compose_study.presentation.window.vr_window.VRWindow
 import com.example.a01_compose_study.presentation.main.MainEvent
 import com.example.a01_compose_study.presentation.main.MainUiState
 import com.example.a01_compose_study.presentation.main.MainViewModel
@@ -37,7 +37,7 @@ fun MainRoute(
             }
 
             is MainUiState.HelpWindow -> {
-                CustomSizeAlertDialog(
+                VRWindow(
                     uiState = uiState as MainUiState.HelpWindow,
                     contentColor = Color.Green,
                     onDismiss = {
