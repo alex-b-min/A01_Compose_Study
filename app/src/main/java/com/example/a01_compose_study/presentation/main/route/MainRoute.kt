@@ -19,6 +19,8 @@ import com.example.a01_compose_study.presentation.window.vr_window.VRWindow
 import com.example.a01_compose_study.presentation.main.MainEvent
 import com.example.a01_compose_study.presentation.main.MainUiState
 import com.example.a01_compose_study.presentation.main.MainViewModel
+import com.example.a01_compose_study.presentation.main.VREvent
+import com.example.a01_compose_study.presentation.main.VRUiState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -27,26 +29,54 @@ fun MainRoute(
     viewModel: MainViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val vrUiState by viewModel.vrUiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
 
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        when (uiState) {
-            is MainUiState.VRWindow -> {
-                VRWindow(
-                    uiState = uiState as MainUiState.VRWindow,
-                    contentColor = Color.Green,
-                    onDismiss = {
-                        viewModel.onEvent(MainEvent.CloseWindowEvent)
-                    })
+
+        when (vrUiState) {
+            is VRUiState.NoneWindow -> {
+
             }
 
+            is VRUiState.VRWindow -> {
+                VRWindow(
+                    vrUiState = vrUiState as VRUiState.VRWindow,
+                    contentColor = Color.Green,
+                    onDismiss = {
+                        viewModel.onDomainEvent(MainEvent.CloseDomainWindowEvent)
+                        viewModel.onVREvent(VREvent.CloseVRWindowEvent)
+                    }
+                )
+            }
+        }
+
+
+        when (uiState) {
             is MainUiState.NoneWindow -> {
             }
 
             is MainUiState.HelpWindow -> {
-
+                //ToDo(Help 윈도우 띄우기)
+                com.example.a01_compose_study.presentation.window.vr_window.HelpDummyScreen(
+                    mainUiState = uiState as MainUiState.HelpWindow,
+                    contentColor = Color.Red,
+                    onDismiss = {
+                        viewModel.onDomainEvent(MainEvent.CloseDomainWindowEvent)
+                    },
+                    onBackButton = {
+                        viewModel.onDomainEvent(MainEvent.CloseDomainWindowEvent)
+                        viewModel.onVREvent(
+                            event = VREvent.OpenVRWindowEvent(
+                                isError = false,
+                                text = "음성 인식 중 입니다...",
+                                screenSizeType = ScreenSizeType.Middle
+                            )
+                        )
+                    }
+                )
             }
 
             is MainUiState.AnnounceWindow -> {
@@ -84,38 +114,49 @@ fun MainRoute(
             horizontalAlignment = Alignment.End
         ) {
             PttButton(
-                modifier = Modifier.fillMaxSize(0.1f),
-                contentText = "Open",
+                modifier = Modifier.fillMaxSize(0.13f),
+                contentText = "VR Open",
                 onClick = {
-                    viewModel.onEvent(
-                        event = MainEvent.OpenVRWindowEvent(
+                    viewModel.onVREvent(
+                        event = VREvent.OpenVRWindowEvent(
                             isError = false,
-                            text = "VRWindow",
-                            screenSizeType = ScreenSizeType.Large
+                            text = "음성 인식 중 입니다...",
+                            screenSizeType = ScreenSizeType.Middle
                         )
                     )
                 }
             )
             PttButton(
-                modifier = Modifier.fillMaxSize(0.1f),
-                contentText = "Close",
+                modifier = Modifier.fillMaxSize(0.13f),
+                contentText = "VR Close",
                 onClick = {
                     scope.launch {
                         viewModel.closeVRWindow()
                         delay(500)
-                        viewModel.onEvent(MainEvent.CloseWindowEvent)
+                        viewModel.onVREvent(VREvent.CloseVRWindowEvent)
                     }
                 }
             )
             PttButton(
-                modifier = Modifier.fillMaxSize(0.1f),
+                modifier = Modifier.fillMaxSize(0.13f),
+                contentText = "Help Close",
+                onClick = {
+                    scope.launch {
+                        viewModel.closeHelpWindow()
+                        delay(500)
+                        viewModel.onDomainEvent(MainEvent.CloseDomainWindowEvent)
+                    }
+                }
+            )
+            PttButton(
+                modifier = Modifier.fillMaxSize(0.13f),
                 contentText = "Error",
                 onClick = {
-                    viewModel.onEvent(
-                        event = MainEvent.OpenVRWindowEvent(
+                    viewModel.onVREvent(
+                        event = VREvent.OpenVRWindowEvent(
                             isError = true,
-                            text = "VRWindow",
-                            screenSizeType = ScreenSizeType.Large
+                            text = "음성 인식 오류...",
+                            screenSizeType = ScreenSizeType.Middle
                         )
                     )
                 }

@@ -1,54 +1,169 @@
 package com.example.a01_compose_study.presentation.main
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.a01_compose_study.domain.ScreenType
+import com.example.a01_compose_study.domain.SealedDomainType
+import com.example.a01_compose_study.domain.usecase.HelpUsecase
+import com.example.a01_compose_study.domain.util.ScreenSizeType
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MainViewModel @Inject constructor() : ViewModel() {
+class MainViewModel @Inject constructor(
+    private val helpUsecase: HelpUsecase,
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow<MainUiState>(MainUiState.NoneWindow)
     val uiState: StateFlow<MainUiState> = _uiState
 
-    fun onEvent(event: MainEvent) {
+    private val _vrUiState = MutableStateFlow<VRUiState>(VRUiState.NoneWindow)
+    val vrUiState: StateFlow<VRUiState> = _vrUiState
+
+    fun onVREvent(event: VREvent) {
         when (event) {
-            is MainEvent.CloseWindowEvent -> {
+            is VREvent.CloseVRWindowEvent -> {
+                _vrUiState.update { visible ->
+                    VRUiState.NoneWindow
+                }
                 _uiState.update { uiState ->
                     MainUiState.NoneWindow
                 }
             }
 
-            is MainEvent.OpenVRWindowEvent -> {
+            is VREvent.OpenVRWindowEvent -> {
                 _uiState.update { uiState ->
-                    /**
-                     * TODO 여기서 데이터와 관련된 비즈니스 로직을 실행하고 그 결과값(success/true)을 isError 인자에 넣어준다.
-                     * 하지만 현재, 데이터 발행이 없기에 이벤트가 발생될 때 직접 생성하는 방식으로 성공과 에러를 발생시키도록 한다.
-                     */
-                    MainUiState.VRWindow(
+                    MainUiState.NoneWindow
+                }
+
+                _vrUiState.update { vrUiState ->
+                    VRUiState.VRWindow(
                         visible = true,
                         isError = event.isError,
                         text = event.text,
                         screenSizeType = event.screenSizeType
                     )
                 }
+
+                viewModelScope.launch {
+                    /**
+                     * TODO 추후 UseCase()의 결과값을 통해 자동으로 DomainType이 주입 되야함
+                     * 현재는 helpUsecase()로부터 값을 받아오기 때문에 도메인 타입이 Help로 고정됨
+                     */
+                    delay(2500)
+                    if (event.isError) {
+                        // 에러일때 VR 윈도우 재호출
+                        onVREvent(
+                            event = VREvent.OpenVRWindowEvent(
+                                isError = false,
+                                text = "음성 인식 중 입니다...",
+                                screenSizeType = ScreenSizeType.Middle
+                            )
+                        )
+                    } else { // 에러가 아닐 때 다음 DomainEvent 발행
+                        val helpList = helpUsecase()
+                        if (uiState.value !is MainUiState.NoneWindow) {
+                            _vrUiState.update { visible ->
+                                VRUiState.NoneWindow
+                            }
+                        }
+                        if (helpList.isNotEmpty()) {
+                            _vrUiState.update { visible ->
+                                VRUiState.NoneWindow
+                            }
+                        }
+                        onDomainEvent(
+                            event = MainEvent.OpenDomainWindowEvent(
+                                domainType = SealedDomainType.Help,
+                                screenType = ScreenType.HelpList,
+                                data = helpList,
+                                isError = false,
+                                screenSizeType = ScreenSizeType.Middle
+                            )
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    fun onDomainEvent(event: MainEvent) {
+        when (event) {
+            is MainEvent.CloseDomainWindowEvent -> {
+                _uiState.update { uiState ->
+                    MainUiState.NoneWindow
+                }
             }
 
-            is MainEvent.OpenHelpWindowEvent -> {
+            is MainEvent.OpenDomainWindowEvent -> {
+                _uiState.update { uiState ->
+                    val mainUiState = when (event.domainType) {
+                        SealedDomainType.None -> {
+                            MainUiState.NoneWindow
+                        }
 
+                        SealedDomainType.Help -> {
+                            MainUiState.HelpWindow(
+                                domainType = event.domainType,
+                                screenType = event.screenType,
+                                visible = true,
+                                text = "HelpWindow",
+                                screenSizeType = ScreenSizeType.Large
+                            )
+                        }
+
+                        SealedDomainType.Announce -> {
+                            MainUiState.AnnounceWindow
+                        }
+
+                        SealedDomainType.MainMenu -> {
+                            MainUiState.MainMenuWindow
+                        }
+
+                        SealedDomainType.Call -> {
+                            MainUiState.CallWindow
+                        }
+
+                        SealedDomainType.Navigation -> {
+                            MainUiState.NavigationWindow
+                        }
+
+                        SealedDomainType.Radio -> {
+                            MainUiState.RadioWindow
+                        }
+
+                        else -> {
+                            MainUiState.WeatherWindow
+                        }
+                    }
+                    mainUiState
+                }
             }
-
-            // TODO(다른 시나리오 Window를 열었을 때 해당 Window를 띄우도록 해야함)
         }
     }
 
     fun closeVRWindow() {
         // 현재의 error 상태에 따른 glow 애니메이션창을 내려야하기 때문에 isError에 uiState.isError로 설정
-        if (_uiState.value is MainUiState.VRWindow) {
+        if (_vrUiState.value is VRUiState.VRWindow) {
+            _vrUiState.update { vrUiState ->
+                (vrUiState as? VRUiState.VRWindow)?.copy(
+                    visible = false,
+                    isError = vrUiState.isError
+                ) ?: vrUiState
+            }
+        }
+    }
+
+    fun closeHelpWindow() {
+        // 현재의 error 상태에 따른 glow 애니메이션창을 내려야하기 때문에 isError에 uiState.isError로 설정
+        if (_uiState.value is MainUiState.HelpWindow) {
             _uiState.update { uiState ->
-                (uiState as? MainUiState.VRWindow)?.copy(
+                (uiState as? MainUiState.HelpWindow)?.copy(
                     visible = false,
                     isError = uiState.isError
                 ) ?: uiState
