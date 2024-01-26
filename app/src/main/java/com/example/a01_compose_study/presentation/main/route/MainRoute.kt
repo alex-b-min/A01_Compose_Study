@@ -21,6 +21,7 @@ import com.example.a01_compose_study.presentation.main.MainUiState
 import com.example.a01_compose_study.presentation.main.MainViewModel
 import com.example.a01_compose_study.presentation.main.VREvent
 import com.example.a01_compose_study.presentation.main.VRUiState
+import com.example.a01_compose_study.ui.help.ComposeHelpScreen
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -60,23 +61,31 @@ fun MainRoute(
 
             is MainUiState.HelpWindow -> {
                 //ToDo(Help 윈도우 띄우기)
-                com.example.a01_compose_study.presentation.window.vr_window.HelpDummyScreen(
-                    mainUiState = uiState as MainUiState.HelpWindow,
+//                com.example.a01_compose_study.presentation.window.vr_window.HelpDummyScreen(
+//                    mainUiState = uiState as MainUiState.HelpWindow,
+//                    contentColor = Color.Red,
+//                    onDismiss = {
+//                        viewModel.onDomainEvent(MainEvent.CloseDomainWindowEvent)
+//                    },
+//                    onBackButton = {
+//                        viewModel.onDomainEvent(MainEvent.CloseDomainWindowEvent)
+//                        viewModel.onVREvent(
+//                            event = VREvent.OpenVRWindowEvent(
+//                                isError = false,
+//                                text = "음성 인식 중 입니다...",
+//                                screenSizeType = ScreenSizeType.Middle
+//                            )
+//                        )
+//                    }
+//                )
+                ComposeHelpScreen(mainUiState = uiState as MainUiState.HelpWindow,
                     contentColor = Color.Red,
                     onDismiss = {
-                        viewModel.onDomainEvent(MainEvent.CloseDomainWindowEvent)
+                        /*TODO*/
                     },
                     onBackButton = {
-                        viewModel.onDomainEvent(MainEvent.CloseDomainWindowEvent)
-                        viewModel.onVREvent(
-                            event = VREvent.OpenVRWindowEvent(
-                                isError = false,
-                                text = "음성 인식 중 입니다...",
-                                screenSizeType = ScreenSizeType.Middle
-                            )
-                        )
-                    }
-                )
+                        /*TODO*/
+                    })
             }
 
             is MainUiState.AnnounceWindow -> {

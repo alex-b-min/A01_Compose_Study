@@ -111,6 +111,7 @@ class MainViewModel @Inject constructor(
                             MainUiState.HelpWindow(
                                 domainType = event.domainType,
                                 screenType = event.screenType,
+                                data = event.data,
                                 visible = true,
                                 text = "HelpWindow",
                                 screenSizeType = ScreenSizeType.Large
