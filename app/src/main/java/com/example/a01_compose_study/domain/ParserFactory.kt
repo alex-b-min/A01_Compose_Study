@@ -6,35 +6,35 @@ import com.example.a01_compose_study.domain.util.CustomLogger
 class ParserFactory {
 
 
-    fun dataParsing(vrResult: VRResult, dialogueMode: DialogueMode? = null): Unit {
-        TODO("데이터 파싱 로직 구")
-//        //val type = getDomainType(vrResult.intention, vrResult.domain, dialogueMode)
-//        val type = getDomainTypeByLoader(vrResult)
-//        val analyzer = createParser(type, dialogueMode)
-//        CustomLogger.e("dataParsing Intention:${vrResult.intention}, dataSize : ${vrResult.result?.size}")
-//        // TODO 여기서 내가 어떤 analyzer인지 알필요없이, 데이터를 넣어줄순있을것같은데...
-//        // 이걸 사용하는 곳에서 model as NavigationModel이런식으로 해야 꺼낼수있을것 같긴한데...
-//        // Bundle에 타입을 같이 추가해주면 캐스팅이 가능하려나....
-//        val bundle = analyzer?.analyze(vrResult)
-//        if (Intentions.Back.isEqual(vrResult.intention)) {
-//            bundle?.isBack = true
-//        }
-//        if (Intentions.Exit.isEqual(vrResult.intention)) {
-//            bundle?.isExit = true
-//        }
-//        if (type == ParseDomainType.LAUNCHAPP) {
-//            bundle?.type = ParseDomainType.LAUNCHAPP
-//        }
-//        if (type == ParseDomainType.UNSUPPORTED_DOMAIN) {
-//            bundle?.type = ParseDomainType.UNSUPPORTED_DOMAIN
-//        }
-//        if (!vrResult.result.isNullOrEmpty()) {
-//            vrResult.result?.first()?.phrase?.let {
-//                bundle?.phrase = it
-//            }
-//        }
-//        return bundle
-    }
+//    fun dataParsing(vrResult: VRResult, dialogueMode: DialogueMode? = null): Unit {
+//        TODO("데이터 파싱 로직 구")
+////        //val type = getDomainType(vrResult.intention, vrResult.domain, dialogueMode)
+////        val type = getDomainTypeByLoader(vrResult)
+////        val analyzer = createParser(type, dialogueMode)
+////        CustomLogger.e("dataParsing Intention:${vrResult.intention}, dataSize : ${vrResult.result?.size}")
+////        // TODO 여기서 내가 어떤 analyzer인지 알필요없이, 데이터를 넣어줄순있을것같은데...
+////        // 이걸 사용하는 곳에서 model as NavigationModel이런식으로 해야 꺼낼수있을것 같긴한데...
+////        // Bundle에 타입을 같이 추가해주면 캐스팅이 가능하려나....
+////        val bundle = analyzer?.analyze(vrResult)
+////        if (Intentions.Back.isEqual(vrResult.intention)) {
+////            bundle?.isBack = true
+////        }
+////        if (Intentions.Exit.isEqual(vrResult.intention)) {
+////            bundle?.isExit = true
+////        }
+////        if (type == ParseDomainType.LAUNCHAPP) {
+////            bundle?.type = ParseDomainType.LAUNCHAPP
+////        }
+////        if (type == ParseDomainType.UNSUPPORTED_DOMAIN) {
+////            bundle?.type = ParseDomainType.UNSUPPORTED_DOMAIN
+////        }
+////        if (!vrResult.result.isNullOrEmpty()) {
+////            vrResult.result?.first()?.phrase?.let {
+////                bundle?.phrase = it
+////            }
+////        }
+////        return bundle
+//    }
 
     private fun createParser(
         domainType: ParseDomainType,
