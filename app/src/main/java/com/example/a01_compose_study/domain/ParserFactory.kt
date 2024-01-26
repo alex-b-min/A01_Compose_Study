@@ -1,11 +1,9 @@
-//package com.example.a01_compose_study.domain
-//
-//import com.example.a01_compose_study.data.DialogueMode
-//import com.example.a01_compose_study.domain.util.CustomLogger
-//
+package com.example.a01_compose_study.domain
+
+import com.example.a01_compose_study.data.DialogueMode
+import com.example.a01_compose_study.domain.util.CustomLogger
+
 //class ParserFactory {
-//
-//
 //    fun dataParsing(vrResult: VRResult, dialogueMode: DialogueMode? = null): Unit {
 //        TODO("데이터 파싱 로직 구")
 ////        //val type = getDomainType(vrResult.intention, vrResult.domain, dialogueMode)
@@ -35,6 +33,7 @@
 ////        }
 ////        return bundle
 //    }
+
 //
 //    private fun createParser(
 //        domainType: ParseDomainType,
@@ -90,6 +89,7 @@
 //                    }
 //
 //                    else -> type = ParseDomainType.NAVI
+
 //                }
 //            }
 //

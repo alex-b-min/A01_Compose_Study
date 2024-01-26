@@ -9,5 +9,5 @@ data class HelpModel(var intent: String) : BaseModel(intent) {
 data class HelpItemData(
     var domainId: String = StringUtils.EMPTY,
     var command: String,
-    var commandsDetail: MutableList<String> = mutableListOf()
+    var commandsDetail: List<String> = mutableListOf()
 )
