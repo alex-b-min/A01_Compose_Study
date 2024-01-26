@@ -39,9 +39,10 @@ import com.example.a01_compose_study.domain.model.HelpItemData
 @Composable
 fun ComposeHelpScreen(
 
-){
+) {
 
 }
+
 @Composable
 fun <T> List(
     helpList: List<T>,
