@@ -48,4 +48,18 @@ sealed class MainUiState(
     data class SendMessageWindow(
         override val screenSizeType: ScreenSizeType = ScreenSizeType.Small
     ) : MainUiState(screenSizeType)
+
+    fun copyWithNewSizeType(sizeType: ScreenSizeType): MainUiState {
+        return when (this) {
+            is NoneWindow -> copy(screenSizeType = sizeType)
+            is HelpWindow -> copy(screenSizeType = sizeType)
+            is AnnounceWindow -> copy(screenSizeType = sizeType)
+            is MainMenuWindow -> copy(screenSizeType = sizeType)
+            is CallWindow -> copy(screenSizeType = sizeType)
+            is NavigationWindow -> copy(screenSizeType = sizeType)
+            is RadioWindow -> copy(screenSizeType = sizeType)
+            is WeatherWindow -> copy(screenSizeType = sizeType)
+            is SendMessageWindow -> copy(screenSizeType = sizeType)
+        }
+    }
 }

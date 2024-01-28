@@ -189,4 +189,15 @@ class MainViewModel @Inject constructor(
     fun openDomainWindow() {
         _domainWindowVisible.value = true
     }
+
+    /**
+     * 현재 데이터는 유지한 체 ScreenSizeType 프로퍼티만 변경하기
+     * ==> 즉, 현재 화면에서 직접적으로 화면 크기를 변경하게 할 수 있음
+     * MainUiState에 미리 copyWithNewSizeType()라는 함수를 정의하여 기존 데이터는 유지한 체 screenSizeType 만을 변경하여 사용하도록 함.
+     */
+    fun changeDomainScreenSizeType(sizeType: ScreenSizeType) {
+        _uiState.update { uiState ->
+            uiState.copyWithNewSizeType(sizeType)
+        }
+    }
 }

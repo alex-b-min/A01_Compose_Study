@@ -51,8 +51,8 @@ fun ComposeHelpScreen(
     mainUiState: MainUiState.HelpWindow,
     contentColor: Color,
     onDismiss: () -> Unit,
-    onBackButton: () -> Unit,
-    onScreenSizeChange: (ScreenSizeType) -> Unit
+    onHelpListBackButton: () -> Unit,
+    onScreenSizeChange: (ScreenSizeType) -> Unit,
 ) {
     /**
      * [Help Window -> Help Detail Window 띄우기 생각한 방법]
@@ -77,6 +77,7 @@ fun ComposeHelpScreen(
                     onDismiss()
                 },
                 onBackButton = {
+                    onDismiss()
                 },
                 onScreenSizeChange = { screenSizeType ->
                     onScreenSizeChange(screenSizeType)
@@ -91,7 +92,7 @@ fun ComposeHelpScreen(
 @Composable
 fun <T> List(
     helpList: List<T>,
-    helpListContent: @Composable (T) -> Unit
+    helpListContent: @Composable (T) -> Unit,
 ) {
     LazyColumn {
         items(helpList.size) { index ->
@@ -107,7 +108,7 @@ fun HelpListWindow(
     helpList: List<HelpItemData>,
     onDismiss: () -> Unit,
     onBackButton: () -> Unit,
-    onScreenSizeChange: (ScreenSizeType) -> Unit
+    onScreenSizeChange: (ScreenSizeType) -> Unit,
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -121,7 +122,7 @@ fun HelpListWindow(
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                IconButton(onClick = {
+                IconButton(onClick = { // 닫기 버튼
                     onDismiss()
                 }) {
                     Icon(
@@ -130,7 +131,7 @@ fun HelpListWindow(
                         tint = if (mainUiState.isError) Color.Red else contentColor
                     )
                 }
-                IconButton(onClick = {
+                IconButton(onClick = { // 뒤로가기 버튼
                     /**
                      * TODO: 뒤로가기 버튼 로직 구현
                      */
@@ -143,6 +144,7 @@ fun HelpListWindow(
                 }
             }
 
+            // List UI
             List(helpList = helpList) { helpItemData ->
                 HelpListItem(
                     domainId = helpItemData.domainId,
@@ -150,13 +152,23 @@ fun HelpListWindow(
                 )
             }
         }
+
+        /**
+         * 창 조절하는 아이콘들 테스트용
+         */
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.End,
             verticalArrangement = Arrangement.Center
         ) {
             IconButton(onClick = {
-                onScreenSizeChange(ScreenSizeType.Large)
+                //현재 사이즈 타입을 확인하여 변경할 새로운 사이즈 타입을 구하고 그 값을 onScreenSizeC값hange() 통해 전달한다.
+                val newScreenSizeType = when (mainUiState.screenSizeType) {
+                    is ScreenSizeType.Small -> ScreenSizeType.Middle
+                    is ScreenSizeType.Middle -> ScreenSizeType.Large
+                    is ScreenSizeType.Large -> ScreenSizeType.Large
+                }
+                onScreenSizeChange(newScreenSizeType)
             }) {
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowUp,
@@ -165,7 +177,13 @@ fun HelpListWindow(
                 )
             }
             IconButton(onClick = {
-                onScreenSizeChange(ScreenSizeType.Small)
+                //현재 사이즈 타입을 확인하여 변경할 새로운 사이즈 타입을 구하고 그 값을 onScreenSizeC값hange() 통해 전달한다.
+                val newScreenSizeType = when (mainUiState.screenSizeType) {
+                    is ScreenSizeType.Small -> ScreenSizeType.Small
+                    is ScreenSizeType.Middle -> ScreenSizeType.Small
+                    is ScreenSizeType.Large -> ScreenSizeType.Middle
+                }
+                onScreenSizeChange(newScreenSizeType)
             }) {
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowDown,

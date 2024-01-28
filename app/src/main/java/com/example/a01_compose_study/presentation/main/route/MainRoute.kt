@@ -1,8 +1,8 @@
 package com.example.a01_compose_study.presentation.main.route
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -21,7 +21,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -56,14 +55,16 @@ fun MainRoute(
 //    var visible by remember { mutableStateOf(false) }
     val domainWindowVisibleState by viewModel.domainWindowVisible.collectAsStateWithLifecycle()
 
-    var targetFillMaxHeight by remember { mutableStateOf(Animatable(0.4f)) }
+    val targetFillMaxHeight by remember { mutableStateOf(Animatable(0.4f)) }
 
     LaunchedEffect(uiState) {
-        targetFillMaxHeight = when (uiState.screenSizeType) {
-            is ScreenSizeType.Small -> Animatable(0.15f)
-            is ScreenSizeType.Middle -> Animatable(0.268f)
-            is ScreenSizeType.Large -> Animatable(0.433f)
+        Log.d("@@ uiState 변경", "${uiState.screenSizeType}")
+        val newTargetValue = when (uiState.screenSizeType) {
+            is ScreenSizeType.Small -> 0.15f
+            is ScreenSizeType.Middle ->0.268f
+            is ScreenSizeType.Large -> 0.433f
         }
+        targetFillMaxHeight.animateTo(newTargetValue)
     }
 
     Box(
@@ -117,22 +118,22 @@ fun MainRoute(
 
                         is MainUiState.HelpWindow -> {
                             ComposeHelpScreen(mainUiState = uiState as MainUiState.HelpWindow,
-                                contentColor = Color.Red,
+                                contentColor = Color.White,
                                 onDismiss = {
                                     /**
                                      * 닫기 버튼
                                      */
                                     viewModel.closeDomainWindow()
                                 },
-                                onBackButton = {
+                                onHelpListBackButton = {
                                     /*TODO(뒤로가기 구현)*/
                                 },
                                 onScreenSizeChange = { screenSizeType ->
                                     /**
-                                     * 혹시나 targetFillMaxHeight의 사이즈 타입을 직접적으로 변경하고 싶을때
+                                     * 혹시나 띄어져 있는 화면(현재)에서 직접적으로 화면 사이즈를 변경하고 싶을때
                                      */
                                     scope.launch {
-                                        targetFillMaxHeight = changeSizeType(screenSizeType)
+                                        viewModel.changeDomainScreenSizeType(sizeType = screenSizeType)
                                     }
                                 }
                             )
@@ -231,13 +232,5 @@ fun MainRoute(
                 }
             )
         }
-    }
-}
-
-fun changeSizeType(sizeType: ScreenSizeType): Animatable<Float, AnimationVector1D> {
-    return when (sizeType) {
-        is ScreenSizeType.Small -> Animatable(0.15f)
-        is ScreenSizeType.Middle -> Animatable(0.268f)
-        is ScreenSizeType.Large -> Animatable(0.433f)
     }
 }
