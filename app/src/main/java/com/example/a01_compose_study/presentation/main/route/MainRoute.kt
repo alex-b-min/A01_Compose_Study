@@ -1,12 +1,27 @@
 package com.example.a01_compose_study.presentation.main.route
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationVector1D
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -15,12 +30,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.components.button.PttButton
-import com.example.a01_compose_study.presentation.window.vr_window.VRWindow
 import com.example.a01_compose_study.presentation.main.MainEvent
 import com.example.a01_compose_study.presentation.main.MainUiState
 import com.example.a01_compose_study.presentation.main.MainViewModel
 import com.example.a01_compose_study.presentation.main.VREvent
 import com.example.a01_compose_study.presentation.main.VRUiState
+import com.example.a01_compose_study.presentation.window.vr_window.VRWindow
 import com.example.a01_compose_study.ui.help.ComposeHelpScreen
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -33,13 +48,29 @@ fun MainRoute(
     val vrUiState by viewModel.vrUiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
 
+    /**
+     * Compose에서 해당 뷰를 조작하는 변수(visible)는 remember 타입으로 해야하지만,
+     * 이렇게 하게 되면 해당 뷰를 조작하는 변수를 다른곳에서 조작을 하지 못하는 이슈가 있음.
+     * 그래서 정답은 아니지만, viewModel에서 visible 변수를 만들어 관리함
+     */
+//    var visible by remember { mutableStateOf(false) }
+    val visible by viewModel.visible.collectAsStateWithLifecycle()
+
+    var targetFillMaxHeight by remember { mutableStateOf(Animatable(0.4f)) }
+
+    LaunchedEffect(uiState) {
+        targetFillMaxHeight = when (uiState.screenSizeType) {
+            is ScreenSizeType.Small -> Animatable(0.15f)
+            is ScreenSizeType.Middle -> Animatable(0.268f)
+            is ScreenSizeType.Large -> Animatable(0.433f)
+        }
+    }
+
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-
         when (vrUiState) {
             is VRUiState.NoneWindow -> {
-
             }
 
             is VRUiState.VRWindow -> {
@@ -54,66 +85,88 @@ fun MainRoute(
             }
         }
 
+        AnimatedVisibility(
+            visible = visible,
+            modifier = Modifier.fillMaxWidth(),
+            enter = slideInVertically(
+                initialOffsetY = { it },
+                animationSpec = tween(1000)
+            ),
+            exit = slideOutVertically(
+                targetOffsetY = { it },
+                animationSpec = tween(1000)
+            )
+        ) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.BottomStart
+            ) {
+                Column(
+                    modifier = Modifier
+                        .offset(x = 10.dp, y = (10).dp)
+                        .fillMaxHeight(targetFillMaxHeight.value)
+                        .fillMaxWidth(0.233f)
+                        .background(
+                            color = Color.DarkGray,
+                            shape = RoundedCornerShape(15.dp)
+                        ),
+                ) {
+                    when (uiState) {
+                        is MainUiState.NoneWindow -> {
+                        }
 
-        when (uiState) {
-            is MainUiState.NoneWindow -> {
-            }
+                        is MainUiState.HelpWindow -> {
+                            ComposeHelpScreen(mainUiState = uiState as MainUiState.HelpWindow,
+                                contentColor = Color.Red,
+                                onDismiss = {
+                                    /**
+                                     * 닫기 버튼
+                                     */
+                                    viewModel.closeDomainWindow()
+                                },
+                                onBackButton = {
+                                    /*TODO(뒤로가기 구현)*/
+                                },
+                                onScreenSizeChange = { screenSizeType ->
+                                    /**
+                                     * 혹시나 targetFillMaxHeight의 사이즈 타입을 직접적으로 변경하고 싶을때
+                                     */
+                                    scope.launch {
+                                        targetFillMaxHeight = changeSizeType(screenSizeType)
+                                    }
+                                }
+                            )
+                        }
 
-            is MainUiState.HelpWindow -> {
-                //ToDo(Help 윈도우 띄우기)
-//                com.example.a01_compose_study.presentation.window.vr_window.HelpDummyScreen(
-//                    mainUiState = uiState as MainUiState.HelpWindow,
-//                    contentColor = Color.Red,
-//                    onDismiss = {
-//                        viewModel.onDomainEvent(MainEvent.CloseDomainWindowEvent)
-//                    },
-//                    onBackButton = {
-//                        viewModel.onDomainEvent(MainEvent.CloseDomainWindowEvent)
-//                        viewModel.onVREvent(
-//                            event = VREvent.OpenVRWindowEvent(
-//                                isError = false,
-//                                text = "음성 인식 중 입니다...",
-//                                screenSizeType = ScreenSizeType.Middle
-//                            )
-//                        )
-//                    }
-//                )
-                ComposeHelpScreen(mainUiState = uiState as MainUiState.HelpWindow,
-                    contentColor = Color.Red,
-                    onDismiss = {
-                        /*TODO*/
-                    },
-                    onBackButton = {
-                        /*TODO*/
-                    })
-            }
+                        is MainUiState.AnnounceWindow -> {
 
-            is MainUiState.AnnounceWindow -> {
+                        }
 
-            }
+                        is MainUiState.MainMenuWindow -> {
 
-            is MainUiState.MainMenuWindow -> {
+                        }
 
-            }
+                        is MainUiState.CallWindow -> {
 
-            is MainUiState.CallWindow -> {
+                        }
 
-            }
+                        is MainUiState.NavigationWindow -> {
 
-            is MainUiState.NavigationWindow -> {
+                        }
 
-            }
+                        is MainUiState.RadioWindow -> {
 
-            is MainUiState.RadioWindow -> {
+                        }
 
-            }
+                        is MainUiState.WeatherWindow -> {
 
-            is MainUiState.WeatherWindow -> {
+                        }
 
-            }
+                        is MainUiState.SendMessageWindow -> {
 
-            is MainUiState.SendMessageWindow -> {
-
+                        }
+                    }
+                }
             }
         }
 
@@ -148,12 +201,19 @@ fun MainRoute(
             )
             PttButton(
                 modifier = Modifier.fillMaxSize(0.13f),
-                contentText = "Help Close",
+                contentText = "Domain Close",
                 onClick = {
                     scope.launch {
-                        viewModel.closeHelpWindow()
-                        delay(500)
                         viewModel.onDomainEvent(MainEvent.CloseDomainWindowEvent)
+                    }
+                }
+            )
+            PttButton(
+                modifier = Modifier.fillMaxSize(0.13f),
+                contentText = "None Screen",
+                onClick = {
+                    scope.launch {
+                        viewModel.onDomainEvent(MainEvent.NoneDomainWindowEvent(uiState.screenSizeType))
                     }
                 }
             )
@@ -171,5 +231,13 @@ fun MainRoute(
                 }
             )
         }
+    }
+}
+
+fun changeSizeType(sizeType: ScreenSizeType): Animatable<Float, AnimationVector1D> {
+    return when (sizeType) {
+        is ScreenSizeType.Small -> Animatable(0.15f)
+        is ScreenSizeType.Middle -> Animatable(0.268f)
+        is ScreenSizeType.Large -> Animatable(0.433f)
     }
 }
