@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -45,6 +46,8 @@ import com.example.a01_compose_study.domain.SealedDomainType
 import com.example.a01_compose_study.domain.model.HelpItemData
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.main.MainUiState
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun ComposeHelpScreen(
@@ -54,6 +57,7 @@ fun ComposeHelpScreen(
     onHelpListBackButton: () -> Unit,
     onScreenSizeChange: (ScreenSizeType) -> Unit,
 ) {
+    val scope = rememberCoroutineScope()
     /**
      * [Help Window -> Help Detail Window 띄우기 생각한 방법]
      *
@@ -68,7 +72,6 @@ fun ComposeHelpScreen(
      */
     Box(modifier = Modifier.fillMaxSize()) {
         if (mainUiState.screenType is ScreenType.HelpList) {
-            Log.d("@@ mainUiState.data", "${mainUiState.data}")
             HelpListWindow(
                 mainUiState = mainUiState,
                 contentColor = contentColor,
@@ -77,7 +80,11 @@ fun ComposeHelpScreen(
                     onDismiss()
                 },
                 onBackButton = {
-                    onDismiss()
+                    scope.launch {
+                        onDismiss()
+                        delay(500)
+                        onHelpListBackButton()
+                    }
                 },
                 onScreenSizeChange = { screenSizeType ->
                     onScreenSizeChange(screenSizeType)
@@ -132,9 +139,7 @@ fun HelpListWindow(
                     )
                 }
                 IconButton(onClick = { // 뒤로가기 버튼
-                    /**
-                     * TODO: 뒤로가기 버튼 로직 구현
-                     */
+                    onBackButton()
                 }) {
                     Icon(
                         imageVector = Icons.Default.ArrowBack,

@@ -126,7 +126,14 @@ fun MainRoute(
                                     viewModel.closeDomainWindow()
                                 },
                                 onHelpListBackButton = {
-                                    /*TODO(뒤로가기 구현)*/
+                                    /**
+                                     * HelpList에서의 백버튼 로직 구현
+                                     */
+                                   viewModel.onVREvent(VREvent.OpenVRWindowEvent(
+                                       isError = false,
+                                       text = "VR 재실행",
+                                       screenSizeType = ScreenSizeType.Middle
+                                   ))
                                 },
                                 onScreenSizeChange = { screenSizeType ->
                                     /**

@@ -56,7 +56,7 @@ class MainViewModel @Inject constructor(
                      * TODO 추후 UseCase()의 결과값을 통해 자동으로 DomainType이 주입 되야함
                      * 현재는 helpUsecase()로부터 값을 받아오기 때문에 도메인 타입이 Help로 고정됨
                      */
-                    delay(2500)
+                    delay(2000)
                     if (event.isError) {
                         // 에러일때 VR 윈도우 재호출
                         onVREvent(
