@@ -54,7 +54,7 @@ fun MainRoute(
      * 그래서 정답은 아니지만, viewModel에서 visible 변수를 만들어 관리함
      */
 //    var visible by remember { mutableStateOf(false) }
-    val visible by viewModel.visible.collectAsStateWithLifecycle()
+    val domainWindowVisibleState by viewModel.domainWindowVisible.collectAsStateWithLifecycle()
 
     var targetFillMaxHeight by remember { mutableStateOf(Animatable(0.4f)) }
 
@@ -86,7 +86,7 @@ fun MainRoute(
         }
 
         AnimatedVisibility(
-            visible = visible,
+            visible = domainWindowVisibleState,
             modifier = Modifier.fillMaxWidth(),
             enter = slideInVertically(
                 initialOffsetY = { it },

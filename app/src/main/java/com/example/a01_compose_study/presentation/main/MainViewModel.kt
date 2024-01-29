@@ -25,8 +25,8 @@ class MainViewModel @Inject constructor(
     private val _vrUiState = MutableStateFlow<VRUiState>(VRUiState.NoneWindow)
     val vrUiState: StateFlow<VRUiState> = _vrUiState
 
-    private val _visible = MutableStateFlow<Boolean>(false)
-    val visible: StateFlow<Boolean> = _visible
+    private val _domainWindowVisible = MutableStateFlow<Boolean>(false)
+    val domainWindowVisible: StateFlow<Boolean> = _domainWindowVisible
 
     fun onVREvent(event: VREvent) {
         when (event) {
@@ -176,17 +176,17 @@ class MainViewModel @Inject constructor(
                 ) ?: vrUiState
             }
         }
-        _visible.value = false
+        _domainWindowVisible.value = false
         _uiState.update { uiState ->
             MainUiState.NoneWindow()
         }
     }
 
     fun closeDomainWindow() {
-        _visible.value = false
+        _domainWindowVisible.value = false
     }
 
     fun openDomainWindow() {
-        _visible.value = true
+        _domainWindowVisible.value = true
     }
 }
