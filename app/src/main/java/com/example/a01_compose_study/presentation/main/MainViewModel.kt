@@ -36,7 +36,19 @@ class MainViewModel @Inject constructor(
                 }
                 closeDomainWindow()
             }
-
+            is VREvent.ChangeVRWindowSizeEvent -> {
+                /**
+                 * 현재 데이터는 유지한 체 ScreenSizeType 프로퍼티만 변경하기
+                 * ==> 즉, 현재 화면에서 직접적으로 화면 크기를 변경하게 할 수 있음
+                 * 어차피 vrUiState의 타입이 VRWindow 일 때만 사이즈를 변경 가능할 수 있기에 타입을 지정하여 copy()를 사용함.
+                 */
+                _vrUiState.update { currentState ->
+                    when (currentState) {
+                        is VRUiState.VRWindow -> currentState.copy(screenSizeType = event.screenSizeType)
+                        else -> currentState
+                    }
+                }
+            }
             is VREvent.OpenVRWindowEvent -> {
                 _uiState.update { uiState ->
                     MainUiState.NoneWindow()
@@ -176,7 +188,8 @@ class MainViewModel @Inject constructor(
                 ) ?: vrUiState
             }
         }
-        _domainWindowVisible.value = false
+        // VRWindow의 닫기 버튼을 클릭한다면 DomainWindow도 닫혀야 된다고 생각하고 아래의 코드 추가
+        closeDomainWindow()
         _uiState.update { uiState ->
             MainUiState.NoneWindow()
         }
@@ -195,7 +208,7 @@ class MainViewModel @Inject constructor(
      * ==> 즉, 현재 화면에서 직접적으로 화면 크기를 변경하게 할 수 있음
      * MainUiState에 미리 copyWithNewSizeType()라는 함수를 정의하여 기존 데이터는 유지한 체 screenSizeType 만을 변경하여 사용하도록 함.
      */
-    fun changeDomainScreenSizeType(sizeType: ScreenSizeType) {
+    fun changeDomainWindowSizeType(sizeType: ScreenSizeType) {
         _uiState.update { uiState ->
             uiState.copyWithNewSizeType(sizeType)
         }

@@ -78,6 +78,9 @@ fun MainRoute(
                 VRWindow(
                     vrUiState = vrUiState as VRUiState.VRWindow,
                     contentColor = Color.Green,
+                    onChangeWindowSize = { screenSizeType ->
+                         viewModel.onVREvent(VREvent.ChangeVRWindowSizeEvent(screenSizeType))
+                    },
                     onDismiss = {
                         viewModel.onDomainEvent(MainEvent.CloseDomainWindowEvent)
                         viewModel.onVREvent(VREvent.CloseVRWindowEvent)
@@ -123,7 +126,7 @@ fun MainRoute(
                                     /**
                                      * 닫기 버튼
                                      */
-                                    viewModel.closeDomainWindow()
+                                    viewModel.onVREvent(VREvent.CloseVRWindowEvent)
                                 },
                                 onHelpListBackButton = {
                                     /**
@@ -140,7 +143,7 @@ fun MainRoute(
                                      * 혹시나 띄어져 있는 화면(현재)에서 직접적으로 화면 사이즈를 변경하고 싶을때
                                      */
                                     scope.launch {
-                                        viewModel.changeDomainScreenSizeType(sizeType = screenSizeType)
+                                        viewModel.changeDomainWindowSizeType(sizeType = screenSizeType)
                                     }
                                 }
                             )

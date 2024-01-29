@@ -51,6 +51,7 @@ import kotlinx.coroutines.launch
 fun VRWindow(
     vrUiState: VRUiState.VRWindow,
     contentColor: Color,
+    onChangeWindowSize: (ScreenSizeType) -> Unit,
     onDismiss: () -> Unit,
 ) {
     // 애니메이션을 제어하기 위한 visible 변수, 애니메이션 효과가 없다면 uiState의 visible값을 바로 사용해도 무방하다.
@@ -61,7 +62,7 @@ fun VRWindow(
     var textAlpha: Float by remember { mutableStateOf(0f) }
 
     // 화면 크기(세로) 변경 애니메이션 상태 관리 변수
-    var targetFillMaxHeight by remember { mutableStateOf(Animatable(0f)) }
+    val targetFillMaxHeight by remember { mutableStateOf(Animatable(0f)) }
 
     Log.d("@@ VRError : ", "${vrUiState.isError}")
     /**
@@ -72,15 +73,17 @@ fun VRWindow(
      */
 
     if (vrUiState.visible) { // uiState.visible가 true 일 때는 remember 타입의 visible을 false에서 true로 바꿔 띄우는 애니메이션 효과를 준다.
-        LaunchedEffect(Unit) {
+        //screenSizeType이 변할때 마다 현재 사이즈 타입에 따라 적절한 크기를 검사하고 그 크기로 애니메이션화하여 변화시킨다.
+        LaunchedEffect(vrUiState.screenSizeType) {
             visible = true
 
             // uiState로부터의 screenSizeType을 얻어 해당 화면 크기 설정
-            targetFillMaxHeight = when (vrUiState.screenSizeType) {
-                is ScreenSizeType.Small -> Animatable(0.15f)
-                is ScreenSizeType.Middle -> Animatable(0.268f)
-                is ScreenSizeType.Large -> Animatable(0.433f)
+            val newTargetValue = when (vrUiState.screenSizeType) {
+                is ScreenSizeType.Small -> 0.15f
+                is ScreenSizeType.Middle ->0.268f
+                is ScreenSizeType.Large -> 0.433f
             }
+            targetFillMaxHeight.animateTo(newTargetValue)
         }
     } else { // uiState.visible가 false 일 때는 remember 타입의 visible을 true에서 false로 바꿔 닫는 애니메이션 효과를 준다.
         LaunchedEffect(Unit) {
@@ -142,12 +145,13 @@ fun VRWindow(
                     ) {
                         IconButton(onClick = {
                             scope.launch {
-                                val newTargetValue = when (targetFillMaxHeight.value) {
-                                    0.15f -> 0.268f
-                                    0.268f -> 0.433f
-                                    else -> targetFillMaxHeight.value
+                                //현재 사이즈 타입을 확인하여 변경할 새로운 사이즈 타입을 구하고 그 값을 onScreenSizeC값hange() 통해 전달한다.
+                                val newScreenSizeType = when (vrUiState.screenSizeType) {
+                                    is ScreenSizeType.Small -> ScreenSizeType.Middle
+                                    is ScreenSizeType.Middle -> ScreenSizeType.Large
+                                    is ScreenSizeType.Large -> ScreenSizeType.Large
                                 }
-                                targetFillMaxHeight.animateTo(newTargetValue)
+                                onChangeWindowSize(newScreenSizeType)
                             }
                         }) {
                             Icon(
@@ -158,12 +162,13 @@ fun VRWindow(
                         }
                         IconButton(onClick = {
                             scope.launch {
-                                val newTargetValue = when (targetFillMaxHeight.value) {
-                                    0.268f -> 0.15f
-                                    0.433f -> 0.268f
-                                    else -> targetFillMaxHeight.value
+                                //현재 사이즈 타입을 확인하여 변경할 새로운 사이즈 타입을 구하고 그 값을 onScreenSizeC값hange() 통해 전달한다.
+                                val newScreenSizeType = when (vrUiState.screenSizeType) {
+                                    is ScreenSizeType.Small -> ScreenSizeType.Small
+                                    is ScreenSizeType.Middle -> ScreenSizeType.Small
+                                    is ScreenSizeType.Large -> ScreenSizeType.Middle
                                 }
-                                targetFillMaxHeight.animateTo(newTargetValue)
+                                onChangeWindowSize(newScreenSizeType)
                             }
                         }) {
                             Icon(
@@ -262,6 +267,7 @@ fun CustomSizeAlertDialogPreview() {
             screenSizeType = ScreenSizeType.Middle
         ),
         contentColor = Color.Magenta,
+        onChangeWindowSize = { },
         onDismiss = {
         })
 }
