@@ -1,9 +1,7 @@
 package com.example.a01_compose_study.ui.help
 
 import android.util.Log
-import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,15 +9,12 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -30,12 +25,6 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -44,12 +33,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -58,131 +44,46 @@ import com.example.a01_compose_study.domain.ScreenType
 import com.example.a01_compose_study.domain.SealedDomainType
 import com.example.a01_compose_study.domain.model.HelpItemData
 import com.example.a01_compose_study.domain.util.ScreenSizeType
-import com.example.a01_compose_study.presentation.components.lottie.LottieAssetAnimationHandler
-import com.example.a01_compose_study.presentation.components.lottie.LottieRawAnimationHandler
 import com.example.a01_compose_study.presentation.main.MainUiState
-import com.example.a01_compose_study.presentation.util.TextModifier.normalize
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @Composable
 fun ComposeHelpScreen(
     mainUiState: MainUiState.HelpWindow,
     contentColor: Color,
     onDismiss: () -> Unit,
-    onBackButton: () -> Unit
+    onBackButton: () -> Unit,
+    onScreenSizeChange: (ScreenSizeType) -> Unit
 ) {
-    var targetFillMaxHeight by remember { mutableStateOf(Animatable(0f)) }
-    val scope = rememberCoroutineScope()
-    LaunchedEffect(Unit) {
-//        visible = true
-        
-        
-        // uiState로부터의 screenSizeType을 얻어 해당 화면 크기 설정
-        targetFillMaxHeight = when (mainUiState.screenSizeType) {
-            is ScreenSizeType.Small -> Animatable(0.15f)
-            is ScreenSizeType.Middle -> Animatable(0.268f)
-            is ScreenSizeType.Large -> Animatable(0.433f)
-        }
-    }
-    
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.BottomStart
-    ) {
-        Column(
-            modifier = Modifier
-                .offset(x = 10.dp, y = (10).dp)
-                .fillMaxHeight(targetFillMaxHeight.value)
-                .fillMaxWidth(0.233f)
-                .background(
-                    color = Color.DarkGray,
-                    shape = RoundedCornerShape(15.dp)
-                ),
-        ) {
-            Box(modifier = Modifier.fillMaxSize()) {
-                if (mainUiState.screenType is ScreenType.HelpList) {
-                    Log.d("@@ mainUiState.data" ,"${mainUiState.data}")
-                    HelpList(helpList = mainUiState.data as List<HelpItemData>)
-                } else {
-                    
+    /**
+     * [Help Window -> Help Detail Window 띄우기 생각한 방법]
+     *
+     * 1번 방법 - UiState를 None으로 바꾸고 Help Detail Window을 띄우도록 한다.
+     * ==> 발생할 수 있는 사이드 이펙트는 데이터를 None으로 바꾸었기에 데이터가 리셋되어서 뒤로가기 구현을 신경쓰지 못한다.
+     *
+     * 2번 방법 - UiState를 현재 가지고 있는 정보를 기반으로 해서 HelpList 타입에서 HelpDetailList 타입으로 변경한다.
+     * 이렇게 하게 되면 uiState가 변경되었기 때문에 아래의 if문에서 걸러 화면이 Recomposition이 이루어져 이동을 하게 된다.
+     * ==> 뒤로가기 구현에 대해 생각해본 점은 현재 가지고 있는 uiState를 기반으로 다시 HelpDetailList 타입에서 HelpList 타입으로 바꾸면 뒤로가기가 구현될 것 같다.
+     *
+     * 뒤로가기를 고려한다면 2번 방법이 조금 더 구현 가능성이 높아 보인다.
+     */
+    Box(modifier = Modifier.fillMaxSize()) {
+        if (mainUiState.screenType is ScreenType.HelpList) {
+            Log.d("@@ mainUiState.data", "${mainUiState.data}")
+            HelpListWindow(
+                mainUiState = mainUiState,
+                contentColor = contentColor,
+                helpList = mainUiState.data as List<HelpItemData>,
+                onDismiss = {
+                    onDismiss()
+                },
+                onBackButton = {
+                },
+                onScreenSizeChange = { screenSizeType ->
+                    onScreenSizeChange(screenSizeType)
                 }
-                
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    horizontalAlignment = Alignment.End
-                ) {
-                    IconButton(onClick = {
-                        scope.launch {
-//                            visible = false
-                            delay(500)
-                            onDismiss()
-                        }
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = null,
-                            tint = if (mainUiState.isError) Color.Red else contentColor
-                        )
-                    }
-                }
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    horizontalAlignment = Alignment.Start
-                ) {
-                    IconButton(onClick = {
-                        scope.launch {
-//                            visible = false
-                            delay(500)
-                            onBackButton()
-                        }
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = null,
-                            tint = if (mainUiState.isError) Color.Red else contentColor
-                        )
-                    }
-                }
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    horizontalAlignment = Alignment.End,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    IconButton(onClick = {
-                        scope.launch {
-                            val newTargetValue = when (targetFillMaxHeight.value) {
-                                0.15f -> 0.268f
-                                0.268f -> 0.433f
-                                else -> targetFillMaxHeight.value
-                            }
-                            targetFillMaxHeight.animateTo(newTargetValue)
-                        }
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.KeyboardArrowUp,
-                            contentDescription = null,
-                            tint = if (mainUiState.isError) Color.Red else contentColor
-                        )
-                    }
-                    IconButton(onClick = {
-                        scope.launch {
-                            val newTargetValue = when (targetFillMaxHeight.value) {
-                                0.268f -> 0.15f
-                                0.433f -> 0.268f
-                                else -> targetFillMaxHeight.value
-                            }
-                            targetFillMaxHeight.animateTo(newTargetValue)
-                        }
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.KeyboardArrowDown,
-                            contentDescription = null,
-                            tint = if (mainUiState.isError) Color.Red else contentColor
-                        )
-                    }
-                }
-            }
+            )
+        } else {
+
         }
     }
 }
@@ -200,23 +101,102 @@ fun <T> List(
 }
 
 @Composable
-fun HelpList(helpList: List<HelpItemData>) {
-    List(helpList = helpList) { helpItemData ->
-        HelpListItem(domainId = helpItemData.domainId, command = helpItemData.command)
-    }
+fun HelpListWindow(
+    mainUiState: MainUiState.HelpWindow,
+    contentColor: Color,
+    helpList: List<HelpItemData>,
+    onDismiss: () -> Unit,
+    onBackButton: () -> Unit,
+    onScreenSizeChange: (ScreenSizeType) -> Unit
+) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(8.dp), // 원하는 여백 설정
+            verticalArrangement = Arrangement.Top
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                IconButton(onClick = {
+                    onDismiss()
+                }) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = null,
+                        tint = if (mainUiState.isError) Color.Red else contentColor
+                    )
+                }
+                IconButton(onClick = {
+                    /**
+                     * TODO: 뒤로가기 버튼 로직 구현
+                     */
+                }) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = null,
+                        tint = if (mainUiState.isError) Color.Red else contentColor
+                    )
+                }
+            }
 
+            List(helpList = helpList) { helpItemData ->
+                HelpListItem(
+                    domainId = helpItemData.domainId,
+                    command = helpItemData.command,
+                )
+            }
+        }
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.End,
+            verticalArrangement = Arrangement.Center
+        ) {
+            IconButton(onClick = {
+                onScreenSizeChange(ScreenSizeType.Large)
+            }) {
+                Icon(
+                    imageVector = Icons.Default.KeyboardArrowUp,
+                    contentDescription = null,
+                    tint = if (mainUiState.isError) Color.Red else contentColor
+                )
+            }
+            IconButton(onClick = {
+                onScreenSizeChange(ScreenSizeType.Small)
+            }) {
+                Icon(
+                    imageVector = Icons.Default.KeyboardArrowDown,
+                    contentDescription = null,
+                    tint = if (mainUiState.isError) Color.Red else contentColor
+                )
+            }
+        }
+    }
 }
 
 @Composable
 fun HelpDetailList(helpItemData: HelpItemData) {
     List(helpList = helpItemData.commandsDetail) { commandDeatail ->
-        HelpDetailListItem(domainId = helpItemData.domainId.text, commandDetail = commandDeatail)
+        HelpDetailListItem(
+            domainId = helpItemData.domainId.text,
+            commandDetail = commandDeatail
+        )
     }
 }
 
 
 @Composable
-fun HelpListItem(domainId: SealedDomainType, command: String, focused: Boolean = false) {
+fun HelpListItem(
+    domainId: SealedDomainType,
+    command: String,
+    focused: Boolean = false,
+) {
+    /**
+     * TODO[클릭 이벤트 처리를 해야함]
+     */
     Row(
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -391,7 +371,24 @@ fun HelpListPreview() {
         )
     )
 
-    HelpList(helpList = helpItemDataList)
+    HelpListWindow(
+        mainUiState = MainUiState.HelpWindow(
+            domainType = SealedDomainType.Help,
+            screenType = ScreenType.HelpList,
+            data = "",
+            visible = true,
+            text = "HelpWindow",
+            screenSizeType = ScreenSizeType.Large
+        ),
+        contentColor = Color.DarkGray,
+        helpList = helpItemDataList,
+        onDismiss = {
+        },
+        onBackButton = {
+        },
+        onScreenSizeChange = {
+        }
+    )
 }
 
 @Composable

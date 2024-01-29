@@ -19,11 +19,14 @@ class MainViewModel @Inject constructor(
     private val helpUsecase: HelpUsecase,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<MainUiState>(MainUiState.NoneWindow)
+    private val _uiState = MutableStateFlow<MainUiState>(MainUiState.NoneWindow())
     val uiState: StateFlow<MainUiState> = _uiState
 
     private val _vrUiState = MutableStateFlow<VRUiState>(VRUiState.NoneWindow)
     val vrUiState: StateFlow<VRUiState> = _vrUiState
+
+    private val _visible = MutableStateFlow<Boolean>(false)
+    val visible: StateFlow<Boolean> = _visible
 
     fun onVREvent(event: VREvent) {
         when (event) {
@@ -31,14 +34,12 @@ class MainViewModel @Inject constructor(
                 _vrUiState.update { visible ->
                     VRUiState.NoneWindow
                 }
-                _uiState.update { uiState ->
-                    MainUiState.NoneWindow
-                }
+                closeDomainWindow()
             }
 
             is VREvent.OpenVRWindowEvent -> {
                 _uiState.update { uiState ->
-                    MainUiState.NoneWindow
+                    MainUiState.NoneWindow()
                 }
 
                 _vrUiState.update { vrUiState ->
@@ -67,25 +68,26 @@ class MainViewModel @Inject constructor(
                         )
                     } else { // 에러가 아닐 때 다음 DomainEvent 발행
                         val helpList = helpUsecase()
-                        if (uiState.value !is MainUiState.NoneWindow) {
-                            _vrUiState.update { visible ->
-                                VRUiState.NoneWindow
-                            }
-                        }
                         if (helpList.isNotEmpty()) {
-                            _vrUiState.update { visible ->
-                                VRUiState.NoneWindow
+                            viewModelScope.launch {
+                                _vrUiState.update { visible ->
+                                    VRUiState.NoneWindow
+                                }
+                                closeVRWindow()
+
+                                delay(500)
+                                openDomainWindow()
+                                onDomainEvent(
+                                    event = MainEvent.OpenDomainWindowEvent(
+                                        domainType = SealedDomainType.Help,
+                                        screenType = ScreenType.HelpList,
+                                        data = helpList,
+                                        isError = false,
+                                        screenSizeType = ScreenSizeType.Large
+                                    )
+                                )
                             }
                         }
-                        onDomainEvent(
-                            event = MainEvent.OpenDomainWindowEvent(
-                                domainType = SealedDomainType.Help,
-                                screenType = ScreenType.HelpList,
-                                data = helpList,
-                                isError = false,
-                                screenSizeType = ScreenSizeType.Middle
-                            )
-                        )
                     }
                 }
             }
@@ -95,8 +97,12 @@ class MainViewModel @Inject constructor(
     fun onDomainEvent(event: MainEvent) {
         when (event) {
             is MainEvent.CloseDomainWindowEvent -> {
+                closeDomainWindow()
+            }
+
+            is MainEvent.NoneDomainWindowEvent -> {
                 _uiState.update { uiState ->
-                    MainUiState.NoneWindow
+                    MainUiState.NoneWindow(event.screenSizeType)
                 }
             }
 
@@ -104,7 +110,7 @@ class MainViewModel @Inject constructor(
                 _uiState.update { uiState ->
                     val mainUiState = when (event.domainType) {
                         SealedDomainType.None -> {
-                            MainUiState.NoneWindow
+                            MainUiState.NoneWindow()
                         }
 
                         SealedDomainType.Help -> {
@@ -119,27 +125,39 @@ class MainViewModel @Inject constructor(
                         }
 
                         SealedDomainType.Announce -> {
-                            MainUiState.AnnounceWindow
+                            MainUiState.AnnounceWindow(
+
+                            )
                         }
 
                         SealedDomainType.MainMenu -> {
-                            MainUiState.MainMenuWindow
+                            MainUiState.MainMenuWindow(
+
+                            )
                         }
 
                         SealedDomainType.Call -> {
-                            MainUiState.CallWindow
+                            MainUiState.CallWindow(
+
+                            )
                         }
 
                         SealedDomainType.Navigation -> {
-                            MainUiState.NavigationWindow
+                            MainUiState.NavigationWindow(
+
+                            )
                         }
 
                         SealedDomainType.Radio -> {
-                            MainUiState.RadioWindow
+                            MainUiState.RadioWindow(
+
+                            )
                         }
 
                         else -> {
-                            MainUiState.WeatherWindow
+                            MainUiState.WeatherWindow(
+
+                            )
                         }
                     }
                     mainUiState
@@ -158,17 +176,17 @@ class MainViewModel @Inject constructor(
                 ) ?: vrUiState
             }
         }
+        _visible.value = false
+        _uiState.update { uiState ->
+            MainUiState.NoneWindow()
+        }
     }
 
-    fun closeHelpWindow() {
-        // 현재의 error 상태에 따른 glow 애니메이션창을 내려야하기 때문에 isError에 uiState.isError로 설정
-        if (_uiState.value is MainUiState.HelpWindow) {
-            _uiState.update { uiState ->
-                (uiState as? MainUiState.HelpWindow)?.copy(
-                    visible = false,
-                    isError = uiState.isError
-                ) ?: uiState
-            }
-        }
+    fun closeDomainWindow() {
+        _visible.value = false
+    }
+
+    fun openDomainWindow() {
+        _visible.value = true
     }
 }
