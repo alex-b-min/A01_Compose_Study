@@ -19,8 +19,8 @@ class MainViewModel @Inject constructor(
     private val helpUsecase: HelpUsecase,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<MainUiState>(MainUiState.NoneWindow())
-    val uiState: StateFlow<MainUiState> = _uiState
+    private val _domainUiState = MutableStateFlow<DomainUiState>(DomainUiState.NoneWindow())
+    val domainUiState: StateFlow<DomainUiState> = _domainUiState
 
     private val _vrUiState = MutableStateFlow<VRUiState>(VRUiState.NoneWindow)
     val vrUiState: StateFlow<VRUiState> = _vrUiState
@@ -50,8 +50,8 @@ class MainViewModel @Inject constructor(
                 }
             }
             is VREvent.OpenVRWindowEvent -> {
-                _uiState.update { uiState ->
-                    MainUiState.NoneWindow()
+                _domainUiState.update { uiState ->
+                    DomainUiState.NoneWindow()
                 }
 
                 _vrUiState.update { vrUiState ->
@@ -113,8 +113,8 @@ class MainViewModel @Inject constructor(
             }
 
             is MainEvent.NoneDomainWindowEvent -> {
-                _uiState.update { uiState ->
-                    MainUiState.NoneWindow(event.screenSizeType)
+                _domainUiState.update { uiState ->
+                    DomainUiState.NoneWindow(event.screenSizeType)
                 }
             }
 
@@ -124,20 +124,20 @@ class MainViewModel @Inject constructor(
                  * ==> 즉, 현재 화면에서 직접적으로 화면 크기를 변경하게 할 수 있음
                  * MainUiState에 미리 copyWithNewSizeType()라는 함수를 정의하여 기존 데이터는 유지한 체 screenSizeType 만을 변경하여 사용하도록 함.
                  */
-                _uiState.update { uiState ->
+                _domainUiState.update { uiState ->
                     uiState.copyWithNewSizeType(event.screenSizeType)
                 }
             }
 
             is MainEvent.OpenDomainWindowEvent -> {
-                _uiState.update { uiState ->
-                    val mainUiState = when (event.domainType) {
+                _domainUiState.update { uiState ->
+                    val domainUiState = when (event.domainType) {
                         SealedDomainType.None -> {
-                            MainUiState.NoneWindow()
+                            DomainUiState.NoneWindow()
                         }
 
                         SealedDomainType.Help -> {
-                            MainUiState.HelpWindow(
+                            DomainUiState.HelpWindow(
                                 domainType = event.domainType,
                                 screenType = event.screenType,
                                 data = event.data,
@@ -148,42 +148,42 @@ class MainViewModel @Inject constructor(
                         }
 
                         SealedDomainType.Announce -> {
-                            MainUiState.AnnounceWindow(
+                            DomainUiState.AnnounceWindow(
 
                             )
                         }
 
                         SealedDomainType.MainMenu -> {
-                            MainUiState.MainMenuWindow(
+                            DomainUiState.DomainMenuWindow(
 
                             )
                         }
 
                         SealedDomainType.Call -> {
-                            MainUiState.CallWindow(
+                            DomainUiState.CallWindow(
 
                             )
                         }
 
                         SealedDomainType.Navigation -> {
-                            MainUiState.NavigationWindow(
+                            DomainUiState.NavigationWindow(
 
                             )
                         }
 
                         SealedDomainType.Radio -> {
-                            MainUiState.RadioWindow(
+                            DomainUiState.RadioWindow(
 
                             )
                         }
 
                         else -> {
-                            MainUiState.WeatherWindow(
+                            DomainUiState.WeatherWindow(
 
                             )
                         }
                     }
-                    mainUiState
+                    domainUiState
                 }
             }
         }
@@ -201,8 +201,8 @@ class MainViewModel @Inject constructor(
         }
         // VRWindow의 닫기 버튼을 클릭한다면 DomainWindow도 닫혀야 된다고 생각하고 아래의 코드 추가
         closeDomainWindow()
-        _uiState.update { uiState ->
-            MainUiState.NoneWindow()
+        _domainUiState.update { uiState ->
+            DomainUiState.NoneWindow()
         }
     }
 

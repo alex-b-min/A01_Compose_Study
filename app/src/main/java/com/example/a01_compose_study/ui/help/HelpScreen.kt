@@ -1,6 +1,5 @@
 package com.example.a01_compose_study.ui.help
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -45,13 +44,13 @@ import com.example.a01_compose_study.domain.ScreenType
 import com.example.a01_compose_study.domain.SealedDomainType
 import com.example.a01_compose_study.domain.model.HelpItemData
 import com.example.a01_compose_study.domain.util.ScreenSizeType
-import com.example.a01_compose_study.presentation.main.MainUiState
+import com.example.a01_compose_study.presentation.main.DomainUiState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
 fun ComposeHelpScreen(
-    mainUiState: MainUiState.HelpWindow,
+    domainUiState: DomainUiState.HelpWindow,
     contentColor: Color,
     onDismiss: () -> Unit,
     onHelpListBackButton: () -> Unit,
@@ -71,11 +70,11 @@ fun ComposeHelpScreen(
      * 뒤로가기를 고려한다면 2번 방법이 조금 더 구현 가능성이 높아 보인다.
      */
     Box(modifier = Modifier.fillMaxSize()) {
-        if (mainUiState.screenType is ScreenType.HelpList) {
+        if (domainUiState.screenType is ScreenType.HelpList) {
             HelpListWindow(
-                mainUiState = mainUiState,
+                domainUiState = domainUiState,
                 contentColor = contentColor,
-                helpList = mainUiState.data as List<HelpItemData>,
+                helpList = domainUiState.data as List<HelpItemData>,
                 onDismiss = {
                     onDismiss()
                 },
@@ -110,7 +109,7 @@ fun <T> List(
 
 @Composable
 fun HelpListWindow(
-    mainUiState: MainUiState.HelpWindow,
+    domainUiState: DomainUiState.HelpWindow,
     contentColor: Color,
     helpList: List<HelpItemData>,
     onDismiss: () -> Unit,
@@ -135,7 +134,7 @@ fun HelpListWindow(
                     Icon(
                         imageVector = Icons.Default.Close,
                         contentDescription = null,
-                        tint = if (mainUiState.isError) Color.Red else contentColor
+                        tint = if (domainUiState.isError) Color.Red else contentColor
                     )
                 }
                 IconButton(onClick = { // 뒤로가기 버튼
@@ -144,7 +143,7 @@ fun HelpListWindow(
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
                         contentDescription = null,
-                        tint = if (mainUiState.isError) Color.Red else contentColor
+                        tint = if (domainUiState.isError) Color.Red else contentColor
                     )
                 }
             }
@@ -168,7 +167,7 @@ fun HelpListWindow(
         ) {
             IconButton(onClick = {
                 //현재 사이즈 타입을 확인하여 변경할 새로운 사이즈 타입을 구하고 그 값을 onScreenSizeC값hange() 통해 전달한다.
-                val newScreenSizeType = when (mainUiState.screenSizeType) {
+                val newScreenSizeType = when (domainUiState.screenSizeType) {
                     is ScreenSizeType.Small -> ScreenSizeType.Middle
                     is ScreenSizeType.Middle -> ScreenSizeType.Large
                     is ScreenSizeType.Large -> ScreenSizeType.Large
@@ -178,12 +177,12 @@ fun HelpListWindow(
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowUp,
                     contentDescription = null,
-                    tint = if (mainUiState.isError) Color.Red else contentColor
+                    tint = if (domainUiState.isError) Color.Red else contentColor
                 )
             }
             IconButton(onClick = {
                 //현재 사이즈 타입을 확인하여 변경할 새로운 사이즈 타입을 구하고 그 값을 onScreenSizeC값hange() 통해 전달한다.
-                val newScreenSizeType = when (mainUiState.screenSizeType) {
+                val newScreenSizeType = when (domainUiState.screenSizeType) {
                     is ScreenSizeType.Small -> ScreenSizeType.Small
                     is ScreenSizeType.Middle -> ScreenSizeType.Small
                     is ScreenSizeType.Large -> ScreenSizeType.Middle
@@ -193,7 +192,7 @@ fun HelpListWindow(
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowDown,
                     contentDescription = null,
-                    tint = if (mainUiState.isError) Color.Red else contentColor
+                    tint = if (domainUiState.isError) Color.Red else contentColor
                 )
             }
         }
@@ -395,7 +394,7 @@ fun HelpListPreview() {
     )
 
     HelpListWindow(
-        mainUiState = MainUiState.HelpWindow(
+        domainUiState = DomainUiState.HelpWindow(
             domainType = SealedDomainType.Help,
             screenType = ScreenType.HelpList,
             data = "",

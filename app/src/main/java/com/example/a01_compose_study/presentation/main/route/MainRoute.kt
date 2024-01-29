@@ -30,7 +30,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.components.button.PttButton
 import com.example.a01_compose_study.presentation.main.MainEvent
-import com.example.a01_compose_study.presentation.main.MainUiState
+import com.example.a01_compose_study.presentation.main.DomainUiState
 import com.example.a01_compose_study.presentation.main.MainViewModel
 import com.example.a01_compose_study.presentation.main.VREvent
 import com.example.a01_compose_study.presentation.main.VRUiState
@@ -43,7 +43,7 @@ import kotlinx.coroutines.launch
 fun MainRoute(
     viewModel: MainViewModel = hiltViewModel(),
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by viewModel.domainUiState.collectAsStateWithLifecycle()
     val vrUiState by viewModel.vrUiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
 
@@ -116,11 +116,11 @@ fun MainRoute(
                         ),
                 ) {
                     when (uiState) {
-                        is MainUiState.NoneWindow -> {
+                        is DomainUiState.NoneWindow -> {
                         }
 
-                        is MainUiState.HelpWindow -> {
-                            ComposeHelpScreen(mainUiState = uiState as MainUiState.HelpWindow,
+                        is DomainUiState.HelpWindow -> {
+                            ComposeHelpScreen(domainUiState = uiState as DomainUiState.HelpWindow,
                                 contentColor = Color.White,
                                 onDismiss = {
                                     /**
@@ -151,31 +151,31 @@ fun MainRoute(
                             )
                         }
 
-                        is MainUiState.AnnounceWindow -> {
+                        is DomainUiState.AnnounceWindow -> {
 
                         }
 
-                        is MainUiState.MainMenuWindow -> {
+                        is DomainUiState.DomainMenuWindow -> {
 
                         }
 
-                        is MainUiState.CallWindow -> {
+                        is DomainUiState.CallWindow -> {
 
                         }
 
-                        is MainUiState.NavigationWindow -> {
+                        is DomainUiState.NavigationWindow -> {
 
                         }
 
-                        is MainUiState.RadioWindow -> {
+                        is DomainUiState.RadioWindow -> {
 
                         }
 
-                        is MainUiState.WeatherWindow -> {
+                        is DomainUiState.WeatherWindow -> {
 
                         }
 
-                        is MainUiState.SendMessageWindow -> {
+                        is DomainUiState.SendMessageWindow -> {
 
                         }
                     }
