@@ -1,45 +1,14 @@
 package com.example.a01_compose_study.ui.help
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.example.a01_compose_study.R
 import com.example.a01_compose_study.domain.ScreenType
 import com.example.a01_compose_study.domain.SealedDomainType
 import com.example.a01_compose_study.domain.model.HelpItemData
@@ -89,23 +58,22 @@ fun ComposeHelpScreen(
                     onScreenSizeChange(screenSizeType)
                 }
             )
-        } else {
-
+        } else if (domainUiState.screenType is ScreenType.HelpDetailList) {
+//            HelpDetailWindow(
+//                mainUiState = mainUiState,
+//                contentColor = contentColor,
+//                helpItemData = ,
+//                domainId = ,
+//                onDismiss = {
+//                    onDismiss()
+//                },
+//                onBackButton = { /*TODO*/ },
+//                onScreenSizeChange =
+//            )
         }
     }
 }
 
-@Composable
-fun <T> List(
-    helpList: List<T>,
-    helpListContent: @Composable (T) -> Unit,
-) {
-    LazyColumn {
-        items(helpList.size) { index ->
-            helpListContent(helpList[index])
-        }
-    }
-}
 
 @Composable
 fun HelpListWindow(
@@ -118,263 +86,102 @@ fun HelpListWindow(
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(8.dp), // 원하는 여백 설정
-            verticalArrangement = Arrangement.Top
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                IconButton(onClick = { // 닫기 버튼
-                    onDismiss()
-                }) {
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = null,
-                        tint = if (domainUiState.isError) Color.Red else contentColor
-                    )
-                }
-                IconButton(onClick = { // 뒤로가기 버튼
-                    onBackButton()
-                }) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowBack,
-                        contentDescription = null,
-                        tint = if (domainUiState.isError) Color.Red else contentColor
-                    )
-                }
-            }
-
-            // List UI
-            List(helpList = helpList) { helpItemData ->
-                HelpListItem(
-                    domainId = helpItemData.domainId,
-                    command = helpItemData.command,
-                )
-            }
-        }
-
-        /**
-         * 창 조절하는 아이콘들 테스트용
-         */
-        Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.End,
-            verticalArrangement = Arrangement.Center
         ) {
-            IconButton(onClick = {
-                //현재 사이즈 타입을 확인하여 변경할 새로운 사이즈 타입을 구하고 그 값을 onScreenSizeC값hange() 통해 전달한다.
-                val newScreenSizeType = when (domainUiState.screenSizeType) {
-                    is ScreenSizeType.Small -> ScreenSizeType.Middle
-                    is ScreenSizeType.Middle -> ScreenSizeType.Large
-                    is ScreenSizeType.Large -> ScreenSizeType.Large
+            TopAppBarContent(
+                title = "",
+                onNavigationIconClick = {
+                    // 뒤로 가기
+                },
+                onActionIconClick = {
+                    // 화면 닫기
                 }
-                onScreenSizeChange(newScreenSizeType)
-            }) {
-                Icon(
-                    imageVector = Icons.Default.KeyboardArrowUp,
-                    contentDescription = null,
-                    tint = if (domainUiState.isError) Color.Red else contentColor
-                )
-            }
-            IconButton(onClick = {
-                //현재 사이즈 타입을 확인하여 변경할 새로운 사이즈 타입을 구하고 그 값을 onScreenSizeC값hange() 통해 전달한다.
-                val newScreenSizeType = when (domainUiState.screenSizeType) {
-                    is ScreenSizeType.Small -> ScreenSizeType.Small
-                    is ScreenSizeType.Middle -> ScreenSizeType.Small
-                    is ScreenSizeType.Large -> ScreenSizeType.Middle
-                }
-                onScreenSizeChange(newScreenSizeType)
-            }) {
-                Icon(
-                    imageVector = Icons.Default.KeyboardArrowDown,
-                    contentDescription = null,
-                    tint = if (domainUiState.isError) Color.Red else contentColor
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun HelpDetailList(helpItemData: HelpItemData) {
-    List(helpList = helpItemData.commandsDetail) { commandDeatail ->
-        HelpDetailListItem(
-            domainId = helpItemData.domainId.text,
-            commandDetail = commandDeatail
-        )
-    }
-}
-
-
-@Composable
-fun HelpListItem(
-    domainId: SealedDomainType,
-    command: String,
-    focused: Boolean = false,
-) {
-    /**
-     * TODO[클릭 이벤트 처리를 해야함]
-     */
-    Row(
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(IntrinsicSize.Min)
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(IntrinsicSize.Min)
-            ) {
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .defaultMinSize(minHeight = dimensionResource(R.dimen.dp_80))
-                        .alpha(if (focused) 1.0f else 0.3f)
-                ) {
-                    Row {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(
-                                    top = dimensionResource(R.dimen.dp_6_7),
-                                    bottom = dimensionResource(R.dimen.dp_6_7),
-                                    start = dimensionResource(R.dimen.dp_33_3)
-                                )
-                        ) {
-                            Text(
-                                text = domainId.text,
-                                modifier = Modifier
-                                    .defaultMinSize(minHeight = dimensionResource(R.dimen.dp_24)),
-                                color = colorResource(id = R.color.guidance_domain_text_color),
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                style = MaterialTheme.typography.subtitle2,
-                                textAlign = TextAlign.Center,
-                                fontSize = 16.sp,
-                                letterSpacing = (-0.32).sp
-                            )
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(end = 28.7.dp)
-                                    .defaultMinSize(minHeight = dimensionResource(R.dimen.dp_32)),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-
-                                val context = LocalContext.current
-                                val commandId = context.resources.getIdentifier(
-                                    command,
-                                    "string",
-                                    context.packageName
-                                )
-//                                val commandText = context.getString(commandId)
-//                                val pattern = Regex("\\{([^}]*)\\}")
-                                Box(
-                                    modifier = Modifier.width(dimensionResource(R.dimen.dp_316))
-                                ) {
-                                    Text(
-                                        text = command,
-//                                        text = buildAnnotatedString {
-//                                            var startIndex = 0
-//                                            pattern.findAll(commandText).forEach { result ->
-//                                                val match = result.value
-//                                                val range = result.range
-//
-//                                                // Append text before the match
-//                                                append(
-//                                                    commandText.substring(
-//                                                        startIndex,
-//                                                        range.first
-//                                                    )
-//                                                )
-//
-//                                                // Apply style to the match
-//                                                withStyle(style = SpanStyle(color = Color.White)) {
-//                                                    append(
-//                                                        match.substring(
-//                                                            1,
-//                                                            match.length - 1
-//                                                        )
-//                                                    ) // Exclude {}
-//                                                }
-//
-//                                                startIndex = range.last + 1
-//                                            }
-//
-//                                            // Append the remaining text
-//                                            if (startIndex < commandText.length) {
-//                                                append(commandText.substring(startIndex))
-//                                            }
-//                                        },
-                                        color = Color.White,
-                                        maxLines = 3,
-                                        overflow = TextOverflow.Ellipsis,
-                                        style = MaterialTheme.typography.h5.plus(
-                                            TextStyle(
-                                                letterSpacing = (-0.48).sp,
-                                                lineHeight = 32.sp
-                                            )
-                                        ),
-                                        textAlign = TextAlign.Start
-                                    )
-                                }
-                                Image(
-                                    painter = painterResource(id = R.drawable.ic_guidance_indicator),
-                                    contentDescription = null,
-                                    modifier = Modifier
-                                        .width(dimensionResource(R.dimen.dp_16))
-                                        .height(dimensionResource(R.dimen.dp_16))
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun HelpDetailListItem(domainId: String, commandDetail: String) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .defaultMinSize(minHeight = dimensionResource(R.dimen.dp_80)),
-        contentAlignment = Alignment.CenterStart
-    ) {
-        Row {
-            Spacer(modifier = Modifier.width(dimensionResource(R.dimen.dp_33)))
-            Text(
-                text = commandDetail,
-                modifier = Modifier.padding(
-                    top = dimensionResource(R.dimen.dp_15),
-                    bottom = dimensionResource(R.dimen.dp_15),
-                    end = dimensionResource(R.dimen.dp_33)
-                ),
-                color = colorResource(id = R.color.white),
-                maxLines = 3,
-                overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.h3,
-                letterSpacing = (-0.43).sp,
-                fontSize = 21.3.sp,
-                textAlign = TextAlign.Start
             )
+            HelpList(helpList = helpList)
+//            IconButton(onClick = {
+//                onScreenSizeChange(ScreenSizeType.Large)
+//            }) {
+//                Icon(
+//                    imageVector = Icons.Default.KeyboardArrowUp,
+//                    contentDescription = null,
+//                    tint = if (mainUiState.isError) Color.Red else contentColor
+//                )
+//            }
+//            IconButton(onClick = {
+//                onScreenSizeChange(ScreenSizeType.Small)
+//            }) {
+//                Icon(
+//                    imageVector = Icons.Default.KeyboardArrowDown,
+//                    contentDescription = null,
+//                    tint = if (mainUiState.isError) Color.Red else contentColor
+//                )
+//            }
         }
     }
 }
 
-
 @Composable
-fun HelpListPreview() {
+fun HelpDetailWindow(
+    domainUiState: DomainUiState.HelpWindow,
+    contentColor: Color,
+    helpItemData: HelpItemData,
+    domainId: String,
+    onDismiss: () -> Unit,
+    onBackButton: () -> Unit,
+    onScreenSizeChange: (ScreenSizeType) -> Unit
+) {
+    Column {
+        TopAppBarContent(
+            title = domainId,
+            onNavigationIconClick = {
+                // 뒤로 가기
+            },
+            onActionIconClick = {
+                // 화면 닫기
+            }
+
+        )
+        HelpDetailList(helpItemData = helpItemData)
+    }
+}
+
+@Preview
+@Composable
+fun HelpDetailListWindowPreview() {
+
+    val helpItemData = HelpItemData(
+        domainId = SealedDomainType.Help,
+        command = "Command1",
+        commandsDetail = listOf("Detail1", "Detail2")
+    )
+
+
+    HelpDetailWindow(
+        domainUiState = DomainUiState.HelpWindow(
+            domainType = SealedDomainType.Help,
+            screenType = ScreenType.HelpDetailList,
+            data = "",
+            visible = true,
+            text = "HelpWindow",
+            screenSizeType = ScreenSizeType.Large
+        ),
+        contentColor = Color.DarkGray,
+        helpItemData = helpItemData,
+        onDismiss = {
+        },
+        onBackButton = {
+        },
+        onScreenSizeChange = {
+        },
+        domainId = "Navigation"
+    )
+}
+
+
+@Preview
+@Composable
+fun HelpListWindowPreview() {
     val helpItemDataList = listOf(
         HelpItemData(
             domainId = SealedDomainType.Help,
@@ -411,27 +218,4 @@ fun HelpListPreview() {
         onScreenSizeChange = {
         }
     )
-}
-
-@Composable
-fun HelpDetailListPreview() {
-    val helpItemData = HelpItemData(
-        domainId = SealedDomainType.Help,
-        command = "Command1",
-        commandsDetail = listOf("Detail1", "Detail2")
-    )
-
-    HelpDetailList(helpItemData = helpItemData)
-}
-
-@Preview
-@Composable
-fun HelpListPreviewPreview() {
-    HelpListPreview()
-}
-
-@Preview
-@Composable
-fun HelpDetailListPreviewPreview() {
-    HelpDetailListPreview()
 }
