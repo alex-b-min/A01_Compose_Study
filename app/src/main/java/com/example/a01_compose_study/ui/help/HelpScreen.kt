@@ -1,8 +1,5 @@
 package com.example.a01_compose_study.ui.help
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -61,7 +58,7 @@ fun ComposeHelpScreen(
                     onScreenSizeChange(screenSizeType)
                 }
             )
-        } else if (mainUiState.screenType is ScreenType.HelpDetailList) {
+        } else if (domainUiState.screenType is ScreenType.HelpDetailList) {
 //            HelpDetailWindow(
 //                mainUiState = mainUiState,
 //                contentColor = contentColor,
@@ -126,7 +123,7 @@ fun HelpListWindow(
 
 @Composable
 fun HelpDetailWindow(
-    mainUiState: MainUiState.HelpWindow,
+    domainUiState: DomainUiState.HelpWindow,
     contentColor: Color,
     helpItemData: HelpItemData,
     domainId: String,
@@ -161,7 +158,7 @@ fun HelpDetailListWindowPreview() {
 
 
     HelpDetailWindow(
-        mainUiState = MainUiState.HelpWindow(
+        domainUiState = DomainUiState.HelpWindow(
             domainType = SealedDomainType.Help,
             screenType = ScreenType.HelpDetailList,
             data = "",

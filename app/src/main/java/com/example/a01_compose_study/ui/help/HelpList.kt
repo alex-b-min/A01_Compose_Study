@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -31,10 +30,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.a01_compose_study.R
-import com.example.a01_compose_study.domain.ScreenType
 import com.example.a01_compose_study.domain.SealedDomainType
 import com.example.a01_compose_study.domain.model.HelpItemData
-import com.example.a01_compose_study.presentation.main.MainUiState
 
 
 @Composable
@@ -48,8 +45,9 @@ fun <T> List(
         }
     }
 }
+
 @Composable
-fun HelpList(helpList: List<HelpItemData>,) {
+fun HelpList(helpList: List<HelpItemData>) {
     List(helpList = helpList) { helpItemData ->
         HelpListItem(
             domainId = helpItemData.domainId,
