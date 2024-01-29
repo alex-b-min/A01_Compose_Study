@@ -79,7 +79,7 @@ fun MainRoute(
                     vrUiState = vrUiState as VRUiState.VRWindow,
                     contentColor = Color.Green,
                     onChangeWindowSize = { screenSizeType ->
-                         viewModel.onVREvent(VREvent.ChangeVRWindowSizeEvent(screenSizeType))
+                        viewModel.onVREvent(VREvent.ChangeVRWindowSizeEvent(screenSizeType))
                     },
                     onDismiss = {
                         viewModel.onDomainEvent(MainEvent.CloseDomainWindowEvent)
@@ -132,11 +132,11 @@ fun MainRoute(
                                     /**
                                      * HelpList에서의 백버튼 로직 구현
                                      */
-                                   viewModel.onVREvent(VREvent.OpenVRWindowEvent(
-                                       isError = false,
-                                       text = "VR 재실행",
-                                       screenSizeType = ScreenSizeType.Middle
-                                   ))
+                                    viewModel.onVREvent(VREvent.OpenVRWindowEvent(
+                                        isError = false,
+                                        text = "VR 재실행",
+                                        screenSizeType = ScreenSizeType.Middle
+                                    ))
                                 },
                                 onScreenSizeChange = { screenSizeType ->
                                     /**
