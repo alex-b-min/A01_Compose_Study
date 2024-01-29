@@ -2,6 +2,7 @@ package com.example.a01_compose_study.presentation.main.route
 
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
@@ -14,7 +15,10 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -67,95 +71,193 @@ fun MainRoute(
         targetFillMaxHeight.animateTo(newTargetValue)
     }
 
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        when (vrUiState) {
-            is VRUiState.NoneWindow -> {
+    Scaffold(modifier = Modifier.fillMaxSize(),
+        backgroundColor = Color.White) { innerPadding ->
+        Crossfade(targetState = uiState,
+            modifier = Modifier.padding(innerPadding), label = "",
+            animationSpec = tween(durationMillis = 1000)
+        ) { current ->
+            when (vrUiState) {
+                is VRUiState.NoneWindow -> {
+                    // VR 없는 상태에 대한 처리
+                }
+
+                is VRUiState.VRWindow -> {
+                    VRWindow(
+                        vrUiState = vrUiState as VRUiState.VRWindow,
+                        contentColor = Color.Green,
+                        onChangeWindowSize = { screenSizeType ->
+                            viewModel.onVREvent(VREvent.ChangeVRWindowSizeEvent(screenSizeType))
+                        },
+                        onDismiss = {
+                            viewModel.onDomainEvent(MainEvent.CloseDomainWindowEvent)
+                            viewModel.onVREvent(VREvent.CloseVRWindowEvent)
+                        }
+                    )
+                }
             }
 
-            is VRUiState.VRWindow -> {
-                VRWindow(
-                    vrUiState = vrUiState as VRUiState.VRWindow,
-                    contentColor = Color.Green,
-                    onChangeWindowSize = { screenSizeType ->
-                        viewModel.onVREvent(VREvent.ChangeVRWindowSizeEvent(screenSizeType))
-                    },
-                    onDismiss = {
-                        viewModel.onDomainEvent(MainEvent.CloseDomainWindowEvent)
-                        viewModel.onVREvent(VREvent.CloseVRWindowEvent)
-                    }
-                )
-            }
-        }
-
-        AnimatedVisibility(
-            visible = domainWindowVisibleState,
-            modifier = Modifier.fillMaxWidth(),
-            enter = slideInVertically(
-                initialOffsetY = { it },
-                animationSpec = tween(1000)
-            ),
-            exit = slideOutVertically(
-                targetOffsetY = { it },
-                animationSpec = tween(1000)
-            )
-        ) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.BottomStart
-            ) {
-                Column(
-                    modifier = Modifier
-                        .offset(x = 10.dp, y = (10).dp)
-                        .fillMaxHeight(targetFillMaxHeight.value)
-                        .fillMaxWidth(0.233f)
-                        .background(
-                            color = Color.DarkGray,
-                            shape = RoundedCornerShape(15.dp)
-                        ),
+//            AnimatedVisibility(
+//                visible = domainWindowVisibleState,
+//                modifier = Modifier.fillMaxWidth(),
+//                enter = slideInVertically(
+//                    initialOffsetY = { it },
+//                    animationSpec = tween(1000)
+//                ),
+//                exit = slideOutVertically(
+//                    targetOffsetY = { it },
+//                    animationSpec = tween(1000)
+//                )
+//            ) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.BottomStart
                 ) {
-                    when (uiState) {
-                        is DomainUiState.NoneWindow -> {
-                        }
+                    Column(
+                        modifier = Modifier
+                            .offset(x = 10.dp, y = (10).dp)
+                            .fillMaxHeight(targetFillMaxHeight.value)
+                            .fillMaxWidth(0.233f)
+                            .background(
+                                color = Color.DarkGray,
+                                shape = RoundedCornerShape(15.dp)
+                            ),
+                    ) {
+                        when (current) {
+                            is DomainUiState.NoneWindow -> {
+                                // NoneWindow에 대한 처리
+                            }
 
-                        is DomainUiState.HelpWindow -> {
-                            ComposeHelpScreen(domainUiState = uiState as DomainUiState.HelpWindow,
-                                contentColor = Color.White
-                            )
-                        }
+                            is DomainUiState.HelpWindow -> {
+                                ComposeHelpScreen(
+                                    domainUiState = current,
+                                    contentColor = Color.White
+                                )
+                            }
 
-                        is DomainUiState.AnnounceWindow -> {
+                            is DomainUiState.AnnounceWindow -> {
+                                // AnnounceWindow에 대한 처리
+                            }
 
-                        }
+                            is DomainUiState.DomainMenuWindow -> {
+                                // DomainMenuWindow에 대한 처리
+                            }
 
-                        is DomainUiState.DomainMenuWindow -> {
+                            is DomainUiState.CallWindow -> {
+                                // CallWindow에 대한 처리
+                            }
 
-                        }
+                            is DomainUiState.NavigationWindow -> {
+                                // NavigationWindow에 대한 처리
+                            }
 
-                        is DomainUiState.CallWindow -> {
+                            is DomainUiState.RadioWindow -> {
+                                // RadioWindow에 대한 처리
+                            }
 
-                        }
+                            is DomainUiState.WeatherWindow -> {
+                                // WeatherWindow에 대한 처리
+                            }
 
-                        is DomainUiState.NavigationWindow -> {
-
-                        }
-
-                        is DomainUiState.RadioWindow -> {
-
-                        }
-
-                        is DomainUiState.WeatherWindow -> {
-
-                        }
-
-                        is DomainUiState.SendMessageWindow -> {
-
+                            is DomainUiState.SendMessageWindow -> {
+                                // SendMessageWindow에 대한 처리
+                            }
                         }
                     }
                 }
-            }
+//            }
         }
+    }
+
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+//        when (vrUiState) {
+//            is VRUiState.NoneWindow -> {
+//            }
+//
+//            is VRUiState.VRWindow -> {
+//                VRWindow(
+//                    vrUiState = vrUiState as VRUiState.VRWindow,
+//                    contentColor = Color.Green,
+//                    onChangeWindowSize = { screenSizeType ->
+//                        viewModel.onVREvent(VREvent.ChangeVRWindowSizeEvent(screenSizeType))
+//                    },
+//                    onDismiss = {
+//                        viewModel.onDomainEvent(MainEvent.CloseDomainWindowEvent)
+//                        viewModel.onVREvent(VREvent.CloseVRWindowEvent)
+//                    }
+//                )
+//            }
+//        }
+//
+//        AnimatedVisibility(
+//            visible = domainWindowVisibleState,
+//            modifier = Modifier.fillMaxWidth(),
+//            enter = slideInVertically(
+//                initialOffsetY = { it },
+//                animationSpec = tween(1000)
+//            ),
+//            exit = slideOutVertically(
+//                targetOffsetY = { it },
+//                animationSpec = tween(1000)
+//            )
+//        ) {
+//            Box(
+//                modifier = Modifier.fillMaxSize(),
+//                contentAlignment = Alignment.BottomStart
+//            ) {
+//                Column(
+//                    modifier = Modifier
+//                        .offset(x = 10.dp, y = (10).dp)
+//                        .fillMaxHeight(targetFillMaxHeight.value)
+//                        .fillMaxWidth(0.233f)
+//                        .background(
+//                            color = Color.DarkGray,
+//                            shape = RoundedCornerShape(15.dp)
+//                        ),
+//                ) {
+//                    when (uiState) {
+//                        is DomainUiState.NoneWindow -> {
+//                        }
+//
+//                        is DomainUiState.HelpWindow -> {
+//                            ComposeHelpScreen(domainUiState = uiState as DomainUiState.HelpWindow,
+//                                contentColor = Color.White
+//                            )
+//                        }
+//
+//                        is DomainUiState.AnnounceWindow -> {
+//
+//                        }
+//
+//                        is DomainUiState.DomainMenuWindow -> {
+//
+//                        }
+//
+//                        is DomainUiState.CallWindow -> {
+//
+//                        }
+//
+//                        is DomainUiState.NavigationWindow -> {
+//
+//                        }
+//
+//                        is DomainUiState.RadioWindow -> {
+//
+//                        }
+//
+//                        is DomainUiState.WeatherWindow -> {
+//
+//                        }
+//
+//                        is DomainUiState.SendMessageWindow -> {
+//
+//                        }
+//                    }
+//                }
+//            }
+//        }
 
         Column(
             modifier = Modifier.fillMaxSize(),
