@@ -143,7 +143,9 @@ fun MainRoute(
                                      * 혹시나 띄어져 있는 화면(현재)에서 직접적으로 화면 사이즈를 변경하고 싶을때
                                      */
                                     scope.launch {
-                                        viewModel.changeDomainWindowSizeType(sizeType = screenSizeType)
+                                        viewModel.onDomainEvent(MainEvent.ChangeDomainWindowSizeEvent(
+                                            screenSizeType = screenSizeType
+                                        ))
                                     }
                                 }
                             )
