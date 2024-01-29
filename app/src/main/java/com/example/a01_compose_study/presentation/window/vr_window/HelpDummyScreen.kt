@@ -35,31 +35,26 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Devices
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.a01_compose_study.R
-import com.example.a01_compose_study.domain.ScreenType
-import com.example.a01_compose_study.domain.SealedDomainType
-import com.example.a01_compose_study.domain.model.HelpItemData
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.components.lottie.LottieAssetAnimationHandler
 import com.example.a01_compose_study.presentation.components.lottie.LottieRawAnimationHandler
-import com.example.a01_compose_study.presentation.main.MainUiState
+import com.example.a01_compose_study.presentation.main.DomainUiState
 import com.example.a01_compose_study.presentation.util.TextModifier.normalize
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
 fun HelpDummyScreen(
-    mainUiState: MainUiState.HelpWindow,
+    domainUiState: DomainUiState.HelpWindow,
     contentColor: Color,
     onDismiss: () -> Unit,
     onBackButton: () -> Unit
 ) {
     // 애니메이션을 제어하기 위한 visible 변수, 애니메이션 효과가 없다면 uiState의 visible값을 바로 사용해도 무방하다.
-    var visible by remember { mutableStateOf(mainUiState.visible.not()) }
+    var visible by remember { mutableStateOf(domainUiState.visible.not()) }
     val scope = rememberCoroutineScope()
 
 
@@ -69,7 +64,7 @@ fun HelpDummyScreen(
     // 화면 크기(세로) 변경 애니메이션 상태 관리 변수
     var targetFillMaxHeight by remember { mutableStateOf(Animatable(0f)) }
 
-    Log.d("@@ VRError : ", "${mainUiState.isError}")
+    Log.d("@@ VRError : ", "${domainUiState.isError}")
     /**
      * uiState의 visible 값이 true 일 때는 닫는 애니메이션을 위해 remember 타입의 visible = false 로 설정 / 반대로 false일 때는 띄우는 애니메이션을 위해 remember 타입의 visible = true 로 설정
      * 그렇기에  remember 타입의 visible의 값을 결정짓는 외부 데이터 uiState를 업데이트 시킬때 반대로 업데이트를 해야한다.
@@ -77,11 +72,11 @@ fun HelpDummyScreen(
      * [참고] 위에서 말하는 visible은 화면 전체 UI를 결정 짓는 uiState의 visible / 화면 내부에서 visible을 조절하는 remember 타입의 visile 두 가지가 있고 각각에 대한 설명임
      */
 
-    if (mainUiState.visible) { // uiState.visible가 true 일 때는 remember 타입의 visible을 false에서 true로 바꿔 띄우는 애니메이션 효과를 준다.
+    if (domainUiState.visible) { // uiState.visible가 true 일 때는 remember 타입의 visible을 false에서 true로 바꿔 띄우는 애니메이션 효과를 준다.
         LaunchedEffect(Unit) {
             visible = true
             // uiState로부터의 screenSizeType을 얻어 해당 화면 크기 설정
-            targetFillMaxHeight = when (mainUiState.screenSizeType) {
+            targetFillMaxHeight = when (domainUiState.screenSizeType) {
                 is ScreenSizeType.Small -> Animatable(0.15f)
                 is ScreenSizeType.Middle -> Animatable(0.268f)
                 is ScreenSizeType.Large -> Animatable(0.433f)
@@ -136,7 +131,7 @@ fun HelpDummyScreen(
                             Icon(
                                 imageVector = Icons.Default.Close,
                                 contentDescription = null,
-                                tint = if (mainUiState.isError) Color.Red else contentColor
+                                tint = if (domainUiState.isError) Color.Red else contentColor
                             )
                         }
                     }
@@ -154,7 +149,7 @@ fun HelpDummyScreen(
                             Icon(
                                 imageVector = Icons.Default.ArrowBack,
                                 contentDescription = null,
-                                tint = if (mainUiState.isError) Color.Red else contentColor
+                                tint = if (domainUiState.isError) Color.Red else contentColor
                             )
                         }
                     }
@@ -176,7 +171,7 @@ fun HelpDummyScreen(
                             Icon(
                                 imageVector = Icons.Default.KeyboardArrowUp,
                                 contentDescription = null,
-                                tint = if (mainUiState.isError) Color.Red else contentColor
+                                tint = if (domainUiState.isError) Color.Red else contentColor
                             )
                         }
                         IconButton(onClick = {
@@ -192,7 +187,7 @@ fun HelpDummyScreen(
                             Icon(
                                 imageVector = Icons.Default.KeyboardArrowDown,
                                 contentDescription = null,
-                                tint = if (mainUiState.isError) Color.Red else contentColor
+                                tint = if (domainUiState.isError) Color.Red else contentColor
                             )
                         }
                     }
@@ -201,7 +196,7 @@ fun HelpDummyScreen(
                         contentAlignment = Alignment.BottomCenter
                     ) {
                         //error에 따른 애니메이션 재생 분기
-                        if (mainUiState.isError) {
+                        if (domainUiState.isError) {
                             // Lottie Animation 배경 재생
                             LottieAssetAnimationHandler(
                                 modifier = Modifier.fillMaxSize(),
@@ -257,11 +252,11 @@ fun HelpDummyScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = mainUiState.text,
+                            text = domainUiState.text,
                             modifier = Modifier
                                 .alpha(textAlpha)
                                 .padding(bottom = 10.dp),
-                            color = if (mainUiState.isError) Color.Red else contentColor,
+                            color = if (domainUiState.isError) Color.Red else contentColor,
                             fontSize = when (targetFillMaxHeight.value) {
                                 0.2f -> 15.sp
                                 0.4f -> 25.sp

@@ -11,4 +11,8 @@ sealed class VREvent {
         val text: String,
         val screenSizeType: ScreenSizeType
     ) : VREvent()
+
+    data class ChangeVRWindowSizeEvent(
+        val screenSizeType: ScreenSizeType
+    ) : VREvent()
 }

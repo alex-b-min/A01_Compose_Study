@@ -1,8 +1,8 @@
 package com.example.a01_compose_study.presentation.main.route
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -21,7 +21,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,7 +30,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.components.button.PttButton
 import com.example.a01_compose_study.presentation.main.MainEvent
-import com.example.a01_compose_study.presentation.main.MainUiState
+import com.example.a01_compose_study.presentation.main.DomainUiState
 import com.example.a01_compose_study.presentation.main.MainViewModel
 import com.example.a01_compose_study.presentation.main.VREvent
 import com.example.a01_compose_study.presentation.main.VRUiState
@@ -44,7 +43,7 @@ import kotlinx.coroutines.launch
 fun MainRoute(
     viewModel: MainViewModel = hiltViewModel(),
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by viewModel.domainUiState.collectAsStateWithLifecycle()
     val vrUiState by viewModel.vrUiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
 
@@ -56,14 +55,16 @@ fun MainRoute(
 //    var visible by remember { mutableStateOf(false) }
     val domainWindowVisibleState by viewModel.domainWindowVisible.collectAsStateWithLifecycle()
 
-    var targetFillMaxHeight by remember { mutableStateOf(Animatable(0.4f)) }
+    val targetFillMaxHeight by remember { mutableStateOf(Animatable(0.4f)) }
 
     LaunchedEffect(uiState) {
-        targetFillMaxHeight = when (uiState.screenSizeType) {
-            is ScreenSizeType.Small -> Animatable(0.15f)
-            is ScreenSizeType.Middle -> Animatable(0.268f)
-            is ScreenSizeType.Large -> Animatable(0.433f)
+        Log.d("@@ uiState 변경", "${uiState.screenSizeType}")
+        val newTargetValue = when (uiState.screenSizeType) {
+            is ScreenSizeType.Small -> 0.15f
+            is ScreenSizeType.Middle ->0.268f
+            is ScreenSizeType.Large -> 0.433f
         }
+        targetFillMaxHeight.animateTo(newTargetValue)
     }
 
     Box(
@@ -77,6 +78,9 @@ fun MainRoute(
                 VRWindow(
                     vrUiState = vrUiState as VRUiState.VRWindow,
                     contentColor = Color.Green,
+                    onChangeWindowSize = { screenSizeType ->
+                        viewModel.onVREvent(VREvent.ChangeVRWindowSizeEvent(screenSizeType))
+                    },
                     onDismiss = {
                         viewModel.onDomainEvent(MainEvent.CloseDomainWindowEvent)
                         viewModel.onVREvent(VREvent.CloseVRWindowEvent)
@@ -112,57 +116,66 @@ fun MainRoute(
                         ),
                 ) {
                     when (uiState) {
-                        is MainUiState.NoneWindow -> {
+                        is DomainUiState.NoneWindow -> {
                         }
 
-                        is MainUiState.HelpWindow -> {
-                            ComposeHelpScreen(mainUiState = uiState as MainUiState.HelpWindow,
-                                contentColor = Color.Red,
+                        is DomainUiState.HelpWindow -> {
+                            ComposeHelpScreen(domainUiState = uiState as DomainUiState.HelpWindow,
+                                contentColor = Color.White,
                                 onDismiss = {
                                     /**
                                      * 닫기 버튼
                                      */
-                                    viewModel.closeDomainWindow()
+                                    viewModel.onVREvent(VREvent.CloseVRWindowEvent)
                                 },
-                                onBackButton = {
-                                    /*TODO(뒤로가기 구현)*/
+                                onHelpListBackButton = {
+                                    /**
+                                     * HelpList에서의 백버튼 로직 구현
+                                     */
+                                    viewModel.onVREvent(VREvent.OpenVRWindowEvent(
+                                        isError = false,
+                                        text = "VR 재실행",
+                                        screenSizeType = ScreenSizeType.Middle
+                                    ))
                                 },
                                 onScreenSizeChange = { screenSizeType ->
                                     /**
-                                     * 혹시나 targetFillMaxHeight의 사이즈 타입을 직접적으로 변경하고 싶을때
+                                     * 혹시나 띄어져 있는 화면(현재)에서 직접적으로 화면 사이즈를 변경하고 싶을때
                                      */
                                     scope.launch {
-                                        targetFillMaxHeight = changeSizeType(screenSizeType)
+                                        viewModel.onDomainEvent(MainEvent.ChangeDomainWindowSizeEvent(
+                                            screenSizeType = screenSizeType
+                                        ))
                                     }
                                 }
                             )
                         }
 
-                        is MainUiState.AnnounceWindow -> {
+                        is DomainUiState.AnnounceWindow -> {
 
                         }
 
-                        is MainUiState.MainMenuWindow -> {
+                        is DomainUiState.DomainMenuWindow -> {
 
                         }
 
-                        is MainUiState.CallWindow -> {
+                        is DomainUiState.CallWindow -> {
 
                         }
 
-                        is MainUiState.NavigationWindow -> {
+                        is DomainUiState.NavigationWindow -> {
 
                         }
 
-                        is MainUiState.RadioWindow -> {
+                        is DomainUiState.RadioWindow -> {
 
                         }
 
-                        is MainUiState.WeatherWindow -> {
+                        is DomainUiState.WeatherWindow -> {
 
                         }
 
-                        is MainUiState.SendMessageWindow -> {
+                        is DomainUiState.SendMessageWindow -> {
 
                         }
                     }
@@ -231,13 +244,5 @@ fun MainRoute(
                 }
             )
         }
-    }
-}
-
-fun changeSizeType(sizeType: ScreenSizeType): Animatable<Float, AnimationVector1D> {
-    return when (sizeType) {
-        is ScreenSizeType.Small -> Animatable(0.15f)
-        is ScreenSizeType.Middle -> Animatable(0.268f)
-        is ScreenSizeType.Large -> Animatable(0.433f)
     }
 }
