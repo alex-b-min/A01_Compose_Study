@@ -29,8 +29,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.components.button.PttButton
-import com.example.a01_compose_study.presentation.main.MainEvent
 import com.example.a01_compose_study.presentation.main.DomainUiState
+import com.example.a01_compose_study.presentation.main.MainEvent
 import com.example.a01_compose_study.presentation.main.MainViewModel
 import com.example.a01_compose_study.presentation.main.VREvent
 import com.example.a01_compose_study.presentation.main.VRUiState
@@ -121,33 +121,7 @@ fun MainRoute(
 
                         is DomainUiState.HelpWindow -> {
                             ComposeHelpScreen(domainUiState = uiState as DomainUiState.HelpWindow,
-                                contentColor = Color.White,
-                                onDismiss = {
-                                    /**
-                                     * 닫기 버튼
-                                     */
-                                    viewModel.onVREvent(VREvent.CloseVRWindowEvent)
-                                },
-                                onHelpListBackButton = {
-                                    /**
-                                     * HelpList에서의 백버튼 로직 구현
-                                     */
-                                    viewModel.onVREvent(VREvent.OpenVRWindowEvent(
-                                        isError = false,
-                                        text = "VR 재실행",
-                                        screenSizeType = ScreenSizeType.Middle
-                                    ))
-                                },
-                                onScreenSizeChange = { screenSizeType ->
-                                    /**
-                                     * 혹시나 띄어져 있는 화면(현재)에서 직접적으로 화면 사이즈를 변경하고 싶을때
-                                     */
-                                    scope.launch {
-                                        viewModel.onDomainEvent(MainEvent.ChangeDomainWindowSizeEvent(
-                                            screenSizeType = screenSizeType
-                                        ))
-                                    }
-                                }
+                                contentColor = Color.White
                             )
                         }
 

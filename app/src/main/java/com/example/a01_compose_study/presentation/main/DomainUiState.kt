@@ -2,6 +2,7 @@ package com.example.a01_compose_study.presentation.main
 
 import com.example.a01_compose_study.domain.ScreenType
 import com.example.a01_compose_study.domain.SealedDomainType
+import com.example.a01_compose_study.domain.model.HelpItemData
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 
 sealed class DomainUiState(
@@ -14,7 +15,8 @@ sealed class DomainUiState(
     data class HelpWindow(
         val domainType: SealedDomainType,
         val screenType: ScreenType,
-        val data: Any,
+        val data: List<HelpItemData>,
+        val detailData: HelpItemData = HelpItemData(command = ""),
         val visible: Boolean,
         val isError: Boolean = false,
         val text: String = "",

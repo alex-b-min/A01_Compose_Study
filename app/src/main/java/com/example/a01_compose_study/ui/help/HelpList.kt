@@ -30,7 +30,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.a01_compose_study.R
-import com.example.a01_compose_study.domain.SealedDomainType
 import com.example.a01_compose_study.domain.model.HelpItemData
 
 
@@ -47,13 +46,13 @@ fun <T> List(
 }
 
 @Composable
-fun HelpList(helpList: List<HelpItemData>) {
+fun HelpList(helpList: List<HelpItemData>,
+             onItemClick: (HelpItemData) -> Unit) {
     List(helpList = helpList) { helpItemData ->
         HelpListItem(
-            domainId = helpItemData.domainId,
-            command = helpItemData.command,
+            helpItemData,
             onItemClick = {
-
+                onItemClick(helpItemData)
             }
         )
     }
@@ -71,15 +70,14 @@ fun HelpDetailList(helpItemData: HelpItemData) {
 
 @Composable
 fun HelpListItem(
-    domainId: SealedDomainType,
-    command: String,
+    helpItemData: HelpItemData,
     focused: Boolean = false,
-    onItemClick: () -> Unit
+    onItemClick: (HelpItemData) -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onItemClick() },
+            .clickable { onItemClick(helpItemData) },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
@@ -109,7 +107,7 @@ fun HelpListItem(
                                 )
                         ) {
                             Text(
-                                text = domainId.text,
+                                text = helpItemData.domainId.text,
                                 modifier = Modifier
                                     .defaultMinSize(minHeight = dimensionResource(R.dimen.dp_24)),
                                 color = colorResource(id = R.color.guidance_domain_text_color),
@@ -131,7 +129,7 @@ fun HelpListItem(
 
                                 val context = LocalContext.current
                                 val commandId = context.resources.getIdentifier(
-                                    command,
+                                    helpItemData.command,
                                     "string",
                                     context.packageName
                                 )
@@ -140,7 +138,7 @@ fun HelpListItem(
                                     modifier = Modifier.width(dimensionResource(R.dimen.dp_316))
                                 ) {
                                     Text(
-                                        text = command,
+                                        text = helpItemData.command,
                                         color = Color.White,
                                         maxLines = 3,
                                         overflow = TextOverflow.Ellipsis,

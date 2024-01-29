@@ -4,11 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.a01_compose_study.domain.ScreenType
 import com.example.a01_compose_study.domain.SealedDomainType
+import com.example.a01_compose_study.domain.model.HelpItemData
 import com.example.a01_compose_study.domain.usecase.HelpUsecase
 import com.example.a01_compose_study.domain.util.ScreenSizeType
+import com.example.a01_compose_study.presentation.data.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -19,14 +20,14 @@ class MainViewModel @Inject constructor(
     private val helpUsecase: HelpUsecase,
 ) : ViewModel() {
 
-    private val _domainUiState = MutableStateFlow<DomainUiState>(DomainUiState.NoneWindow())
-    val domainUiState: StateFlow<DomainUiState> = _domainUiState
+    private val _domainUiState = UiState._domainUiState
+    val domainUiState: StateFlow<DomainUiState> = UiState.domainUiState
 
-    private val _vrUiState = MutableStateFlow<VRUiState>(VRUiState.NoneWindow)
-    val vrUiState: StateFlow<VRUiState> = _vrUiState
+    private val _vrUiState = UiState._vrUiState
+    val vrUiState: StateFlow<VRUiState> = UiState.vrUiState
 
-    private val _domainWindowVisible = MutableStateFlow<Boolean>(false)
-    val domainWindowVisible: StateFlow<Boolean> = _domainWindowVisible
+    private val _domainWindowVisible = UiState._domainWindowVisible
+    val domainWindowVisible: StateFlow<Boolean> = UiState.domainWindowVisible
 
     fun onVREvent(event: VREvent) {
         when (event) {
@@ -137,10 +138,11 @@ class MainViewModel @Inject constructor(
                         }
 
                         SealedDomainType.Help -> {
+                            val helpData = event.data as? List<HelpItemData> ?: emptyList()
                             DomainUiState.HelpWindow(
                                 domainType = event.domainType,
                                 screenType = event.screenType,
-                                data = event.data,
+                                data = helpData,
                                 visible = true,
                                 text = "HelpWindow",
                                 screenSizeType = ScreenSizeType.Large
