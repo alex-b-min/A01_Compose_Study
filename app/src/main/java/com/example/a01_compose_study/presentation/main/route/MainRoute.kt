@@ -7,6 +7,8 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -68,7 +70,14 @@ fun MainRoute(
     }
 
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null
+            ) {
+                viewModel.onVREvent(VREvent.CloseVRWindowEvent)
+            }
     ) {
         when (vrUiState) {
             is VRUiState.NoneWindow -> {
@@ -82,7 +91,6 @@ fun MainRoute(
                         viewModel.onVREvent(VREvent.ChangeVRWindowSizeEvent(screenSizeType))
                     },
                     onDismiss = {
-                        viewModel.onDomainEvent(MainEvent.CloseDomainWindowEvent)
                         viewModel.onVREvent(VREvent.CloseVRWindowEvent)
                     }
                 )
@@ -124,7 +132,11 @@ fun MainRoute(
                             .background(
                                 color = Color.DarkGray,
                                 shape = RoundedCornerShape(15.dp)
-                            ),
+                            )
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null
+                            ) {},
                     ) {
                         when (currDomainUiState) {
                             is DomainUiState.NoneWindow -> {
