@@ -1,4 +1,4 @@
-package com.example.a01_compose_study.data.repositoryImpl
+package com.example.a01_compose_study.data.repository.vr
 
 import com.example.a01_compose_study.domain.SealedDomainType
 import com.example.a01_compose_study.domain.model.HelpItemData

@@ -1,4 +1,4 @@
-package com.example.a01_compose_study.data.repositoryImpl
+package com.example.a01_compose_study.data.repository
 
 import androidx.lifecycle.ViewModel
 import com.example.a01_compose_study.domain.util.CustomLogger
