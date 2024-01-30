@@ -4,9 +4,9 @@ import com.example.a01_compose_study.domain.model.VRResult
 import com.example.a01_compose_study.domain.repository.vr.VRRepository
 
 class VRUseCase(
-    private val repository: VRRepository
+    private val repository: VRRepository,
 ) {
-    operator fun invoke(): VRResult{
+    operator fun invoke(): VRResult {
         return repository.onVRResult()
     }
 }
