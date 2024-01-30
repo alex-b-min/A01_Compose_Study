@@ -99,10 +99,13 @@ class MainViewModel @Inject constructor(
                         if (anyTypeData is List<*> && anyTypeData.isNotEmpty()) {
                             onVREvent(VREvent.CloseVRWindowEvent)
                             delay(500)
+                            /**
+                             * 추후 파싱된 데이터에는 domainType / screenType / data 이렇게 3개가 파싱되어 내려올 것으로 예상하고 작성함.
+                             */
                             onDomainEvent(
                                 event = MainEvent.OpenDomainWindowEvent(
-                                    domainType = SealedDomainType.Help,
-                                    screenType = ScreenType.HelpList,
+                                    domainType = SealedDomainType.Help, // 현재는 직접 도메인 타입(Help)을 넣음
+                                    screenType = ScreenType.HelpList, // 현재는 직접 스크린 타입(HelpList)을 넣음
                                     data = anyTypeData,
                                     isError = false,
                                     screenSizeType = ScreenSizeType.Large
