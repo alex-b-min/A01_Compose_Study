@@ -32,7 +32,6 @@ import androidx.compose.ui.unit.sp
 import com.example.a01_compose_study.R
 import com.example.a01_compose_study.domain.model.HelpItemData
 
-
 @Composable
 fun <T> List(
     helpList: List<T>,
@@ -46,14 +45,16 @@ fun <T> List(
 }
 
 @Composable
-fun HelpList(helpList: List<HelpItemData>,
-             onItemClick: (HelpItemData) -> Unit) {
+fun HelpList(
+    helpList: List<HelpItemData>,
+    onItemClick: (HelpItemData) -> Unit
+) {
     List(helpList = helpList) { helpItemData ->
         HelpListItem(
-            helpItemData,
-            onItemClick = {
+            helpItemData = helpItemData,
+            onItemClick = { helpItemData ->
                 onItemClick(helpItemData)
-            }
+            },
         )
     }
 }
@@ -71,8 +72,7 @@ fun HelpDetailList(helpItemData: HelpItemData) {
 @Composable
 fun HelpListItem(
     helpItemData: HelpItemData,
-    focused: Boolean = false,
-    onItemClick: (HelpItemData) -> Unit
+    onItemClick: (HelpItemData) -> Unit,
 ) {
     Row(
         modifier = Modifier

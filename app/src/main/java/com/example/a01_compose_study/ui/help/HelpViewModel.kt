@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.a01_compose_study.domain.ScreenType
 import com.example.a01_compose_study.domain.usecase.HelpUseCase
-import com.example.a01_compose_study.domain.usecase.VRUseCase
 import com.example.a01_compose_study.presentation.data.UiState
 import com.example.a01_compose_study.presentation.main.DomainUiState
 import com.example.a01_compose_study.presentation.main.VRUiState
@@ -30,6 +29,7 @@ class HelpViewModel @Inject constructor(
             is HelpEvent.OnDismiss -> {
                 _domainWindowVisible.value = false
             }
+
             is HelpEvent.OnHelpListBack -> {
                 viewModelScope.launch {
                     _domainWindowVisible.value = false
@@ -48,6 +48,7 @@ class HelpViewModel @Inject constructor(
                     }
                 }
             }
+
             is HelpEvent.OnHelpDetailBack -> {
                 _domainUiState.update { domainUiState ->
                     (domainUiState as? DomainUiState.HelpWindow)?.copy(
@@ -55,14 +56,16 @@ class HelpViewModel @Inject constructor(
                     ) ?: domainUiState
                 }
             }
+
             is HelpEvent.HelpListItemOnClick -> {
                 _domainUiState.update { domainUiState ->
                     (domainUiState as? DomainUiState.HelpWindow)?.copy(
                         screenType = ScreenType.HelpDetailList,
-                        detailData = event.helpItemData
+                        detailData = event.selectedHelpItem
                     ) ?: domainUiState
                 }
             }
+
             is HelpEvent.ChangeHelpWindowSizeEvent -> {
                 _domainUiState.update { uiState ->
                     uiState.copyWithNewSizeType(event.screenSizeType)

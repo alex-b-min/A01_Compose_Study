@@ -194,7 +194,7 @@ class MainViewModel @Inject constructor(
 
     fun closeVRWindow() {
         // 현재의 error 상태에 따른 glow 애니메이션창을 내려야하기 때문에 isError에 uiState.isError로 설정
-        if (_vrUiState.value is VRUiState.VRWindow) {
+        if (vrUiState.value is VRUiState.VRWindow) {
             _vrUiState.update { vrUiState ->
                 (vrUiState as? VRUiState.VRWindow)?.copy(
                     visible = false,
