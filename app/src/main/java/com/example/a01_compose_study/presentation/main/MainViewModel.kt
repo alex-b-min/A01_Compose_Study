@@ -38,6 +38,15 @@ class MainViewModel @Inject constructor(
                         else -> VRUiState.NoneWindow
                     }
                 }
+            }
+            
+            is VREvent.CloseAllVRWindowsEvent -> {
+                _vrUiState.update { vrUiState ->
+                    when (vrUiState) {
+                        is VRUiState.VRWindow -> vrUiState.copy(visible = false)
+                        else -> VRUiState.NoneWindow
+                    }
+                }
                 closeDomainWindow()
             }
 
@@ -89,13 +98,8 @@ class MainViewModel @Inject constructor(
 
                         if (helpList is List<*> && helpList.isNotEmpty()) {
                             viewModelScope.launch {
-                                _vrUiState.update { visible ->
-                                    VRUiState.NoneWindow
-                                }
-                                closeVRWindow()
-
+                                onVREvent(VREvent.CloseVRWindowEvent)
                                 delay(500)
-                                openDomainWindow()
                                 onDomainEvent(
                                     event = MainEvent.OpenDomainWindowEvent(
                                         domainType = SealedDomainType.Help,
@@ -137,6 +141,7 @@ class MainViewModel @Inject constructor(
             }
 
             is MainEvent.OpenDomainWindowEvent -> {
+                _domainWindowVisible.value = true
                 _domainUiState.update { uiState ->
                     val domainUiState = when (event.domainType) {
                         SealedDomainType.None -> {

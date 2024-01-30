@@ -1,6 +1,5 @@
 package com.example.a01_compose_study.presentation.window.vr_window
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
@@ -52,7 +51,8 @@ fun VRWindow(
     vrUiState: VRUiState.VRWindow,
     contentColor: Color,
     onChangeWindowSize: (ScreenSizeType) -> Unit,
-    onDismiss: () -> Unit,
+    onCloseVRWindow: () -> Unit,
+    onCloseAllWindow: () -> Unit,
 ) {
     // 애니메이션을 제어하기 위한 visible 변수, 애니메이션 효과가 없다면 uiState의 visible값을 바로 사용해도 무방하다.
     var visible by remember { mutableStateOf(vrUiState.visible.not()) }
@@ -91,7 +91,7 @@ fun VRWindow(
         LaunchedEffect(Unit) {
             visible = false
             delay(500)
-            onDismiss()
+            onCloseVRWindow()
         }
     }
 
@@ -130,7 +130,7 @@ fun VRWindow(
                             scope.launch {
                                 visible = false
                                 delay(500)
-                                onDismiss()
+                                onCloseAllWindow()
                             }
                         }) {
                             Icon(
@@ -272,6 +272,8 @@ fun CustomSizeAlertDialogPreview() {
         ),
         contentColor = Color.Magenta,
         onChangeWindowSize = { },
-        onDismiss = {
+        onCloseVRWindow = {
+        },
+        onCloseAllWindow = {
         })
 }

@@ -76,7 +76,7 @@ fun MainRoute(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null
             ) {
-                viewModel.onVREvent(VREvent.CloseVRWindowEvent)
+                viewModel.onVREvent(VREvent.CloseAllVRWindowsEvent)
             }
     ) {
         when (vrUiState) {
@@ -90,8 +90,11 @@ fun MainRoute(
                     onChangeWindowSize = { screenSizeType ->
                         viewModel.onVREvent(VREvent.ChangeVRWindowSizeEvent(screenSizeType))
                     },
-                    onDismiss = {
+                    onCloseVRWindow = {
                         viewModel.onVREvent(VREvent.CloseVRWindowEvent)
+                    },
+                    onCloseAllWindow = {
+                        viewModel.onVREvent(VREvent.CloseAllVRWindowsEvent)
                     }
                 )
             }
@@ -207,7 +210,7 @@ fun MainRoute(
                     scope.launch {
                         viewModel.closeVRWindow()
                         delay(500)
-                        viewModel.onVREvent(VREvent.CloseVRWindowEvent)
+                        viewModel.onVREvent(VREvent.CloseAllVRWindowsEvent)
                     }
                 }
             )

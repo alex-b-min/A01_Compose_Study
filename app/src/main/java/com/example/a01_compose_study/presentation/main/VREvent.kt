@@ -6,6 +6,8 @@ sealed class VREvent {
 
     object CloseVRWindowEvent : VREvent()
 
+    object CloseAllVRWindowsEvent : VREvent()
+
     data class OpenVRWindowEvent(
         val isError: Boolean,
         val text: String,
