@@ -23,7 +23,10 @@ class VRRepositoryImpl @Inject constructor() : VRRepository {
                 data = parseVRDataToItemData(helpVRDataList as List<HelpVRData>),
                 domainType = SealedDomainType.Help,
                 screenType = ScreenType.HelpList,
-                screenSizeType = ScreenSizeType.Large)
+                screenSizeType = ScreenSizeType.Large
+            )
+        } else if (helpVRDataList is List<*> && helpVRDataList.isEmpty()) {
+            VRResult.NoData
         } else {
             VRResult.Error(
                 errorMessage = "errorMessage"
@@ -69,31 +72,39 @@ class VRRepositoryImpl @Inject constructor() : VRRepository {
     private fun mapDomainId(vrDomainId: String): SealedDomainType {
         // 여기에서 적절한 로직을 추가하여 HelpVRData의 domainId를 HelpItemData의 domainId로 매핑
         // 예를 들어, "Navigation"이면 SealedDomainType.Navigation을 반환하는 식으로
-        val domainType = when(vrDomainId) {
+        val domainType = when (vrDomainId) {
             "Navigation" -> {
                 SealedDomainType.Navigation
             }
+
             "Call" -> {
                 SealedDomainType.Call
             }
+
             "Weather" -> {
                 SealedDomainType.Weather
             }
+
             "Radio" -> {
                 SealedDomainType.Radio
             }
+
             "SendMessage" -> {
                 SealedDomainType.SendMessage
             }
+
             "MainMenu" -> {
                 SealedDomainType.MainMenu
             }
+
             "Announce" -> {
                 SealedDomainType.Announce
             }
+
             "Help" -> {
                 SealedDomainType.Help
             }
+
             else -> {
                 SealedDomainType.None
             }
