@@ -27,7 +27,6 @@ fun ComposeHelpScreen(
     domainUiState: DomainUiState.HelpWindow,
     contentColor: Color,
 ) {
-    val scope = rememberCoroutineScope()
     val viewModel: HelpViewModel = hiltViewModel()
     /**
      * [Help Window -> Help Detail Window 화면 전환 방법]
@@ -56,7 +55,7 @@ fun ComposeHelpScreen(
                     viewModel.onHelpEvent(event = HelpEvent.ChangeHelpWindowSizeEvent(screenSizeType))
                 },
                 onClickListener = { helpItemData ->
-                    viewModel.onEvent(HelpEvent.SelectHelpItem(helpItemData))
+                    viewModel.onHelpEvent(HelpEvent.SelectHelpListItem(helpItemData))
                 }
             )
         } else if (domainUiState.screenType is ScreenType.HelpDetailList) {
@@ -87,7 +86,7 @@ fun HelpListWindow(
     onScreenSizeChange: (ScreenSizeType) -> Unit,
     onClickListener: (HelpItemData) -> Unit
 ) {
-    val helpList = domainUiState.data as List<HelpItemData>
+    val helpList = domainUiState.data
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier.fillMaxSize(),

@@ -1,11 +1,6 @@
 package com.example.a01_compose_study.ui.help
 
 import androidx.lifecycle.ViewModel
-import com.example.a01_compose_study.domain.ScreenType
-import com.example.a01_compose_study.domain.model.HelpItemData
-import com.example.a01_compose_study.domain.usecase.HelpUsecase
-import com.example.a01_compose_study.presentation.data.UiState
-import com.example.a01_compose_study.presentation.main.DomainUiState
 import androidx.lifecycle.viewModelScope
 import com.example.a01_compose_study.domain.ScreenType
 import com.example.a01_compose_study.domain.usecase.VRUseCase
@@ -16,14 +11,13 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 @HiltViewModel
 class HelpViewModel @Inject constructor(
-    private val VRUsecase: VRUseCase,
+    private val vrUsecase: VRUseCase,
 ) : ViewModel() {
-    
+
     private val _domainUiState = UiState._domainUiState
 
     private val _vrUiState = UiState._vrUiState
@@ -35,6 +29,7 @@ class HelpViewModel @Inject constructor(
             is HelpEvent.OnDismiss -> {
                 _domainWindowVisible.value = false
             }
+
             is HelpEvent.OnHelpListBack -> {
                 viewModelScope.launch {
                     _domainWindowVisible.value = false
@@ -53,6 +48,7 @@ class HelpViewModel @Inject constructor(
                     }
                 }
             }
+
             is HelpEvent.OnHelpDetailBack -> {
                 _domainUiState.update { domainUiState ->
                     (domainUiState as? DomainUiState.HelpWindow)?.copy(
@@ -60,7 +56,8 @@ class HelpViewModel @Inject constructor(
                     ) ?: domainUiState
                 }
             }
-            is HelpEvent.SelectHelpItem -> {
+
+            is HelpEvent.SelectHelpListItem -> {
                 _domainUiState.update { domainUiState ->
                     (domainUiState as? DomainUiState.HelpWindow)?.copy(
                         screenType = ScreenType.HelpDetailList,
@@ -68,6 +65,7 @@ class HelpViewModel @Inject constructor(
                     ) ?: domainUiState
                 }
             }
+
             is HelpEvent.ChangeHelpWindowSizeEvent -> {
                 _domainUiState.update { uiState ->
                     uiState.copyWithNewSizeType(event.screenSizeType)
@@ -75,11 +73,4 @@ class HelpViewModel @Inject constructor(
             }
         }
     }
-    
-
-    fun getHelpList(): List<HelpItemData> {
-        return helpUsecase.invoke()
-    }
-
-
 }

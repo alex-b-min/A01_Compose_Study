@@ -6,8 +6,6 @@ import com.example.a01_compose_study.domain.ScreenType
 import com.example.a01_compose_study.domain.SealedDomainType
 import com.example.a01_compose_study.domain.model.HelpItemData
 import com.example.a01_compose_study.domain.usecase.VRUseCase
-import com.example.a01_compose_study.domain.model.HelpItemData
-import com.example.a01_compose_study.domain.usecase.HelpUsecase
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.data.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,7 +19,7 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     private val VRUsecase: VRUseCase,
 ) : ViewModel() {
-    
+
     private val _domainUiState = UiState._domainUiState
     val domainUiState: StateFlow<DomainUiState> = UiState.domainUiState
 
@@ -34,7 +32,7 @@ class MainViewModel @Inject constructor(
     fun onVREvent(event: VREvent) {
         when (event) {
             is VREvent.CloseVRWindowEvent -> {
-                vrUiState.update { visible ->
+                _vrUiState.update { visible ->
                     VRUiState.NoneWindow
                 }
                 closeDomainWindow()
@@ -46,7 +44,7 @@ class MainViewModel @Inject constructor(
                  * ==> 즉, 현재 화면에서 직접적으로 화면 크기를 변경하게 할 수 있음
                  * 어차피 vrUiState의 타입이 VRWindow 일 때만 사이즈를 변경 가능할 수 있기에 타입을 지정하여 copy()를 사용함.
                  */
-                vrUiState.update { currentState ->
+                _vrUiState.update { currentState ->
                     when (currentState) {
                         is VRUiState.VRWindow -> currentState.copy(screenSizeType = event.screenSizeType)
                         else -> currentState
@@ -55,11 +53,11 @@ class MainViewModel @Inject constructor(
             }
 
             is VREvent.OpenVRWindowEvent -> {
-                domainUiState.update { uiState ->
+                _domainUiState.update { uiState ->
                     DomainUiState.NoneWindow()
                 }
 
-                vrUiState.update { vrUiState ->
+                _vrUiState.update { vrUiState ->
                     VRUiState.VRWindow(
                         visible = true,
                         isError = event.isError,
@@ -88,7 +86,7 @@ class MainViewModel @Inject constructor(
 
                         if (helpList is List<*> && helpList.isNotEmpty()) {
                             viewModelScope.launch {
-                                vrUiState.update { visible ->
+                                _vrUiState.update { visible ->
                                     VRUiState.NoneWindow
                                 }
                                 closeVRWindow()
@@ -119,7 +117,7 @@ class MainViewModel @Inject constructor(
             }
 
             is MainEvent.NoneDomainWindowEvent -> {
-                domainUiState.update { uiState ->
+                _domainUiState.update { uiState ->
                     DomainUiState.NoneWindow(event.screenSizeType)
                 }
             }
@@ -130,13 +128,13 @@ class MainViewModel @Inject constructor(
                  * ==> 즉, 현재 화면에서 직접적으로 화면 크기를 변경하게 할 수 있음
                  * MainUiState에 미리 copyWithNewSizeType()라는 함수를 정의하여 기존 데이터는 유지한 체 screenSizeType 만을 변경하여 사용하도록 함.
                  */
-                domainUiState.update { uiState ->
+                _domainUiState.update { uiState ->
                     uiState.copyWithNewSizeType(event.screenSizeType)
                 }
             }
 
             is MainEvent.OpenDomainWindowEvent -> {
-                domainUiState.update { uiState ->
+                _domainUiState.update { uiState ->
                     val domainUiState = when (event.domainType) {
                         SealedDomainType.None -> {
                             DomainUiState.NoneWindow()
@@ -199,7 +197,7 @@ class MainViewModel @Inject constructor(
     fun closeVRWindow() {
         // 현재의 error 상태에 따른 glow 애니메이션창을 내려야하기 때문에 isError에 uiState.isError로 설정
         if (vrUiState.value is VRUiState.VRWindow) {
-            vrUiState.update { vrUiState ->
+            _vrUiState.update { vrUiState ->
                 (vrUiState as? VRUiState.VRWindow)?.copy(
                     visible = false,
                     isError = vrUiState.isError
@@ -208,16 +206,16 @@ class MainViewModel @Inject constructor(
         }
         // VRWindow의 닫기 버튼을 클릭한다면 DomainWindow도 닫혀야 된다고 생각하고 아래의 코드 추가
         closeDomainWindow()
-        domainUiState.update { uiState ->
+        _domainUiState.update { uiState ->
             DomainUiState.NoneWindow()
         }
     }
 
     fun closeDomainWindow() {
-        domainWindowVisible.value = false
+        _domainWindowVisible.value = false
     }
 
     fun openDomainWindow() {
-        domainWindowVisible.value = true
+        _domainWindowVisible.value = true
     }
 }
