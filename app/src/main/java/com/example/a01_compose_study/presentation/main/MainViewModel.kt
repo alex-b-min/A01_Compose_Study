@@ -84,7 +84,7 @@ class MainViewModel @Inject constructor(
                      * 현재는 helpUsecase()로부터 값을 받아오기 때문에 도메인 타입이 Help로 고정됨
                      */
                     delay(2000)
-                    if (!event.isError) {
+                    if (!event.isError) { // 에러가 아닐 때
                         when (val vrResult = vrUsecase()) {
                             is VRResult.Success -> {
                                 onVREvent(VREvent.CloseVRWindowEvent)
@@ -124,7 +124,7 @@ class MainViewModel @Inject constructor(
                             }
                         }
                     }
-                    else {
+                    else { // 에러 일 때 이 코드는 추후에 삭제 예정
                         delay(500)
                         onVREvent(
                             event = VREvent.OpenVRWindowEvent(
