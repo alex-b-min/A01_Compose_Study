@@ -34,34 +34,6 @@ import com.example.a01_compose_study.R
 import com.example.a01_compose_study.domain.model.HelpItemData
 import com.example.a01_compose_study.presentation.components.list.LazyColumnList
 
-//@Composable
-//fun HelpList(
-//    helpList: List<HelpItemData>,
-//    onItemClick: (HelpItemData) -> Unit
-//) {
-//    LazyColumn {
-//        itemsIndexed(
-//            helpList,
-//        ) { index, helpItemData ->
-//            HelpListItem(
-//                helpItemData = helpItemData,
-//                onItemClick = onItemClick,
-//            )
-//        }
-//    }
-//}
-//
-//@Composable
-//fun HelpDetailList(helpItemData: HelpItemData) {
-//    LazyColumn {
-//        itemsIndexed(helpItemData.commandsDetail) { index, commandDetail ->
-//            HelpDetailListItem(
-//                commandDetail = commandDetail
-//            )
-//        }
-//    }
-//}
-
 @Composable
 fun HelpList(
     helpList: List<HelpItemData>, onItemClick: (HelpItemData) -> Unit
