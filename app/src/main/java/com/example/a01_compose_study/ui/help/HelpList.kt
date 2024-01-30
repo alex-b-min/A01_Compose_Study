@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -33,39 +34,29 @@ import com.example.a01_compose_study.R
 import com.example.a01_compose_study.domain.model.HelpItemData
 
 @Composable
-fun <T> List(
-    helpList: List<T>,
-    helpListContent: @Composable (T) -> Unit
+fun HelpList(
+    helpList: List<HelpItemData>,
+    onItemClick: (HelpItemData) -> Unit
 ) {
     LazyColumn {
-        items(helpList.size) { index ->
-            helpListContent(helpList[index])
+        items(helpList) { helpItemData ->
+            HelpListItem(
+                helpItemData = helpItemData,
+                onItemClick = onItemClick,
+            )
         }
     }
 }
 
 @Composable
-fun HelpList(
-    helpList: List<HelpItemData>,
-    onItemClick: (HelpItemData) -> Unit
-) {
-    List(helpList = helpList) { helpItemData ->
-        HelpListItem(
-            helpItemData = helpItemData,
-            onItemClick = { helpItemData ->
-                onItemClick(helpItemData)
-            },
-        )
-    }
-}
-
-@Composable
 fun HelpDetailList(helpItemData: HelpItemData) {
-    List(helpList = helpItemData.commandsDetail) { commandDeatail ->
-        HelpDetailListItem(
-            domainId = helpItemData.domainId.text,
-            commandDetail = commandDeatail
-        )
+    LazyColumn {
+        items(helpItemData.commandsDetail) { commandDetail ->
+            HelpDetailListItem(
+                domainId = helpItemData.domainId.text,
+                commandDetail = commandDetail
+            )
+        }
     }
 }
 
