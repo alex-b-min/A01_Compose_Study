@@ -84,45 +84,56 @@ class MainViewModel @Inject constructor(
                      * 현재는 helpUsecase()로부터 값을 받아오기 때문에 도메인 타입이 Help로 고정됨
                      */
                     delay(2000)
-                    when (val vrResult = vrUsecase()) {
-                        is VRResult.Success -> {
-                            onVREvent(VREvent.CloseVRWindowEvent)
-                            delay(500)
-                            /**
-                             * 추후 파싱된 데이터에는 data / domainType / screenType / screenSizeType 이렇게 4개가 파싱되어 내려올 것으로 예상하고 작성함.
-                             */
-                            onDomainEvent(
-                                event = MainEvent.OpenDomainWindowEvent(
-                                    domainType = vrResult.domainType,
-                                    screenType = vrResult.screenType,
-                                    data = vrResult.data,
-                                    isError = false,
-                                    screenSizeType = vrResult.screenSizeType
+                    if (!event.isError) {
+                        when (val vrResult = vrUsecase()) {
+                            is VRResult.Success -> {
+                                onVREvent(VREvent.CloseVRWindowEvent)
+                                delay(500)
+                                /**
+                                 * 추후 파싱된 데이터에는 data / domainType / screenType / screenSizeType 이렇게 4개가 파싱되어 내려올 것으로 예상하고 작성함.
+                                 */
+                                onDomainEvent(
+                                    event = MainEvent.OpenDomainWindowEvent(
+                                        domainType = vrResult.domainType,
+                                        screenType = vrResult.screenType,
+                                        data = vrResult.data,
+                                        isError = false,
+                                        screenSizeType = vrResult.screenSizeType
+                                    )
                                 )
-                            )
-                        }
+                            }
 
-                        is VRResult.Error -> {
-                            onVREvent(
-                                event = VREvent.OpenVRWindowEvent(
-                                    isError = false,
-                                    text = event.text,
-                                    screenSizeType = ScreenSizeType.Middle
+                            is VRResult.Error -> {
+                                onVREvent(
+                                    event = VREvent.OpenVRWindowEvent(
+                                        isError = false,
+                                        text = event.text,
+                                        screenSizeType = ScreenSizeType.Middle
+                                    )
                                 )
-                            )
-                        }
+                            }
 
-                        is VRResult.NoData -> {
-                            onVREvent(
-                                event = VREvent.OpenVRWindowEvent(
-                                    isError = false,
-                                    text = "데이터가 들어있지 않습니다.",
-                                    screenSizeType = ScreenSizeType.Middle
+                            is VRResult.NoData -> {
+                                onVREvent(
+                                    event = VREvent.OpenVRWindowEvent(
+                                        isError = false,
+                                        text = "데이터가 들어있지 않습니다.",
+                                        screenSizeType = ScreenSizeType.Middle
+                                    )
                                 )
-                            )
+                            }
                         }
                     }
-
+                    else {
+                        delay(500)
+                        onVREvent(
+                            event = VREvent.OpenVRWindowEvent(
+                                isError = false,
+                                text = "음성 인식 중 입니다...",
+                                screenSizeType = ScreenSizeType.Middle
+                            )
+                        )
+                    }
                 }
             }
         }
