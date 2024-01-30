@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.a01_compose_study.domain.ScreenType
 import com.example.a01_compose_study.domain.SealedDomainType
 import com.example.a01_compose_study.domain.model.HelpItemData
-import com.example.a01_compose_study.domain.usecase.HelpUsecase
+import com.example.a01_compose_study.domain.usecase.VRUsecase
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.data.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,7 +17,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val helpUsecase: HelpUsecase,
+    private val VRUsecase: VRUsecase,
 ) : ViewModel() {
 
     private val _domainUiState = UiState._domainUiState
@@ -80,8 +80,9 @@ class MainViewModel @Inject constructor(
                             )
                         )
                     } else { // 에러가 아닐 때 다음 DomainEvent 발행
-                        val helpList = helpUsecase()
-                        if (helpList.isNotEmpty()) {
+                        val helpList = VRUsecase()
+
+                        if (helpList is List<*> && helpList.isNotEmpty()) {
                             viewModelScope.launch {
                                 _vrUiState.update { visible ->
                                     VRUiState.NoneWindow

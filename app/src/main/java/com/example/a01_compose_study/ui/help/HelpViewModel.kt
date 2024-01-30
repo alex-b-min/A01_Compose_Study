@@ -3,7 +3,7 @@ package com.example.a01_compose_study.ui.help
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.a01_compose_study.domain.ScreenType
-import com.example.a01_compose_study.domain.usecase.HelpUsecase
+import com.example.a01_compose_study.domain.usecase.VRUsecase
 import com.example.a01_compose_study.presentation.data.UiState
 import com.example.a01_compose_study.presentation.main.DomainUiState
 import com.example.a01_compose_study.presentation.main.VRUiState
@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HelpViewModel @Inject constructor(
-    private val helpUsecase: HelpUsecase,
+    private val VRUsecase: VRUsecase,
 ) : ViewModel() {
 
     private val _domainUiState = UiState._domainUiState

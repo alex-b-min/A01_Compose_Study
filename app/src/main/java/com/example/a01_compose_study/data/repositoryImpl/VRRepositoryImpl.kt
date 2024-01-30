@@ -3,16 +3,21 @@ package com.example.a01_compose_study.data.repositoryImpl
 import com.example.a01_compose_study.domain.SealedDomainType
 import com.example.a01_compose_study.domain.model.HelpItemData
 import com.example.a01_compose_study.domain.model.HelpVRData
-import com.example.a01_compose_study.domain.repository.HelpRepository
+import com.example.a01_compose_study.domain.repository.VRRepository
 import javax.inject.Inject
 
-class HelpRepositoryImpl @Inject constructor() : HelpRepository {
-    override fun getHelpItems(): List<HelpItemData> {
-        val helpVRDataList = createDummyVRData()
-        return parseVRDataToItemData(helpVRDataList)
+class VRRepositoryImpl @Inject constructor() : VRRepository {
+    override fun onVRResult(): Any {
+        /**
+         * VR에 대한 결과를 받아오고 파싱을 하여 각 도메인 화면에 적합한 데이터를 UI에 뿌려주어야 한다.
+         * 현재는 VR에 대한 결과를 예상할 수 없어 List<HelpVRData> 타입의 DummyVRHelpData 사용해
+         * Help에 관한 데이터를 특정지어 결과를 반환한다.
+         */
+        val helpVRDataList = createDummyVRHelpData()
+        return parseVRDataToItemData(helpVRDataList as List<HelpVRData>)
     }
 
-    private fun createDummyVRData(): List<HelpVRData> {
+    private fun createDummyVRHelpData(): Any {
         return listOf(
             HelpVRData(
                 "Navigation",
