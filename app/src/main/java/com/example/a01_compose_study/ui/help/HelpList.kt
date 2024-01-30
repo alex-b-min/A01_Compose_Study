@@ -14,7 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -32,33 +32,57 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.a01_compose_study.R
 import com.example.a01_compose_study.domain.model.HelpItemData
+import com.example.a01_compose_study.presentation.components.list.LazyColumnList
+
+//@Composable
+//fun HelpList(
+//    helpList: List<HelpItemData>,
+//    onItemClick: (HelpItemData) -> Unit
+//) {
+//    LazyColumn {
+//        itemsIndexed(
+//            helpList,
+//        ) { index, helpItemData ->
+//            HelpListItem(
+//                helpItemData = helpItemData,
+//                onItemClick = onItemClick,
+//            )
+//        }
+//    }
+//}
+//
+//@Composable
+//fun HelpDetailList(helpItemData: HelpItemData) {
+//    LazyColumn {
+//        itemsIndexed(helpItemData.commandsDetail) { index, commandDetail ->
+//            HelpDetailListItem(
+//                commandDetail = commandDetail
+//            )
+//        }
+//    }
+//}
 
 @Composable
 fun HelpList(
-    helpList: List<HelpItemData>,
-    onItemClick: (HelpItemData) -> Unit
+    helpList: List<HelpItemData>, onItemClick: (HelpItemData) -> Unit
 ) {
-    LazyColumn {
-        items(helpList) { helpItemData ->
-            HelpListItem(
-                helpItemData = helpItemData,
-                onItemClick = onItemClick,
-            )
-        }
+    LazyColumnList(list = helpList) { helpItemData ->
+        HelpListItem(
+            helpItemData = helpItemData,
+            onItemClick = onItemClick,
+        )
     }
 }
 
 @Composable
 fun HelpDetailList(helpItemData: HelpItemData) {
-    LazyColumn {
-        items(helpItemData.commandsDetail) { commandDetail ->
-            HelpDetailListItem(
-                domainId = helpItemData.domainId.text,
-                commandDetail = commandDetail
-            )
-        }
+    LazyColumnList(list = helpItemData.commandsDetail) { commandDeatail ->
+        HelpDetailListItem(
+            commandDetail = commandDeatail
+        )
     }
 }
+
 
 @Composable
 fun HelpListItem(
@@ -99,8 +123,7 @@ fun HelpListItem(
                         ) {
                             Text(
                                 text = helpItemData.domainId.text,
-                                modifier = Modifier
-                                    .defaultMinSize(minHeight = dimensionResource(R.dimen.dp_24)),
+                                modifier = Modifier.defaultMinSize(minHeight = dimensionResource(R.dimen.dp_24)),
                                 color = colorResource(id = R.color.guidance_domain_text_color),
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
@@ -120,9 +143,7 @@ fun HelpListItem(
 
                                 val context = LocalContext.current
                                 val commandId = context.resources.getIdentifier(
-                                    helpItemData.command,
-                                    "string",
-                                    context.packageName
+                                    helpItemData.command, "string", context.packageName
                                 )
 
                                 Box(
@@ -135,8 +156,7 @@ fun HelpListItem(
                                         overflow = TextOverflow.Ellipsis,
                                         style = MaterialTheme.typography.h5.plus(
                                             TextStyle(
-                                                letterSpacing = (-0.48).sp,
-                                                lineHeight = 32.sp
+                                                letterSpacing = (-0.48).sp, lineHeight = 32.sp
                                             )
                                         ),
                                         textAlign = TextAlign.Start
@@ -159,7 +179,7 @@ fun HelpListItem(
 }
 
 @Composable
-fun HelpDetailListItem(domainId: String, commandDetail: String) {
+fun HelpDetailListItem(commandDetail: String) {
     Box(
         modifier = Modifier
             .fillMaxWidth()

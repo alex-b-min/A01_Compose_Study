@@ -1,4 +1,4 @@
-package com.example.a01_compose_study.presentation.components.top_app_bar
+package com.example.a01_compose_study.presentation.components.top_bar
 
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
