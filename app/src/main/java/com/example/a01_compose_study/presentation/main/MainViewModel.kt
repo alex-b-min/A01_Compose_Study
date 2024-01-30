@@ -32,11 +32,15 @@ class MainViewModel @Inject constructor(
     fun onVREvent(event: VREvent) {
         when (event) {
             is VREvent.CloseVRWindowEvent -> {
-                _vrUiState.update { visible ->
-                    VRUiState.NoneWindow
+                _vrUiState.update { vrUiState ->
+                    when (vrUiState) {
+                        is VRUiState.VRWindow -> vrUiState.copy(visible = false)
+                        else -> VRUiState.NoneWindow
+                    }
                 }
                 closeDomainWindow()
             }
+
             is VREvent.ChangeVRWindowSizeEvent -> {
                 /**
                  * 현재 데이터는 유지한 체 ScreenSizeType 프로퍼티만 변경하기
@@ -50,6 +54,7 @@ class MainViewModel @Inject constructor(
                     }
                 }
             }
+
             is VREvent.OpenVRWindowEvent -> {
                 _domainUiState.update { uiState ->
                     DomainUiState.NoneWindow()
