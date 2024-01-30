@@ -39,7 +39,7 @@ class MainViewModel @Inject constructor(
                     }
                 }
             }
-            
+
             is VREvent.CloseAllVRWindowsEvent -> {
                 _vrUiState.update { vrUiState ->
                     when (vrUiState) {
@@ -97,19 +97,17 @@ class MainViewModel @Inject constructor(
                         val helpList = VRUsecase()
 
                         if (helpList is List<*> && helpList.isNotEmpty()) {
-                            viewModelScope.launch {
-                                onVREvent(VREvent.CloseVRWindowEvent)
-                                delay(500)
-                                onDomainEvent(
-                                    event = MainEvent.OpenDomainWindowEvent(
-                                        domainType = SealedDomainType.Help,
-                                        screenType = ScreenType.HelpList,
-                                        data = helpList,
-                                        isError = false,
-                                        screenSizeType = ScreenSizeType.Large
-                                    )
+                            onVREvent(VREvent.CloseVRWindowEvent)
+                            delay(500)
+                            onDomainEvent(
+                                event = MainEvent.OpenDomainWindowEvent(
+                                    domainType = SealedDomainType.Help,
+                                    screenType = ScreenType.HelpList,
+                                    data = helpList,
+                                    isError = false,
+                                    screenSizeType = ScreenSizeType.Large
                                 )
-                            }
+                            )
                         }
                     }
                 }
