@@ -3,7 +3,7 @@ package com.example.a01_compose_study.data.repositoryImpl
 import com.example.a01_compose_study.domain.SealedDomainType
 import com.example.a01_compose_study.domain.model.HelpItemData
 import com.example.a01_compose_study.domain.model.HelpVRData
-import com.example.a01_compose_study.domain.repository.VRRepository
+import com.example.a01_compose_study.domain.repository.vr.VRRepository
 import javax.inject.Inject
 
 class VRRepositoryImpl @Inject constructor() : VRRepository {

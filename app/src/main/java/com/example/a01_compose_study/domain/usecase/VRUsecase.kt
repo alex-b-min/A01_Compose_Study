@@ -1,6 +1,6 @@
 package com.example.a01_compose_study.domain.usecase
 
-import com.example.a01_compose_study.domain.repository.VRRepository
+import com.example.a01_compose_study.domain.repository.vr.VRRepository
 
 class VRUsecase(
     private val repository: VRRepository
