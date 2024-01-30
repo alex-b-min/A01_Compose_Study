@@ -37,7 +37,7 @@ import com.example.a01_compose_study.presentation.main.MainViewModel
 import com.example.a01_compose_study.presentation.main.VREvent
 import com.example.a01_compose_study.presentation.main.VRUiState
 import com.example.a01_compose_study.presentation.window.vr_window.VRWindow
-import com.example.a01_compose_study.ui.help.ComposeHelpScreen
+import com.example.a01_compose_study.ui.help.screen.ComposeHelpScreen
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
