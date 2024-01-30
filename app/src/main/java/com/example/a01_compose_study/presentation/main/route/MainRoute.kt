@@ -1,6 +1,5 @@
 package com.example.a01_compose_study.presentation.main.route
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.Animatable
@@ -15,10 +14,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -47,7 +43,7 @@ import kotlinx.coroutines.launch
 fun MainRoute(
     viewModel: MainViewModel = hiltViewModel(),
 ) {
-    val uiState by viewModel.domainUiState.collectAsStateWithLifecycle()
+    val domainUiState by viewModel.domainUiState.collectAsStateWithLifecycle()
     val vrUiState by viewModel.vrUiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
 
@@ -59,11 +55,11 @@ fun MainRoute(
 //    var visible by remember { mutableStateOf(false) }
     val domainWindowVisibleState by viewModel.domainWindowVisible.collectAsStateWithLifecycle()
 
-    val targetFillMaxHeight by remember { mutableStateOf(Animatable(0.4f)) }
+    val targetFillMaxHeight by remember { mutableStateOf(Animatable(0f)) }
 
-    LaunchedEffect(uiState) {
-        Log.d("@@ uiState 변경", "${uiState.screenSizeType}")
-        val newTargetValue = when (uiState.screenSizeType) {
+    LaunchedEffect(domainUiState) {
+        val newTargetValue = when (domainUiState.screenSizeType) {
+            is ScreenSizeType.Zero -> 0f
             is ScreenSizeType.Small -> 0.15f
             is ScreenSizeType.Middle ->0.268f
             is ScreenSizeType.Large -> 0.433f
@@ -71,44 +67,51 @@ fun MainRoute(
         targetFillMaxHeight.animateTo(newTargetValue)
     }
 
-    Scaffold(modifier = Modifier.fillMaxSize(),
-        backgroundColor = Color.White) { innerPadding ->
-        Crossfade(targetState = uiState,
-            modifier = Modifier.padding(innerPadding), label = "",
-            animationSpec = tween(durationMillis = 1000)
-        ) { current ->
-            when (vrUiState) {
-                is VRUiState.NoneWindow -> {
-                    // VR 없는 상태에 대한 처리
-                }
-
-                is VRUiState.VRWindow -> {
-                    VRWindow(
-                        vrUiState = vrUiState as VRUiState.VRWindow,
-                        contentColor = Color.Green,
-                        onChangeWindowSize = { screenSizeType ->
-                            viewModel.onVREvent(VREvent.ChangeVRWindowSizeEvent(screenSizeType))
-                        },
-                        onDismiss = {
-                            viewModel.onDomainEvent(MainEvent.CloseDomainWindowEvent)
-                            viewModel.onVREvent(VREvent.CloseVRWindowEvent)
-                        }
-                    )
-                }
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        when (vrUiState) {
+            is VRUiState.NoneWindow -> {
             }
 
-//            AnimatedVisibility(
-//                visible = domainWindowVisibleState,
-//                modifier = Modifier.fillMaxWidth(),
-//                enter = slideInVertically(
-//                    initialOffsetY = { it },
-//                    animationSpec = tween(1000)
-//                ),
-//                exit = slideOutVertically(
-//                    targetOffsetY = { it },
-//                    animationSpec = tween(1000)
-//                )
-//            ) {
+            is VRUiState.VRWindow -> {
+                VRWindow(
+                    vrUiState = vrUiState as VRUiState.VRWindow,
+                    contentColor = Color.Green,
+                    onChangeWindowSize = { screenSizeType ->
+                        viewModel.onVREvent(VREvent.ChangeVRWindowSizeEvent(screenSizeType))
+                    },
+                    onDismiss = {
+                        viewModel.onDomainEvent(MainEvent.CloseDomainWindowEvent)
+                        viewModel.onVREvent(VREvent.CloseVRWindowEvent)
+                    }
+                )
+            }
+        }
+
+        /**
+         * AnimatedVisibility() 안에 Crossfade()를 넣어,
+         * 화면 띄우기 및 닫을 때  AnimatedVisibility 로 인해 아래에서 위로 올라오는 효과 / 위에서 아래로 내려가는 효과
+         * 화면(콘텐츠)을 교체(전환)할 때는 Crossfade 로 인해 fade 효과가 적용됨
+         * [주의사항] 각 스크린(화면)의 매개변수인 domainUiState에 값을 할당할 때 uiState 값을 넣는게 아니라 Crossfade 로부터 발행된 currDomainUiState 값을 넣어야함
+         */
+        AnimatedVisibility(
+            visible = domainWindowVisibleState,
+            modifier = Modifier.fillMaxWidth(),
+            enter = slideInVertically(
+                initialOffsetY = { it },
+                animationSpec = tween(1000)
+            ),
+            exit = slideOutVertically(
+                targetOffsetY = { it },
+                animationSpec = tween(1000)
+            )
+        ) {
+            Crossfade(
+                targetState = domainUiState,
+                label = "",
+                animationSpec = tween(durationMillis = 1500)
+            ) { currDomainUiState ->
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.BottomStart
@@ -123,141 +126,49 @@ fun MainRoute(
                                 shape = RoundedCornerShape(15.dp)
                             ),
                     ) {
-                        when (current) {
+                        when (currDomainUiState) {
                             is DomainUiState.NoneWindow -> {
-                                // NoneWindow에 대한 처리
                             }
 
                             is DomainUiState.HelpWindow -> {
                                 ComposeHelpScreen(
-                                    domainUiState = current,
+                                    domainUiState = currDomainUiState,
                                     contentColor = Color.White
                                 )
                             }
 
                             is DomainUiState.AnnounceWindow -> {
-                                // AnnounceWindow에 대한 처리
+
                             }
 
                             is DomainUiState.DomainMenuWindow -> {
-                                // DomainMenuWindow에 대한 처리
+
                             }
 
                             is DomainUiState.CallWindow -> {
-                                // CallWindow에 대한 처리
+
                             }
 
                             is DomainUiState.NavigationWindow -> {
-                                // NavigationWindow에 대한 처리
+
                             }
 
                             is DomainUiState.RadioWindow -> {
-                                // RadioWindow에 대한 처리
+
                             }
 
                             is DomainUiState.WeatherWindow -> {
-                                // WeatherWindow에 대한 처리
+
                             }
 
                             is DomainUiState.SendMessageWindow -> {
-                                // SendMessageWindow에 대한 처리
+
                             }
                         }
                     }
                 }
-//            }
+            }
         }
-    }
-
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-//        when (vrUiState) {
-//            is VRUiState.NoneWindow -> {
-//            }
-//
-//            is VRUiState.VRWindow -> {
-//                VRWindow(
-//                    vrUiState = vrUiState as VRUiState.VRWindow,
-//                    contentColor = Color.Green,
-//                    onChangeWindowSize = { screenSizeType ->
-//                        viewModel.onVREvent(VREvent.ChangeVRWindowSizeEvent(screenSizeType))
-//                    },
-//                    onDismiss = {
-//                        viewModel.onDomainEvent(MainEvent.CloseDomainWindowEvent)
-//                        viewModel.onVREvent(VREvent.CloseVRWindowEvent)
-//                    }
-//                )
-//            }
-//        }
-//
-//        AnimatedVisibility(
-//            visible = domainWindowVisibleState,
-//            modifier = Modifier.fillMaxWidth(),
-//            enter = slideInVertically(
-//                initialOffsetY = { it },
-//                animationSpec = tween(1000)
-//            ),
-//            exit = slideOutVertically(
-//                targetOffsetY = { it },
-//                animationSpec = tween(1000)
-//            )
-//        ) {
-//            Box(
-//                modifier = Modifier.fillMaxSize(),
-//                contentAlignment = Alignment.BottomStart
-//            ) {
-//                Column(
-//                    modifier = Modifier
-//                        .offset(x = 10.dp, y = (10).dp)
-//                        .fillMaxHeight(targetFillMaxHeight.value)
-//                        .fillMaxWidth(0.233f)
-//                        .background(
-//                            color = Color.DarkGray,
-//                            shape = RoundedCornerShape(15.dp)
-//                        ),
-//                ) {
-//                    when (uiState) {
-//                        is DomainUiState.NoneWindow -> {
-//                        }
-//
-//                        is DomainUiState.HelpWindow -> {
-//                            ComposeHelpScreen(domainUiState = uiState as DomainUiState.HelpWindow,
-//                                contentColor = Color.White
-//                            )
-//                        }
-//
-//                        is DomainUiState.AnnounceWindow -> {
-//
-//                        }
-//
-//                        is DomainUiState.DomainMenuWindow -> {
-//
-//                        }
-//
-//                        is DomainUiState.CallWindow -> {
-//
-//                        }
-//
-//                        is DomainUiState.NavigationWindow -> {
-//
-//                        }
-//
-//                        is DomainUiState.RadioWindow -> {
-//
-//                        }
-//
-//                        is DomainUiState.WeatherWindow -> {
-//
-//                        }
-//
-//                        is DomainUiState.SendMessageWindow -> {
-//
-//                        }
-//                    }
-//                }
-//            }
-//        }
 
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -302,7 +213,7 @@ fun MainRoute(
                 contentText = "None Screen",
                 onClick = {
                     scope.launch {
-                        viewModel.onDomainEvent(MainEvent.NoneDomainWindowEvent(uiState.screenSizeType))
+                        viewModel.onDomainEvent(MainEvent.NoneDomainWindowEvent(domainUiState.screenSizeType))
                     }
                 }
             )

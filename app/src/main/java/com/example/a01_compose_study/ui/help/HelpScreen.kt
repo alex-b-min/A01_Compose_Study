@@ -126,6 +126,7 @@ fun HelpListWindow(
             IconButton(onClick = {
                 //현재 사이즈 타입을 확인하여 변경할 새로운 사이즈 타입을 구하고 그 값을 onScreenSizeChange() 통해 전달한다.
                 val newScreenSizeType = when (domainUiState.screenSizeType) {
+                    is ScreenSizeType.Zero -> ScreenSizeType.Zero
                     is ScreenSizeType.Small -> ScreenSizeType.Middle
                     is ScreenSizeType.Middle -> ScreenSizeType.Large
                     is ScreenSizeType.Large -> ScreenSizeType.Large
@@ -141,6 +142,7 @@ fun HelpListWindow(
             IconButton(onClick = {
                 //현재 사이즈 타입을 확인하여 변경할 새로운 사이즈 타입을 구하고 그 값을 onScreenSizeChange() 통해 전달한다.
                 val newScreenSizeType = when (domainUiState.screenSizeType) {
+                    is ScreenSizeType.Zero -> ScreenSizeType.Zero
                     is ScreenSizeType.Small -> ScreenSizeType.Small
                     is ScreenSizeType.Middle -> ScreenSizeType.Small
                     is ScreenSizeType.Large -> ScreenSizeType.Middle
@@ -189,6 +191,7 @@ fun HelpDetailWindow(
         IconButton(onClick = {
             //현재 사이즈 타입을 확인하여 변경할 새로운 사이즈 타입을 구하고 그 값을 onScreenSizeChange() 통해 전달한다.
             val newScreenSizeType = when (domainUiState.screenSizeType) {
+                is ScreenSizeType.Zero -> ScreenSizeType.Zero
                 is ScreenSizeType.Small -> ScreenSizeType.Middle
                 is ScreenSizeType.Middle -> ScreenSizeType.Large
                 is ScreenSizeType.Large -> ScreenSizeType.Large
@@ -204,6 +207,7 @@ fun HelpDetailWindow(
         IconButton(onClick = {
             //현재 사이즈 타입을 확인하여 변경할 새로운 사이즈 타입을 구하고 그 값을 onScreenSizeChange() 통해 전달한다.
             val newScreenSizeType = when (domainUiState.screenSizeType) {
+                is ScreenSizeType.Zero -> ScreenSizeType.Zero
                 is ScreenSizeType.Small -> ScreenSizeType.Small
                 is ScreenSizeType.Middle -> ScreenSizeType.Small
                 is ScreenSizeType.Large -> ScreenSizeType.Middle
