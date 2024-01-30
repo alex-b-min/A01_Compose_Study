@@ -297,6 +297,6 @@ fun HelpListWindowPreview() {
         },
         onScreenSizeChange = {
         },
-        onClickListener = {}
+        onItemClick = {}
     )
 }
