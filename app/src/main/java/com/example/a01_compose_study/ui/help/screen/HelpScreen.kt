@@ -1,4 +1,4 @@
-package com.example.a01_compose_study.ui.help
+package com.example.a01_compose_study.ui.help.screen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,11 +13,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.a01_compose_study.domain.ScreenType
+import com.example.a01_compose_study.domain.SealedDomainType
 import com.example.a01_compose_study.domain.model.HelpItemData
 import com.example.a01_compose_study.domain.util.ScreenSizeType
+import com.example.a01_compose_study.presentation.components.top_bar.TopAppBarContent
 import com.example.a01_compose_study.presentation.main.DomainUiState
+import com.example.a01_compose_study.ui.help.HelpEvent
+import com.example.a01_compose_study.ui.help.HelpViewModel
 
 @Composable
 fun ComposeHelpScreen(
@@ -211,76 +216,87 @@ fun HelpDetailWindow(
     }
 }
 
-//@Preview
-//@Composable
-//fun HelpDetailListWindowPreview() {
-//
-//    val helpItemData = HelpItemData(
-//        domainId = SealedDomainType.Help,
-//        command = "Command1",
-//        commandsDetail = listOf("Detail1", "Detail2")
-//    )
-//
-//
-//    HelpDetailWindow(
-//        domainUiState = DomainUiState.HelpWindow(
-//            domainType = SealedDomainType.Help,
-//            screenType = ScreenType.HelpDetailList,
-//            data = "",
-//            detailData = HelpItemData(),
-//            visible = true,
-//            text = "HelpWindow",
-//            screenSizeType = ScreenSizeType.Large
-//        ),
-//        contentColor = Color.DarkGray,
-//        onDismiss = {
-//        },
-//        onBackButton = {
-//        },
-//        onScreenSizeChange = {
-//        },
-//    )
-//}
-//
-//
-//@Preview
-//@Composable
-//fun HelpListWindowPreview() {
-//    val helpItemDataList = listOf(
-//        HelpItemData(
-//            domainId = SealedDomainType.Help,
-//            command = "Command1",
-//            commandsDetail = listOf("Detail1", "Detail2")
-//        ),
-//        HelpItemData(
-//            domainId = SealedDomainType.Navigation,
-//            command = "Command2",
-//            commandsDetail = listOf("Detail3", "Detail4")
-//        ),
-//        HelpItemData(
-//            domainId = SealedDomainType.Call,
-//            command = "Command3",
-//            commandsDetail = listOf("Detail5", "Detail6")
-//        )
-//    )
-//
-//    HelpListWindow(
-//        domainUiState = DomainUiState.HelpWindow(
-//            domainType = SealedDomainType.Help,
-//            screenType = ScreenType.HelpList,
-//            data = "",
-//            visible = true,
-//            text = "HelpWindow",
-//            screenSizeType = ScreenSizeType.Large
-//        ),
-//        contentColor = Color.DarkGray,
-////        helpList = helpItemDataList,
-//        onDismiss = {
-//        },
-//        onBackButton = {
-//        },
-//        onScreenSizeChange = {
-//        },
-//        onClickListener = {}
-//    )
-//}
+@Preview
+@Composable
+fun HelpDetailListWindowPreview() {
+
+    val helpItemDataList = listOf(
+        HelpItemData(
+            domainId = SealedDomainType.Help,
+            command = "Command1",
+            commandsDetail = listOf("Detail1", "Detail2")
+        ),
+        HelpItemData(
+            domainId = SealedDomainType.Navigation,
+            command = "Command2",
+            commandsDetail = listOf("Detail3", "Detail4")
+        ),
+        HelpItemData(
+            domainId = SealedDomainType.Call,
+            command = "Command3",
+            commandsDetail = listOf("Detail5", "Detail6")
+        )
+    )
+
+
+    HelpDetailWindow(
+        domainUiState = DomainUiState.HelpWindow(
+            domainType = SealedDomainType.Help,
+            screenType = ScreenType.HelpDetailList,
+            data =helpItemDataList,
+            detailData = helpItemDataList[0],
+            visible = true,
+            text = "HelpWindow",
+            screenSizeType = ScreenSizeType.Large
+        ),
+        contentColor = Color.DarkGray,
+        onDismiss = {
+        },
+        onBackButton = {
+        },
+        onScreenSizeChange = {
+        },
+    )
+}
+
+
+@Preview
+@Composable
+fun HelpListWindowPreview() {
+    val helpItemDataList = listOf(
+        HelpItemData(
+            domainId = SealedDomainType.Help,
+            command = "Command1",
+            commandsDetail = listOf("Detail1", "Detail2")
+        ),
+        HelpItemData(
+            domainId = SealedDomainType.Navigation,
+            command = "Command2",
+            commandsDetail = listOf("Detail3", "Detail4")
+        ),
+        HelpItemData(
+            domainId = SealedDomainType.Call,
+            command = "Command3",
+            commandsDetail = listOf("Detail5", "Detail6")
+        )
+    )
+
+    HelpListWindow(
+        domainUiState = DomainUiState.HelpWindow(
+            domainType = SealedDomainType.Help,
+            screenType = ScreenType.HelpList,
+            data = helpItemDataList,
+            visible = true,
+            text = "HelpWindow",
+            screenSizeType = ScreenSizeType.Large
+        ),
+        contentColor = Color.DarkGray,
+        onDismiss = {
+        },
+        onBackButton = {
+        },
+        onScreenSizeChange = {
+        },
+        onItemClick = {}
+    )
+}
