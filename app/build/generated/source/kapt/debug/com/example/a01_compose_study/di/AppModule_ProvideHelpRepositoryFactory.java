@@ -1,6 +1,6 @@
 package com.example.a01_compose_study.di;
 
-import com.example.a01_compose_study.domain.repository.HelpRepository;
+import com.example.a01_compose_study.domain.repository.domain.HelpRepository;
 import dagger.internal.DaggerGenerated;
 import dagger.internal.Factory;
 import dagger.internal.Preconditions;

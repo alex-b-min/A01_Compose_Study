@@ -13,13 +13,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.a01_compose_study.domain.ScreenType
-import com.example.a01_compose_study.domain.SealedDomainType
 import com.example.a01_compose_study.domain.model.HelpItemData
 import com.example.a01_compose_study.domain.util.ScreenSizeType
-import com.example.a01_compose_study.presentation.data.UiState
 import com.example.a01_compose_study.presentation.main.DomainUiState
 
 @Composable
@@ -54,8 +51,8 @@ fun ComposeHelpScreen(
                 onScreenSizeChange = { screenSizeType ->
                     viewModel.onHelpEvent(event = HelpEvent.ChangeHelpWindowSizeEvent(screenSizeType))
                 },
-                onClickListener = { helpItemData ->
-                    viewModel.onHelpEvent(HelpEvent.SelectHelpListItem(helpItemData))
+                onItemClick = { helpItemData ->
+                    viewModel.onHelpEvent(HelpEvent.HelpListItemOnClick(helpItemData))
                 }
             )
         } else if (domainUiState.screenType is ScreenType.HelpDetailList) {
@@ -84,7 +81,7 @@ fun HelpListWindow(
     onDismiss: () -> Unit,
     onBackButton: () -> Unit,
     onScreenSizeChange: (ScreenSizeType) -> Unit,
-    onClickListener: (HelpItemData) -> Unit
+    onItemClick: (HelpItemData) -> Unit
 ) {
     val helpList = domainUiState.data
     Box(modifier = Modifier.fillMaxSize()) {
@@ -106,7 +103,7 @@ fun HelpListWindow(
             HelpList(
                 helpList = helpList,
                 onItemClick = { helpItemData ->
-                onClickListener(helpItemData)
+                onItemClick(helpItemData)
             })
         }
 
