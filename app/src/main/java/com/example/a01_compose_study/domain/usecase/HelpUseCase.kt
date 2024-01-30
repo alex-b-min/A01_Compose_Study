@@ -1,6 +1,6 @@
 package com.example.a01_compose_study.domain.usecase
 
-import com.example.a01_compose_study.domain.repository.HelpRepository
+import com.example.a01_compose_study.domain.repository.domain.HelpRepository
 
 class HelpUseCase(
     private val repository: HelpRepository

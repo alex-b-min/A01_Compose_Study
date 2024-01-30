@@ -1,6 +1,6 @@
 package com.example.a01_compose_study.data.repository.help
 
-import com.example.a01_compose_study.domain.repository.HelpRepository
+import com.example.a01_compose_study.domain.repository.domain.HelpRepository
 
 class HelpRepositoryImpl() : HelpRepository {
 

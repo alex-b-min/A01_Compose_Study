@@ -2,7 +2,7 @@ package com.example.a01_compose_study.di
 
 import com.example.a01_compose_study.data.repository.help.HelpRepositoryImpl
 import com.example.a01_compose_study.data.repository.vr.VRRepositoryImpl
-import com.example.a01_compose_study.domain.repository.HelpRepository
+import com.example.a01_compose_study.domain.repository.domain.HelpRepository
 import com.example.a01_compose_study.domain.repository.vr.VRRepository
 import com.example.a01_compose_study.domain.usecase.HelpUseCase
 import com.example.a01_compose_study.domain.usecase.VRUseCase

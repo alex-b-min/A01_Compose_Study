@@ -2,9 +2,9 @@ package com.example.a01_compose_study.presentation.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.a01_compose_study.domain.ScreenType
 import com.example.a01_compose_study.domain.SealedDomainType
 import com.example.a01_compose_study.domain.model.HelpItemData
+import com.example.a01_compose_study.domain.model.VRResult
 import com.example.a01_compose_study.domain.usecase.VRUseCase
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.data.UiState
@@ -17,7 +17,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val VRUsecase: VRUseCase,
+    private val vrUsecase: VRUseCase,
 ) : ViewModel() {
 
     private val _domainUiState = UiState._domainUiState
@@ -84,35 +84,45 @@ class MainViewModel @Inject constructor(
                      * 현재는 helpUsecase()로부터 값을 받아오기 때문에 도메인 타입이 Help로 고정됨
                      */
                     delay(2000)
-                    if (event.isError) {
-                        // 에러일때 VR 윈도우 재호출
-                        onVREvent(
-                            event = VREvent.OpenVRWindowEvent(
-                                isError = false,
-                                text = "음성 인식 중 입니다...",
-                                screenSizeType = ScreenSizeType.Middle
-                            )
-                        )
-                    } else { // 에러가 아닐 때 다음 DomainEvent 발행
-                        val anyTypeData = VRUsecase()
-
-                        if (anyTypeData is List<*> && anyTypeData.isNotEmpty()) {
+                    when (val vrResult = vrUsecase()) {
+                        is VRResult.Success -> {
                             onVREvent(VREvent.CloseVRWindowEvent)
                             delay(500)
                             /**
-                             * 추후 파싱된 데이터에는 domainType / screenType / data 이렇게 3개가 파싱되어 내려올 것으로 예상하고 작성함.
+                             * 추후 파싱된 데이터에는 data / domainType / screenType / screenSizeType 이렇게 4개가 파싱되어 내려올 것으로 예상하고 작성함.
                              */
                             onDomainEvent(
                                 event = MainEvent.OpenDomainWindowEvent(
-                                    domainType = SealedDomainType.Help, // 현재는 직접 도메인 타입(Help)을 넣음
-                                    screenType = ScreenType.HelpList, // 현재는 직접 스크린 타입(HelpList)을 넣음
-                                    data = anyTypeData,
+                                    domainType = vrResult.domainType,
+                                    screenType = vrResult.screenType,
+                                    data = vrResult.data,
                                     isError = false,
-                                    screenSizeType = ScreenSizeType.Large
+                                    screenSizeType = vrResult.screenSizeType
+                                )
+                            )
+                        }
+
+                        is VRResult.Error -> {
+                            onVREvent(
+                                event = VREvent.OpenVRWindowEvent(
+                                    isError = false,
+                                    text = event.text,
+                                    screenSizeType = ScreenSizeType.Middle
+                                )
+                            )
+                        }
+
+                        is VRResult.NoData -> {
+                            onVREvent(
+                                event = VREvent.OpenVRWindowEvent(
+                                    isError = false,
+                                    text = "데이터가 들어있지 않습니다.",
+                                    screenSizeType = ScreenSizeType.Middle
                                 )
                             )
                         }
                     }
+
                 }
             }
         }
@@ -215,9 +225,6 @@ class MainViewModel @Inject constructor(
         }
         // VRWindow의 닫기 버튼을 클릭한다면 DomainWindow도 닫혀야 된다고 생각하고 아래의 코드 추가
         closeDomainWindow()
-        _domainUiState.update { uiState ->
-            DomainUiState.NoneWindow()
-        }
     }
 
     fun closeDomainWindow() {
