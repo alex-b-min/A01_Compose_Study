@@ -142,7 +142,7 @@ class MainViewModel @Inject constructor(
             }
 
             is MainEvent.OpenDomainWindowEvent -> {
-                _domainWindowVisible.value = true
+                openDomainWindow()
                 _domainUiState.update { uiState ->
                     val domainUiState = when (event.domainType) {
                         SealedDomainType.None -> {
