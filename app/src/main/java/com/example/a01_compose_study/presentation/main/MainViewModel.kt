@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.a01_compose_study.domain.ScreenType
 import com.example.a01_compose_study.domain.SealedDomainType
 import com.example.a01_compose_study.domain.model.HelpItemData
-import com.example.a01_compose_study.domain.usecase.VRUsecase
+import com.example.a01_compose_study.domain.usecase.VRUseCase
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.data.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,7 +17,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val VRUsecase: VRUsecase,
+    private val VRUsecase: VRUseCase,
 ) : ViewModel() {
 
     private val _domainUiState = UiState._domainUiState

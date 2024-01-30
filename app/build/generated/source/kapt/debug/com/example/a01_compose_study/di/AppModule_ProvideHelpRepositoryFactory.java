@@ -1,6 +1,6 @@
 package com.example.a01_compose_study.di;
 
-import com.example.a01_compose_study.domain.repository.vr.VRRepository;
+import com.example.a01_compose_study.domain.repository.HelpRepository;
 import dagger.internal.DaggerGenerated;
 import dagger.internal.Factory;
 import dagger.internal.Preconditions;
@@ -21,9 +21,9 @@ import javax.annotation.processing.Generated;
     "KotlinInternal",
     "KotlinInternalInJava"
 })
-public final class AppModule_ProvideHelpRepositoryFactory implements Factory<VRRepository> {
+public final class AppModule_ProvideHelpRepositoryFactory implements Factory<HelpRepository> {
   @Override
-  public VRRepository get() {
+  public HelpRepository get() {
     return provideHelpRepository();
   }
 
@@ -31,8 +31,8 @@ public final class AppModule_ProvideHelpRepositoryFactory implements Factory<VRR
     return InstanceHolder.INSTANCE;
   }
 
-  public static VRRepository provideHelpRepository() {
-    return Preconditions.checkNotNullFromProvides(AppModule.INSTANCE.provideVRRepository());
+  public static HelpRepository provideHelpRepository() {
+    return Preconditions.checkNotNullFromProvides(AppModule.INSTANCE.provideHelpRepository());
   }
 
   private static final class InstanceHolder {

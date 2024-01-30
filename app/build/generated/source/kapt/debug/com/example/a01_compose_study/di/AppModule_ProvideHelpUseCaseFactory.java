@@ -1,7 +1,7 @@
 package com.example.a01_compose_study.di;
 
-import com.example.a01_compose_study.domain.repository.vr.VRRepository;
-import com.example.a01_compose_study.domain.usecase.VRUsecase;
+import com.example.a01_compose_study.domain.repository.HelpRepository;
+import com.example.a01_compose_study.domain.usecase.HelpUseCase;
 import dagger.internal.DaggerGenerated;
 import dagger.internal.Factory;
 import dagger.internal.Preconditions;
@@ -23,24 +23,24 @@ import javax.inject.Provider;
     "KotlinInternal",
     "KotlinInternalInJava"
 })
-public final class AppModule_ProvideHelpUseCaseFactory implements Factory<VRUsecase> {
-  private final Provider<VRRepository> repositoryProvider;
+public final class AppModule_ProvideHelpUseCaseFactory implements Factory<HelpUseCase> {
+  private final Provider<HelpRepository> repositoryProvider;
 
-  public AppModule_ProvideHelpUseCaseFactory(Provider<VRRepository> repositoryProvider) {
+  public AppModule_ProvideHelpUseCaseFactory(Provider<HelpRepository> repositoryProvider) {
     this.repositoryProvider = repositoryProvider;
   }
 
   @Override
-  public VRUsecase get() {
+  public HelpUseCase get() {
     return provideHelpUseCase(repositoryProvider.get());
   }
 
   public static AppModule_ProvideHelpUseCaseFactory create(
-      Provider<VRRepository> repositoryProvider) {
+      Provider<HelpRepository> repositoryProvider) {
     return new AppModule_ProvideHelpUseCaseFactory(repositoryProvider);
   }
 
-  public static VRUsecase provideHelpUseCase(VRRepository repository) {
-    return Preconditions.checkNotNullFromProvides(AppModule.INSTANCE.provideVRUseCase(repository));
+  public static HelpUseCase provideHelpUseCase(HelpRepository repository) {
+    return Preconditions.checkNotNullFromProvides(AppModule.INSTANCE.provideHelpUseCase(repository));
   }
 }
