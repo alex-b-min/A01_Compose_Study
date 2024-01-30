@@ -2,51 +2,53 @@ package com.example.a01_compose_study.presentation.main
 
 import com.example.a01_compose_study.domain.ScreenType
 import com.example.a01_compose_study.domain.SealedDomainType
+import com.example.a01_compose_study.domain.model.HelpItemData
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 
 sealed class DomainUiState(
-    open val screenSizeType: ScreenSizeType = ScreenSizeType.Small
+    open val screenSizeType: ScreenSizeType = ScreenSizeType.Zero
 ) {
     data class NoneWindow(
-        override val screenSizeType: ScreenSizeType = ScreenSizeType.Small
+        override val screenSizeType: ScreenSizeType = ScreenSizeType.Zero
     ) : DomainUiState(screenSizeType)
 
     data class HelpWindow(
         val domainType: SealedDomainType,
         val screenType: ScreenType,
-        val data: Any,
+        val data: List<HelpItemData>,
+        val detailData: HelpItemData = HelpItemData(command = ""),
         val visible: Boolean,
         val isError: Boolean = false,
         val text: String = "",
-        override val screenSizeType: ScreenSizeType = ScreenSizeType.Small
+        override val screenSizeType: ScreenSizeType = ScreenSizeType.Zero
     ) : DomainUiState(screenSizeType)
 
     data class AnnounceWindow(
-        override val screenSizeType: ScreenSizeType = ScreenSizeType.Small
+        override val screenSizeType: ScreenSizeType = ScreenSizeType.Zero
     ) : DomainUiState(screenSizeType)
 
     data class DomainMenuWindow(
-        override val screenSizeType: ScreenSizeType = ScreenSizeType.Small
+        override val screenSizeType: ScreenSizeType = ScreenSizeType.Zero
     ) : DomainUiState(screenSizeType)
 
     data class CallWindow(
-        override val screenSizeType: ScreenSizeType = ScreenSizeType.Small
+        override val screenSizeType: ScreenSizeType = ScreenSizeType.Zero
     ) : DomainUiState(screenSizeType)
 
     data class NavigationWindow(
-        override val screenSizeType: ScreenSizeType = ScreenSizeType.Small
+        override val screenSizeType: ScreenSizeType = ScreenSizeType.Zero
     ) : DomainUiState(screenSizeType)
 
     data class RadioWindow(
-        override val screenSizeType: ScreenSizeType = ScreenSizeType.Small
+        override val screenSizeType: ScreenSizeType = ScreenSizeType.Zero
     ) : DomainUiState(screenSizeType)
 
     data class WeatherWindow(
-        override val screenSizeType: ScreenSizeType = ScreenSizeType.Small
+        override val screenSizeType: ScreenSizeType = ScreenSizeType.Zero
     ) : DomainUiState(screenSizeType)
 
     data class SendMessageWindow(
-        override val screenSizeType: ScreenSizeType = ScreenSizeType.Small
+        override val screenSizeType: ScreenSizeType = ScreenSizeType.Zero
     ) : DomainUiState(screenSizeType)
 
     fun copyWithNewSizeType(sizeType: ScreenSizeType): DomainUiState {

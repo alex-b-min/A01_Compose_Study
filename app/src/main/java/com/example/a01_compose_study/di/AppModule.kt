@@ -1,9 +1,11 @@
 package com.example.a01_compose_study.di
 
-import android.app.Application
-import com.example.a01_compose_study.data.repositoryImpl.HelpRepositoryImpl
+import com.example.a01_compose_study.data.repository.help.HelpRepositoryImpl
+import com.example.a01_compose_study.data.repository.vr.VRRepositoryImpl
 import com.example.a01_compose_study.domain.repository.HelpRepository
-import com.example.a01_compose_study.domain.usecase.HelpUsecase
+import com.example.a01_compose_study.domain.repository.vr.VRRepository
+import com.example.a01_compose_study.domain.usecase.HelpUseCase
+import com.example.a01_compose_study.domain.usecase.VRUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,15 +17,29 @@ import javax.inject.Singleton
 object AppModule {
     @Provides
     @Singleton
+    fun provideVRRepository(): VRRepository {
+        return VRRepositoryImpl()
+    }
+
+    @Provides
+    @Singleton
+    fun provideVRUseCase(repository: VRRepository): VRUseCase {
+        return VRUseCase(
+            repository
+        )
+    }
+
+    @Provides
+    @Singleton
     fun provideHelpRepository(): HelpRepository {
         return HelpRepositoryImpl()
     }
 
     @Provides
     @Singleton
-   fun provideHelpUseCase(repository: HelpRepository) : HelpUsecase {
-       return HelpUsecase(
-           repository
-       )
-   }
+    fun provideHelpUseCase(repository: HelpRepository): HelpUseCase {
+        return HelpUseCase(
+            repository
+        )
+    }
 }

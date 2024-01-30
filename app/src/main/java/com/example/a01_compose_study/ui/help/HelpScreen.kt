@@ -1,31 +1,32 @@
 package com.example.a01_compose_study.ui.help
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.a01_compose_study.domain.ScreenType
 import com.example.a01_compose_study.domain.SealedDomainType
 import com.example.a01_compose_study.domain.model.HelpItemData
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.main.DomainUiState
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @Composable
 fun ComposeHelpScreen(
     domainUiState: DomainUiState.HelpWindow,
     contentColor: Color,
-    onDismiss: () -> Unit,
-    onHelpListBackButton: () -> Unit,
-    onScreenSizeChange: (ScreenSizeType) -> Unit,
 ) {
-    val scope = rememberCoroutineScope()
+    val viewModel: HelpViewModel = hiltViewModel()
     /**
      * [Help Window -> Help Detail Window 띄우기 생각한 방법]
      *
@@ -45,31 +46,39 @@ fun ComposeHelpScreen(
                 contentColor = contentColor,
                 helpList = domainUiState.data as List<HelpItemData>,
                 onDismiss = {
-                    onDismiss()
+                    viewModel.onHelpEvent(HelpEvent.OnDismiss)
                 },
                 onBackButton = {
-                    scope.launch {
-                        onDismiss()
-                        delay(500)
-                        onHelpListBackButton()
-                    }
+                    viewModel.onHelpEvent(
+                        HelpEvent.OnHelpListBack(
+                            isError = false,
+                            text = "VR 재실행",
+                            screenSizeType = ScreenSizeType.Middle
+                        )
+                    )
                 },
                 onScreenSizeChange = { screenSizeType ->
-                    onScreenSizeChange(screenSizeType)
+                    viewModel.onHelpEvent(event = HelpEvent.ChangeHelpWindowSizeEvent(screenSizeType))
+                },
+                onItemClick = { helpItemData ->
+                    viewModel.onHelpEvent(HelpEvent.HelpListItemOnClick(helpItemData = helpItemData))
                 }
             )
         } else if (domainUiState.screenType is ScreenType.HelpDetailList) {
-//            HelpDetailWindow(
-//                mainUiState = mainUiState,
-//                contentColor = contentColor,
-//                helpItemData = ,
-//                domainId = ,
-//                onDismiss = {
-//                    onDismiss()
-//                },
-//                onBackButton = { /*TODO*/ },
-//                onScreenSizeChange =
-//            )
+            HelpDetailWindow(
+                domainUiState = domainUiState,
+                contentColor = contentColor,
+                helpItemData = domainUiState.detailData,
+                onDismiss = {
+                    viewModel.onHelpEvent(HelpEvent.OnDismiss)
+                },
+                onBackButton = {
+                    viewModel.onHelpEvent(HelpEvent.OnHelpDetailBack)
+                },
+                onScreenSizeChange = { screenSizeType ->
+                    viewModel.onHelpEvent(event = HelpEvent.ChangeHelpWindowSizeEvent(screenSizeType))
+                }
+            )
         }
     }
 }
@@ -83,8 +92,10 @@ fun HelpListWindow(
     onDismiss: () -> Unit,
     onBackButton: () -> Unit,
     onScreenSizeChange: (ScreenSizeType) -> Unit,
+    onItemClick: (HelpItemData) -> Unit,
 ) {
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize())
+    {
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.End,
@@ -93,30 +104,57 @@ fun HelpListWindow(
                 title = "",
                 onNavigationIconClick = {
                     // 뒤로 가기
+                    onBackButton()
                 },
                 onActionIconClick = {
                     // 화면 닫기
+                    onDismiss()
                 }
             )
-            HelpList(helpList = helpList)
-//            IconButton(onClick = {
-//                onScreenSizeChange(ScreenSizeType.Large)
-//            }) {
-//                Icon(
-//                    imageVector = Icons.Default.KeyboardArrowUp,
-//                    contentDescription = null,
-//                    tint = if (mainUiState.isError) Color.Red else contentColor
-//                )
-//            }
-//            IconButton(onClick = {
-//                onScreenSizeChange(ScreenSizeType.Small)
-//            }) {
-//                Icon(
-//                    imageVector = Icons.Default.KeyboardArrowDown,
-//                    contentDescription = null,
-//                    tint = if (mainUiState.isError) Color.Red else contentColor
-//                )
-//            }
+            HelpList(
+                helpList = helpList,
+                onItemClick = { helpitem ->
+                    onItemClick(helpitem)
+                })
+        }
+
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.End,
+            verticalArrangement = Arrangement.Center
+        ) {
+            IconButton(onClick = {
+                //현재 사이즈 타입을 확인하여 변경할 새로운 사이즈 타입을 구하고 그 값을 onScreenSizeChange() 통해 전달한다.
+                val newScreenSizeType = when (domainUiState.screenSizeType) {
+                    is ScreenSizeType.Zero -> ScreenSizeType.Zero
+                    is ScreenSizeType.Small -> ScreenSizeType.Middle
+                    is ScreenSizeType.Middle -> ScreenSizeType.Large
+                    is ScreenSizeType.Large -> ScreenSizeType.Large
+                }
+                onScreenSizeChange(newScreenSizeType)
+            }) {
+                Icon(
+                    imageVector = Icons.Default.KeyboardArrowUp,
+                    contentDescription = null,
+                    tint = if (domainUiState.isError) Color.Red else contentColor
+                )
+            }
+            IconButton(onClick = {
+                //현재 사이즈 타입을 확인하여 변경할 새로운 사이즈 타입을 구하고 그 값을 onScreenSizeChange() 통해 전달한다.
+                val newScreenSizeType = when (domainUiState.screenSizeType) {
+                    is ScreenSizeType.Zero -> ScreenSizeType.Zero
+                    is ScreenSizeType.Small -> ScreenSizeType.Small
+                    is ScreenSizeType.Middle -> ScreenSizeType.Small
+                    is ScreenSizeType.Large -> ScreenSizeType.Middle
+                }
+                onScreenSizeChange(newScreenSizeType)
+            }) {
+                Icon(
+                    imageVector = Icons.Default.KeyboardArrowDown,
+                    contentDescription = null,
+                    tint = if (domainUiState.isError) Color.Red else contentColor
+                )
+            }
         }
     }
 }
@@ -126,42 +164,79 @@ fun HelpDetailWindow(
     domainUiState: DomainUiState.HelpWindow,
     contentColor: Color,
     helpItemData: HelpItemData,
-    domainId: String,
     onDismiss: () -> Unit,
     onBackButton: () -> Unit,
-    onScreenSizeChange: (ScreenSizeType) -> Unit
+    onScreenSizeChange: (ScreenSizeType) -> Unit,
 ) {
     Column {
         TopAppBarContent(
-            title = domainId,
+            title = helpItemData.domainId.text,
             onNavigationIconClick = {
                 // 뒤로 가기
+                onBackButton()
             },
             onActionIconClick = {
                 // 화면 닫기
+                onDismiss()
             }
-
         )
         HelpDetailList(helpItemData = helpItemData)
+    }
+
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.End,
+        verticalArrangement = Arrangement.Center
+    ) {
+        IconButton(onClick = {
+            //현재 사이즈 타입을 확인하여 변경할 새로운 사이즈 타입을 구하고 그 값을 onScreenSizeChange() 통해 전달한다.
+            val newScreenSizeType = when (domainUiState.screenSizeType) {
+                is ScreenSizeType.Zero -> ScreenSizeType.Zero
+                is ScreenSizeType.Small -> ScreenSizeType.Middle
+                is ScreenSizeType.Middle -> ScreenSizeType.Large
+                is ScreenSizeType.Large -> ScreenSizeType.Large
+            }
+            onScreenSizeChange(newScreenSizeType)
+        }) {
+            Icon(
+                imageVector = Icons.Default.KeyboardArrowUp,
+                contentDescription = null,
+                tint = if (domainUiState.isError) Color.Red else contentColor
+            )
+        }
+        IconButton(onClick = {
+            //현재 사이즈 타입을 확인하여 변경할 새로운 사이즈 타입을 구하고 그 값을 onScreenSizeChange() 통해 전달한다.
+            val newScreenSizeType = when (domainUiState.screenSizeType) {
+                is ScreenSizeType.Zero -> ScreenSizeType.Zero
+                is ScreenSizeType.Small -> ScreenSizeType.Small
+                is ScreenSizeType.Middle -> ScreenSizeType.Small
+                is ScreenSizeType.Large -> ScreenSizeType.Middle
+            }
+            onScreenSizeChange(newScreenSizeType)
+        }) {
+            Icon(
+                imageVector = Icons.Default.KeyboardArrowDown,
+                contentDescription = null,
+                tint = if (domainUiState.isError) Color.Red else contentColor
+            )
+        }
     }
 }
 
 @Preview
 @Composable
 fun HelpDetailListWindowPreview() {
-
     val helpItemData = HelpItemData(
         domainId = SealedDomainType.Help,
         command = "Command1",
         commandsDetail = listOf("Detail1", "Detail2")
     )
 
-
     HelpDetailWindow(
         domainUiState = DomainUiState.HelpWindow(
             domainType = SealedDomainType.Help,
             screenType = ScreenType.HelpDetailList,
-            data = "",
+            data = emptyList(),
             visible = true,
             text = "HelpWindow",
             screenSizeType = ScreenSizeType.Large
@@ -173,8 +248,7 @@ fun HelpDetailListWindowPreview() {
         onBackButton = {
         },
         onScreenSizeChange = {
-        },
-        domainId = "Navigation"
+        }
     )
 }
 
@@ -204,7 +278,8 @@ fun HelpListWindowPreview() {
         domainUiState = DomainUiState.HelpWindow(
             domainType = SealedDomainType.Help,
             screenType = ScreenType.HelpList,
-            data = "",
+            data = emptyList(),
+            detailData = HelpItemData(command = ""),
             visible = true,
             text = "HelpWindow",
             screenSizeType = ScreenSizeType.Large
@@ -216,6 +291,8 @@ fun HelpListWindowPreview() {
         onBackButton = {
         },
         onScreenSizeChange = {
+        },
+        onItemClick = {
         }
     )
 }
