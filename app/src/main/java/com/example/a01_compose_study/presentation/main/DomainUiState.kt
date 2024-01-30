@@ -15,7 +15,7 @@ sealed class DomainUiState(
     data class HelpWindow(
         val domainType: SealedDomainType,
         val screenType: ScreenType,
-        val data: List<HelpItemData>,
+        val data: List<HelpItemData> = emptyList(),
         val detailData: HelpItemData = HelpItemData(command = ""),
         val visible: Boolean,
         val isError: Boolean = false,

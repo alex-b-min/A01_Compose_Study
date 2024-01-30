@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HelpViewModel @Inject constructor(
-    private val VRUsecase: VRUseCase,
+    private val vrUsecase: VRUseCase,
 ) : ViewModel() {
 
     private val _domainUiState = UiState._domainUiState
@@ -29,6 +29,7 @@ class HelpViewModel @Inject constructor(
             is HelpEvent.OnDismiss -> {
                 _domainWindowVisible.value = false
             }
+
             is HelpEvent.OnHelpListBack -> {
                 viewModelScope.launch {
                     _domainWindowVisible.value = false
@@ -47,6 +48,7 @@ class HelpViewModel @Inject constructor(
                     }
                 }
             }
+
             is HelpEvent.OnHelpDetailBack -> {
                 _domainUiState.update { domainUiState ->
                     (domainUiState as? DomainUiState.HelpWindow)?.copy(
@@ -54,14 +56,16 @@ class HelpViewModel @Inject constructor(
                     ) ?: domainUiState
                 }
             }
-            is HelpEvent.HelpListItemOnClick -> {
+
+            is HelpEvent.SelectHelpListItem -> {
                 _domainUiState.update { domainUiState ->
                     (domainUiState as? DomainUiState.HelpWindow)?.copy(
                         screenType = ScreenType.HelpDetailList,
-                        detailData = event.helpItemData
+                        detailData = event.selectedHelpItem
                     ) ?: domainUiState
                 }
             }
+
             is HelpEvent.ChangeHelpWindowSizeEvent -> {
                 _domainUiState.update { uiState ->
                     uiState.copyWithNewSizeType(event.screenSizeType)
