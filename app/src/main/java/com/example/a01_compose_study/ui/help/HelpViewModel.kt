@@ -1,6 +1,11 @@
 package com.example.a01_compose_study.ui.help
 
 import androidx.lifecycle.ViewModel
+import com.example.a01_compose_study.domain.ScreenType
+import com.example.a01_compose_study.domain.model.HelpItemData
+import com.example.a01_compose_study.domain.usecase.HelpUsecase
+import com.example.a01_compose_study.presentation.data.UiState
+import com.example.a01_compose_study.presentation.main.DomainUiState
 import androidx.lifecycle.viewModelScope
 import com.example.a01_compose_study.domain.ScreenType
 import com.example.a01_compose_study.domain.usecase.VRUseCase
@@ -11,13 +16,14 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 @HiltViewModel
 class HelpViewModel @Inject constructor(
     private val VRUsecase: VRUseCase,
 ) : ViewModel() {
-
+    
     private val _domainUiState = UiState._domainUiState
 
     private val _vrUiState = UiState._vrUiState
@@ -54,11 +60,11 @@ class HelpViewModel @Inject constructor(
                     ) ?: domainUiState
                 }
             }
-            is HelpEvent.HelpListItemOnClick -> {
+            is HelpEvent.SelectHelpItem -> {
                 _domainUiState.update { domainUiState ->
                     (domainUiState as? DomainUiState.HelpWindow)?.copy(
                         screenType = ScreenType.HelpDetailList,
-                        detailData = event.helpItemData
+                        detailData = event.selectedHelpItem
                     ) ?: domainUiState
                 }
             }
@@ -69,4 +75,11 @@ class HelpViewModel @Inject constructor(
             }
         }
     }
+    
+
+    fun getHelpList(): List<HelpItemData> {
+        return helpUsecase.invoke()
+    }
+
+
 }

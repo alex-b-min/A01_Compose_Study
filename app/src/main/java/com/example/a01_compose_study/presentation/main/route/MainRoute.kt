@@ -61,7 +61,7 @@ fun MainRoute(
         val newTargetValue = when (domainUiState.screenSizeType) {
             is ScreenSizeType.Zero -> 0f
             is ScreenSizeType.Small -> 0.15f
-            is ScreenSizeType.Middle ->0.268f
+            is ScreenSizeType.Middle -> 0.268f
             is ScreenSizeType.Large -> 0.433f
         }
         targetFillMaxHeight.animateTo(newTargetValue)

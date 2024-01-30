@@ -21,4 +21,6 @@ sealed class HelpEvent {
     data class ChangeHelpWindowSizeEvent(
         val screenSizeType: ScreenSizeType
     ) : HelpEvent()
+    object GetHelpList : HelpEvent()
+    data class SelectHelpItem(val selectedHelpItem: HelpItemData)  : HelpEvent()
 }
