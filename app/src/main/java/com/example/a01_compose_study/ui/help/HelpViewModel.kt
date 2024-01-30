@@ -26,8 +26,13 @@ class HelpViewModel @Inject constructor(
 
     fun onHelpEvent(event: HelpEvent) {
         when (event) {
-            is HelpEvent.OnDismiss -> {
-                _domainWindowVisible.value = false
+            is HelpEvent.HelpListItemOnClick -> {
+                _domainUiState.update { domainUiState ->
+                    (domainUiState as? DomainUiState.HelpWindow)?.copy(
+                        screenType = ScreenType.HelpDetailList,
+                        detailData = event.selectedHelpItem
+                    ) ?: domainUiState
+                }
             }
 
             is HelpEvent.OnHelpListBack -> {
@@ -57,19 +62,14 @@ class HelpViewModel @Inject constructor(
                 }
             }
 
-            is HelpEvent.HelpListItemOnClick -> {
-                _domainUiState.update { domainUiState ->
-                    (domainUiState as? DomainUiState.HelpWindow)?.copy(
-                        screenType = ScreenType.HelpDetailList,
-                        detailData = event.selectedHelpItem
-                    ) ?: domainUiState
-                }
-            }
-
             is HelpEvent.ChangeHelpWindowSizeEvent -> {
                 _domainUiState.update { uiState ->
                     uiState.copyWithNewSizeType(event.screenSizeType)
                 }
+            }
+
+            is HelpEvent.OnDismiss -> {
+                _domainWindowVisible.value = false
             }
         }
     }

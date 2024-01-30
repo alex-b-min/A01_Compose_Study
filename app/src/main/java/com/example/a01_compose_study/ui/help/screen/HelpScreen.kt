@@ -78,7 +78,6 @@ fun ComposeHelpScreen(
     }
 }
 
-
 @Composable
 fun HelpListWindow(
     domainUiState: DomainUiState.HelpWindow,
@@ -97,19 +96,17 @@ fun HelpListWindow(
             TopAppBarContent(
                 title = "",
                 onNavigationIconClick = {
-                    // 뒤로 가기
                     onBackButton()
                 },
                 onActionIconClick = {
-                    // 화면 닫기
                     onDismiss()
                 }
             )
             HelpList(
                 helpList = helpList,
                 onItemClick = { helpItemData ->
-                onItemClick(helpItemData)
-            })
+                    onItemClick(helpItemData)
+                })
         }
 
         Column(
@@ -152,7 +149,6 @@ fun HelpListWindow(
         }
     }
 }
-
 @Composable
 fun HelpDetailWindow(
     domainUiState: DomainUiState.HelpWindow,
@@ -165,11 +161,9 @@ fun HelpDetailWindow(
         TopAppBarContent(
             title = domainUiState.detailData.domainId.text,
             onNavigationIconClick = {
-                // 뒤로 가기
                 onBackButton()
             },
             onActionIconClick = {
-                // 화면 닫기
                 onDismiss()
             }
         )
