@@ -94,16 +94,16 @@ class MainViewModel @Inject constructor(
                             )
                         )
                     } else { // 에러가 아닐 때 다음 DomainEvent 발행
-                        val helpList = VRUsecase()
+                        val anyTypeData = VRUsecase()
 
-                        if (helpList is List<*> && helpList.isNotEmpty()) {
+                        if (anyTypeData is List<*> && anyTypeData.isNotEmpty()) {
                             onVREvent(VREvent.CloseVRWindowEvent)
                             delay(500)
                             onDomainEvent(
                                 event = MainEvent.OpenDomainWindowEvent(
                                     domainType = SealedDomainType.Help,
                                     screenType = ScreenType.HelpList,
-                                    data = helpList,
+                                    data = anyTypeData,
                                     isError = false,
                                     screenSizeType = ScreenSizeType.Large
                                 )
