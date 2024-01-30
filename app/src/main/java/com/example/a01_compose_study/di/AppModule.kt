@@ -14,13 +14,13 @@ import javax.inject.Singleton
 object AppModule {
     @Provides
     @Singleton
-    fun provideHelpRepository(): VRRepository {
+    fun provideVRRepository(): VRRepository {
         return VRRepositoryImpl()
     }
 
     @Provides
     @Singleton
-   fun provideHelpUseCase(repository: VRRepository) : VRUsecase {
+   fun provideVRUseCase(repository: VRRepository) : VRUsecase {
        return VRUsecase(
            repository
        )

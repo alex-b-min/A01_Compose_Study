@@ -32,7 +32,7 @@ public final class AppModule_ProvideHelpRepositoryFactory implements Factory<VRR
   }
 
   public static VRRepository provideHelpRepository() {
-    return Preconditions.checkNotNullFromProvides(AppModule.INSTANCE.provideHelpRepository());
+    return Preconditions.checkNotNullFromProvides(AppModule.INSTANCE.provideVRRepository());
   }
 
   private static final class InstanceHolder {

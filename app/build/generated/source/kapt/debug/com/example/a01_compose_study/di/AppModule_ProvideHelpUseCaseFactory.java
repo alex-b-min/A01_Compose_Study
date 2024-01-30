@@ -41,6 +41,6 @@ public final class AppModule_ProvideHelpUseCaseFactory implements Factory<VRUsec
   }
 
   public static VRUsecase provideHelpUseCase(VRRepository repository) {
-    return Preconditions.checkNotNullFromProvides(AppModule.INSTANCE.provideHelpUseCase(repository));
+    return Preconditions.checkNotNullFromProvides(AppModule.INSTANCE.provideVRUseCase(repository));
   }
 }
