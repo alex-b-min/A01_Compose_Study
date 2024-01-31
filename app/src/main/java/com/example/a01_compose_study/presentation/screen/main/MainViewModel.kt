@@ -1,8 +1,8 @@
-package com.example.a01_compose_study.presentation.main
+package com.example.a01_compose_study.presentation.screen.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.a01_compose_study.domain.SealedDomainType
+import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.model.HelpItemData
 import com.example.a01_compose_study.domain.model.VRResult
 import com.example.a01_compose_study.domain.usecase.VRUseCase

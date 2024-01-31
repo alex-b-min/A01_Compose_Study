@@ -1,4 +1,4 @@
-package com.example.a01_compose_study.domain
+package com.example.a01_compose_study.domain.util
 
 import com.example.a01_compose_study.data.DialogueMode
 import com.example.a01_compose_study.domain.util.CustomLogger

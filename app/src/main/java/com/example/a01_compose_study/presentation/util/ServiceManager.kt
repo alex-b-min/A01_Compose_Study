@@ -35,7 +35,7 @@
 //import com.example.a01_compose_study.databinding.LayoutToDrawBinding
 //import com.example.a01_compose_study.di.ApplicationScope
 //import com.example.a01_compose_study.domain.state.AnimationState
-//import com.example.a01_compose_study.domain.MyLifecycleOwner
+//import com.example.a01_compose_study.domain.util.MyLifecycleOwner
 //import com.example.a01_compose_study.domain.model.BaseManager
 //import com.example.a01_compose_study.domain.model.ServiceViewModel
 //import com.example.a01_compose_study.domain.model.VrmwManager

@@ -1,4 +1,4 @@
-package com.example.a01_compose_study.presentation.main.route
+package com.example.a01_compose_study.presentation.screen.main.route
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
@@ -31,13 +31,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.components.button.PttButton
-import com.example.a01_compose_study.presentation.main.DomainUiState
-import com.example.a01_compose_study.presentation.main.MainEvent
-import com.example.a01_compose_study.presentation.main.MainViewModel
-import com.example.a01_compose_study.presentation.main.VREvent
-import com.example.a01_compose_study.presentation.main.VRUiState
-import com.example.a01_compose_study.presentation.window.vr_window.VRWindow
-import com.example.a01_compose_study.ui.help.screen.ComposeHelpScreen
+import com.example.a01_compose_study.presentation.screen.main.DomainUiState
+import com.example.a01_compose_study.presentation.screen.main.MainEvent
+import com.example.a01_compose_study.presentation.screen.main.MainViewModel
+import com.example.a01_compose_study.presentation.screen.main.VREvent
+import com.example.a01_compose_study.presentation.screen.main.VRUiState
+import com.example.a01_compose_study.presentation.screen.main.vr_window.VRWindow
+import com.example.a01_compose_study.presentation.screen.help.screen.ComposeHelpScreen
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
