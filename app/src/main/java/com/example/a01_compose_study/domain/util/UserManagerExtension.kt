@@ -1,4 +1,4 @@
-package com.example.a01_compose_study.domain
+package com.example.a01_compose_study.domain.util
 
 import android.annotation.SuppressLint
 import android.os.Build
@@ -6,7 +6,6 @@ import android.os.UserHandle
 import android.os.UserManager
 import androidx.annotation.RequiresApi
 import com.example.a01_compose_study.data.UserProfileNum
-import com.example.a01_compose_study.domain.util.CustomLogger
 
 @SuppressLint("NewApi")
 fun UserManager.getUserProfileHandle(): UserHandle? =

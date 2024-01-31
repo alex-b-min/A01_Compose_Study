@@ -1,4 +1,4 @@
-package com.example.a01_compose_study.domain
+package com.example.a01_compose_study.domain.model
 
 sealed class ScreenType {
     object None : ScreenType()

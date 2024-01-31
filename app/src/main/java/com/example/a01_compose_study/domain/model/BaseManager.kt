@@ -21,8 +21,8 @@
 //import com.example.a01_compose_study.domain.state.SettingState
 //import com.example.a01_compose_study.domain.state.SystemState
 //import com.example.a01_compose_study.domain.state.UIState
-//import com.example.a01_compose_study.domain.ParseDomainType
-//import com.example.a01_compose_study.domain.VRResultListener
+//import com.example.a01_compose_study.domain.model.ParseDomainType
+//import com.example.a01_compose_study.domain.util.VRResultListener
 //import com.example.a01_compose_study.domain.getUserProfileHandle
 //import com.example.a01_compose_study.domain.util.CustomLogger
 //import kotlinx.coroutines.Runnable

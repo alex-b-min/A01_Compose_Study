@@ -1,4 +1,4 @@
-package com.example.a01_compose_study.ui.help.screen
+package com.example.a01_compose_study.presentation.screen.help.screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable

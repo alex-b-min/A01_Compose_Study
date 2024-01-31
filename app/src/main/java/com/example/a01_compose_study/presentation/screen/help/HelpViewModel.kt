@@ -1,12 +1,12 @@
-package com.example.a01_compose_study.ui.help
+package com.example.a01_compose_study.presentation.screen.help
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.a01_compose_study.domain.ScreenType
+import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.usecase.HelpUseCase
 import com.example.a01_compose_study.presentation.data.UiState
-import com.example.a01_compose_study.presentation.main.DomainUiState
-import com.example.a01_compose_study.presentation.main.VRUiState
+import com.example.a01_compose_study.presentation.screen.main.DomainUiState
+import com.example.a01_compose_study.presentation.screen.main.VRUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.update
@@ -26,8 +26,13 @@ class HelpViewModel @Inject constructor(
 
     fun onHelpEvent(event: HelpEvent) {
         when (event) {
-            is HelpEvent.OnDismiss -> {
-                _domainWindowVisible.value = false
+            is HelpEvent.HelpListItemOnClick -> {
+                _domainUiState.update { domainUiState ->
+                    (domainUiState as? DomainUiState.HelpWindow)?.copy(
+                        screenType = ScreenType.HelpDetailList,
+                        detailData = event.selectedHelpItem
+                    ) ?: domainUiState
+                }
             }
 
             is HelpEvent.OnHelpListBack -> {
@@ -57,19 +62,14 @@ class HelpViewModel @Inject constructor(
                 }
             }
 
-            is HelpEvent.HelpListItemOnClick -> {
-                _domainUiState.update { domainUiState ->
-                    (domainUiState as? DomainUiState.HelpWindow)?.copy(
-                        screenType = ScreenType.HelpDetailList,
-                        detailData = event.selectedHelpItem
-                    ) ?: domainUiState
-                }
-            }
-
             is HelpEvent.ChangeHelpWindowSizeEvent -> {
                 _domainUiState.update { uiState ->
                     uiState.copyWithNewSizeType(event.screenSizeType)
                 }
+            }
+
+            is HelpEvent.OnDismiss -> {
+                _domainWindowVisible.value = false
             }
         }
     }

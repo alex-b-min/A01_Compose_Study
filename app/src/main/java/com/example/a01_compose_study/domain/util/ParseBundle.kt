@@ -3,7 +3,7 @@ package com.example.a01_compose_study.domain.util
 import android.os.Parcel
 import android.os.Parcelable
 import com.example.a01_compose_study.data.DialogueMode
-import com.example.a01_compose_study.domain.ParseDomainType
+import com.example.a01_compose_study.domain.model.ParseDomainType
 
 class ParseBundle<T>(var type: ParseDomainType) : Parcelable {
     // type 을 가지고 각 사용하는곳에서 확인후 model을 캐스팅하도록,

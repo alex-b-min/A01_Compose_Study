@@ -1,4 +1,4 @@
-package com.example.a01_compose_study.ui.help.screen
+package com.example.a01_compose_study.presentation.screen.help.screen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,14 +15,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.a01_compose_study.domain.ScreenType
-import com.example.a01_compose_study.domain.SealedDomainType
+import com.example.a01_compose_study.domain.model.ScreenType
+import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.model.HelpItemData
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.components.top_bar.TopAppBarContent
-import com.example.a01_compose_study.presentation.main.DomainUiState
-import com.example.a01_compose_study.ui.help.HelpEvent
-import com.example.a01_compose_study.ui.help.HelpViewModel
+import com.example.a01_compose_study.presentation.screen.main.DomainUiState
+import com.example.a01_compose_study.presentation.screen.help.HelpEvent
+import com.example.a01_compose_study.presentation.screen.help.HelpViewModel
 
 @Composable
 fun ComposeHelpScreen(
@@ -78,7 +78,6 @@ fun ComposeHelpScreen(
     }
 }
 
-
 @Composable
 fun HelpListWindow(
     domainUiState: DomainUiState.HelpWindow,
@@ -97,19 +96,17 @@ fun HelpListWindow(
             TopAppBarContent(
                 title = "",
                 onNavigationIconClick = {
-                    // 뒤로 가기
                     onBackButton()
                 },
                 onActionIconClick = {
-                    // 화면 닫기
                     onDismiss()
                 }
             )
             HelpList(
                 helpList = helpList,
                 onItemClick = { helpItemData ->
-                onItemClick(helpItemData)
-            })
+                    onItemClick(helpItemData)
+                })
         }
 
         Column(
@@ -152,7 +149,6 @@ fun HelpListWindow(
         }
     }
 }
-
 @Composable
 fun HelpDetailWindow(
     domainUiState: DomainUiState.HelpWindow,
@@ -165,11 +161,9 @@ fun HelpDetailWindow(
         TopAppBarContent(
             title = domainUiState.detailData.domainId.text,
             onNavigationIconClick = {
-                // 뒤로 가기
                 onBackButton()
             },
             onActionIconClick = {
-                // 화면 닫기
                 onDismiss()
             }
         )
