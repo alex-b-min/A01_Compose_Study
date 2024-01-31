@@ -11,9 +11,9 @@ import com.example.a01_compose_study.R
 
 @Composable
 fun TopAppBarContent(
-    onNavigationIconClick: () -> Unit,
-    onActionIconClick: () -> Unit,
-    title: String
+    onNavigationIconClick: () -> Unit = {},
+    onActionIconClick: () -> Unit = {},
+    title: String = ""
 ) {
     TopAppBar(
         backgroundColor = MaterialTheme.colors.background,
