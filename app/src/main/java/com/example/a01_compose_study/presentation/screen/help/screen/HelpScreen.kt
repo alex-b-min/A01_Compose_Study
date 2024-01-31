@@ -94,7 +94,6 @@ fun HelpListWindow(
             horizontalAlignment = Alignment.End,
         ) {
             TopAppBarContent(
-                title = "",
                 onNavigationIconClick = {
                     onBackButton()
                 },
