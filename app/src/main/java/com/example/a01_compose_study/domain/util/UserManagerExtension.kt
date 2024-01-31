@@ -1,4 +1,4 @@
-package com.example.a01_compose_study.domain
+package com.example.a01_compose_study.domain.util
 
 import android.annotation.SuppressLint
 import android.os.Build

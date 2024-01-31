@@ -1,12 +1,12 @@
-package com.example.a01_compose_study.ui.help
+package com.example.a01_compose_study.presentation.help
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.a01_compose_study.domain.ScreenType
+import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.usecase.HelpUseCase
 import com.example.a01_compose_study.presentation.data.UiState
-import com.example.a01_compose_study.presentation.main.DomainUiState
-import com.example.a01_compose_study.presentation.main.VRUiState
+import com.example.a01_compose_study.presentation.screen.main.DomainUiState
+import com.example.a01_compose_study.presentation.screen.main.VRUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.update

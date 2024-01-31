@@ -1,4 +1,4 @@
-package com.example.a01_compose_study.presentation.window.vr_window
+package com.example.a01_compose_study.presentation.screen.main.window.vr_window
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
@@ -41,7 +41,7 @@ import com.example.a01_compose_study.R
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.components.lottie.LottieAssetAnimationHandler
 import com.example.a01_compose_study.presentation.components.lottie.LottieRawAnimationHandler
-import com.example.a01_compose_study.presentation.main.VRUiState
+import com.example.a01_compose_study.presentation.screen.main.VRUiState
 import com.example.a01_compose_study.presentation.util.TextModifier.normalize
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

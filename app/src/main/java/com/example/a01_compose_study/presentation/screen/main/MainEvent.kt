@@ -1,7 +1,7 @@
 package com.example.a01_compose_study.presentation.main
 
-import com.example.a01_compose_study.domain.ScreenType
-import com.example.a01_compose_study.domain.SealedDomainType
+import com.example.a01_compose_study.domain.model.ScreenType
+import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 
 sealed class MainEvent() {
