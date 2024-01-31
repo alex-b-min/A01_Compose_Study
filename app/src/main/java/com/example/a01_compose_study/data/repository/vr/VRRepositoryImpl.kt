@@ -1,8 +1,7 @@
 package com.example.a01_compose_study.data.repository.vr
 
-import com.example.a01_compose_study.data.DomainType
-import com.example.a01_compose_study.domain.ScreenType
-import com.example.a01_compose_study.domain.SealedDomainType
+import com.example.a01_compose_study.domain.model.ScreenType
+import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.model.HelpItemData
 import com.example.a01_compose_study.domain.model.HelpVRData
 import com.example.a01_compose_study.domain.model.VRResult

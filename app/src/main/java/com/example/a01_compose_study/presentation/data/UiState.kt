@@ -1,7 +1,7 @@
 package com.example.a01_compose_study.presentation.data
 
-import com.example.a01_compose_study.presentation.main.DomainUiState
-import com.example.a01_compose_study.presentation.main.VRUiState
+import com.example.a01_compose_study.presentation.screen.main.DomainUiState
+import com.example.a01_compose_study.presentation.screen.main.VRUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 

@@ -1,4 +1,4 @@
-package com.example.a01_compose_study.presentation.help
+package com.example.a01_compose_study.presentation.screen.help
 
 import com.example.a01_compose_study.domain.model.HelpItemData
 import com.example.a01_compose_study.domain.util.ScreenSizeType

@@ -22,7 +22,7 @@
 //import com.example.a01_compose_study.domain.state.BluetoothState
 //import com.example.a01_compose_study.domain.state.MWState
 //import com.example.a01_compose_study.domain.state.UIState
-//import com.example.a01_compose_study.domain.VRResultListener
+//import com.example.a01_compose_study.domain.util.VRResultListener
 //import com.example.a01_compose_study.domain.util.CustomLogger
 //
 //import com.google.gson.Gson

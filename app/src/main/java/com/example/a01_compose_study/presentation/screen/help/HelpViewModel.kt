@@ -1,4 +1,4 @@
-package com.example.a01_compose_study.presentation.help
+package com.example.a01_compose_study.presentation.screen.help
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

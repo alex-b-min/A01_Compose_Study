@@ -1,4 +1,4 @@
-package com.example.a01_compose_study.presentation.screen.main.window.vr_window
+package com.example.a01_compose_study.presentation.screen.main.vr_window
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable

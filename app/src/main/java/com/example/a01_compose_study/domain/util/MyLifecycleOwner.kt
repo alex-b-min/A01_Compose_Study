@@ -1,4 +1,4 @@
-package com.example.a01_compose_study.domain
+package com.example.a01_compose_study.domain.util
 
 
 import android.os.Bundle
@@ -7,7 +7,6 @@ import androidx.lifecycle.LifecycleRegistry
 import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
-import com.example.a01_compose_study.domain.util.CustomLogger
 
 
 class MyLifecycleOwner : SavedStateRegistryOwner {

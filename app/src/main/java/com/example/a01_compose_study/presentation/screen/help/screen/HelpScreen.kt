@@ -1,4 +1,4 @@
-package com.example.a01_compose_study.presentation.help.screen
+package com.example.a01_compose_study.presentation.screen.help.screen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,8 +21,8 @@ import com.example.a01_compose_study.domain.model.HelpItemData
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.components.top_bar.TopAppBarContent
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
-import com.example.a01_compose_study.presentation.help.HelpEvent
-import com.example.a01_compose_study.presentation.help.HelpViewModel
+import com.example.a01_compose_study.presentation.screen.help.HelpEvent
+import com.example.a01_compose_study.presentation.screen.help.HelpViewModel
 
 @Composable
 fun ComposeHelpScreen(
