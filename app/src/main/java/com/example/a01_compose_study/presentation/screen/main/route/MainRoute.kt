@@ -38,6 +38,8 @@ import com.example.a01_compose_study.presentation.screen.main.VREvent
 import com.example.a01_compose_study.presentation.screen.main.VRUiState
 import com.example.a01_compose_study.presentation.screen.main.vr_window.VRWindow
 import com.example.a01_compose_study.presentation.screen.help.screen.ComposeHelpScreen
+import com.example.a01_compose_study.presentation.util.MultipleEventsCutter
+import com.example.a01_compose_study.presentation.util.get
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -48,6 +50,7 @@ fun MainRoute(
     val domainUiState by viewModel.domainUiState.collectAsStateWithLifecycle()
     val vrUiState by viewModel.vrUiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
+    val multipleEventsCutter = remember { MultipleEventsCutter.get() }
 
     /**
      * Compose에서 해당 뷰를 조작하는 변수(visible)는 remember 타입으로 해야하지만,
@@ -194,13 +197,15 @@ fun MainRoute(
                 modifier = Modifier.fillMaxSize(0.13f),
                 contentText = "VR Open",
                 onClick = {
-                    viewModel.onVREvent(
-                        event = VREvent.OpenVRWindowEvent(
-                            isError = false,
-                            text = "음성 인식 중 입니다...",
-                            screenSizeType = ScreenSizeType.Middle
+                    multipleEventsCutter.processEvent {
+                        viewModel.onVREvent(
+                            event = VREvent.OpenVRWindowEvent(
+                                isError = false,
+                                text = "음성 인식 중 입니다...",
+                                screenSizeType = ScreenSizeType.Middle
+                            )
                         )
-                    )
+                    }
                 }
             )
             PttButton(
