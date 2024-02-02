@@ -1,5 +1,6 @@
 package com.example.a01_compose_study.presentation.screen.main.route
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.Animatable
@@ -69,6 +70,7 @@ fun MainRoute(
             is ScreenSizeType.Large -> 0.433f
         }
         targetFillMaxHeight.animateTo(newTargetValue)
+        Log.d("@@ 현재 스크린 타입 사이즈 ", "${domainUiState.screenSizeType} / ${newTargetValue}")
     }
 
     Box(
@@ -135,7 +137,7 @@ fun MainRoute(
                             .fillMaxHeight(targetFillMaxHeight.value)
                             .fillMaxWidth(0.233f)
                             .background(
-                                color = Color.DarkGray,
+                                color = Color.Transparent,
                                 shape = RoundedCornerShape(15.dp)
                             )
                             .clickable(
@@ -158,7 +160,7 @@ fun MainRoute(
                             is DomainUiState.HelpWindow -> {
                                 ComposeHelpScreen(
                                     domainUiState = currDomainUiState,
-                                    contentColor = Color.White
+                                    contentColor = Color.DarkGray
                                 )
                             }
 
@@ -205,16 +207,18 @@ fun MainRoute(
                 contentText = "PTT Open",
                 onClick = {
                     multipleEventsCutter.processEvent {
-                        viewModel.onDomainEvent(
-                            event = MainEvent.OpenDomainWindowEvent(
-                                domainType = SealedDomainType.Ptt,
-                                screenType = ScreenType.Ptt,
-                                data = "음성 인식",
-                                isError = false,
-                                screenSizeType = ScreenSizeType.Small
-                            )
-                        )
+
                     }
+
+                    viewModel.onDomainEvent(
+                        event = MainEvent.OpenDomainWindowEvent(
+                            domainType = SealedDomainType.Ptt,
+                            screenType = ScreenType.Ptt,
+                            data = "음성 인식",
+                            isError = false,
+                            screenSizeType = ScreenSizeType.Small
+                        )
+                    )
                 }
             )
             PttButton(

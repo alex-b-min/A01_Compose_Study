@@ -1,5 +1,6 @@
 package com.example.a01_compose_study.presentation.screen.help.screen
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -88,7 +89,7 @@ fun HelpListWindow(
     onItemClick: (HelpItemData) -> Unit
 ) {
     val helpList = domainUiState.data
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize().background(contentColor)) {
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.End,
