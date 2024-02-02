@@ -29,18 +29,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.a01_compose_study.domain.model.ScreenType
+import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.components.button.PttButton
+import com.example.a01_compose_study.presentation.screen.help.screen.ComposeHelpScreen
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
 import com.example.a01_compose_study.presentation.screen.main.MainEvent
 import com.example.a01_compose_study.presentation.screen.main.MainViewModel
-import com.example.a01_compose_study.presentation.screen.main.VREvent
-import com.example.a01_compose_study.presentation.screen.main.VRUiState
-import com.example.a01_compose_study.presentation.screen.main.vr_window.VRWindow
-import com.example.a01_compose_study.presentation.screen.help.screen.ComposeHelpScreen
+import com.example.a01_compose_study.presentation.screen.ptt.ComposePttScreen
 import com.example.a01_compose_study.presentation.util.MultipleEventsCutter
 import com.example.a01_compose_study.presentation.util.get
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -48,7 +47,7 @@ fun MainRoute(
     viewModel: MainViewModel = hiltViewModel(),
 ) {
     val domainUiState by viewModel.domainUiState.collectAsStateWithLifecycle()
-    val vrUiState by viewModel.vrUiState.collectAsStateWithLifecycle()
+//    val vrUiState by viewModel.vrUiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
     val multipleEventsCutter = remember { MultipleEventsCutter.get() }
 
@@ -79,29 +78,29 @@ fun MainRoute(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null
             ) {
-                viewModel.onVREvent(VREvent.CloseAllVRWindowsEvent)
+//                viewModel.onVREvent(VREvent.CloseAllVRWindowsEvent)
             }
     ) {
-        when (vrUiState) {
-            is VRUiState.NoneWindow -> {
-            }
-
-            is VRUiState.VRWindow -> {
-                VRWindow(
-                    vrUiState = vrUiState as VRUiState.VRWindow,
-                    contentColor = Color.Green,
-                    onChangeWindowSize = { screenSizeType ->
-                        viewModel.onVREvent(VREvent.ChangeVRWindowSizeEvent(screenSizeType))
-                    },
-                    onCloseVRWindow = {
-                        viewModel.onVREvent(VREvent.CloseVRWindowEvent)
-                    },
-                    onCloseAllWindow = {
-                        viewModel.onVREvent(VREvent.CloseAllVRWindowsEvent)
-                    }
-                )
-            }
-        }
+//        when (vrUiState) {
+//            is VRUiState.NoneWindow -> {
+//            }
+//
+//            is VRUiState.VRWindow -> {
+//                VRWindow(
+//                    vrUiState = vrUiState as VRUiState.VRWindow,
+//                    contentColor = Color.Green,
+//                    onChangeWindowSize = { screenSizeType ->
+//                        viewModel.onVREvent(VREvent.ChangeVRWindowSizeEvent(screenSizeType))
+//                    },
+//                    onCloseVRWindow = {
+//                        viewModel.onVREvent(VREvent.CloseVRWindowEvent)
+//                    },
+//                    onCloseAllWindow = {
+//                        viewModel.onVREvent(VREvent.CloseAllVRWindowsEvent)
+//                    }
+//                )
+//            }
+//        }
 
         /**
          * AnimatedVisibility() 안에 Crossfade()를 넣어,
@@ -146,6 +145,14 @@ fun MainRoute(
                     ) {
                         when (currDomainUiState) {
                             is DomainUiState.NoneWindow -> {
+                            }
+
+                            is DomainUiState.PttWindow -> {
+                                ComposePttScreen(
+                                    domainUiState = currDomainUiState,
+                                    contentColor = Color.White
+                                )
+
                             }
 
                             is DomainUiState.HelpWindow -> {
@@ -195,14 +202,16 @@ fun MainRoute(
         ) {
             PttButton(
                 modifier = Modifier.fillMaxSize(0.13f),
-                contentText = "VR Open",
+                contentText = "PTT Open",
                 onClick = {
                     multipleEventsCutter.processEvent {
-                        viewModel.onVREvent(
-                            event = VREvent.OpenVRWindowEvent(
+                        viewModel.onDomainEvent(
+                            event = MainEvent.OpenDomainWindowEvent(
+                                domainType = SealedDomainType.Ptt,
+                                screenType = ScreenType.Ptt,
+                                data = "음성 인식",
                                 isError = false,
-                                text = "음성 인식 중 입니다...",
-                                screenSizeType = ScreenSizeType.Middle
+                                screenSizeType = ScreenSizeType.Small
                             )
                         )
                     }
@@ -210,24 +219,14 @@ fun MainRoute(
             )
             PttButton(
                 modifier = Modifier.fillMaxSize(0.13f),
-                contentText = "VR Close",
+                contentText = "PTT Close",
                 onClick = {
                     scope.launch {
-                        viewModel.closeVRWindow()
-                        delay(500)
-                        viewModel.onVREvent(VREvent.CloseAllVRWindowsEvent)
+                        viewModel.closeDomainWindow()
                     }
                 }
             )
-            PttButton(
-                modifier = Modifier.fillMaxSize(0.13f),
-                contentText = "Domain Close",
-                onClick = {
-                    scope.launch {
-                        viewModel.onDomainEvent(MainEvent.CloseDomainWindowEvent)
-                    }
-                }
-            )
+
             PttButton(
                 modifier = Modifier.fillMaxSize(0.13f),
                 contentText = "None Screen",
@@ -241,15 +240,23 @@ fun MainRoute(
                 modifier = Modifier.fillMaxSize(0.13f),
                 contentText = "Error",
                 onClick = {
-                    viewModel.onVREvent(
-                        event = VREvent.OpenVRWindowEvent(
-                            isError = true,
-                            text = "음성 인식 오류...",
-                            screenSizeType = ScreenSizeType.Middle
+
+                    multipleEventsCutter.processEvent {
+                        viewModel.onDomainEvent(
+                            event = MainEvent.OpenDomainWindowEvent(
+                                domainType = SealedDomainType.Ptt,
+                                screenType = ScreenType.Ptt,
+                                data = "에러",
+                                isError = false,
+                                screenSizeType = ScreenSizeType.Small
+                            )
                         )
-                    )
+                    }
+
                 }
             )
         }
     }
 }
+
+

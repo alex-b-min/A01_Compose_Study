@@ -43,7 +43,7 @@ class PttScreen @Inject constructor(
 }
 
 @Composable
-fun ComposePttScreen(viewModel: ServiceViewModel = hiltViewModel()) {
+fun PttScreen(viewModel: ServiceViewModel = hiltViewModel()) {
 
     Box(
         modifier = Modifier

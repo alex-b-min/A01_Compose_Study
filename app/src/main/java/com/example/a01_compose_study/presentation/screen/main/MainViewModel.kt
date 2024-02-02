@@ -10,10 +10,8 @@ import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.data.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -29,8 +27,8 @@ class MainViewModel @Inject constructor(
     private val _domainUiState = UiState._domainUiState
     val domainUiState: StateFlow<DomainUiState> = UiState.domainUiState
 
-    private val _vrUiState = UiState._vrUiState
-    val vrUiState: StateFlow<VRUiState> = UiState.vrUiState
+//    private val _vrUiState = UiState._vrUiState
+//    val vrUiState: StateFlow<VRUiState> = UiState.vrUiState
 
     private val _domainWindowVisible = UiState._domainWindowVisible
     val domainWindowVisible: StateFlow<Boolean> = UiState.domainWindowVisible
@@ -213,6 +211,16 @@ class MainViewModel @Inject constructor(
                             DomainUiState.NoneWindow()
                         }
 
+                        SealedDomainType.Ptt -> {
+                            DomainUiState.PttWindow(
+                                domainType = event.domainType,
+                                screenType = event.screenType,
+                                visible = true,
+                                text = "",
+                                screenSizeType = ScreenSizeType.Small
+                            )
+                        }
+
                         SealedDomainType.Help -> {
                             val helpData = event.data as? List<HelpItemData> ?: emptyList()
                             DomainUiState.HelpWindow(
@@ -266,20 +274,20 @@ class MainViewModel @Inject constructor(
             }
         }
     }
-
-    fun closeVRWindow() {
-        // 현재의 error 상태에 따른 glow 애니메이션창을 내려야하기 때문에 isError에 uiState.isError로 설정
-        if (vrUiState.value is VRUiState.VRWindow) {
-            _vrUiState.update { vrUiState ->
-                (vrUiState as? VRUiState.VRWindow)?.copy(
-                    visible = false,
-                    isError = vrUiState.isError
-                ) ?: vrUiState
-            }
-        }
-        // VRWindow의 닫기 버튼을 클릭한다면 DomainWindow도 닫혀야 된다고 생각하고 아래의 코드 추가
-        closeDomainWindow()
-    }
+//
+//    fun closeVRWindow() {
+//        // 현재의 error 상태에 따른 glow 애니메이션창을 내려야하기 때문에 isError에 uiState.isError로 설정
+//        if (vrUiState.value is VRUiState.VRWindow) {
+//            _vrUiState.update { vrUiState ->
+//                (vrUiState as? VRUiState.VRWindow)?.copy(
+//                    visible = false,
+//                    isError = vrUiState.isError
+//                ) ?: vrUiState
+//            }
+//        }
+//        // VRWindow의 닫기 버튼을 클릭한다면 DomainWindow도 닫혀야 된다고 생각하고 아래의 코드 추가
+//        closeDomainWindow()
+//    }
 
     fun closeDomainWindow() {
         _domainWindowVisible.value = false
