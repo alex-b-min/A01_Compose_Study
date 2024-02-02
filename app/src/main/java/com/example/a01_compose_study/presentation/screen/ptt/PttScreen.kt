@@ -1,5 +1,6 @@
-package com.example.a01_compose_study.presentation.screen.main.vr_window
+package com.example.a01_compose_study.presentation.screen.ptt
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
@@ -38,24 +39,29 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.a01_compose_study.R
+import com.example.a01_compose_study.data.vr.PttScreen
+import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.components.lottie.LottieAssetAnimationHandler
 import com.example.a01_compose_study.presentation.components.lottie.LottieRawAnimationHandler
+import com.example.a01_compose_study.presentation.screen.main.DomainUiState
 import com.example.a01_compose_study.presentation.screen.main.VRUiState
 import com.example.a01_compose_study.presentation.util.TextModifier.normalize
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
-fun VRWindow(
-    vrUiState: VRUiState.VRWindow,
+fun ComposePttScreen(
+    domainUiState: DomainUiState.PttWindow,
     contentColor: Color,
-    onChangeWindowSize: (ScreenSizeType) -> Unit,
-    onCloseVRWindow: () -> Unit,
-    onCloseAllWindow: () -> Unit,
+//    vrUiState: VRUiState.VRWindow,
+//    contentColor: Color,
+//    onChangeWindowSize: (ScreenSizeType) -> Unit,
+//    onCloseVRWindow: () -> Unit,
+//    onCloseAllWindow: () -> Unit,
 ) {
     // 애니메이션을 제어하기 위한 visible 변수, 애니메이션 효과가 없다면 uiState의 visible값을 바로 사용해도 무방하다.
-    var visible by remember { mutableStateOf(vrUiState.visible.not()) }
+//    var visible by remember { mutableStateOf(domainUiState.visible.not()) }
     val scope = rememberCoroutineScope()
 
     // 글자 투명도에 대한 상태 관리 변수
@@ -73,30 +79,30 @@ fun VRWindow(
      * 그렇기에  remember 타입의 visible의 값을 결정짓는 외부 데이터 uiState를 업데이트 시킬때 반대로 업데이트를 해야한다.
      *  ==> 예를 들어 열 때는 vrUiState의 visible을 false로 업데이트 하고 닫을때는 vrUiState의 visible을 true로 업데이트 한다.
      */
-    if (vrUiState.visible) { // uiState.visible가 true 일 때는 remember 타입의 visible을 false에서 true로 바꿔 띄우는 애니메이션 효과를 준다.
-        //screenSizeType이 변할때 마다 현재 사이즈 타입에 따라 적절한 크기를 검사하고 그 크기로 애니메이션화하여 변화시킨다.
-        LaunchedEffect(vrUiState.screenSizeType) {
-            visible = true
-
-            // uiState로부터의 screenSizeType을 얻어 해당 화면 크기 설정
-            val newTargetValue = when (vrUiState.screenSizeType) {
-                is ScreenSizeType.Zero -> 0f
-                is ScreenSizeType.Small -> 0.15f
-                is ScreenSizeType.Middle ->0.268f
-                is ScreenSizeType.Large -> 0.433f
-            }
-            targetFillMaxHeight.animateTo(newTargetValue)
-        }
-    } else { // uiState.visible가 false 일 때는 remember 타입의 visible을 true에서 false로 바꿔 닫는 애니메이션 효과를 준다.
-        LaunchedEffect(Unit) {
-            visible = false
-            delay(500)
-            onCloseVRWindow()
-        }
-    }
+//    if (domainUiState.visible) { // uiState.visible가 true 일 때는 remember 타입의 visible을 false에서 true로 바꿔 띄우는 애니메이션 효과를 준다.
+//        //screenSizeType이 변할때 마다 현재 사이즈 타입에 따라 적절한 크기를 검사하고 그 크기로 애니메이션화하여 변화시킨다.
+//        LaunchedEffect(domainUiState.screenSizeType) {
+//            visible = true
+//
+//            // uiState로부터의 screenSizeType을 얻어 해당 화면 크기 설정
+//            val newTargetValue = when (domainUiState.screenSizeType) {
+//                is ScreenSizeType.Zero -> 0f
+//                is ScreenSizeType.Small -> 0.15f
+//                is ScreenSizeType.Middle ->0.268f
+//                is ScreenSizeType.Large -> 0.433f
+//            }
+//            targetFillMaxHeight.animateTo(newTargetValue)
+//        }
+//    } else { // uiState.visible가 false 일 때는 remember 타입의 visible을 true에서 false로 바꿔 닫는 애니메이션 효과를 준다.
+//        LaunchedEffect(Unit) {
+//            visible = false
+//            delay(500)
+////            onCloseVRWindow()
+//        }
+//    }
 
     AnimatedVisibility(
-        visible = visible,
+        visible = domainUiState.visible,
         modifier = Modifier.fillMaxWidth(),
         enter = slideInVertically(
             initialOffsetY = { it },
@@ -128,15 +134,15 @@ fun VRWindow(
                     ) {
                         IconButton(onClick = {
                             scope.launch {
-                                visible = false
+//                                visible = false
                                 delay(500)
-                                onCloseAllWindow()
+//                                onCloseAllWindow()
                             }
                         }) {
                             Icon(
                                 imageVector = Icons.Default.Close,
                                 contentDescription = null,
-                                tint = if (vrUiState.isError) Color.Red else contentColor
+                                tint = if (domainUiState.isError) Color.Red else contentColor
                             )
                         }
                     }
@@ -148,37 +154,37 @@ fun VRWindow(
                         IconButton(onClick = {
                             scope.launch {
                                 //현재 사이즈 타입을 확인하여 변경할 새로운 사이즈 타입을 구하고 그 값을 onScreenSizeC값hange() 통해 전달한다.
-                                val newScreenSizeType = when (vrUiState.screenSizeType) {
+                                val newScreenSizeType = when (domainUiState.screenSizeType) {
                                     is ScreenSizeType.Zero -> ScreenSizeType.Zero
                                     is ScreenSizeType.Small -> ScreenSizeType.Middle
                                     is ScreenSizeType.Middle -> ScreenSizeType.Large
                                     is ScreenSizeType.Large -> ScreenSizeType.Large
                                 }
-                                onChangeWindowSize(newScreenSizeType)
+//                                onChangeWindowSize(newScreenSizeType)
                             }
                         }) {
                             Icon(
                                 imageVector = Icons.Default.KeyboardArrowUp,
                                 contentDescription = null,
-                                tint = if (vrUiState.isError) Color.Red else contentColor
+                                tint = if (domainUiState.isError) Color.Red else contentColor
                             )
                         }
                         IconButton(onClick = {
                             scope.launch {
                                 //현재 사이즈 타입을 확인하여 변경할 새로운 사이즈 타입을 구하고 그 값을 onScreenSizeC값hange() 통해 전달한다.
-                                val newScreenSizeType = when (vrUiState.screenSizeType) {
+                                val newScreenSizeType = when (domainUiState.screenSizeType) {
                                     is ScreenSizeType.Zero -> ScreenSizeType.Zero
                                     is ScreenSizeType.Small -> ScreenSizeType.Small
                                     is ScreenSizeType.Middle -> ScreenSizeType.Small
                                     is ScreenSizeType.Large -> ScreenSizeType.Middle
                                 }
-                                onChangeWindowSize(newScreenSizeType)
+//                                onChangeWindowSize(newScreenSizeType)
                             }
                         }) {
                             Icon(
                                 imageVector = Icons.Default.KeyboardArrowDown,
                                 contentDescription = null,
-                                tint = if (vrUiState.isError) Color.Red else contentColor
+                                tint = if (domainUiState.isError) Color.Red else contentColor
                             )
                         }
                     }
@@ -187,7 +193,7 @@ fun VRWindow(
                         contentAlignment = Alignment.BottomCenter
                     ) {
                         //error에 따른 애니메이션 재생 분기
-                        if (vrUiState.isError) {
+                        if (domainUiState.isError) {
                             // Lottie Animation 배경 재생
                             LottieAssetAnimationHandler(
                                 modifier = Modifier.fillMaxSize(),
@@ -213,6 +219,7 @@ fun VRWindow(
                             )
                         } else {
                             // Lottie Animation 배경 재생
+                            Log.d("@@ 에러 아님", "${domainUiState.visible}")
                             LottieAssetAnimationHandler(
                                 modifier = Modifier.fillMaxSize(),
                                 lottieJsonAssetPath = "bg_glow/09_tsd_frame_glow_l_lt.json",
@@ -243,11 +250,11 @@ fun VRWindow(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = vrUiState.text,
+                            text = domainUiState.text,
                             modifier = Modifier
                                 .alpha(textAlpha)
                                 .padding(bottom = 10.dp),
-                            color = if (vrUiState.isError) Color.Red else contentColor,
+                            color = if (domainUiState.isError) Color.Red else contentColor,
                             fontSize = when (targetFillMaxHeight.value) {
                                 0.2f -> 15.sp
                                 0.4f -> 25.sp
@@ -261,19 +268,14 @@ fun VRWindow(
     }
 }
 
-@Preview(device = Devices.TABLET)
-@Composable
-fun CustomSizeAlertDialogPreview() {
-    VRWindow(
-        vrUiState = VRUiState.VRWindow(
-            visible = true,
-            text = "string",
-            screenSizeType = ScreenSizeType.Middle
-        ),
-        contentColor = Color.Magenta,
-        onChangeWindowSize = { },
-        onCloseVRWindow = {
-        },
-        onCloseAllWindow = {
-        })
-}
+//@Preview(device = Devices.TABLET)
+//@Composable
+//fun CustomSizeAlertDialogPreview() {
+//    PttScreen(
+//        domainUiState = DomainUiState.PttWindow(
+//            visible = true,
+//            text = "string",
+//            screenSizeType = ScreenSizeType.Middle
+//        ),
+//        contentColor = Color.Magenta,
+//}
