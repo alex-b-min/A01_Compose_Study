@@ -1,9 +1,12 @@
+import com.github.javaparser.utils.Utils.set
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("kotlin-kapt")
     id("dagger.hilt.android.plugin")
 }
+
 
 android {
     namespace = "com.example.a01_compose_study"

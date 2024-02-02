@@ -1,59 +1,57 @@
-//package com.example.a01_compose_study.presentation
-//
-//import android.app.ActivityManager
-//import android.content.Context
-//import android.content.Intent
-//import android.content.pm.PackageManager
-//import android.content.res.Configuration
-//import android.telephony.TelephonyManager
-//import androidx.compose.ui.platform.ComposeView
-//import androidx.lifecycle.MutableLiveData
-//import com.example.a01_compose_study.data.DialogueMode
-//import com.example.a01_compose_study.data.DomainType
-//import com.example.a01_compose_study.data.HLanguageType
-//import com.example.a01_compose_study.data.MWContext
-//import com.example.a01_compose_study.data.ScreenData
-//import com.example.a01_compose_study.data.ScreenType
-//import com.example.a01_compose_study.data.UxPreset
-//import com.example.a01_compose_study.data.VrConfig
-//import com.example.a01_compose_study.data.WindowMode
-//import com.example.a01_compose_swns_1618
-//import com.example.a01_compose_study.data.repositoryImpl.JobManager
-//import com.example.a01_compose_study.domain.model.NoticeModel
-//import com.example.a01_compose_study.domain.model.RequestType
-//import com.example.a01_compose_study.domain.model.WeatherModel
-//import com.example.a01_compose_study.domain.state.AdditionalInfo
-//import com.example.a01_compose_study.domain.state.AnimationState
-//import com.example.a01_compose_study.domain.state.BluetoothState
-//import com.example.a01_compose_study.domain.state.MWState
-//import com.example.a01_compose_study.domain.state.NetworkState
-//import com.example.a01_compose_study.domain.state.SettingState
-//import com.example.a01_compose_study.domain.state.SystemState
-//import com.example.a01_compose_study.domain.state.TestState
-//import com.example.a01_compose_study.domain.state.Tracker
-//import com.example.a01_compose_study.domain.state.UIState
-//import com.example.a01_compose_study.domain.util.CustomLogger
-//import com.example.a01_compose_study.domain.util.CustomTimer
-//import com.example.a01_compose_study.domain.util.ParseBundle
-//import kotlinx.coroutines.CompletableDeferred
-//import kotlinx.coroutines.CoroutineScope
-//import kotlinx.coroutines.Dispatchers
-//import kotlinx.coroutines.Job
-//import kotlinx.coroutines.Runnable
-//import kotlinx.coroutines.delay
-//import kotlinx.coroutines.flow.MutableStateFlow
-//import kotlinx.coroutines.isActive
-//import kotlinx.coroutines.launch
-//import java.io.File
-//import java.util.Locale
-//import javax.inject.Inject
-//import javax.inject.Singleton
-//import kotlin.coroutines.Continuation
-//
-//
-//@Singleton
-//class ServiceViewModel @Inject constructor(
-//): JobManager() {
+package com.example.a01_compose_study.presentation
+
+import android.app.ActivityManager
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.content.res.Configuration
+import android.telephony.TelephonyManager
+import androidx.compose.ui.platform.ComposeView
+import androidx.lifecycle.MutableLiveData
+import com.example.a01_compose_study.data.DialogueMode
+import com.example.a01_compose_study.data.DomainType
+import com.example.a01_compose_study.data.HLanguageType
+import com.example.a01_compose_study.data.MWContext
+import com.example.a01_compose_study.data.ScreenType
+import com.example.a01_compose_study.data.UxPreset
+import com.example.a01_compose_study.data.VrConfig
+import com.example.a01_compose_study.data.WindowMode
+import com.example.a01_compose_study.data.repository.JobManager
+import com.example.a01_compose_study.domain.model.BaseApplication
+import com.example.a01_compose_study.domain.model.NoticeModel
+import com.example.a01_compose_study.domain.model.RequestType
+import com.example.a01_compose_study.domain.model.WeatherModel
+import com.example.a01_compose_study.domain.state.AdditionalInfo
+import com.example.a01_compose_study.domain.state.AnimationState
+import com.example.a01_compose_study.domain.state.BluetoothState
+import com.example.a01_compose_study.domain.state.MWState
+import com.example.a01_compose_study.domain.state.NetworkState
+import com.example.a01_compose_study.domain.state.SettingState
+import com.example.a01_compose_study.domain.state.SystemState
+import com.example.a01_compose_study.domain.state.TestState
+import com.example.a01_compose_study.domain.state.Tracker
+import com.example.a01_compose_study.domain.util.CustomLogger
+import com.example.a01_compose_study.domain.util.CustomTimer
+import com.example.a01_compose_study.domain.util.ParseBundle
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.Runnable
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import java.io.File
+import java.util.Locale
+import javax.inject.Inject
+import javax.inject.Singleton
+import kotlin.coroutines.Continuation
+
+
+@Singleton
+class ServiceViewModel @Inject constructor(
+): JobManager() {
 //    val TAG = this.javaClass.simpleName
 //
 //    var timer: CustomTimer? = null
@@ -75,7 +73,7 @@
 //    //Blutooth 상태
 //    val bluetoothState = BluetoothState()
 //
-//    val mwState = MWState()
+    val mwState = MWState()
 //
 //    val vrConfig = MutableStateFlow(VrConfig())
 //
@@ -133,6 +131,18 @@
 //    val isWaitingPBG2PState = MutableStateFlow(false)
 //
 //    var jobRunner: Job? = null
+//
+//    fun getPcmList(): List<File> {
+//        ///data/user/10/com.example.ndkconnectapp/files/VRMW/test/vrmanager/pcm
+//        val context = BaseApplication.appContext
+//
+//        val builtinList = listFilesInDirectory("${context.filesDir}/VRMW/test/vrmanager/pcm")
+//        val developFile = listFilesInDirectory("${context.filesDir}/developPcm")
+//        val sumList = developFile.toMutableList()
+//        sumList.addAll(builtinList)
+//        listPCM.value = sumList.toList()
+//        return listPCM.value
+//    }
 //
 //    var addScreenJob: Job? = null
 //
@@ -748,18 +758,18 @@
 //    }
 //
 //    var listPCM = MutableStateFlow(listOf<File>())
-//    var skipStore = false
-////    fun getPcmList(): List<File> {
-////        ///data/user/10/com.example.ndkconnectapp/files/VRMW/test/vrmanager/pcm
-////        val context = BaseApplication.appContext
-////
-////        val builtinList = listFilesInDirectory("${context.filesDir}/VRMW/test/vrmanager/pcm")
-////        val developFile = listFilesInDirectory("${context.filesDir}/developPcm")
-////        val sumList = developFile.toMutableList()
-////        sumList.addAll(builtinList)
-////        listPCM.value = sumList.toList()
-////        return listPCM.value
-////    }
+    var skipStore = false
+//    fun getPcmList(): List<File> {
+//        ///data/user/10/com.example.ndkconnectapp/files/VRMW/test/vrmanager/pcm
+//        val context = BaseApplication.appContext
+//
+//        val builtinList = listFilesInDirectory("${context.filesDir}/VRMW/test/vrmanager/pcm")
+//        val developFile = listFilesInDirectory("${context.filesDir}/developPcm")
+//        val sumList = developFile.toMutableList()
+//        sumList.addAll(builtinList)
+//        listPCM.value = sumList.toList()
+//        return listPCM.value
+//    }
 //
 //    fun listFilesInDirectory(path: String): List<File> {
 //        val directory = File(path)
@@ -888,4 +898,4 @@
 ////            serviceManager?.vrmwManager?.startTTS(ttsString, "test[${System.currentTimeMillis()}]")
 ////        }
 ////    }
-//}
+}
