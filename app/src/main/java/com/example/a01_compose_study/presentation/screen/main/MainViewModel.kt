@@ -172,8 +172,8 @@ class MainViewModel @Inject constructor(
                                 domainType = event.domainType,
                                 screenType = event.screenType,
                                 visible = true,
-                                text = "",
-                                screenSizeType = ScreenSizeType.Small
+                                text = "음성인식 결과다잉",
+                                screenSizeType = event.screenSizeType
                             )
                         }
 
