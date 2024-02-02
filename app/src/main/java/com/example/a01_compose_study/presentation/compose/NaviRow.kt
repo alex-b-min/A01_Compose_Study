@@ -31,9 +31,9 @@
 //import androidx.compose.ui.unit.dp
 //import androidx.compose.ui.unit.sp
 //import com.ftd.ivi.cerence.R
-//import com.ftd.ivi.cerence.data.model.ui.NaviData
-//import com.ftd.ivi.cerence.data.model.ui.NaviFavoriteIconType
-//import com.ftd.ivi.cerence.data.model.ui.NaviStationIconType
+//import com.example.a01_compose_study.data.pasing.NaviData
+//import com.example.a01_compose_study.data.pasing.NaviFavoriteIconType
+//import com.example.a01_compose_study.data.pasing.NaviStationIconType
 //import com.ftd.ivi.cerence.ui.theme.fonts
 //import java.math.BigDecimal
 //import java.math.RoundingMode

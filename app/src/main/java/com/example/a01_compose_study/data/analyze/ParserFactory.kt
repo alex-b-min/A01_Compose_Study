@@ -1,19 +1,9 @@
-package com.example.a01_compose_study.domain.util
+package com.example.a01_compose_study.data.analyze
 
 import com.example.a01_compose_study.data.DialogueMode
 import com.example.a01_compose_study.data.Intentions
 import com.example.a01_compose_study.data.VRResult
-import com.example.a01_compose_study.data.analyze.BaseParser
-import com.example.a01_compose_study.data.analyze.CallParser
-import com.example.a01_compose_study.data.analyze.CommonParser
-import com.example.a01_compose_study.data.analyze.HelpParser
-import com.example.a01_compose_study.data.analyze.IntentionLoader
-import com.example.a01_compose_study.data.analyze.LaunchAppParser
-import com.example.a01_compose_study.data.analyze.ParseBundle
-import com.example.a01_compose_study.data.analyze.ParseDomainType
-import com.example.a01_compose_study.data.analyze.RadioParser
-import com.example.a01_compose_study.data.analyze.SendMsgParser
-import com.example.a01_compose_study.data.analyze.WeatherParser
+import com.example.a01_compose_study.domain.util.CustomLogger
 import com.ftd.ivi.cerence.analyze.NavigationParser
 
 class ParserFactory {

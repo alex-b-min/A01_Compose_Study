@@ -24,7 +24,7 @@
 //import com.ftd.ivi.cerence.data.PhonebookDownloadState
 //import com.ftd.ivi.cerence.data.model.HVRG2PMode
 //import com.ftd.ivi.cerence.data.model.HfpDevice
-//import com.ftd.ivi.cerence.data.model.ui.NoticeModel
+//import com.example.a01_compose_study.data.pasing.NoticeModel
 //import com.ftd.ivi.cerence.viewmodel.ServiceViewModel
 //import kotlinx.coroutines.CoroutineScope
 //import kotlinx.coroutines.Dispatchers

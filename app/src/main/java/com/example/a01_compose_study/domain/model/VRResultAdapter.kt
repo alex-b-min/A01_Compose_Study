@@ -2,16 +2,16 @@ package com.example.a01_compose_study.domain.model
 
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 
-sealed class VRResult {
+sealed class VRResultAdapter {
 
     data class Success(
         val data: Any,
         val domainType: SealedDomainType,
         val screenType: ScreenType,
         val screenSizeType: ScreenSizeType,
-    ) : VRResult()
+    ) : VRResultAdapter()
 
-    data class Error(val errorMessage: String) : VRResult()
+    data class Error(val errorMessage: String) : VRResultAdapter()
 
-    object NoData : VRResult()
+    object NoData : VRResultAdapter()
 }

@@ -1,9 +1,9 @@
 package com.example.a01_compose_study.data
 
-import com.example.a01_compose_study.domain.model.ParseDomainType
-import com.example.a01_compose_study.domain.util.VRResultListener
-import com.example.a01_compose_study.domain.util.ParseBundle
+import com.example.a01_compose_study.data.analyze.ParseBundle
+import com.example.a01_compose_study.data.analyze.ParseDomainType
 import com.example.a01_compose_study.domain.util.CustomLogger
+import com.example.a01_compose_study.domain.util.VRResultListener
 
 class MWContext(
     val dialogueMode: DialogueMode,
@@ -28,7 +28,8 @@ class MWContext(
         isSubContext = when (dialogueMode) {
             DialogueMode.YESNO,
             DialogueMode.CALLNAME,
-            DialogueMode.LIST -> {
+            DialogueMode.LIST,
+            -> {
                 true
             }
 

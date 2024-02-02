@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.model.HelpItemData
-import com.example.a01_compose_study.domain.model.VRResult
+import com.example.a01_compose_study.domain.model.VRResultAdapter
 import com.example.a01_compose_study.domain.usecase.VRUseCase
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.data.UiState
@@ -86,7 +86,7 @@ class MainViewModel @Inject constructor(
                     delay(2000)
                     if (!event.isError) { // 에러가 아닐 때
                         when (val vrResult = vrUsecase()) {
-                            is VRResult.Success -> {
+                            is VRResultAdapter.Success -> {
                                 onVREvent(VREvent.CloseVRWindowEvent)
                                 delay(500)
                                 /**
@@ -103,7 +103,7 @@ class MainViewModel @Inject constructor(
                                 )
                             }
 
-                            is VRResult.Error -> {
+                            is VRResultAdapter.Error -> {
                                 onVREvent(
                                     event = VREvent.OpenVRWindowEvent(
                                         isError = false,
@@ -113,7 +113,7 @@ class MainViewModel @Inject constructor(
                                 )
                             }
 
-                            is VRResult.NoData -> {
+                            is VRResultAdapter.NoData -> {
                                 onVREvent(
                                     event = VREvent.OpenVRWindowEvent(
                                         isError = false,

@@ -25,8 +25,8 @@
 //import androidx.compose.ui.unit.sp
 //import androidx.constraintlayout.compose.ConstraintLayout
 //import com.ftd.ivi.cerence.R
-//import com.ftd.ivi.cerence.data.model.ui.WeatherIconType
-//import com.ftd.ivi.cerence.data.model.ui.WeatherItem
+//import com.example.a01_compose_study.data.pasing.WeatherIconType
+//import com.example.a01_compose_study.data.pasing.WeatherItem
 //import java.time.DayOfWeek
 //
 //

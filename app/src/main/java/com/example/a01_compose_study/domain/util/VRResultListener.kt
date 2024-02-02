@@ -1,7 +1,7 @@
 package com.example.a01_compose_study.domain.util
 
 import com.example.a01_compose_study.data.HVRError
-import com.example.a01_compose_study.domain.util.ParseBundle
+import com.example.a01_compose_study.data.analyze.ParseBundle
 
 interface VRResultListener {
     fun onReceiveBundle(bundle: ParseBundle<out Any>)

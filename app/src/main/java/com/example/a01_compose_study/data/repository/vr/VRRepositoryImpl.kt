@@ -4,13 +4,13 @@ import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.model.HelpItemData
 import com.example.a01_compose_study.domain.model.HelpVRData
-import com.example.a01_compose_study.domain.model.VRResult
+import com.example.a01_compose_study.domain.model.VRResultAdapter
 import com.example.a01_compose_study.domain.repository.vr.VRRepository
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 import javax.inject.Inject
 
 class VRRepositoryImpl @Inject constructor() : VRRepository {
-    override fun onVRResult(): VRResult {
+    override fun onVRResult(): VRResultAdapter {
         /**
          * VR에 대한 결과를 받아오고 파싱을 하여 각 도메인 화면에 적합한 데이터를 UI에 뿌려주어야 한다.
          * 현재는 VR에 대한 결과를 예상할 수 없어 List<HelpVRData> 타입의 DummyVRHelpData 사용해
@@ -18,16 +18,16 @@ class VRRepositoryImpl @Inject constructor() : VRRepository {
          */
         val helpVRDataList = createDummyVRHelpData()
         return if (helpVRDataList is List<*> && helpVRDataList.isNotEmpty()) {
-            VRResult.Success(
+            VRResultAdapter.Success(
                 data = parseVRDataToItemData(helpVRDataList as List<HelpVRData>),
                 domainType = SealedDomainType.Help,
                 screenType = ScreenType.HelpList,
                 screenSizeType = ScreenSizeType.Large
             )
         } else if (helpVRDataList is List<*> && helpVRDataList.isEmpty()) {
-            VRResult.NoData
+            VRResultAdapter.NoData
         } else {
-            VRResult.Error(
+            VRResultAdapter.Error(
                 errorMessage = "errorMessage"
             )
         }

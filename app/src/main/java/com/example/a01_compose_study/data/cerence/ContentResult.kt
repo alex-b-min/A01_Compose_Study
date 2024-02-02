@@ -1,4 +1,4 @@
-package com.ftd.ivi.cerence.data.model.server.cerence
+package com.example.a01_compose_study.data.cerence
 
 import com.ftd.ivi.cerence.data.model.server.cerence.contentResult.navigation.ParkingInfoResult
 import com.ftd.ivi.cerence.data.model.server.cerence.contentResult.navigation.ServerSearchResult
