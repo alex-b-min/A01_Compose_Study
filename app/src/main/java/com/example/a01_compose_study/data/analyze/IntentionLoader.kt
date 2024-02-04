@@ -1,6 +1,7 @@
 package com.example.a01_compose_study.data.analyze
 
 import android.content.Context
+import android.util.Log
 import com.example.a01_compose_study.data.VRResult
 import com.example.a01_compose_study.data.analyze.model.SupportIntention
 import com.example.a01_compose_study.domain.model.BaseApplication
@@ -14,6 +15,10 @@ object IntentionLoader {
 //    companion object {
 //        val instance: IntentionLoader by lazy { IntentionLoader() }
 //    }
+
+    /**
+     * supportIntentions이 null 임
+     */
 
     private val supportIntentions = ArrayList<SupportIntention>()
 
@@ -56,8 +61,14 @@ object IntentionLoader {
 
     private fun findDomain(intention: String): ParseDomainType {
         var foundDomain = ParseDomainType.UNSUPPORTED_DOMAIN
+        Log.d("@@ supportIntentions : ", "${supportIntentions}")
         val matchingIntention = supportIntentions.find { supportIntention ->
-            supportIntention.intentions?.any { it.equals(intention, ignoreCase = true) } == true
+            Log.d("@@ supportIntention : ", "${supportIntention}")
+            supportIntention.intentions?.any {
+                Log.d("@@ it : ", "${it}")
+                Log.d("@@ intention : ", "${intention}")
+                it.equals(intention, ignoreCase = true)
+            } == true
         }
         matchingIntention?.let { supportIntention ->
             supportIntention.vrDomainType?.let {

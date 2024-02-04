@@ -2,6 +2,8 @@ package com.example.a01_compose_study.presentation.screen.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.a01_compose_study.data.custom.MWContext
+import com.example.a01_compose_study.data.custom.VRmwManager
 import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.model.HelpItemData
 import com.example.a01_compose_study.domain.model.VRResultAdapter
@@ -20,6 +22,8 @@ class MainViewModel @Inject constructor(
     private val vrUsecase: VRUseCase,
 ) : ViewModel() {
 
+    val vRmwManager = VRmwManager(MWContext())
+
     private val _domainUiState = UiState._domainUiState
     val domainUiState: StateFlow<DomainUiState> = UiState.domainUiState
 
@@ -28,6 +32,10 @@ class MainViewModel @Inject constructor(
 
     private val _domainWindowVisible = UiState._domainWindowVisible
     val domainWindowVisible: StateFlow<Boolean> = UiState.domainWindowVisible
+
+    init {
+        vRmwManager.setVRResult()
+    }
 
     fun onVREvent(event: VREvent) {
         when (event) {
