@@ -17,26 +17,26 @@ class G2PController @Inject constructor(val viewModel: ServiceViewModel) : IG2PL
     external fun updateCacheFiles(deviceId: String)
 
     override fun onG2PStatusChanged(mode: Int, state: Int, deviceId: String) {
-        val g2pMode = HVRG2PMode.values()[mode]
-        val g2pState = HG2PStatus.values()[state]
-        CustomLogger.i("Main onG2PStatusChanged ${g2pMode.name} ${g2pState.name}")
-        viewModel.systemState.g2pStatus[g2pMode]?.value = g2pState
-
-        when (g2pState) {
-            HG2PStatus.SUCCESS,
-            HG2PStatus.FAILED,
-            HG2PStatus.CANCELLED -> {
-                viewModel.isWaitingPBG2PState.value = false
-            }
-
-            else -> {}
-        }
+//        val g2pMode = HVRG2PMode.values()[mode]
+//        val g2pState = HG2PStatus.values()[state]
+//        CustomLogger.i("Main onG2PStatusChanged ${g2pMode.name} ${g2pState.name}")
+//        viewModel.systemState.g2pStatus[g2pMode]?.value = g2pState
+//
+//        when (g2pState) {
+//            HG2PStatus.SUCCESS,
+//            HG2PStatus.FAILED,
+//            HG2PStatus.CANCELLED -> {
+//                viewModel.isWaitingPBG2PState.value = false
+//            }
+//
+//            else -> {}
+//        }
     }
 
     override fun onG2PCompleted(mode: Int, deviceId: String, count: Int) {
-        val g2pMode = HVRG2PMode.values()[mode]
-        CustomLogger.i("Main onG2PCompleted $count")
-        viewModel.systemState.g2pCompleteCnt[g2pMode]?.value = count
+//        val g2pMode = HVRG2PMode.values()[mode]
+//        CustomLogger.i("Main onG2PCompleted $count")
+//        viewModel.systemState.g2pCompleteCnt[g2pMode]?.value = count
     }
 
     fun cancel(g2pMode: HVRG2PMode) {

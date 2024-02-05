@@ -1,5 +1,6 @@
 package com.example.a01_compose_study.presentation.screen.main.route
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.Animatable
@@ -29,18 +30,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.a01_compose_study.domain.model.ScreenType
+import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.components.button.PttButton
+import com.example.a01_compose_study.presentation.screen.help.screen.ComposeHelpScreen
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
 import com.example.a01_compose_study.presentation.screen.main.MainEvent
 import com.example.a01_compose_study.presentation.screen.main.MainViewModel
-import com.example.a01_compose_study.presentation.screen.main.VREvent
-import com.example.a01_compose_study.presentation.screen.main.VRUiState
-import com.example.a01_compose_study.presentation.screen.main.vr_window.VRWindow
-import com.example.a01_compose_study.presentation.screen.help.screen.ComposeHelpScreen
+import com.example.a01_compose_study.presentation.screen.ptt.ComposePttScreen
 import com.example.a01_compose_study.presentation.util.MultipleEventsCutter
 import com.example.a01_compose_study.presentation.util.get
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -48,7 +48,7 @@ fun MainRoute(
     viewModel: MainViewModel = hiltViewModel(),
 ) {
     val domainUiState by viewModel.domainUiState.collectAsStateWithLifecycle()
-    val vrUiState by viewModel.vrUiState.collectAsStateWithLifecycle()
+//    val vrUiState by viewModel.vrUiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
     val multipleEventsCutter = remember { MultipleEventsCutter.get() }
 
@@ -70,6 +70,7 @@ fun MainRoute(
             is ScreenSizeType.Large -> 0.433f
         }
         targetFillMaxHeight.animateTo(newTargetValue)
+        Log.d("@@ 현재 스크린 타입 사이즈 ", "${domainUiState.screenSizeType} / ${newTargetValue}")
     }
 
     Box(
@@ -79,29 +80,29 @@ fun MainRoute(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null
             ) {
-                viewModel.onVREvent(VREvent.CloseAllVRWindowsEvent)
+                viewModel.onDomainEvent(MainEvent.CloseDomainWindowEvent)
             }
     ) {
-        when (vrUiState) {
-            is VRUiState.NoneWindow -> {
-            }
-
-            is VRUiState.VRWindow -> {
-                VRWindow(
-                    vrUiState = vrUiState as VRUiState.VRWindow,
-                    contentColor = Color.Green,
-                    onChangeWindowSize = { screenSizeType ->
-                        viewModel.onVREvent(VREvent.ChangeVRWindowSizeEvent(screenSizeType))
-                    },
-                    onCloseVRWindow = {
-                        viewModel.onVREvent(VREvent.CloseVRWindowEvent)
-                    },
-                    onCloseAllWindow = {
-                        viewModel.onVREvent(VREvent.CloseAllVRWindowsEvent)
-                    }
-                )
-            }
-        }
+//        when (vrUiState) {
+//            is VRUiState.NoneWindow -> {
+//            }
+//
+//            is VRUiState.VRWindow -> {
+//                VRWindow(
+//                    vrUiState = vrUiState as VRUiState.VRWindow,
+//                    contentColor = Color.Green,
+//                    onChangeWindowSize = { screenSizeType ->
+//                        viewModel.onVREvent(VREvent.ChangeVRWindowSizeEvent(screenSizeType))
+//                    },
+//                    onCloseVRWindow = {
+//                        viewModel.onVREvent(VREvent.CloseVRWindowEvent)
+//                    },
+//                    onCloseAllWindow = {
+//                        viewModel.onVREvent(VREvent.CloseAllVRWindowsEvent)
+//                    }
+//                )
+//            }
+//        }
 
         /**
          * AnimatedVisibility() 안에 Crossfade()를 넣어,
@@ -136,7 +137,7 @@ fun MainRoute(
                             .fillMaxHeight(targetFillMaxHeight.value)
                             .fillMaxWidth(0.233f)
                             .background(
-                                color = Color.DarkGray,
+                                color = Color.Transparent,
                                 shape = RoundedCornerShape(15.dp)
                             )
                             .clickable(
@@ -148,10 +149,19 @@ fun MainRoute(
                             is DomainUiState.NoneWindow -> {
                             }
 
+                            is DomainUiState.PttWindow -> {
+                                ComposePttScreen(
+                                    domainUiState = currDomainUiState,
+                                    contentColor = Color.White
+                                )
+
+                            }
+
                             is DomainUiState.HelpWindow -> {
                                 ComposeHelpScreen(
                                     domainUiState = currDomainUiState,
-                                    contentColor = Color.White
+                                    contentColor = Color.White,
+                                    backgroundColor = Color.DarkGray
                                 )
                             }
 
@@ -195,61 +205,54 @@ fun MainRoute(
         ) {
             PttButton(
                 modifier = Modifier.fillMaxSize(0.13f),
-                contentText = "VR Open",
+                contentText = "PTT Open",
                 onClick = {
                     multipleEventsCutter.processEvent {
-                        viewModel.onVREvent(
-                            event = VREvent.OpenVRWindowEvent(
-                                isError = false,
-                                text = "음성 인식 중 입니다...",
-                                screenSizeType = ScreenSizeType.Middle
-                            )
+
+                    }
+
+                    viewModel.onDomainEvent(
+                        event = MainEvent.OpenDomainWindowEvent(
+                            domainType = SealedDomainType.Ptt,
+                            screenType = ScreenType.Ptt,
+                            data = "음성 인식",
+                            isError = false,
+                            screenSizeType = ScreenSizeType.Small
                         )
-                    }
+                    )
                 }
             )
             PttButton(
                 modifier = Modifier.fillMaxSize(0.13f),
-                contentText = "VR Close",
+                contentText = "PTT Close",
                 onClick = {
                     scope.launch {
-                        viewModel.closeVRWindow()
-                        delay(500)
-                        viewModel.onVREvent(VREvent.CloseAllVRWindowsEvent)
+                        viewModel.closeDomainWindow()
                     }
                 }
             )
-            PttButton(
-                modifier = Modifier.fillMaxSize(0.13f),
-                contentText = "Domain Close",
-                onClick = {
-                    scope.launch {
-                        viewModel.onDomainEvent(MainEvent.CloseDomainWindowEvent)
-                    }
-                }
-            )
-            PttButton(
-                modifier = Modifier.fillMaxSize(0.13f),
-                contentText = "None Screen",
-                onClick = {
-                    scope.launch {
-                        viewModel.onDomainEvent(MainEvent.NoneDomainWindowEvent(domainUiState.screenSizeType))
-                    }
-                }
-            )
+
             PttButton(
                 modifier = Modifier.fillMaxSize(0.13f),
                 contentText = "Error",
                 onClick = {
-                    viewModel.onVREvent(
-                        event = VREvent.OpenVRWindowEvent(
-                            isError = true,
-                            text = "음성 인식 오류...",
-                            screenSizeType = ScreenSizeType.Middle
+
+                    multipleEventsCutter.processEvent {
+                        viewModel.onDomainEvent(
+                            event = MainEvent.OpenDomainWindowEvent(
+                                domainType = SealedDomainType.Ptt,
+                                screenType = ScreenType.Ptt,
+                                data = "에러",
+                                isError = true,
+                                screenSizeType = ScreenSizeType.Small
+                            )
                         )
-                    )
+                    }
+
                 }
             )
         }
     }
 }
+
+

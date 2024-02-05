@@ -1,5 +1,6 @@
 package com.example.a01_compose_study.presentation.screen.help.screen
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,6 +29,7 @@ import com.example.a01_compose_study.presentation.screen.help.HelpViewModel
 fun ComposeHelpScreen(
     domainUiState: DomainUiState.HelpWindow,
     contentColor: Color,
+    backgroundColor: Color
 ) {
     val viewModel: HelpViewModel = hiltViewModel()
     /**
@@ -41,6 +43,7 @@ fun ComposeHelpScreen(
             HelpListWindow(
                 domainUiState = domainUiState,
                 contentColor = contentColor,
+                backgroundColor = backgroundColor,
                 onDismiss = {
                     viewModel.onHelpEvent(HelpEvent.OnDismiss)
                 },
@@ -82,13 +85,14 @@ fun ComposeHelpScreen(
 fun HelpListWindow(
     domainUiState: DomainUiState.HelpWindow,
     contentColor: Color,
+    backgroundColor: Color,
     onDismiss: () -> Unit,
     onBackButton: () -> Unit,
     onScreenSizeChange: (ScreenSizeType) -> Unit,
     onItemClick: (HelpItemData) -> Unit
 ) {
     val helpList = domainUiState.data
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize().background(contentColor)) {
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.End,
@@ -283,6 +287,7 @@ fun HelpListWindowPreview() {
             text = "HelpWindow",
             screenSizeType = ScreenSizeType.Large
         ),
+        backgroundColor = Color.Black,
         contentColor = Color.DarkGray,
         onDismiss = {
         },
