@@ -1,8 +1,8 @@
 package com.example.a01_compose_study.presentation.screen.main
 
+import com.example.a01_compose_study.domain.model.HelpItemData
 import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.model.SealedDomainType
-import com.example.a01_compose_study.domain.model.HelpItemData
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 
 sealed class DomainUiState(
@@ -10,6 +10,15 @@ sealed class DomainUiState(
 ) {
     data class NoneWindow(
         override val screenSizeType: ScreenSizeType = ScreenSizeType.Zero
+    ) : DomainUiState(screenSizeType)
+
+    data class PttWindow(
+        override val screenSizeType: ScreenSizeType = ScreenSizeType.Zero,
+        val domainType: SealedDomainType,
+        val screenType: ScreenType,
+//        val visible: Boolean,
+        val isError: Boolean = false,
+        val text: String = "",
     ) : DomainUiState(screenSizeType)
 
     data class HelpWindow(
@@ -54,6 +63,7 @@ sealed class DomainUiState(
     fun copyWithNewSizeType(sizeType: ScreenSizeType): DomainUiState {
         return when (this) {
             is NoneWindow -> copy(screenSizeType = sizeType)
+            is PttWindow -> copy(screenSizeType = sizeType)
             is HelpWindow -> copy(screenSizeType = sizeType)
             is AnnounceWindow -> copy(screenSizeType = sizeType)
             is DomainMenuWindow -> copy(screenSizeType = sizeType)
