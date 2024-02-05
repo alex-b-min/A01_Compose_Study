@@ -1,9 +1,12 @@
 package com.example.a01_compose_study.data.custom
 
 import com.example.a01_compose_study.data.DialogueMode
+import com.example.a01_compose_study.data.HTextToSpeechState
+import com.example.a01_compose_study.data.HVRState
 import com.example.a01_compose_study.data.VRResult
 import com.example.a01_compose_study.data.analyze.ParseDomainType
 import com.example.a01_compose_study.data.analyze.ParserFactory
+import com.example.a01_compose_study.domain.util.CustomLogger
 import com.example.a01_compose_study.presentation.data.UiState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -12,8 +15,26 @@ import kotlinx.coroutines.launch
 import javax.inject.Singleton
 
 @Singleton
-class MWContext {
+class MWContext(val dialogueMode: DialogueMode) {
     private val helpManager: HelpManager = HelpManager()
+    var vrState = HVRState.IDLE
+    var ttsState = HTextToSpeechState.IDLE
+
+    var isSubContext = false
+
+    init {
+        isSubContext = when (dialogueMode) {
+            DialogueMode.YESNO,
+            DialogueMode.CALLNAME,
+            DialogueMode.LIST -> {
+                true
+            }
+
+            else -> {
+                false
+            }
+        }
+    }
 
     /**
      * 파싱된 데이터를 하나로 묶기 위한 StateFlow 타입의 sealedParsedData 전역변수
@@ -22,6 +43,18 @@ class MWContext {
     val sealedParsedData: SharedFlow<SealedParsedData> = UiState._sealedParsedData
 
     private val job = CoroutineScope(Dispatchers.Default)
+
+    fun onTTSState(state: HTextToSpeechState) {
+        CustomLogger.i("setTTSState ${state.name}")
+        ttsState = state
+
+    }
+
+    fun onVRState(state: HVRState) {
+        CustomLogger.i("setVRState ${state.name}")
+        vrState = state
+
+    }
 
     fun onVRResult(vrResult: VRResult) {
         val bundle = ParserFactory().dataParsing(vrResult, dialogueMode = DialogueMode.HELP)

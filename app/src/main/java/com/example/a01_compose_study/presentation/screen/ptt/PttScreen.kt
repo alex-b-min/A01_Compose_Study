@@ -123,7 +123,7 @@ fun ComposePttScreen(
                 } else if (domainUiState.screenType is ScreenType.PttLoading) {
                     LottieRawAnimationHandler(
                         modifier = Modifier.fillMaxSize(),
-                        rawResId = R.raw.tsd_thinking_loop_fix_lt_03_2,
+                        rawResId = R.raw.tsd_error_loop_lt_00_2,
                         infiniteLoop = true,
                         onFrameChanged = { currentFrame ->
                             // 현재 프레임에 따라 글자 투명도(Alpha)가 변하도록 설정
