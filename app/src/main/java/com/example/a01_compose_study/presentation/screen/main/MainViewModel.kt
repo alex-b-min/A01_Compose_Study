@@ -3,11 +3,10 @@ package com.example.a01_compose_study.presentation.screen.main
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.a01_compose_study.data.custom.MWContext
+import com.example.a01_compose_study.data.custom.SealedParsedData
 import com.example.a01_compose_study.data.custom.VRmwManager
-import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.model.HelpItemData
-import com.example.a01_compose_study.domain.model.VRResultAdapter
-import com.example.a01_compose_study.domain.usecase.VRUseCase
+import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.data.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,10 +18,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val vrUsecase: VRUseCase,
+//    private val vrUsecase: VRUseCase,
 ) : ViewModel() {
 
     val vRmwManager = VRmwManager(MWContext())
+
+    private val _sealedParsedData = UiState._sealedParsedData
+    val sealedParsedData: StateFlow<SealedParsedData> = UiState._sealedParsedData
 
     private val _domainUiState = UiState._domainUiState
     val domainUiState: StateFlow<DomainUiState> = UiState.domainUiState
@@ -34,7 +36,30 @@ class MainViewModel @Inject constructor(
     val domainWindowVisible: StateFlow<Boolean> = UiState.domainWindowVisible
 
     init {
-        vRmwManager.setVRResult()
+        collectParsedData()
+    }
+
+    private fun collectParsedData() {
+        viewModelScope.launch {
+            sealedParsedData.collect { sealedParsedData ->
+                when (sealedParsedData) {
+                    is SealedParsedData.HelpData -> {
+                        onDomainEvent(
+                            event = MainEvent.OpenDomainWindowEvent(
+                                domainType = sealedParsedData.procHelpData.domainType,
+                                screenType = sealedParsedData.procHelpData.screenType,
+                                data = sealedParsedData.procHelpData.data,
+                                isError = false,
+                                screenSizeType = sealedParsedData.procHelpData.screenSizeType,
+                            )
+                        )
+                    }
+
+                    else -> {
+                    }
+                }
+            }
+        }
     }
 
     fun onVREvent(event: VREvent) {
@@ -87,62 +112,72 @@ class MainViewModel @Inject constructor(
                 }
 
                 viewModelScope.launch {
-                    /**
-                     * TODO 추후 UseCase()의 결과값을 통해 자동으로 DomainType이 주입 되야함
-                     * 현재는 helpUsecase()로부터 값을 받아오기 때문에 도메인 타입이 Help로 고정됨
-                     */
                     delay(2000)
-                    if (!event.isError) { // 에러가 아닐 때
-                        when (val vrResult = vrUsecase()) {
-                            is VRResultAdapter.Success -> {
-                                onVREvent(VREvent.CloseVRWindowEvent)
-                                delay(500)
-                                /**
-                                 * 추후 파싱된 데이터에는 data / domainType / screenType / screenSizeType 이렇게 4개가 파싱되어 내려올 것으로 예상하고 작성함.
-                                 */
-                                onDomainEvent(
-                                    event = MainEvent.OpenDomainWindowEvent(
-                                        domainType = vrResult.domainType,
-                                        screenType = vrResult.screenType,
-                                        data = vrResult.data,
-                                        isError = false,
-                                        screenSizeType = vrResult.screenSizeType
-                                    )
-                                )
-                            }
-
-                            is VRResultAdapter.Error -> {
-                                onVREvent(
-                                    event = VREvent.OpenVRWindowEvent(
-                                        isError = false,
-                                        text = event.text,
-                                        screenSizeType = ScreenSizeType.Middle
-                                    )
-                                )
-                            }
-
-                            is VRResultAdapter.NoData -> {
-                                onVREvent(
-                                    event = VREvent.OpenVRWindowEvent(
-                                        isError = false,
-                                        text = "데이터가 들어있지 않습니다.",
-                                        screenSizeType = ScreenSizeType.Middle
-                                    )
-                                )
-                            }
-                        }
-                    }
-                    else { // 에러 일 때 이 코드는 추후에 삭제 예정
-                        delay(500)
-                        onVREvent(
-                            event = VREvent.OpenVRWindowEvent(
-                                isError = false,
-                                text = "음성 인식 중 입니다...",
-                                screenSizeType = ScreenSizeType.Middle
-                            )
-                        )
-                    }
+                    /**
+                     * 더미데이터를 직접 넣는 작업
+                     * VRmwManager.setVRResult()를 호출 -> mwContext.onVRResult(parsedVRResult) 실행이 되기 때문에
+                     * 현재 호출 위치를 여기에 해놓음
+                     */
+                    vRmwManager.setVRResult()
                 }
+
+//                viewModelScope.launch {
+//                    /**
+//                     * TODO 추후 UseCase()의 결과값을 통해 자동으로 DomainType이 주입 되야함
+//                     * 현재는 helpUsecase()로부터 값을 받아오기 때문에 도메인 타입이 Help로 고정됨
+//                     */
+//                    delay(2000)
+//                    if (!event.isError) { // 에러가 아닐 때
+//                        when (val vrResult = vrUsecase()) {
+//                            is VRResultAdapter.Success -> {
+//                                onVREvent(VREvent.CloseVRWindowEvent)
+//                                delay(500)
+//                                /**
+//                                 * 추후 파싱된 데이터에는 data / domainType / screenType / screenSizeType 이렇게 4개가 파싱되어 내려올 것으로 예상하고 작성함.
+//                                 */
+//                                onDomainEvent(
+//                                    event = MainEvent.OpenDomainWindowEvent(
+//                                        domainType = vrResult.domainType,
+//                                        screenType = vrResult.screenType,
+//                                        data = vrResult.data,
+//                                        isError = false,
+//                                        screenSizeType = vrResult.screenSizeType
+//                                    )
+//                                )
+//                            }
+//
+//                            is VRResultAdapter.Error -> {
+//                                onVREvent(
+//                                    event = VREvent.OpenVRWindowEvent(
+//                                        isError = false,
+//                                        text = event.text,
+//                                        screenSizeType = ScreenSizeType.Middle
+//                                    )
+//                                )
+//                            }
+//
+//                            is VRResultAdapter.NoData -> {
+//                                onVREvent(
+//                                    event = VREvent.OpenVRWindowEvent(
+//                                        isError = false,
+//                                        text = "데이터가 들어있지 않습니다.",
+//                                        screenSizeType = ScreenSizeType.Middle
+//                                    )
+//                                )
+//                            }
+//                        }
+//                    }
+//                    else { // 에러 일 때 이 코드는 추후에 삭제 예정
+//                        delay(500)
+//                        onVREvent(
+//                            event = VREvent.OpenVRWindowEvent(
+//                                isError = false,
+//                                text = "음성 인식 중 입니다...",
+//                                screenSizeType = ScreenSizeType.Middle
+//                            )
+//                        )
+//                    }
+//                }
             }
         }
     }
