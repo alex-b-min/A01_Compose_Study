@@ -29,6 +29,7 @@ import com.example.a01_compose_study.presentation.screen.help.HelpViewModel
 fun ComposeHelpScreen(
     domainUiState: DomainUiState.HelpWindow,
     contentColor: Color,
+    backgroundColor: Color
 ) {
     val viewModel: HelpViewModel = hiltViewModel()
     /**
@@ -42,6 +43,7 @@ fun ComposeHelpScreen(
             HelpListWindow(
                 domainUiState = domainUiState,
                 contentColor = contentColor,
+                backgroundColor = backgroundColor,
                 onDismiss = {
                     viewModel.onHelpEvent(HelpEvent.OnDismiss)
                 },
@@ -83,6 +85,7 @@ fun ComposeHelpScreen(
 fun HelpListWindow(
     domainUiState: DomainUiState.HelpWindow,
     contentColor: Color,
+    backgroundColor: Color,
     onDismiss: () -> Unit,
     onBackButton: () -> Unit,
     onScreenSizeChange: (ScreenSizeType) -> Unit,
@@ -284,6 +287,7 @@ fun HelpListWindowPreview() {
             text = "HelpWindow",
             screenSizeType = ScreenSizeType.Large
         ),
+        backgroundColor = Color.Black,
         contentColor = Color.DarkGray,
         onDismiss = {
         },

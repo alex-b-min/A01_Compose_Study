@@ -79,27 +79,27 @@ fun ComposePttScreen(
      * 그렇기에  remember 타입의 visible의 값을 결정짓는 외부 데이터 uiState를 업데이트 시킬때 반대로 업데이트를 해야한다.
      *  ==> 예를 들어 열 때는 vrUiState의 visible을 false로 업데이트 하고 닫을때는 vrUiState의 visible을 true로 업데이트 한다.
      */
-    if (domainUiState.visible) { // uiState.visible가 true 일 때는 remember 타입의 visible을 false에서 true로 바꿔 띄우는 애니메이션 효과를 준다.
-        //screenSizeType이 변할때 마다 현재 사이즈 타입에 따라 적절한 크기를 검사하고 그 크기로 애니메이션화하여 변화시킨다.
-        LaunchedEffect(domainUiState.screenSizeType) {
-//            visible = true
-
-            // uiState로부터의 screenSizeType을 얻어 해당 화면 크기 설정
-            val newTargetValue = when (domainUiState.screenSizeType) {
-                is ScreenSizeType.Zero -> 0f
-                is ScreenSizeType.Small -> 0.15f
-                is ScreenSizeType.Middle -> 0.268f
-                is ScreenSizeType.Large -> 0.433f
-            }
-
-            Log.d("@@ newTargetValue", "${newTargetValue}")
-            Log.d(
-                "@@ ScreenSizeType",
-                "${domainUiState.screenType} / ${domainUiState.screenSizeType}"
-            )
-            targetFillMaxHeight.animateTo(newTargetValue)
-        }
-    }
+//    if (domainUiState.visible) { // uiState.visible가 true 일 때는 remember 타입의 visible을 false에서 true로 바꿔 띄우는 애니메이션 효과를 준다.
+//        //screenSizeType이 변할때 마다 현재 사이즈 타입에 따라 적절한 크기를 검사하고 그 크기로 애니메이션화하여 변화시킨다.
+//        LaunchedEffect(domainUiState.screenSizeType) {
+////            visible = true
+//
+//            // uiState로부터의 screenSizeType을 얻어 해당 화면 크기 설정
+//            val newTargetValue = when (domainUiState.screenSizeType) {
+//                is ScreenSizeType.Zero -> 0f
+//                is ScreenSizeType.Small -> 0.15f
+//                is ScreenSizeType.Middle -> 0.268f
+//                is ScreenSizeType.Large -> 0.433f
+//            }
+//
+//            Log.d("@@ newTargetValue", "${newTargetValue}")
+//            Log.d(
+//                "@@ ScreenSizeType",
+//                "${domainUiState.screenType} / ${domainUiState.screenSizeType}"
+//            )
+//            targetFillMaxHeight.animateTo(newTargetValue)
+//        }
+//    }
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -223,13 +223,13 @@ fun ComposePttScreen(
             Text(
                 text = domainUiState.text,
                 modifier = Modifier
-                    .alpha(textAlpha)
+//                    .alpha(textAlpha)
                     .padding(bottom = 10.dp),
                 color = if (domainUiState.isError) Color.Red else contentColor,
                 fontSize = when (targetFillMaxHeight.value) {
                     0.2f -> 15.sp
-                    0.4f -> 25.sp
-                    else -> 40.sp
+                    0.4f -> 20.sp
+                    else -> 25.sp
                 }
             )
         }

@@ -80,7 +80,7 @@ fun MainRoute(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null
             ) {
-//                viewModel.onVREvent(VREvent.CloseAllVRWindowsEvent)
+                viewModel.onDomainEvent(MainEvent.CloseDomainWindowEvent)
             }
     ) {
 //        when (vrUiState) {
@@ -160,7 +160,8 @@ fun MainRoute(
                             is DomainUiState.HelpWindow -> {
                                 ComposeHelpScreen(
                                     domainUiState = currDomainUiState,
-                                    contentColor = Color.DarkGray
+                                    contentColor = Color.White,
+                                    backgroundColor = Color.DarkGray
                                 )
                             }
 
@@ -233,15 +234,6 @@ fun MainRoute(
 
             PttButton(
                 modifier = Modifier.fillMaxSize(0.13f),
-                contentText = "None Screen",
-                onClick = {
-                    scope.launch {
-                        viewModel.onDomainEvent(MainEvent.NoneDomainWindowEvent(domainUiState.screenSizeType))
-                    }
-                }
-            )
-            PttButton(
-                modifier = Modifier.fillMaxSize(0.13f),
                 contentText = "Error",
                 onClick = {
 
@@ -251,7 +243,7 @@ fun MainRoute(
                                 domainType = SealedDomainType.Ptt,
                                 screenType = ScreenType.Ptt,
                                 data = "에러",
-                                isError = false,
+                                isError = true,
                                 screenSizeType = ScreenSizeType.Small
                             )
                         )
