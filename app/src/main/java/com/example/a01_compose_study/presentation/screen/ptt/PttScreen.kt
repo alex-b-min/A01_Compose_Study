@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
@@ -111,48 +110,48 @@ fun ComposePttScreen(
                     )
                 }
             }
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.End,
-                verticalArrangement = Arrangement.Center
-            ) {
-                IconButton(onClick = {
-                    scope.launch {
-                        //현재 사이즈 타입을 확인하여 변경할 새로운 사이즈 타입을 구하고 그 값을 onScreenSizeC값hange() 통해 전달한다.
-                        val newScreenSizeType = when (domainUiState.screenSizeType) {
-                            is ScreenSizeType.Zero -> ScreenSizeType.Zero
-                            is ScreenSizeType.Small -> ScreenSizeType.Middle
-                            is ScreenSizeType.Middle -> ScreenSizeType.Large
-                            is ScreenSizeType.Large -> ScreenSizeType.Large
-                        }
-//                                onChangeWindowSize(newScreenSizeType)
-                    }
-                }) {
-                    Icon(
-                        imageVector = Icons.Default.KeyboardArrowUp,
-                        contentDescription = null,
-                        tint = if (domainUiState.isError) Color.Red else contentColor
-                    )
-                }
-                IconButton(onClick = {
-                    scope.launch {
-                        //현재 사이즈 타입을 확인하여 변경할 새로운 사이즈 타입을 구하고 그 값을 onScreenSizeC값hange() 통해 전달한다.
-                        val newScreenSizeType = when (domainUiState.screenSizeType) {
-                            is ScreenSizeType.Zero -> ScreenSizeType.Zero
-                            is ScreenSizeType.Small -> ScreenSizeType.Small
-                            is ScreenSizeType.Middle -> ScreenSizeType.Small
-                            is ScreenSizeType.Large -> ScreenSizeType.Middle
-                        }
-//                                onChangeWindowSize(newScreenSizeType)
-                    }
-                }) {
-                    Icon(
-                        imageVector = Icons.Default.KeyboardArrowDown,
-                        contentDescription = null,
-                        tint = if (domainUiState.isError) Color.Red else contentColor
-                    )
-                }
-            }
+//            Column(
+//                modifier = Modifier.fillMaxSize(),
+//                horizontalAlignment = Alignment.End,
+//                verticalArrangement = Arrangement.Center
+//            ) {
+//                IconButton(onClick = {
+//                    scope.launch {
+//                        //현재 사이즈 타입을 확인하여 변경할 새로운 사이즈 타입을 구하고 그 값을 onScreenSizeC값hange() 통해 전달한다.
+//                        val newScreenSizeType = when (domainUiState.screenSizeType) {
+//                            is ScreenSizeType.Zero -> ScreenSizeType.Zero
+//                            is ScreenSizeType.Small -> ScreenSizeType.Middle
+//                            is ScreenSizeType.Middle -> ScreenSizeType.Large
+//                            is ScreenSizeType.Large -> ScreenSizeType.Large
+//                        }
+////                                onChangeWindowSize(newScreenSizeType)
+//                    }
+//                }) {
+//                    Icon(
+//                        imageVector = Icons.Default.KeyboardArrowUp,
+//                        contentDescription = null,
+//                        tint = if (domainUiState.isError) Color.Red else contentColor
+//                    )
+//                }
+//                IconButton(onClick = {
+//                    scope.launch {
+//                        //현재 사이즈 타입을 확인하여 변경할 새로운 사이즈 타입을 구하고 그 값을 onScreenSizeC값hange() 통해 전달한다.
+//                        val newScreenSizeType = when (domainUiState.screenSizeType) {
+//                            is ScreenSizeType.Zero -> ScreenSizeType.Zero
+//                            is ScreenSizeType.Small -> ScreenSizeType.Small
+//                            is ScreenSizeType.Middle -> ScreenSizeType.Small
+//                            is ScreenSizeType.Large -> ScreenSizeType.Middle
+//                        }
+////                                onChangeWindowSize(newScreenSizeType)
+//                    }
+//                }) {
+//                    Icon(
+//                        imageVector = Icons.Default.KeyboardArrowDown,
+//                        contentDescription = null,
+//                        tint = if (domainUiState.isError) Color.Red else contentColor
+//                    )
+//                }
+//            }
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.BottomCenter
@@ -287,7 +286,7 @@ fun AnnounceView(text: String) {
             .clip(RoundedCornerShape(10.dp))
             .background(Color.Black),
         contentAlignment = Alignment.Center,
-        ) {
+    ) {
         Text(
             text = text,
             style = MaterialTheme.typography.h3,
