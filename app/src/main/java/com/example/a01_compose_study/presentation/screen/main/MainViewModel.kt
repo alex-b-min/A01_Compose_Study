@@ -1,14 +1,17 @@
 package com.example.a01_compose_study.presentation.screen.main
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.a01_compose_study.data.custom.MWContext
 import com.example.a01_compose_study.data.custom.SealedParsedData
 import com.example.a01_compose_study.data.custom.VRmwManager
 import com.example.a01_compose_study.domain.model.HelpItemData
+import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.data.UiState
+import com.example.a01_compose_study.presentation.screen.ptt.PttViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharedFlow
@@ -45,6 +48,16 @@ class MainViewModel @Inject constructor(
             sealedParsedData.collect { sealedParsedData ->
                 when (sealedParsedData) {
                     is SealedParsedData.HelpData -> {
+                        onDomainEvent(
+                            event = MainEvent.OpenDomainWindowEvent(
+                                domainType = SealedDomainType.Announce,
+                                screenType = ScreenType.PttAnounce,
+                                data = sealedParsedData.procHelpData.domainType.text,
+                                isError = false,
+                                screenSizeType = ScreenSizeType.Small
+                            )
+                        )
+                        delay(1000)
                         onDomainEvent(
                             event = MainEvent.OpenDomainWindowEvent(
                                 domainType = sealedParsedData.procHelpData.domainType,
@@ -239,7 +252,7 @@ class MainViewModel @Inject constructor(
 
                         SealedDomainType.Announce -> {
                             DomainUiState.AnnounceWindow(
-
+                                text = event.data as String
                             )
                         }
 

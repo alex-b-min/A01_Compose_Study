@@ -2,7 +2,6 @@ package com.example.a01_compose_study.presentation.screen.main.route
 
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
@@ -34,6 +33,7 @@ import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.components.button.PttButton
+import com.example.a01_compose_study.presentation.screen.announce.AnnounceScreen
 import com.example.a01_compose_study.presentation.screen.help.screen.ComposeHelpScreen
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
 import com.example.a01_compose_study.presentation.screen.main.MainEvent
@@ -168,7 +168,7 @@ fun MainRoute(
                         }
 
                         is DomainUiState.AnnounceWindow -> {
-
+                            AnnounceScreen((domainUiState as DomainUiState.AnnounceWindow).text)
                         }
 
                         is DomainUiState.DomainMenuWindow -> {
@@ -250,7 +250,16 @@ fun MainRoute(
                 contentText = "PTT Announce",
                 onClick = {
                     scope.launch {
-                        pttViewModel.onPttEvent(PttEvent.SetAnnounceType)
+//                        pttViewModel.onPttEvent(PttEvent.SetAnnounceType)
+                        viewModel.onDomainEvent(
+                            event = MainEvent.OpenDomainWindowEvent(
+                                domainType = SealedDomainType.Announce,
+                                screenType = ScreenType.PttAnounce,
+                                data = "Help",
+                                isError = false,
+                                screenSizeType = ScreenSizeType.Small
+                            )
+                        )
                     }
                 }
             )
@@ -266,7 +275,8 @@ fun MainRoute(
             )
 
             PttButton(
-                modifier = Modifier.fillMaxWidth(0.13f)
+                modifier = Modifier
+                    .fillMaxWidth(0.13f)
                     .fillMaxHeight(0.2f),
                 contentText = "Error",
                 onClick = {
@@ -285,7 +295,8 @@ fun MainRoute(
             )
 
             PttButton(
-                modifier = Modifier.fillMaxWidth(0.13f)
+                modifier = Modifier
+                    .fillMaxWidth(0.13f)
                     .fillMaxHeight(0.2f),
                 contentText = "VR Result",
                 onClick = {
