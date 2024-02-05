@@ -6,6 +6,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import com.example.a01_compose_study.R
 
@@ -16,13 +17,14 @@ fun TopAppBarContent(
     title: String = ""
 ) {
     TopAppBar(
-        backgroundColor = MaterialTheme.colors.background,
+        backgroundColor = Color.Black,
         title = { Text(text = title) },
         navigationIcon = {
             IconButton(onClick = onNavigationIconClick) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_guidance_btn_back),
-                    contentDescription = null
+                    contentDescription = null,
+                    tint = Color.Gray
                 )
             }
         },
@@ -30,7 +32,8 @@ fun TopAppBarContent(
             IconButton(onClick = onActionIconClick) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_close),
-                    contentDescription = null
+                    contentDescription = null,
+                    tint = Color.Gray
                 )
             }
         }

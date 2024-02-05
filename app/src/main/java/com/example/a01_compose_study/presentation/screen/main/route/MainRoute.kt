@@ -157,14 +157,13 @@ fun MainRoute(
                                 domainUiState = domainUiState as DomainUiState.PttWindow,
                                 contentColor = Color.White
                             )
-
                         }
 
                         is DomainUiState.HelpWindow -> {
                             ComposeHelpScreen(
                                 domainUiState = domainUiState as DomainUiState.HelpWindow,
-                                contentColor = Color.White,
-                                backgroundColor = Color.DarkGray
+                                contentColor = Color.Gray,
+                                backgroundColor = Color.Black
                             )
                         }
 
