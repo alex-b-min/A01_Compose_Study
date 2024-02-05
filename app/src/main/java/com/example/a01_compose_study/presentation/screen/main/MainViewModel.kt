@@ -3,6 +3,7 @@ package com.example.a01_compose_study.presentation.screen.main
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.a01_compose_study.data.DialogueMode
 import com.example.a01_compose_study.data.custom.MWContext
 import com.example.a01_compose_study.data.custom.SealedParsedData
 import com.example.a01_compose_study.data.custom.VRmwManager
@@ -24,7 +25,7 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
 ) : ViewModel() {
 
-    val vRmwManager = VRmwManager(MWContext())
+    val vRmwManager = VRmwManager(MWContext(DialogueMode.MAINMENU))
 
     private val _sealedParsedData = UiState._sealedParsedData
     val sealedParsedData: SharedFlow<SealedParsedData> = UiState._sealedParsedData

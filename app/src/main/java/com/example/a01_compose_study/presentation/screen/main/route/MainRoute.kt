@@ -56,7 +56,7 @@ fun MainRoute(
     val scope = rememberCoroutineScope()
     val multipleEventsCutter = remember { MultipleEventsCutter.get() }
     val pttViewModel: PttViewModel = hiltViewModel()
-    val mwContext = MWContext()
+    val mwContext = MWContext(DialogueMode.MAINMENU)
 
     /**
      * Compose에서 해당 뷰를 조작하는 변수(visible)는 remember 타입으로 해야하지만,
