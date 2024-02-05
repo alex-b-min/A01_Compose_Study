@@ -10,8 +10,10 @@ import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.data.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -60,64 +62,64 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun onVREvent(event: VREvent) {
-        when (event) {
-            is VREvent.CloseVRWindowEvent -> {
-                _vrUiState.update { vrUiState ->
-                    when (vrUiState) {
-                        is VRUiState.VRWindow -> vrUiState.copy(visible = false)
-                        else -> VRUiState.NoneWindow
-                    }
-                }
-            }
-
-            is VREvent.CloseAllVRWindowsEvent -> {
-                _vrUiState.update { vrUiState ->
-                    when (vrUiState) {
-                        is VRUiState.VRWindow -> vrUiState.copy(visible = false)
-                        else -> VRUiState.NoneWindow
-                    }
-                }
-                closeDomainWindow()
-            }
-
-            is VREvent.ChangeVRWindowSizeEvent -> {
-                /**
-                 * 현재 데이터는 유지한 체 ScreenSizeType 프로퍼티만 변경하기
-                 * ==> 즉, 현재 화면에서 직접적으로 화면 크기를 변경하게 할 수 있음
-                 * 어차피 vrUiState의 타입이 VRWindow 일 때만 사이즈를 변경 가능할 수 있기에 타입을 지정하여 copy()를 사용함.
-                 */
-                _vrUiState.update { currentState ->
-                    when (currentState) {
-                        is VRUiState.VRWindow -> currentState.copy(screenSizeType = event.screenSizeType)
-                        else -> currentState
-                    }
-                }
-            }
-
-            is VREvent.OpenVRWindowEvent -> {
-                _domainUiState.update { uiState ->
-                    DomainUiState.NoneWindow()
-                }
-
-                _vrUiState.update { vrUiState ->
-                    VRUiState.VRWindow(
-                        visible = true,
-                        isError = event.isError,
-                        text = event.text,
-                        screenSizeType = event.screenSizeType
-                    )
-                }
-
-                viewModelScope.launch {
-                    delay(2000)
-                    /**
-                     * 더미데이터를 직접 넣는 작업
-                     * VRmwManager.setVRResult()를 호출 -> mwContext.onVRResult(parsedVRResult) 실행이 되기 때문에
-                     * 현재 호출 위치를 여기에 해놓음
-                     */
-                    vRmwManager.setVRResult()
-                }
+//    fun onVREvent(event: VREvent) {
+//        when (event) {
+//            is VREvent.CloseVRWindowEvent -> {
+//                _vrUiState.update { vrUiState ->
+//                    when (vrUiState) {
+//                        is VRUiState.VRWindow -> vrUiState.copy(visible = false)
+//                        else -> VRUiState.NoneWindow
+//                    }
+//                }
+//            }
+//
+//            is VREvent.CloseAllVRWindowsEvent -> {
+//                _vrUiState.update { vrUiState ->
+//                    when (vrUiState) {
+//                        is VRUiState.VRWindow -> vrUiState.copy(visible = false)
+//                        else -> VRUiState.NoneWindow
+//                    }
+//                }
+//                closeDomainWindow()
+//            }
+//
+//            is VREvent.ChangeVRWindowSizeEvent -> {
+//                /**
+//                 * 현재 데이터는 유지한 체 ScreenSizeType 프로퍼티만 변경하기
+//                 * ==> 즉, 현재 화면에서 직접적으로 화면 크기를 변경하게 할 수 있음
+//                 * 어차피 vrUiState의 타입이 VRWindow 일 때만 사이즈를 변경 가능할 수 있기에 타입을 지정하여 copy()를 사용함.
+//                 */
+//                _vrUiState.update { currentState ->
+//                    when (currentState) {
+//                        is VRUiState.VRWindow -> currentState.copy(screenSizeType = event.screenSizeType)
+//                        else -> currentState
+//                    }
+//                }
+//            }
+//
+//            is VREvent.OpenVRWindowEvent -> {
+//                _domainUiState.update { uiState ->
+//                    DomainUiState.NoneWindow()
+//                }
+//
+//                _vrUiState.update { vrUiState ->
+//                    VRUiState.VRWindow(
+//                        visible = true,
+//                        isError = event.isError,
+//                        text = event.text,
+//                        screenSizeType = event.screenSizeType
+//                    )
+//                }
+//
+//                viewModelScope.launch {
+//                    delay(2000)
+//                    /**
+//                     * 더미데이터를 직접 넣는 작업
+//                     * VRmwManager.setVRResult()를 호출 -> mwContext.onVRResult(parsedVRResult) 실행이 되기 때문에
+//                     * 현재 호출 위치를 여기에 해놓음
+//                     */
+//                    vRmwManager.setVRResult()
+//                }
 
 //                viewModelScope.launch {
 //                    /**
@@ -176,9 +178,9 @@ class MainViewModel @Inject constructor(
 //                        )
 //                    }
 //                }
-            }
-        }
-    }
+//            }
+//        }
+//    }
 
     fun onDomainEvent(event: MainEvent) {
         when (event) {
