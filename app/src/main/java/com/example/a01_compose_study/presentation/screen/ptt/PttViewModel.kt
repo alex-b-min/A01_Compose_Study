@@ -18,7 +18,6 @@ class PttViewModel @Inject constructor() : ViewModel() {
     private val _domainUiState = UiState._domainUiState
 
     private val _sealedParsedData = UiState._sealedParsedData
-    val sealedParsedData: SharedFlow<SealedParsedData> = UiState._sealedParsedData
 
     fun onPttEvent(event: PttEvent) {
         when (event) {
