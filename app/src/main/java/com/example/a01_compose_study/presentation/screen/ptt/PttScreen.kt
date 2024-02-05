@@ -2,7 +2,6 @@ package com.example.a01_compose_study.presentation.screen.ptt
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,8 +13,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,7 +27,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.a01_compose_study.R
 import com.example.a01_compose_study.domain.model.ScreenType
-import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.components.lottie.LottieAssetAnimationHandler
 import com.example.a01_compose_study.presentation.components.lottie.LottieRawAnimationHandler
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
@@ -181,79 +177,69 @@ fun ComposePttScreen(
                             } ?: 0F
                         }
                     )
-                } else if (domainUiState.screenType is ScreenType.PttListen) {
+                } else {
                     LottieAssetAnimationHandler(
                         modifier = Modifier.fillMaxSize(),
                         lottieJsonAssetPath = "bg_glow/09_tsd_frame_glow_l_lt.json",
                         lottieImageAssetFolder = "bg_glow/images/default",
                         infiniteLoop = true
                     )
-                    LottieRawAnimationHandler(
-                        modifier = Modifier.fillMaxSize(),
-                        rawResId = R.raw.tsd_listening_passive_loop_lt_01_2,
-                        infiniteLoop = true,
-                        onFrameChanged = { currentFrame ->
-                            // 현재 프레임에 따라 글자 투명도(Alpha)가 변하도록 설정
-                            textAlpha = currentFrame.let {
-                                when (it) {
-                                    in 0F..10F -> 0F
-                                    in 10F..20F -> it.normalize(10F, 20F)
-                                    in 20F..40F -> 1F - (it.normalize(20F, 40F) * 0.5F)
-                                    else -> 0F
-                                }
-                            } ?: 0F
-                        }
-                    )
-                } else if (domainUiState.screenType is ScreenType.PttLoading) {
-                    LottieAssetAnimationHandler(
-                        modifier = Modifier.fillMaxSize(),
-                        lottieJsonAssetPath = "bg_glow/09_tsd_frame_glow_l_lt.json",
-                        lottieImageAssetFolder = "bg_glow/images/default",
-                        infiniteLoop = true
-                    )
-                    LottieRawAnimationHandler(
-                        modifier = Modifier.fillMaxSize(),
-                        rawResId = R.raw.tsd_thinking_loop_fix_lt_03_2,
-                        infiniteLoop = true,
-                        onFrameChanged = { currentFrame ->
-                            // 현재 프레임에 따라 글자 투명도(Alpha)가 변하도록 설정
-                            textAlpha = currentFrame.let {
-                                when (it) {
-                                    in 0F..10F -> 0F
-                                    in 10F..20F -> it.normalize(10F, 20F)
-                                    in 20F..40F -> 1F - (it.normalize(20F, 40F) * 0.5F)
-                                    else -> 0F
-                                }
-                            } ?: 0F
-                        }
-                    )
+                    if (domainUiState.screenType is ScreenType.PttListen) {
+                        LottieRawAnimationHandler(
+                            modifier = Modifier.fillMaxSize(),
+                            rawResId = R.raw.tsd_listening_passive_loop_lt_01_2,
+                            infiniteLoop = true,
+                            onFrameChanged = { currentFrame ->
+                                // 현재 프레임에 따라 글자 투명도(Alpha)가 변하도록 설정
+                                textAlpha = currentFrame.let {
+                                    when (it) {
+                                        in 0F..10F -> 0F
+                                        in 10F..20F -> it.normalize(10F, 20F)
+                                        in 20F..40F -> 1F - (it.normalize(20F, 40F) * 0.5F)
+                                        else -> 0F
+                                    }
+                                } ?: 0F
+                            }
+                        )
+                    } else if (domainUiState.screenType is ScreenType.PttLoading) {
+                        LottieRawAnimationHandler(
+                            modifier = Modifier.fillMaxSize(),
+                            rawResId = R.raw.tsd_thinking_loop_fix_lt_03_2,
+                            infiniteLoop = true,
+                            onFrameChanged = { currentFrame ->
+                                // 현재 프레임에 따라 글자 투명도(Alpha)가 변하도록 설정
+                                textAlpha = currentFrame.let {
+                                    when (it) {
+                                        in 0F..10F -> 0F
+                                        in 10F..20F -> it.normalize(10F, 20F)
+                                        in 20F..40F -> 1F - (it.normalize(20F, 40F) * 0.5F)
+                                        else -> 0F
+                                    }
+                                } ?: 0F
+                            }
+                        )
 
 
-                } else if (domainUiState.screenType is ScreenType.PttSpeak) {
-                    // Lottie Animation 배경 재생
+                    } else if (domainUiState.screenType is ScreenType.PttSpeak) {
+                        // Lottie Animation 배경 재생
 //                        Log.d("@@ 에러 아님", "${domainUiState.visible}")
-                    LottieAssetAnimationHandler(
-                        modifier = Modifier.fillMaxSize(),
-                        lottieJsonAssetPath = "bg_glow/09_tsd_frame_glow_l_lt.json",
-                        lottieImageAssetFolder = "bg_glow/images/default",
-                        infiniteLoop = true
-                    )
-                    LottieRawAnimationHandler(
-                        modifier = Modifier.fillMaxSize(),
-                        rawResId = R.raw.loop,
-                        infiniteLoop = true,
-                        onFrameChanged = { currentFrame ->
-                            // 현재 프레임에 따라 글자 투명도(Alpha)가 변하도록 설정
-                            textAlpha = currentFrame.let {
-                                when (it) {
-                                    in 0F..10F -> 0F
-                                    in 10F..20F -> it.normalize(10F, 20F)
-                                    in 20F..40F -> 1F - (it.normalize(20F, 40F) * 0.5F)
-                                    else -> 0F
-                                }
-                            } ?: 0F
-                        }
-                    )
+                        LottieRawAnimationHandler(
+                            modifier = Modifier.fillMaxSize(),
+                            rawResId = R.raw.loop,
+                            infiniteLoop = true,
+                            onFrameChanged = { currentFrame ->
+                                // 현재 프레임에 따라 글자 투명도(Alpha)가 변하도록 설정
+                                textAlpha = currentFrame.let {
+                                    when (it) {
+                                        in 0F..10F -> 0F
+                                        in 10F..20F -> it.normalize(10F, 20F)
+                                        in 20F..40F -> 1F - (it.normalize(20F, 40F) * 0.5F)
+                                        else -> 0F
+                                    }
+                                } ?: 0F
+                            }
+                        )
+                    }
                 }
             }
 
