@@ -39,6 +39,8 @@ import com.example.a01_compose_study.presentation.screen.main.DomainUiState
 import com.example.a01_compose_study.presentation.screen.main.MainEvent
 import com.example.a01_compose_study.presentation.screen.main.MainViewModel
 import com.example.a01_compose_study.presentation.screen.ptt.ComposePttScreen
+import com.example.a01_compose_study.presentation.screen.ptt.PttEvent
+import com.example.a01_compose_study.presentation.screen.ptt.pttViewModel
 import com.example.a01_compose_study.presentation.util.MultipleEventsCutter
 import com.example.a01_compose_study.presentation.util.get
 import kotlinx.coroutines.launch
@@ -51,6 +53,7 @@ fun MainRoute(
 //    val vrUiState by viewModel.vrUiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
     val multipleEventsCutter = remember { MultipleEventsCutter.get() }
+    val pttViewModel: pttViewModel = hiltViewModel()
 
     /**
      * Compose에서 해당 뷰를 조작하는 변수(visible)는 remember 타입으로 해야하지만,
@@ -214,7 +217,7 @@ fun MainRoute(
                     viewModel.onDomainEvent(
                         event = MainEvent.OpenDomainWindowEvent(
                             domainType = SealedDomainType.Ptt,
-                            screenType = ScreenType.Ptt,
+                            screenType = ScreenType.PttListen,
                             data = "음성 인식",
                             isError = false,
                             screenSizeType = ScreenSizeType.Small
@@ -222,6 +225,27 @@ fun MainRoute(
                     )
                 }
             )
+
+            PttButton(
+                modifier = Modifier.fillMaxSize(0.13f),
+                contentText = "PTT Speak",
+                onClick = {
+                    scope.launch {
+                        pttViewModel.onPttEvent(PttEvent.SetSpeakType)
+                    }
+                }
+            )
+
+            PttButton(
+                modifier = Modifier.fillMaxSize(0.13f),
+                contentText = "PTT Loading",
+                onClick = {
+                    scope.launch {
+                        pttViewModel.onPttEvent(PttEvent.SetLoadingType)
+                    }
+                }
+            )
+
             PttButton(
                 modifier = Modifier.fillMaxSize(0.13f),
                 contentText = "PTT Close",
@@ -241,7 +265,7 @@ fun MainRoute(
                         viewModel.onDomainEvent(
                             event = MainEvent.OpenDomainWindowEvent(
                                 domainType = SealedDomainType.Ptt,
-                                screenType = ScreenType.Ptt,
+                                screenType = ScreenType.PttListen,
                                 data = "에러",
                                 isError = true,
                                 screenSizeType = ScreenSizeType.Small

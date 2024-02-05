@@ -37,9 +37,6 @@ class PttScreen @Inject constructor(
     val viewModel: ServiceViewModel,
 ) {
     val TAG : String? = this.javaClass.simpleName
-    fun showPtt() {
-        //viewModel.getSttString().value = ""
-    }
 }
 
 @Composable
@@ -58,7 +55,7 @@ fun PttScreen(viewModel: ServiceViewModel = hiltViewModel()) {
             )
             .semantics {
                 contentDescription = "TBD"
-                testTag = "${ScreenType.Ptt}"
+                testTag = "${ScreenType.PttListen}"
             }
     ) {
         Column(

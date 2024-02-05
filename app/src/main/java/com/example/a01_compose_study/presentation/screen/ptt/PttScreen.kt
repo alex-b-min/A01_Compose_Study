@@ -1,21 +1,11 @@
 package com.example.a01_compose_study.presentation.screen.ptt
 
-import android.util.Log
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
@@ -24,7 +14,6 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,20 +21,15 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Devices
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.a01_compose_study.R
-import com.example.a01_compose_study.data.vr.PttScreen
-import com.example.a01_compose_study.domain.model.SealedDomainType
+import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.components.lottie.LottieAssetAnimationHandler
 import com.example.a01_compose_study.presentation.components.lottie.LottieRawAnimationHandler
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
-import com.example.a01_compose_study.presentation.screen.main.VRUiState
 import com.example.a01_compose_study.presentation.util.TextModifier.normalize
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -188,7 +172,55 @@ fun ComposePttScreen(
                         } ?: 0F
                     }
                 )
-            } else {
+            } else if (domainUiState.screenType is ScreenType.PttListen) {
+                LottieAssetAnimationHandler(
+                    modifier = Modifier.fillMaxSize(),
+                    lottieJsonAssetPath = "bg_glow/09_tsd_frame_glow_l_lt.json",
+                    lottieImageAssetFolder = "bg_glow/images/default",
+                    infiniteLoop = true
+                )
+                LottieRawAnimationHandler(
+                    modifier = Modifier.fillMaxSize(),
+                    rawResId = R.raw.error_loop,
+                    infiniteLoop = true,
+                    onFrameChanged = { currentFrame ->
+                        // 현재 프레임에 따라 글자 투명도(Alpha)가 변하도록 설정
+                        textAlpha = currentFrame.let {
+                            when (it) {
+                                in 0F..10F -> 0F
+                                in 10F..20F -> it.normalize(10F, 20F)
+                                in 20F..40F -> 1F - (it.normalize(20F, 40F) * 0.5F)
+                                else -> 0F
+                            }
+                        } ?: 0F
+                    }
+                )
+            } else if (domainUiState.screenType is ScreenType.PttLoading) {
+                LottieAssetAnimationHandler(
+                    modifier = Modifier.fillMaxSize(),
+                    lottieJsonAssetPath = "bg_glow/09_tsd_frame_glow_l_lt.json",
+                    lottieImageAssetFolder = "bg_glow/images/default",
+                    infiniteLoop = true
+                )
+                LottieRawAnimationHandler(
+                    modifier = Modifier.fillMaxSize(),
+                    rawResId = R.raw.error_loop,
+                    infiniteLoop = true,
+                    onFrameChanged = { currentFrame ->
+                        // 현재 프레임에 따라 글자 투명도(Alpha)가 변하도록 설정
+                        textAlpha = currentFrame.let {
+                            when (it) {
+                                in 0F..10F -> 0F
+                                in 10F..20F -> it.normalize(10F, 20F)
+                                in 20F..40F -> 1F - (it.normalize(20F, 40F) * 0.5F)
+                                else -> 0F
+                            }
+                        } ?: 0F
+                    }
+                )
+
+
+            } else if (domainUiState.screenType is ScreenType.PttSpeak) {
                 // Lottie Animation 배경 재생
 //                        Log.d("@@ 에러 아님", "${domainUiState.visible}")
                 LottieAssetAnimationHandler(
