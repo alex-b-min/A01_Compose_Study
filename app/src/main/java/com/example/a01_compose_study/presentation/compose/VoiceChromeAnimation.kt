@@ -33,19 +33,19 @@
 //    val loadingProgress = viewModel.loadingProgress.collectAsState().value
 //
 //    val passiveChrome by rememberLottieComposition(
-//        LottieCompositionSpec.Asset("voice_chrome/01_2_tsd_listening passive_loop_lt.json"),
+//        LottieCompositionSpec.Asset("voice_chrome/tsd_listening_passive_loop_lt_01_2.json"),
 //        imageAssetsFolder = "images"
 //    )
 //    val prepareChrome by rememberLottieComposition(
-//        LottieCompositionSpec.Asset("voice_chrome/00_tsd_wake up_lt.json"),
+//        LottieCompositionSpec.Asset("voice_chrome/tsd_wake_up_lt_00.json"),
 //        imageAssetsFolder = "images"
 //    )
 //    val listeningChrome by rememberLottieComposition(
-//        LottieCompositionSpec.Asset("voice_chrome/02_2_tsd_listening active_loop_lt.json"),
+//        LottieCompositionSpec.Asset("voice_chrome/tsd_listening_active_loop_lt_02_2.json"),
 //        imageAssetsFolder = "images"
 //    )
 //    val thingkingChrome by rememberLottieComposition(
-//        LottieCompositionSpec.Asset("voice_chrome/03_2_tsd_thinking_loop_fix_lt.json"),
+//        LottieCompositionSpec.Asset("voice_chrome/tsd_thinking_loop_fix_lt_03_2.json"),
 //        imageAssetsFolder = "images"
 //    )
 //    val currentChrome = remember { mutableStateOf(passiveChrome) }

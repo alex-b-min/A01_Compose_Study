@@ -248,6 +248,16 @@ fun MainRoute(
 
             PttButton(
                 modifier = Modifier.fillMaxSize(0.13f),
+                contentText = "PTT Announce",
+                onClick = {
+                    scope.launch {
+                        pttViewModel.onPttEvent(PttEvent.SetAnnounceType)
+                    }
+                }
+            )
+
+            PttButton(
+                modifier = Modifier.fillMaxSize(0.13f),
                 contentText = "PTT Close",
                 onClick = {
                     scope.launch {
@@ -257,7 +267,8 @@ fun MainRoute(
             )
 
             PttButton(
-                modifier = Modifier.fillMaxSize(0.13f),
+                modifier = Modifier.fillMaxWidth(0.13f)
+                    .fillMaxHeight(0.2f),
                 contentText = "Error",
                 onClick = {
                     multipleEventsCutter.processEvent {
@@ -275,7 +286,8 @@ fun MainRoute(
             )
 
             PttButton(
-                modifier = Modifier.fillMaxSize(0.13f),
+                modifier = Modifier.fillMaxWidth(0.13f)
+                    .fillMaxHeight(0.2f),
                 contentText = "VR Result",
                 onClick = {
                     multipleEventsCutter.processEvent {
