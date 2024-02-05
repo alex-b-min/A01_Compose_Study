@@ -40,7 +40,7 @@ import com.example.a01_compose_study.presentation.screen.main.MainEvent
 import com.example.a01_compose_study.presentation.screen.main.MainViewModel
 import com.example.a01_compose_study.presentation.screen.ptt.ComposePttScreen
 import com.example.a01_compose_study.presentation.screen.ptt.PttEvent
-import com.example.a01_compose_study.presentation.screen.ptt.pttViewModel
+import com.example.a01_compose_study.presentation.screen.ptt.PttViewModel
 import com.example.a01_compose_study.presentation.util.MultipleEventsCutter
 import com.example.a01_compose_study.presentation.util.get
 import kotlinx.coroutines.launch
@@ -53,7 +53,7 @@ fun MainRoute(
 //    val vrUiState by viewModel.vrUiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
     val multipleEventsCutter = remember { MultipleEventsCutter.get() }
-    val pttViewModel: pttViewModel = hiltViewModel()
+    val pttViewModel: PttViewModel = hiltViewModel()
 
     /**
      * Compose에서 해당 뷰를 조작하는 변수(visible)는 remember 타입으로 해야하지만,
@@ -125,80 +125,80 @@ fun MainRoute(
                 animationSpec = tween(1000)
             )
         ) {
-            Crossfade(
-                targetState = domainUiState,
-                label = "",
-                animationSpec = tween(durationMillis = 1500)
-            ) { currDomainUiState ->
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.BottomStart
+//            Crossfade(
+//                targetState = domainUiState,
+//                label = "",
+//                animationSpec = tween(durationMillis = 1500)
+//            ) { currDomainUiState ->
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.BottomStart
+            ) {
+                Column(
+                    modifier = Modifier
+                        .offset(x = 10.dp, y = (10).dp)
+                        .fillMaxHeight(targetFillMaxHeight.value)
+                        .fillMaxWidth(0.233f)
+                        .background(
+                            color = Color.Transparent,
+                            shape = RoundedCornerShape(15.dp)
+                        )
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null
+                        ) {},
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .offset(x = 10.dp, y = (10).dp)
-                            .fillMaxHeight(targetFillMaxHeight.value)
-                            .fillMaxWidth(0.233f)
-                            .background(
-                                color = Color.Transparent,
-                                shape = RoundedCornerShape(15.dp)
+                    when (domainUiState) {
+                        is DomainUiState.NoneWindow -> {
+                        }
+
+                        is DomainUiState.PttWindow -> {
+                            ComposePttScreen(
+                                domainUiState = domainUiState as DomainUiState.PttWindow,
+                                contentColor = Color.White
                             )
-                            .clickable(
-                                interactionSource = remember { MutableInteractionSource() },
-                                indication = null
-                            ) {},
-                    ) {
-                        when (currDomainUiState) {
-                            is DomainUiState.NoneWindow -> {
-                            }
 
-                            is DomainUiState.PttWindow -> {
-                                ComposePttScreen(
-                                    domainUiState = currDomainUiState,
-                                    contentColor = Color.White
-                                )
+                        }
 
-                            }
+                        is DomainUiState.HelpWindow -> {
+                            ComposeHelpScreen(
+                                domainUiState = domainUiState as DomainUiState.HelpWindow,
+                                contentColor = Color.White,
+                                backgroundColor = Color.DarkGray
+                            )
+                        }
 
-                            is DomainUiState.HelpWindow -> {
-                                ComposeHelpScreen(
-                                    domainUiState = currDomainUiState,
-                                    contentColor = Color.White,
-                                    backgroundColor = Color.DarkGray
-                                )
-                            }
+                        is DomainUiState.AnnounceWindow -> {
 
-                            is DomainUiState.AnnounceWindow -> {
+                        }
 
-                            }
+                        is DomainUiState.DomainMenuWindow -> {
 
-                            is DomainUiState.DomainMenuWindow -> {
+                        }
 
-                            }
+                        is DomainUiState.CallWindow -> {
 
-                            is DomainUiState.CallWindow -> {
+                        }
 
-                            }
+                        is DomainUiState.NavigationWindow -> {
 
-                            is DomainUiState.NavigationWindow -> {
+                        }
 
-                            }
+                        is DomainUiState.RadioWindow -> {
 
-                            is DomainUiState.RadioWindow -> {
+                        }
 
-                            }
+                        is DomainUiState.WeatherWindow -> {
 
-                            is DomainUiState.WeatherWindow -> {
+                        }
 
-                            }
+                        is DomainUiState.SendMessageWindow -> {
 
-                            is DomainUiState.SendMessageWindow -> {
-
-                            }
                         }
                     }
                 }
             }
+//            }
         }
 
         Column(
@@ -260,7 +260,6 @@ fun MainRoute(
                 modifier = Modifier.fillMaxSize(0.13f),
                 contentText = "Error",
                 onClick = {
-
                     multipleEventsCutter.processEvent {
                         viewModel.onDomainEvent(
                             event = MainEvent.OpenDomainWindowEvent(
@@ -272,7 +271,18 @@ fun MainRoute(
                             )
                         )
                     }
+                }
+            )
 
+            PttButton(
+                modifier = Modifier.fillMaxSize(0.13f),
+                contentText = "VR Result",
+                onClick = {
+                    multipleEventsCutter.processEvent {
+                    }
+                    scope.launch {
+                        viewModel.vRmwManager.setVRResult()
+                    }
                 }
             )
         }

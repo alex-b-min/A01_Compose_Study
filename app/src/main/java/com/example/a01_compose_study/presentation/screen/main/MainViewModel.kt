@@ -11,6 +11,7 @@ import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.data.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -24,7 +25,7 @@ class MainViewModel @Inject constructor(
     val vRmwManager = VRmwManager(MWContext())
 
     private val _sealedParsedData = UiState._sealedParsedData
-    val sealedParsedData: StateFlow<SealedParsedData> = UiState._sealedParsedData
+    val sealedParsedData: SharedFlow<SealedParsedData> = UiState._sealedParsedData
 
     private val _domainUiState = UiState._domainUiState
     val domainUiState: StateFlow<DomainUiState> = UiState.domainUiState

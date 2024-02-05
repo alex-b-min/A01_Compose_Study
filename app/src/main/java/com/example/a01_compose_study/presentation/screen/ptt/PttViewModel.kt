@@ -6,7 +6,7 @@ import com.example.a01_compose_study.presentation.data.UiState
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
 import kotlinx.coroutines.flow.update
 
-class pttViewModel : ViewModel(){
+class PttViewModel : ViewModel(){
 
     private val _domainUiState = UiState._domainUiState
 

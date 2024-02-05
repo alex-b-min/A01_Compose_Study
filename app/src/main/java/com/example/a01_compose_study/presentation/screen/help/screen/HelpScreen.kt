@@ -29,7 +29,7 @@ import com.example.a01_compose_study.presentation.screen.help.HelpViewModel
 fun ComposeHelpScreen(
     domainUiState: DomainUiState.HelpWindow,
     contentColor: Color,
-    backgroundColor: Color
+    backgroundColor: Color,
 ) {
     val viewModel: HelpViewModel = hiltViewModel()
     /**
@@ -67,6 +67,7 @@ fun ComposeHelpScreen(
             HelpDetailWindow(
                 domainUiState = domainUiState,
                 contentColor = contentColor,
+                backgroundColor = backgroundColor,
                 onDismiss = {
                     viewModel.onHelpEvent(HelpEvent.OnDismiss)
                 },
@@ -89,10 +90,14 @@ fun HelpListWindow(
     onDismiss: () -> Unit,
     onBackButton: () -> Unit,
     onScreenSizeChange: (ScreenSizeType) -> Unit,
-    onItemClick: (HelpItemData) -> Unit
+    onItemClick: (HelpItemData) -> Unit,
 ) {
     val helpList = domainUiState.data
-    Box(modifier = Modifier.fillMaxSize().background(contentColor)) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(backgroundColor)
+    ) {
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.End,
@@ -112,104 +117,112 @@ fun HelpListWindow(
                 })
         }
 
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.End,
-            verticalArrangement = Arrangement.Center
-        ) {
-            IconButton(onClick = {
-                //현재 사이즈 타입을 확인하여 변경할 새로운 사이즈 타입을 구하고 그 값을 onScreenSizeChange() 통해 전달한다.
-                val newScreenSizeType = when (domainUiState.screenSizeType) {
-                    is ScreenSizeType.Zero -> ScreenSizeType.Zero
-                    is ScreenSizeType.Small -> ScreenSizeType.Middle
-                    is ScreenSizeType.Middle -> ScreenSizeType.Large
-                    is ScreenSizeType.Large -> ScreenSizeType.Large
-                }
-                onScreenSizeChange(newScreenSizeType)
-            }) {
-                Icon(
-                    imageVector = Icons.Default.KeyboardArrowUp,
-                    contentDescription = null,
-                    tint = if (domainUiState.isError) Color.Red else contentColor
-                )
-            }
-            IconButton(onClick = {
-                //현재 사이즈 타입을 확인하여 변경할 새로운 사이즈 타입을 구하고 그 값을 onScreenSizeChange() 통해 전달한다.
-                val newScreenSizeType = when (domainUiState.screenSizeType) {
-                    is ScreenSizeType.Zero -> ScreenSizeType.Zero
-                    is ScreenSizeType.Small -> ScreenSizeType.Small
-                    is ScreenSizeType.Middle -> ScreenSizeType.Small
-                    is ScreenSizeType.Large -> ScreenSizeType.Middle
-                }
-                onScreenSizeChange(newScreenSizeType)
-            }) {
-                Icon(
-                    imageVector = Icons.Default.KeyboardArrowDown,
-                    contentDescription = null,
-                    tint = if (domainUiState.isError) Color.Red else contentColor
-                )
-            }
-        }
+//        Column(
+//            modifier = Modifier.fillMaxSize(),
+//            horizontalAlignment = Alignment.End,
+//            verticalArrangement = Arrangement.Center
+//        ) {
+//            IconButton(onClick = {
+//                //현재 사이즈 타입을 확인하여 변경할 새로운 사이즈 타입을 구하고 그 값을 onScreenSizeChange() 통해 전달한다.
+//                val newScreenSizeType = when (domainUiState.screenSizeType) {
+//                    is ScreenSizeType.Zero -> ScreenSizeType.Zero
+//                    is ScreenSizeType.Small -> ScreenSizeType.Middle
+//                    is ScreenSizeType.Middle -> ScreenSizeType.Large
+//                    is ScreenSizeType.Large -> ScreenSizeType.Large
+//                }
+//                onScreenSizeChange(newScreenSizeType)
+//            }) {
+//                Icon(
+//                    imageVector = Icons.Default.KeyboardArrowUp,
+//                    contentDescription = null,
+//                    tint = if (domainUiState.isError) Color.Red else contentColor
+//                )
+//            }
+//            IconButton(onClick = {
+//                //현재 사이즈 타입을 확인하여 변경할 새로운 사이즈 타입을 구하고 그 값을 onScreenSizeChange() 통해 전달한다.
+//                val newScreenSizeType = when (domainUiState.screenSizeType) {
+//                    is ScreenSizeType.Zero -> ScreenSizeType.Zero
+//                    is ScreenSizeType.Small -> ScreenSizeType.Small
+//                    is ScreenSizeType.Middle -> ScreenSizeType.Small
+//                    is ScreenSizeType.Large -> ScreenSizeType.Middle
+//                }
+//                onScreenSizeChange(newScreenSizeType)
+//            }) {
+//                Icon(
+//                    imageVector = Icons.Default.KeyboardArrowDown,
+//                    contentDescription = null,
+//                    tint = if (domainUiState.isError) Color.Red else contentColor
+//                )
+//            }
+//        }
     }
 }
+
 @Composable
 fun HelpDetailWindow(
     domainUiState: DomainUiState.HelpWindow,
     contentColor: Color,
+    backgroundColor: Color,
     onDismiss: () -> Unit,
     onBackButton: () -> Unit,
     onScreenSizeChange: (ScreenSizeType) -> Unit,
 ) {
-    Column {
-        TopAppBarContent(
-            title = domainUiState.detailData.domainId.text,
-            onNavigationIconClick = {
-                onBackButton()
-            },
-            onActionIconClick = {
-                onDismiss()
-            }
-        )
-        HelpDetailList(helpItemData = domainUiState.detailData)
-    }
-
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.End,
-        verticalArrangement = Arrangement.Center
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(backgroundColor)
     ) {
-        IconButton(onClick = {
-            //현재 사이즈 타입을 확인하여 변경할 새로운 사이즈 타입을 구하고 그 값을 onScreenSizeChange() 통해 전달한다.
-            val newScreenSizeType = when (domainUiState.screenSizeType) {
-                is ScreenSizeType.Zero -> ScreenSizeType.Zero
-                is ScreenSizeType.Small -> ScreenSizeType.Middle
-                is ScreenSizeType.Middle -> ScreenSizeType.Large
-                is ScreenSizeType.Large -> ScreenSizeType.Large
-            }
-            onScreenSizeChange(newScreenSizeType)
-        }) {
-            Icon(
-                imageVector = Icons.Default.KeyboardArrowUp,
-                contentDescription = null,
-                tint = if (domainUiState.isError) Color.Red else contentColor
+        Column {
+            TopAppBarContent(
+                title = domainUiState.detailData.domainId.text,
+                onNavigationIconClick = {
+                    onBackButton()
+                },
+                onActionIconClick = {
+                    onDismiss()
+                }
             )
+            HelpDetailList(helpItemData = domainUiState.detailData)
         }
-        IconButton(onClick = {
-            //현재 사이즈 타입을 확인하여 변경할 새로운 사이즈 타입을 구하고 그 값을 onScreenSizeChange() 통해 전달한다.
-            val newScreenSizeType = when (domainUiState.screenSizeType) {
-                is ScreenSizeType.Zero -> ScreenSizeType.Zero
-                is ScreenSizeType.Small -> ScreenSizeType.Small
-                is ScreenSizeType.Middle -> ScreenSizeType.Small
-                is ScreenSizeType.Large -> ScreenSizeType.Middle
-            }
-            onScreenSizeChange(newScreenSizeType)
-        }) {
-            Icon(
-                imageVector = Icons.Default.KeyboardArrowDown,
-                contentDescription = null,
-                tint = if (domainUiState.isError) Color.Red else contentColor
-            )
-        }
+
+//        Column(
+//            modifier = Modifier.fillMaxSize(),
+//            horizontalAlignment = Alignment.End,
+//            verticalArrangement = Arrangement.Center
+//        ) {
+//            IconButton(onClick = {
+//                //현재 사이즈 타입을 확인하여 변경할 새로운 사이즈 타입을 구하고 그 값을 onScreenSizeChange() 통해 전달한다.
+//                val newScreenSizeType = when (domainUiState.screenSizeType) {
+//                    is ScreenSizeType.Zero -> ScreenSizeType.Zero
+//                    is ScreenSizeType.Small -> ScreenSizeType.Middle
+//                    is ScreenSizeType.Middle -> ScreenSizeType.Large
+//                    is ScreenSizeType.Large -> ScreenSizeType.Large
+//                }
+//                onScreenSizeChange(newScreenSizeType)
+//            }) {
+//                Icon(
+//                    imageVector = Icons.Default.KeyboardArrowUp,
+//                    contentDescription = null,
+//                    tint = if (domainUiState.isError) Color.Red else contentColor
+//                )
+//            }
+//            IconButton(onClick = {
+//                //현재 사이즈 타입을 확인하여 변경할 새로운 사이즈 타입을 구하고 그 값을 onScreenSizeChange() 통해 전달한다.
+//                val newScreenSizeType = when (domainUiState.screenSizeType) {
+//                    is ScreenSizeType.Zero -> ScreenSizeType.Zero
+//                    is ScreenSizeType.Small -> ScreenSizeType.Small
+//                    is ScreenSizeType.Middle -> ScreenSizeType.Small
+//                    is ScreenSizeType.Large -> ScreenSizeType.Middle
+//                }
+//                onScreenSizeChange(newScreenSizeType)
+//            }) {
+//                Icon(
+//                    imageVector = Icons.Default.KeyboardArrowDown,
+//                    contentDescription = null,
+//                    tint = if (domainUiState.isError) Color.Red else contentColor
+//                )
+//            }
+//        }
     }
 }
 
@@ -240,13 +253,14 @@ fun HelpDetailListWindowPreview() {
         domainUiState = DomainUiState.HelpWindow(
             domainType = SealedDomainType.Help,
             screenType = ScreenType.HelpDetailList,
-            data =helpItemDataList,
+            data = helpItemDataList,
             detailData = helpItemDataList[0],
             visible = true,
             text = "HelpWindow",
             screenSizeType = ScreenSizeType.Large
         ),
         contentColor = Color.DarkGray,
+        backgroundColor = Color.DarkGray,
         onDismiss = {
         },
         onBackButton = {
