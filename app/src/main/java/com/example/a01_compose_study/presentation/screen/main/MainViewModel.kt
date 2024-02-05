@@ -215,8 +215,9 @@ class MainViewModel @Inject constructor(
                             DomainUiState.PttWindow(
                                 domainType = event.domainType,
                                 screenType = event.screenType,
-                                visible = true,
-                                text = "음성인식 결과다잉",
+                                isError = event.isError,
+//                                visible = true,
+                                text = "More features will be available\n after leaving the offline mode.",
                                 screenSizeType = event.screenSizeType
                             )
                         }
