@@ -29,6 +29,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.a01_compose_study.data.DialogueMode
+import com.example.a01_compose_study.data.custom.MWContext
 import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.util.ScreenSizeType
@@ -54,6 +56,7 @@ fun MainRoute(
     val scope = rememberCoroutineScope()
     val multipleEventsCutter = remember { MultipleEventsCutter.get() }
     val pttViewModel: PttViewModel = hiltViewModel()
+    val mwContext = MWContext(DialogueMode.MAINMENU)
 
     /**
      * Compose에서 해당 뷰를 조작하는 변수(visible)는 remember 타입으로 해야하지만,
@@ -222,6 +225,7 @@ fun MainRoute(
                             screenSizeType = ScreenSizeType.Small
                         )
                     )
+                    pttViewModel.onPttEvent(PttEvent.StartVR(mwContext))
                 }
             )
 
