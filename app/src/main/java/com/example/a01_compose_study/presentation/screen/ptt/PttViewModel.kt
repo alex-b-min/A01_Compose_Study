@@ -1,5 +1,7 @@
 package com.example.a01_compose_study.presentation.screen.ptt
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.presentation.data.UiState
@@ -9,6 +11,9 @@ import kotlinx.coroutines.flow.update
 class PttViewModel : ViewModel(){
 
     private val _domainUiState = UiState._domainUiState
+
+    private val _announceText = MutableLiveData<String>("")
+    val announceText : LiveData<String> = _announceText
 
     fun onPttEvent(event: PttEvent) {
         when(event) {
@@ -35,7 +40,19 @@ class PttViewModel : ViewModel(){
                     ) ?: domainUiState
                 }
             }
+
+            is PttEvent.SetAnnounceType -> {
+                _domainUiState.update { domainUiState ->
+                    (domainUiState as? DomainUiState.PttWindow)?.copy(
+                        screenType = ScreenType.PttAnounce
+                    ) ?: domainUiState
+                }
+            }
         }
+    }
+
+    fun setAnnounceText() {
+
     }
 }
 

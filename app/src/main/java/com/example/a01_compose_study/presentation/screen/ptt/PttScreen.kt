@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -24,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.a01_compose_study.R
 import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.util.ScreenSizeType
@@ -53,6 +55,7 @@ fun ComposePttScreen(
 
     // 화면 크기(세로) 변경 애니메이션 상태 관리 변수
     val targetFillMaxHeight by remember { mutableStateOf(Animatable(0f)) }
+
 
     /**
      * [vrUiState의 visible] - VRWindow 화면을 제어하는 주요 데이터
@@ -181,7 +184,7 @@ fun ComposePttScreen(
                 )
                 LottieRawAnimationHandler(
                     modifier = Modifier.fillMaxSize(),
-                    rawResId = R.raw.error_loop,
+                    rawResId = R.raw.tsd_listening_passive_loop_lt_01_2,
                     infiniteLoop = true,
                     onFrameChanged = { currentFrame ->
                         // 현재 프레임에 따라 글자 투명도(Alpha)가 변하도록 설정
@@ -204,7 +207,7 @@ fun ComposePttScreen(
                 )
                 LottieRawAnimationHandler(
                     modifier = Modifier.fillMaxSize(),
-                    rawResId = R.raw.error_loop,
+                    rawResId = R.raw.tsd_thinking_loop_fix_lt_03_2,
                     infiniteLoop = true,
                     onFrameChanged = { currentFrame ->
                         // 현재 프레임에 따라 글자 투명도(Alpha)가 변하도록 설정
@@ -245,6 +248,8 @@ fun ComposePttScreen(
                         } ?: 0F
                     }
                 )
+            } else if (domainUiState.screenType is ScreenType.PttAnounce){
+                AnnounceView()
             }
         }
 
@@ -265,6 +270,18 @@ fun ComposePttScreen(
                 }
             )
         }
+    }
+}
+
+@Composable
+fun AnnounceView() {
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth(),
+        contentAlignment = Alignment.Center
+    ) {
+        val displayText = "Help"
     }
 }
 

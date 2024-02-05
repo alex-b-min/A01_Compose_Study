@@ -6,4 +6,5 @@ sealed class PttEvent {
     object SetLoadingType : PttEvent()
     object SetSpeakType : PttEvent()
     object SetListenType : PttEvent()
+    object SetAnnounceType : PttEvent()
 }

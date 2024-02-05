@@ -248,6 +248,16 @@ fun MainRoute(
 
             PttButton(
                 modifier = Modifier.fillMaxSize(0.13f),
+                contentText = "PTT Announce",
+                onClick = {
+                    scope.launch {
+                        pttViewModel.onPttEvent(PttEvent.SetAnnounceType)
+                    }
+                }
+            )
+
+            PttButton(
+                modifier = Modifier.fillMaxSize(0.13f),
                 contentText = "PTT Close",
                 onClick = {
                     scope.launch {
