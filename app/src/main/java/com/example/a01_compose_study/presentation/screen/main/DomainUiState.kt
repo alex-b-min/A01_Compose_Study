@@ -15,7 +15,6 @@ sealed class DomainUiState(
     data class PttWindow(
         val domainType: SealedDomainType,
         val screenType: ScreenType,
-//        val visible: Boolean,
         val isError: Boolean = false,
         val text: String = "",
         override val screenSizeType: ScreenSizeType = ScreenSizeType.Zero,
@@ -26,7 +25,6 @@ sealed class DomainUiState(
         val screenType: ScreenType,
         val data: List<HelpItemData>,
         val detailData: HelpItemData = HelpItemData(command = ""),
-        val visible: Boolean,
         val isError: Boolean = false,
         val text: String = "",
         override val screenSizeType: ScreenSizeType = ScreenSizeType.Zero,

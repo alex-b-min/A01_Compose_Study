@@ -53,18 +53,21 @@ fun MainRoute(
     viewModel: MainViewModel = hiltViewModel(),
 ) {
     val domainUiState by viewModel.domainUiState.collectAsStateWithLifecycle()
-//    val vrUiState by viewModel.vrUiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
     val multipleEventsCutter = remember { MultipleEventsCutter.get() }
     val pttViewModel: PttViewModel = hiltViewModel()
     val mwContext = MWContext(DialogueMode.MAINMENU)
 
     /**
-     * Compose에서 해당 뷰를 조작하는 변수(visible)는 remember 타입으로 해야하지만,
-     * 이렇게 하게 되면 해당 뷰를 조작하는 변수를 다른곳에서 조작을 하지 못하는 이슈가 있음.
-     * 그래서 정답은 아니지만, viewModel에서 visible 변수를 만들어 관리함
+     * Compose에서 뷰를 조작하는 변수(visible)는 remember 타입으로 선언해야 합니다.
+     * 그러나 이 방법은 각 뷰의 가시성을 개별적으로 관리해야 합니다.
+     * 이 방식은 화면 전환 구조에는 적합하지만, 하나의 창 위에 여러 개의 뷰를 관리할 때 여러 개의 visible을 관리해야 하므로 적절하지 않습니다.
+     * 따라서 정확한 해결책은 아니지만, flow 타입의 visible 변수를 싱글톤으로 만들어 최상단의 뷰를 관리합니다.
+     * 이렇게 하면 하나의 AnimatedVisibility() 안에 여러 개의 창을 관리할 수 있습니다.
+     * 실제로 이렇게 사용하게 된다면,
+     * AnimatedVisibility() 안에서 UiState의 조건문을 타고 들어간 후
+     * 해당 Window를 닫기 위해선 가장 상단의 AnimatedVisibility()의 visible 변수를 false로 바꾸면 해당 Window가 닫히게 되는 효과를 얻을 수 있습니다.
      */
-//    var visible by remember { mutableStateOf(false) }
     val domainWindowVisibleState by viewModel.domainWindowVisible.collectAsStateWithLifecycle()
 
     val targetFillMaxHeight by remember { mutableStateOf(Animatable(0f)) }
@@ -79,11 +82,10 @@ fun MainRoute(
         targetFillMaxHeight.animateTo(
             targetValue = newTargetValue,
             animationSpec = tween(
-                durationMillis = 800, // 애니메이션 지속 시간을 조정합니다.
-                easing = FastOutSlowInEasing // 선택적으로 easing 함수를 지정할 수 있습니다.
+                durationMillis = 800, // 애니메이션 지속 시간을 조정
+                easing = FastOutSlowInEasing // 선택적으로 easing 함수를 지정
             )
         )
-        Log.d("@@ 현재 스크린 타입 사이즈 ", "${domainUiState.screenSizeType} / ${newTargetValue}")
     }
 
     Box(
@@ -96,32 +98,8 @@ fun MainRoute(
                 viewModel.onDomainEvent(MainEvent.CloseDomainWindowEvent)
             }
     ) {
-//        when (vrUiState) {
-//            is VRUiState.NoneWindow -> {
-//            }
-//
-//            is VRUiState.VRWindow -> {
-//                VRWindow(
-//                    vrUiState = vrUiState as VRUiState.VRWindow,
-//                    contentColor = Color.Green,
-//                    onChangeWindowSize = { screenSizeType ->
-//                        viewModel.onVREvent(VREvent.ChangeVRWindowSizeEvent(screenSizeType))
-//                    },
-//                    onCloseVRWindow = {
-//                        viewModel.onVREvent(VREvent.CloseVRWindowEvent)
-//                    },
-//                    onCloseAllWindow = {
-//                        viewModel.onVREvent(VREvent.CloseAllVRWindowsEvent)
-//                    }
-//                )
-//            }
-//        }
-
         /**
-         * AnimatedVisibility() 안에 Crossfade()를 넣어,
-         * 화면 띄우기 및 닫을 때  AnimatedVisibility 로 인해 아래에서 위로 올라오는 효과 / 위에서 아래로 내려가는 효과
-         * 화면(콘텐츠)을 교체(전환)할 때는 Crossfade 로 인해 fade 효과가 적용됨
-         * [주의사항] 각 스크린(화면)의 매개변수인 domainUiState에 값을 할당할 때 uiState 값을 넣는게 아니라 Crossfade 로부터 발행된 currDomainUiState 값을 넣어야함
+         * 하나의 AnimatedVisibility() 안에 여러 Window를 구성
          */
         AnimatedVisibility(
             visible = domainWindowVisibleState,
@@ -135,11 +113,6 @@ fun MainRoute(
                 animationSpec = tween(1000)
             )
         ) {
-//            Crossfade(
-//                targetState = domainUiState,
-//                label = "",
-//                animationSpec = tween(durationMillis = 1500)
-//            ) { currDomainUiState ->
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.BottomStart
@@ -207,7 +180,6 @@ fun MainRoute(
                     }
                 }
             }
-//            }
         }
 
         Column(
@@ -262,7 +234,6 @@ fun MainRoute(
                 contentText = "PTT Announce",
                 onClick = {
                     scope.launch {
-//                        pttViewModel.onPttEvent(PttEvent.SetAnnounceType)
                         viewModel.onDomainEvent(
                             event = MainEvent.OpenDomainWindowEvent(
                                 domainType = SealedDomainType.Announce,

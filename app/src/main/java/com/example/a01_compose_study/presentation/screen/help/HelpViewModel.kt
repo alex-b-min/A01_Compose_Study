@@ -47,7 +47,6 @@ class HelpViewModel @Inject constructor(
                         VRUiState.VRWindow(
                             visible = true,
                             isError = event.isError,
-                            text = event.text,
                             screenSizeType = event.screenSizeType
                         )
                     }
@@ -63,6 +62,9 @@ class HelpViewModel @Inject constructor(
             }
 
             is HelpEvent.ChangeHelpWindowSizeEvent -> {
+                /**
+                 * 사이즈의 크기를 버튼을 통해 직접적으로 바꾸고 싶은 경우에 사용
+                 */
                 _domainUiState.update { uiState ->
                     uiState.copyWithNewSizeType(event.screenSizeType)
                 }

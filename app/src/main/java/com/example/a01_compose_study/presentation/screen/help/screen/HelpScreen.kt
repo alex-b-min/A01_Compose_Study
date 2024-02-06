@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
@@ -36,7 +35,6 @@ fun ComposeHelpScreen(
         if (domainUiState.screenType is ScreenType.HelpList) {
             HelpListWindow(
                 domainUiState = domainUiState,
-                contentColor = contentColor,
                 backgroundColor = backgroundColor,
                 onDismiss = {
                     viewModel.onHelpEvent(HelpEvent.OnDismiss)
@@ -45,14 +43,13 @@ fun ComposeHelpScreen(
                     viewModel.onHelpEvent(
                         HelpEvent.OnHelpListBack(
                             isError = false,
-                            text = "VR 재실행",
-                            screenSizeType = ScreenSizeType.Middle
+                            screenSizeType = ScreenSizeType.Small
                         )
                     )
                 },
-                onScreenSizeChange = { screenSizeType ->
-                    viewModel.onHelpEvent(event = HelpEvent.ChangeHelpWindowSizeEvent(screenSizeType))
-                },
+//                onScreenSizeChange = { screenSizeType ->
+//                    viewModel.onHelpEvent(event = HelpEvent.ChangeHelpWindowSizeEvent(screenSizeType))
+//                },
                 onItemClick = { helpItemData ->
                     viewModel.onHelpEvent(HelpEvent.HelpListItemOnClick(helpItemData))
                 }
@@ -60,7 +57,6 @@ fun ComposeHelpScreen(
         } else if (domainUiState.screenType is ScreenType.HelpDetailList) {
             HelpDetailWindow(
                 domainUiState = domainUiState,
-                contentColor = contentColor,
                 backgroundColor = backgroundColor,
                 onDismiss = {
                     viewModel.onHelpEvent(HelpEvent.OnDismiss)
@@ -68,9 +64,9 @@ fun ComposeHelpScreen(
                 onBackButton = {
                     viewModel.onHelpEvent(HelpEvent.OnHelpDetailBack)
                 },
-                onScreenSizeChange = { screenSizeType ->
-                    viewModel.onHelpEvent(event = HelpEvent.ChangeHelpWindowSizeEvent(screenSizeType))
-                }
+//                onScreenSizeChange = { screenSizeType ->
+//                    viewModel.onHelpEvent(event = HelpEvent.ChangeHelpWindowSizeEvent(screenSizeType))
+//                }
             )
         }
     }
@@ -79,11 +75,9 @@ fun ComposeHelpScreen(
 @Composable
 fun HelpListWindow(
     domainUiState: DomainUiState.HelpWindow,
-    contentColor: Color,
     backgroundColor: Color,
     onDismiss: () -> Unit,
     onBackButton: () -> Unit,
-    onScreenSizeChange: (ScreenSizeType) -> Unit,
     onItemClick: (HelpItemData) -> Unit,
 ) {
     val helpList = domainUiState.data
@@ -116,11 +110,9 @@ fun HelpListWindow(
 @Composable
 fun HelpDetailWindow(
     domainUiState: DomainUiState.HelpWindow,
-    contentColor: Color,
     backgroundColor: Color,
     onDismiss: () -> Unit,
     onBackButton: () -> Unit,
-    onScreenSizeChange: (ScreenSizeType) -> Unit,
 ) {
     Box(
         modifier = Modifier
@@ -171,17 +163,13 @@ fun HelpDetailListWindowPreview() {
             screenType = ScreenType.HelpDetailList,
             data = helpItemDataList,
             detailData = helpItemDataList[0],
-            visible = true,
             text = "HelpWindow",
             screenSizeType = ScreenSizeType.Large
         ),
-        contentColor = Color.DarkGray,
         backgroundColor = Color.DarkGray,
         onDismiss = {
         },
         onBackButton = {
-        },
-        onScreenSizeChange = {
         },
     )
 }
@@ -213,17 +201,13 @@ fun HelpListWindowPreview() {
             domainType = SealedDomainType.Help,
             screenType = ScreenType.HelpList,
             data = helpItemDataList,
-            visible = true,
             text = "HelpWindow",
             screenSizeType = ScreenSizeType.Large
         ),
         backgroundColor = Color.Black,
-        contentColor = Color.DarkGray,
         onDismiss = {
         },
         onBackButton = {
-        },
-        onScreenSizeChange = {
         },
         onItemClick = {}
     )

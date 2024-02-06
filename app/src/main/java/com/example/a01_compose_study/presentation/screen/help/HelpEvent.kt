@@ -10,7 +10,6 @@ sealed class HelpEvent {
 
     data class OnHelpListBack(
         val isError: Boolean,
-        val text: String,
         val screenSizeType: ScreenSizeType
     ) : HelpEvent()
 
