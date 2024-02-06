@@ -1,6 +1,5 @@
 package com.example.a01_compose_study.presentation.screen.main
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.a01_compose_study.data.DialogueMode
@@ -12,7 +11,6 @@ import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.data.UiState
-import com.example.a01_compose_study.presentation.screen.ptt.PttViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharedFlow

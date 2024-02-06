@@ -4,11 +4,10 @@ import com.example.a01_compose_study.data.HG2PStatus
 import com.example.a01_compose_study.data.HVRG2PMode
 import com.example.a01_compose_study.data.vr.IG2PListener
 import com.example.a01_compose_study.presentation.data.ServiceState
-import com.example.a01_compose_study.presentation.screen.ptt.PttViewModel
 import javax.inject.Inject
 
 
-class G2PController @Inject constructor(val viewModel: PttViewModel) : IG2PListener {
+class G2PController @Inject constructor() : IG2PListener {
 
     external fun setG2PListener(listener: Any)
     external fun requestG2P(g2pData: String)

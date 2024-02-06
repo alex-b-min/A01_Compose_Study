@@ -3,6 +3,7 @@ package com.example.a01_compose_study.presentation.screen.main.route
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -75,7 +76,13 @@ fun MainRoute(
             is ScreenSizeType.Middle -> 0.268f
             is ScreenSizeType.Large -> 0.433f
         }
-        targetFillMaxHeight.animateTo(newTargetValue)
+        targetFillMaxHeight.animateTo(
+            targetValue = newTargetValue,
+            animationSpec = tween(
+                durationMillis = 800, // 애니메이션 지속 시간을 조정합니다.
+                easing = FastOutSlowInEasing // 선택적으로 easing 함수를 지정할 수 있습니다.
+            )
+        )
         Log.d("@@ 현재 스크린 타입 사이즈 ", "${domainUiState.screenSizeType} / ${newTargetValue}")
     }
 

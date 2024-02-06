@@ -94,7 +94,6 @@ fun HelpListWindow(
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.End,
         ) {
             TopAppBarContent(
                 onNavigationIconClick = {

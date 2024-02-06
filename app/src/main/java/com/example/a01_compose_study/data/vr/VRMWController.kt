@@ -1,5 +1,6 @@
 package com.example.a01_compose_study.data.vr
 
+import android.util.Log
 import com.example.a01_compose_study.data.HVRGuidanceType
 import com.example.a01_compose_study.domain.util.CustomLogger
 import java.util.ArrayDeque
@@ -99,7 +100,8 @@ class VRMWController @Inject constructor(
 
     companion object {
         init {
-            System.loadLibrary("vrmwservice") // 네이티브 라이브러리 로드
+            Log.d("@@ 네이티브 라이브러리 로드 시도", "vrmwservice")
+//            System.loadLibrary("vrmwservice") // 네이티브 라이브러리 로드
             CustomLogger.i("Constructor companion object Hash[${this.hashCode()}]")
         }
 
