@@ -7,6 +7,7 @@ sealed class PttEvent {
     object SetSpeakType : PttEvent()
     object SetListenType : PttEvent()
     object SetAnnounceType : PttEvent()
+    object PreparePtt : PttEvent()
     data class StartVR(
         val mwContext: MWContext,
         val promptString: String = "",
