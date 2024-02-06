@@ -2,11 +2,13 @@ package com.example.a01_compose_study.data.custom
 
 import com.example.a01_compose_study.data.DialogueMode
 import com.example.a01_compose_study.data.HTextToSpeechState
+import com.example.a01_compose_study.data.HVRError
 import com.example.a01_compose_study.data.HVRState
 import com.example.a01_compose_study.data.VRResult
 import com.example.a01_compose_study.data.analyze.ParseDomainType
 import com.example.a01_compose_study.data.analyze.ParserFactory
 import com.example.a01_compose_study.domain.util.CustomLogger
+import com.example.a01_compose_study.domain.util.VRResultListener
 import com.example.a01_compose_study.presentation.data.UiState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -15,10 +17,14 @@ import kotlinx.coroutines.launch
 import javax.inject.Singleton
 
 @Singleton
-class MWContext(val dialogueMode: DialogueMode) {
+class MWContext(
+    val dialogueMode: DialogueMode,
+//    private val resultListener: VRResultListener
+) {
     private val helpManager: HelpManager = HelpManager()
     var vrState = HVRState.IDLE
     var ttsState = HTextToSpeechState.IDLE
+    var promptId = mutableListOf<String>()
 
     var isSubContext = false
 
@@ -55,6 +61,10 @@ class MWContext(val dialogueMode: DialogueMode) {
         vrState = state
 
     }
+
+//    fun onVRError(error: HVRError) {
+//        resultListener.onVRError(error)
+//    }
 
     fun onVRResult(vrResult: VRResult) {
         val bundle = ParserFactory().dataParsing(vrResult, dialogueMode = DialogueMode.HELP)

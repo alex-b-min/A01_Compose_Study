@@ -11,7 +11,7 @@ class VRMWController @Inject constructor(
 
 ) {
 
-    val TAG : String? = this.javaClass.simpleName
+    val TAG: String? = this.javaClass.simpleName
     external fun getMessage(): String
     external fun speak(
         promptId: Array<String>,
@@ -24,7 +24,9 @@ class VRMWController @Inject constructor(
     external fun playEarcon(requestId: String)
     external fun playFile(filePath: String, requestId: String)
     external fun playStop()
-    external fun initSystem(dirPath: String, language: Int, userIdx: String)
+
+    //    external fun initSystem(dirPath: String, language: Int, userIdx: String)
+    external fun initSystem(dirPath: String, userIdx: String)
     external fun loadVR(language: Int)
     external fun loadTTS(language: Int)
 
