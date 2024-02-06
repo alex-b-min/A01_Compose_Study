@@ -95,6 +95,7 @@ class PttViewModel @Inject constructor(
                 ServiceState.bluetoothState.hfpDevice.value.apply {
                     this.recognizing = true
                 }
+
                 CustomLogger.i("pttPrepare")
                 announceString.value = ""
 

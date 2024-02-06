@@ -19,7 +19,6 @@ import javax.inject.Singleton
 @Singleton
 class MWContext(
     val dialogueMode: DialogueMode,
-//    private val resultListener: VRResultListener
 ) {
     private val helpManager: HelpManager = HelpManager()
     var vrState = HVRState.IDLE

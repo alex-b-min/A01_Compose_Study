@@ -1,15 +1,9 @@
 package com.example.a01_compose_study.presentation.screen.ptt
 
-import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,8 +25,6 @@ import com.example.a01_compose_study.presentation.components.lottie.LottieAssetA
 import com.example.a01_compose_study.presentation.components.lottie.LottieRawAnimationHandler
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
 import com.example.a01_compose_study.presentation.util.TextModifier.normalize
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @Composable
 fun ComposePttScreen(
@@ -50,23 +42,6 @@ fun ComposePttScreen(
     //    val targetFillMaxHeight by remember { mutableStateOf(Animatable(0f)) }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.End
-        ) {
-            IconButton(onClick = {
-                scope.launch {
-                    delay(500)
-                }
-            }) {
-                Icon(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = null,
-                    tint = if (domainUiState.isError) Color.Red else contentColor
-                )
-            }
-        }
-
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.BottomCenter

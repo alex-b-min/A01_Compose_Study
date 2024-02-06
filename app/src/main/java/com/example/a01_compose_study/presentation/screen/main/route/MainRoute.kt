@@ -208,6 +208,7 @@ fun MainRoute(
                             screenSizeType = ScreenSizeType.Small
                         )
                     )
+
                     pttViewModel.onPttEvent(PttEvent.PreparePtt)
                     pttViewModel.onPttEvent(PttEvent.StartVR(mwContext))
                 }
