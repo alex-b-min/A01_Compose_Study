@@ -51,7 +51,6 @@ class VrmwManager @Inject constructor(
     val g2pController: G2PController,
     val mediaIn: MediaIn,
     val mediaOut: MediaOut,
-    val pttViewModel: PttViewModel,
 ) : IVRMWListener, IMwController() {
 
     val TAG: String? = this.javaClass.simpleName
@@ -59,6 +58,7 @@ class VrmwManager @Inject constructor(
     var vrResult: VRResult? = null
     var currContext: MWContext? = null
     var resultListener: VRResultListener? = null
+    var skipStore = false
     private val languageCheckMap = mutableMapOf<String, CompletableDeferred<Any>>()
 
     var m_stateMachine: MwStateMachine = MwStateMachine()
@@ -140,8 +140,8 @@ class VrmwManager @Inject constructor(
             resultListener?.onCancel()
         }
         if (mediaIn.isStoreRecord) {
-            if (pttViewModel.skipStore) {
-                pttViewModel.skipStore = false
+            if (skipStore) {
+                skipStore = false
                 mediaIn.finishStore("", cancel = true)
             } else {
                 vrResult.result?.get(0)?.phrase?.let {
