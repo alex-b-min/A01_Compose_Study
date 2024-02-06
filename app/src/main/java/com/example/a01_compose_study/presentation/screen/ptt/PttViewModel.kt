@@ -1,5 +1,6 @@
 package com.example.a01_compose_study.presentation.screen.ptt
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.a01_compose_study.R
@@ -120,47 +121,47 @@ class PttViewModel @Inject constructor(
         offlineRandomCommands = mutableListOf("")
 
         onlineRandomCommands.clear()
-//        onlineRandomCommands.add(getString(R.string.TID_CMN_GUID_13_02))
-//        onlineRandomCommands.add(getString(R.string.TID_CMN_GUID_13_02_4))
-//        onlineRandomCommands.add(getString(R.string.TID_CMN_GUID_13_05_1))
-//        onlineRandomCommands.add(getString(R.string.TID_CMN_GUID_13_05_2))
-//        onlineRandomCommands.add(getString(R.string.TID_CMN_GUID_13_12))
-//        onlineRandomCommands.add(getString(R.string.TID_CMN_GUID_13_12_1))
-//        onlineRandomCommands.add(getString(R.string.TID_CMN_GUID_13_13_1))
-//        if (ServiceState.systemState.isSupportDAB.value) {
-//            onlineRandomCommands.add(getString(R.string.LID_SCR_0133))
-//        } else {
-//            onlineRandomCommands.add(getString(R.string.LID_SCR_0132_1))
-//        }
-//
-//        onlineRandomCommands.add(getString(R.string.LID_SCR_0132))
-//        onlineRandomCommands.add(getString(R.string.LID_SCR_0134))
-//        onlineRandomCommands.add(getString(R.string.TID_CMN_GUID_43_03))
-//        onlineRandomCommands.add(getString(R.string.TID_CMN_GUID_43_06))
-//        onlineRandomCommands.add(getString(R.string.TID_CMN_GUID_54_04))
-//        onlineRandomCommands.add(getString(R.string.TID_CMN_GUID_54_01))
-//
-//        offlineRandomCommands.clear()
-//        offlineRandomCommands.add(getString(R.string.TID_CMN_GUID_13_05_1))
-//        offlineRandomCommands.add(getString(R.string.TID_CMN_GUID_13_05_2))
-//        offlineRandomCommands.add(getString(R.string.TID_CMN_GUID_13_12))
-//        offlineRandomCommands.add(getString(R.string.TID_CMN_GUID_13_12_1))
-//        if (ServiceState.systemState.isSupportDAB.value) {
-//            offlineRandomCommands.add(getString(R.string.LID_SCR_0133))
-//        } else {
-//            offlineRandomCommands.add(getString(R.string.LID_SCR_0132_1))
-//        }
-//        offlineRandomCommands.add(getString(R.string.LID_SCR_0132))
-//        offlineRandomCommands.add(getString(R.string.LID_SCR_0134))
-//        offlineRandomCommands.add(getString(R.string.TID_CMN_GUID_43_03))
-//        offlineRandomCommands.add(getString(R.string.TID_CMN_GUID_43_06))
+        onlineRandomCommands.add(getString(R.string.TID_CMN_GUID_13_02))
+        onlineRandomCommands.add(getString(R.string.TID_CMN_GUID_13_02_4))
+        onlineRandomCommands.add(getString(R.string.TID_CMN_GUID_13_05_1))
+        onlineRandomCommands.add(getString(R.string.TID_CMN_GUID_13_05_2))
+        onlineRandomCommands.add(getString(R.string.TID_CMN_GUID_13_12))
+        onlineRandomCommands.add(getString(R.string.TID_CMN_GUID_13_12_1))
+        onlineRandomCommands.add(getString(R.string.TID_CMN_GUID_13_13_1))
+        if (ServiceState.systemState.isSupportDAB.value) {
+            onlineRandomCommands.add(getString(R.string.LID_SCR_0133))
+        } else {
+            onlineRandomCommands.add(getString(R.string.LID_SCR_0132_1))
+        }
 
+        onlineRandomCommands.add(getString(R.string.LID_SCR_0132))
+        onlineRandomCommands.add(getString(R.string.LID_SCR_0134))
+        onlineRandomCommands.add(getString(R.string.TID_CMN_GUID_43_03))
+        onlineRandomCommands.add(getString(R.string.TID_CMN_GUID_43_06))
+        onlineRandomCommands.add(getString(R.string.TID_CMN_GUID_54_04))
+        onlineRandomCommands.add(getString(R.string.TID_CMN_GUID_54_01))
+
+        offlineRandomCommands.clear()
+        offlineRandomCommands.add(getString(R.string.TID_CMN_GUID_13_05_1))
+        offlineRandomCommands.add(getString(R.string.TID_CMN_GUID_13_05_2))
+        offlineRandomCommands.add(getString(R.string.TID_CMN_GUID_13_12))
+        offlineRandomCommands.add(getString(R.string.TID_CMN_GUID_13_12_1))
+        if (ServiceState.systemState.isSupportDAB.value) {
+            offlineRandomCommands.add(getString(R.string.LID_SCR_0133))
+        } else {
+            offlineRandomCommands.add(getString(R.string.LID_SCR_0132_1))
+        }
+        offlineRandomCommands.add(getString(R.string.LID_SCR_0132))
+        offlineRandomCommands.add(getString(R.string.LID_SCR_0134))
+        offlineRandomCommands.add(getString(R.string.TID_CMN_GUID_43_03))
+        offlineRandomCommands.add(getString(R.string.TID_CMN_GUID_43_06))
+
+        offlineRandomCommands.forEach { it ->
+            Log.d("@@ offlineRandomCommands", "$it")
+        }
     }
-
-//    fun getString(id: Int, vararg args: Any?): String {
-//        return String.format(this.getString(id), *args)
-//    }
-
-
+    fun getString(id: Int, vararg args: Any?): String {
+        return String.format(vrmwManager.context.getString(id), *args)
+    }
 }
 
