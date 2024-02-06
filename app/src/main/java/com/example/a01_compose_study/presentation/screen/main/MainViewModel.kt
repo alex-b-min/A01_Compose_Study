@@ -3,6 +3,7 @@ package com.example.a01_compose_study.presentation.screen.main
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.a01_compose_study.data.DialogueMode
+import com.example.a01_compose_study.data.HVRError
 import com.example.a01_compose_study.data.custom.MWContext
 import com.example.a01_compose_study.data.custom.SealedParsedData
 import com.example.a01_compose_study.data.custom.VRmwManager
@@ -42,6 +43,38 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             sealedParsedData.collect { sealedParsedData ->
                 when (sealedParsedData) {
+                    is SealedParsedData.ErrorData -> {
+                        when (sealedParsedData.error) {
+                            HVRError.ERROR_DIALOGUE_ASR_RECOGNITION_TIMEOUT -> {
+//                                procTimeOut(it)
+                            }
+
+                            HVRError.ERROR_DIALOGUE_ASR_SERVER_RESPONSE,
+                            HVRError.ERROR_DIALOGUE_ASR_SERVER_UNAVAILABLE,
+                            HVRError.ERROR_DIALOGUE_ASR_SERVER_CONNECTION,
+                            HVRError.ERROR_DIALOGUE_ASR_NETWORK_NO_SIGNAL,
+                            HVRError.ERROR_DIALOGUE_ASR_SERVER_NO_RESPONSE, -> {
+//                               procServerErr(error, it)
+                            }
+
+                            HVRError.ERROR_DIALOGUE_ARBITRATOR_REJECTION -> {
+//                                reject()
+                            }
+
+                            HVRError.ERROR_HMI -> {
+                                _domainUiState.update { uiState ->
+                                    when (uiState) {
+                                        is DomainUiState.PttWindow -> uiState.copy(isError = true)
+                                        else -> uiState
+                                    }
+                                }
+                            }
+
+                            else -> {
+
+                            }
+                        }
+                    }
                     is SealedParsedData.HelpData -> {
                         onDomainEvent(
                             event = MainEvent.OpenDomainWindowEvent(

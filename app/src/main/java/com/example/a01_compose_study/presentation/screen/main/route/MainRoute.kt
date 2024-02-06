@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.a01_compose_study.data.DialogueMode
+import com.example.a01_compose_study.data.HVRError
 import com.example.a01_compose_study.data.custom.MWContext
 import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.model.SealedDomainType
@@ -264,18 +265,19 @@ fun MainRoute(
                 modifier = Modifier
                     .fillMaxWidth(0.13f)
                     .fillMaxHeight(0.2f),
-                contentText = "Error",
+                contentText = "ERROR_HMI",
                 onClick = {
                     multipleEventsCutter.processEvent {
-                        viewModel.onDomainEvent(
-                            event = MainEvent.OpenDomainWindowEvent(
-                                domainType = SealedDomainType.Ptt,
-                                screenType = ScreenType.PttListen,
-                                data = "에러",
-                                isError = true,
-                                screenSizeType = ScreenSizeType.Small
-                            )
-                        )
+//                        viewModel.onDomainEvent(
+//                            event = MainEvent.OpenDomainWindowEvent(
+//                                domainType = SealedDomainType.Ptt,
+//                                screenType = ScreenType.PttListen,
+//                                data = "에러",
+//                                isError = true,
+//                                screenSizeType = ScreenSizeType.Small
+//                            )
+//                        )
+                        viewModel.vRmwManager.setVRError(HVRError.ERROR_HMI)
                     }
                 }
             )

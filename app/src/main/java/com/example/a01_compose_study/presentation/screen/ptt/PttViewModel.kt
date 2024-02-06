@@ -3,20 +3,29 @@ package com.example.a01_compose_study.presentation.screen.ptt
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.a01_compose_study.R
 import com.example.a01_compose_study.data.HTextToSpeechState
+import com.example.a01_compose_study.data.HVRError
 import com.example.a01_compose_study.data.HVRState
 import com.example.a01_compose_study.data.VrConfig
 import com.example.a01_compose_study.data.custom.MWContext
+import com.example.a01_compose_study.data.custom.SealedParsedData
 import com.example.a01_compose_study.data.vr.MwStateMachine
 import com.example.a01_compose_study.domain.model.ScreenType
+import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.util.CustomLogger
+import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.data.ServiceState
 import com.example.a01_compose_study.presentation.data.UiState
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
+import com.example.a01_compose_study.presentation.screen.main.MainEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import java.util.Random
 import javax.inject.Inject
 
@@ -26,6 +35,9 @@ class PttViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _domainUiState = UiState._domainUiState
+
+    private val _sealedParsedData = UiState._sealedParsedData
+    val sealedParsedData: SharedFlow<SealedParsedData> = UiState._sealedParsedData
 
     var promptId = mutableListOf<String>()
     var currContext: MWContext? = null
@@ -41,11 +53,13 @@ class PttViewModel @Inject constructor(
     var onlineRandomCommands = mutableListOf("")
     var offlineRandomCommands = mutableListOf("")
 
+
     fun onPttEvent(event: PttEvent) {
         when (event) {
             is PttEvent.SetListenType -> {
                 _domainUiState.update { domainUiState ->
                     (domainUiState as? DomainUiState.PttWindow)?.copy(
+                        isError = false,
                         screenType = ScreenType.PttListen
                     ) ?: domainUiState
                 }
@@ -54,6 +68,7 @@ class PttViewModel @Inject constructor(
             is PttEvent.SetSpeakType -> {
                 _domainUiState.update { domainUiState ->
                     (domainUiState as? DomainUiState.PttWindow)?.copy(
+                        isError = false,
                         screenType = ScreenType.PttSpeak
                     ) ?: domainUiState
                 }
@@ -62,6 +77,7 @@ class PttViewModel @Inject constructor(
             is PttEvent.SetLoadingType -> {
                 _domainUiState.update { domainUiState ->
                     (domainUiState as? DomainUiState.PttWindow)?.copy(
+                        isError = false,
                         screenType = ScreenType.PttLoading
                     ) ?: domainUiState
                 }

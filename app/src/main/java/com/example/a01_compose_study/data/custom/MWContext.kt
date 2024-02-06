@@ -32,7 +32,8 @@ class MWContext(
         isSubContext = when (dialogueMode) {
             DialogueMode.YESNO,
             DialogueMode.CALLNAME,
-            DialogueMode.LIST -> {
+            DialogueMode.LIST,
+            -> {
                 true
             }
 
@@ -62,9 +63,16 @@ class MWContext(
 
     }
 
-//    fun onVRError(error: HVRError) {
-//        resultListener.onVRError(error)
-//    }
+    fun onVRError(error: HVRError) {
+        /**
+         * Error가 발생하는 상황에 대해,
+         * - 발화를 했을 때 인식하지 못할 때의 오류일 때(PTT 화면을 빨갛게 띄웠다가 다시 파란색으로 띄워야함
+         * - Domain Window 화면을 성공적으로 띄우고 나서의 오류일 때도 있나..?
+         */
+        job.launch {
+            _sealedParsedData.emit(SealedParsedData.ErrorData(error))
+        }
+    }
 
     fun onVRResult(vrResult: VRResult) {
         val bundle = ParserFactory().dataParsing(vrResult, dialogueMode = DialogueMode.HELP)
