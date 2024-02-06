@@ -30,8 +30,13 @@ import javax.inject.Singleton
 
 @HiltViewModel
 class PttViewModel @Inject constructor(
-    val vrmwManager: VrmwManager
+    // val vrmwManager: VrmwManager
 ) : ViewModel() {
+
+    val vrmwManager: VrmwManager
+        get() {
+            TODO()
+        }
 
     private val _domainUiState = UiState._domainUiState
     var promptId = mutableListOf<String>()
@@ -39,7 +44,6 @@ class PttViewModel @Inject constructor(
     var vrState = HVRState.IDLE
     var ttsState = HTextToSpeechState.IDLE
     var m_stateMachine: MwStateMachine = MwStateMachine()
-    var skipStore = false
 
     private val _sealedParsedData = UiState._sealedParsedData
 
@@ -80,7 +84,7 @@ class PttViewModel @Inject constructor(
 
             is PttEvent.StartVR -> {
                 currContext?.let { context ->
-                    vrmwManager.startVR(context)
+                   vrmwManager.startVR(context)
                 }
             }
         }
