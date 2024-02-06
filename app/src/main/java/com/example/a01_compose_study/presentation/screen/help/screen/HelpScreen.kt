@@ -23,11 +23,11 @@ import com.example.a01_compose_study.presentation.screen.main.DomainUiState
 
 @Composable
 fun ComposeHelpScreen(
+    viewModel: HelpViewModel = hiltViewModel(),
     domainUiState: DomainUiState.HelpWindow,
     contentColor: Color,
     backgroundColor: Color,
 ) {
-    val viewModel: HelpViewModel = hiltViewModel()
     /**
      * [Help Window -> Help Detail Window 화면 전환 방법]
      * UiState를 현재 가지고 있는 정보를 기반으로 해서 HelpList 타입에서 HelpDetailList 타입으로 변경한다.

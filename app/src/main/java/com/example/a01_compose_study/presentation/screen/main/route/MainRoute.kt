@@ -51,11 +51,12 @@ import kotlinx.coroutines.launch
 @Composable
 fun MainRoute(
     viewModel: MainViewModel = hiltViewModel(),
+    pttViewModel: PttViewModel = hiltViewModel()
 ) {
     val domainUiState by viewModel.domainUiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
     val multipleEventsCutter = remember { MultipleEventsCutter.get() }
-    val pttViewModel: PttViewModel = hiltViewModel()
+
     val mwContext = MWContext(DialogueMode.MAINMENU)
     val announceString by pttViewModel.announceString.collectAsStateWithLifecycle()
 
