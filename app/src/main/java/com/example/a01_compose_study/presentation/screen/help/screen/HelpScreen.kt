@@ -1,29 +1,23 @@
 package com.example.a01_compose_study.presentation.screen.help.screen
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.a01_compose_study.domain.model.HelpItemData
 import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.model.SealedDomainType
-import com.example.a01_compose_study.domain.model.HelpItemData
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.components.top_bar.TopAppBarContent
-import com.example.a01_compose_study.presentation.screen.main.DomainUiState
 import com.example.a01_compose_study.presentation.screen.help.HelpEvent
 import com.example.a01_compose_study.presentation.screen.help.HelpViewModel
+import com.example.a01_compose_study.presentation.screen.main.DomainUiState
 
 @Composable
 fun ComposeHelpScreen(
@@ -110,6 +104,7 @@ fun HelpListWindow(
                     onDismiss()
                 }
             )
+
             HelpList(
                 helpList = helpList,
                 onItemClick = { helpItemData ->

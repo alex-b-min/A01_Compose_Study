@@ -6,7 +6,8 @@ import androidx.compose.runtime.Composable
 
 @Composable
 fun <T> LazyColumnList(
-    list: List<T>, listContent: @Composable (T) -> Unit
+    list: List<T>,
+    listContent: @Composable (T) -> Unit
 ) {
     LazyColumn {
         itemsIndexed(list) { index, item ->
