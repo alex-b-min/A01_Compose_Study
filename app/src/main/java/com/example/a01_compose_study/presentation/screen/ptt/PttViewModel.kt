@@ -32,11 +32,11 @@ class PttViewModel @Inject constructor(
     var vrState = HVRState.IDLE
     var ttsState = HTextToSpeechState.IDLE
     var m_stateMachine: MwStateMachine = MwStateMachine()
-    val announceString = MutableLiveData("")
+    val announceString = MutableStateFlow("")
     val vrConfig = MutableStateFlow(VrConfig())
     val guideString = MutableLiveData<String>()
 
-//    var defaultAnnounceString = getString(R.string.TID_CMN_COMM_01_02)
+    var defaultAnnounceString = getString(R.string.TID_CMN_COMM_01_02)
 
     var onlineRandomCommands = mutableListOf("")
     var offlineRandomCommands = mutableListOf("")
@@ -80,7 +80,7 @@ class PttViewModel @Inject constructor(
                     this.recognizing = true
                 }
                 CustomLogger.i("pttPrepare")
-                announceString.postValue("")
+                announceString.value = ""
 
                 makeRandomCommands()
                 if (ServiceState.settingState.isOfflineMode() ||
@@ -95,7 +95,7 @@ class PttViewModel @Inject constructor(
                 }
 
                 //val notice = checkStarting()
-//                announceString.postValue(defaultAnnounceString)
+                announceString.value = defaultAnnounceString
 
 //                if (notice != null) {
 //                    //launchNotice(notice, true)

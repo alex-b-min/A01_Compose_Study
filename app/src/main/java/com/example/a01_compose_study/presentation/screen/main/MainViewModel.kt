@@ -108,7 +108,7 @@ class MainViewModel @Inject constructor(
                                 screenType = event.screenType,
                                 isError = event.isError,
 //                                visible = true,
-                                text = "More features will be available\n after leaving the offline mode.",
+                                text = event.data as String,
                                 screenSizeType = event.screenSizeType
                             )
                         }
