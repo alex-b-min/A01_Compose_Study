@@ -57,6 +57,7 @@ fun MainRoute(
     val multipleEventsCutter = remember { MultipleEventsCutter.get() }
     val pttViewModel: PttViewModel = hiltViewModel()
     val mwContext = MWContext(DialogueMode.MAINMENU)
+    val announceString by pttViewModel.announceString.collectAsStateWithLifecycle()
 
     /**
      * Compose에서 뷰를 조작하는 변수(visible)는 remember 타입으로 선언해야 합니다.
@@ -138,7 +139,8 @@ fun MainRoute(
                         is DomainUiState.PttWindow -> {
                             ComposePttScreen(
                                 domainUiState = domainUiState as DomainUiState.PttWindow,
-                                contentColor = Color.White
+                                contentColor = Color.White,
+                                displayText = announceString
                             )
                         }
 
@@ -199,7 +201,7 @@ fun MainRoute(
                         event = MainEvent.OpenDomainWindowEvent(
                             domainType = SealedDomainType.Ptt,
                             screenType = ScreenType.PttListen,
-                            data = "음성 인식",
+                            data = announceString,
                             isError = false,
                             screenSizeType = ScreenSizeType.Small
                         )

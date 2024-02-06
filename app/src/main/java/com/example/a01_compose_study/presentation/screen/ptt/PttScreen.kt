@@ -38,6 +38,7 @@ import kotlinx.coroutines.launch
 fun ComposePttScreen(
     domainUiState: DomainUiState.PttWindow,
     contentColor: Color,
+    displayText: String,
 ) {
     val scope = rememberCoroutineScope()
 
@@ -165,12 +166,13 @@ fun ComposePttScreen(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = domainUiState.text,
+                text = displayText,
                 modifier = Modifier
 //                    .alpha(textAlpha)
                     .padding(bottom = 10.dp),
                 color = if (domainUiState.isError) Color.Red else contentColor,
-//                fontSize = when (targetFillMaxHeight.value) {
+                fontSize = 25.sp
+//                when (targetFillMaxHeight.value) {
 //                    0.2f -> 15.sp
 //                    0.4f -> 20.sp
 //                    else -> 25.sp
@@ -190,6 +192,7 @@ fun CustomSizeAlertDialogPreview() {
             screenType = ScreenType.PttSpeak,
             screenSizeType = ScreenSizeType.Middle
         ),
-        contentColor = Color.Magenta
+        contentColor = Color.Magenta,
+        displayText = "PTT"
     )
 }
