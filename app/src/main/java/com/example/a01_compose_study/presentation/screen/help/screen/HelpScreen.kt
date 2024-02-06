@@ -4,10 +4,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.a01_compose_study.domain.model.HelpItemData
 import com.example.a01_compose_study.domain.model.ScreenType
@@ -84,6 +87,7 @@ fun HelpListWindow(
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .clip(RoundedCornerShape(10.dp))
             .background(backgroundColor)
     ) {
         Column(
@@ -117,6 +121,7 @@ fun HelpDetailWindow(
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .clip(RoundedCornerShape(10.dp))
             .background(backgroundColor)
     ) {
         Column {
