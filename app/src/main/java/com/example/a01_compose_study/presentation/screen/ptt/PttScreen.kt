@@ -34,6 +34,7 @@ import kotlinx.coroutines.launch
 fun ComposePttScreen(
     domainUiState: DomainUiState.PttWindow,
     contentColor: Color,
+    displayText: String,
 //    vrUiState: VRUiState.VRWindow,
 //    contentColor: Color,
 //    onChangeWindowSize: (ScreenSizeType) -> Unit,
@@ -241,7 +242,7 @@ fun ComposePttScreen(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = domainUiState.text,
+                text = displayText,
                 modifier = Modifier
 //                    .alpha(textAlpha)
                     .padding(bottom = 10.dp),
