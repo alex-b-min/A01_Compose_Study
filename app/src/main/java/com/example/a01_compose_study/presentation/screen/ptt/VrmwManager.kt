@@ -2,6 +2,7 @@ package com.example.a01_compose_study.presentation.screen.ptt
 
 import android.content.Context
 import android.os.LocaleList
+import com.example.a01_compose_study.data.DialogueMode
 import com.example.a01_compose_study.data.HLanguageType
 import com.example.a01_compose_study.data.HTextToSpeechError
 import com.example.a01_compose_study.data.HTextToSpeechEvent
@@ -31,6 +32,7 @@ import com.example.a01_compose_study.domain.util.VRResultListener
 import com.example.a01_compose_study.presentation.data.ServiceState
 import com.example.a01_compose_study.presentation.util.StringManager
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
@@ -56,7 +58,7 @@ class VrmwManager @Inject constructor(
     val TAG: String? = this.javaClass.simpleName
     val gson = Gson()
     var vrResult: VRResult? = null
-    var currContext: MWContext? = null
+    var currContext: MWContext? = MWContext(DialogueMode.MAINMENU) //MWContext의 DialogueMode의 값 임의의 값 넣음
     var resultListener: VRResultListener? = null
     var skipStore = false
     private val languageCheckMap = mutableMapOf<String, CompletableDeferred<Any>>()
@@ -128,30 +130,41 @@ class VrmwManager @Inject constructor(
     }
 
     fun setVRError(error: HVRError) {
-        getMwState().vrError.value = (error)
-//        currContext?.onVRError(error)
+//        getMwState().vrError.value = (error)
+        currContext?.onVRError(error)
     }
 
     fun setVRResult(vrResult: VRResult) {
-        this.vrResult = vrResult
+        /**
+         * onVRResult() 로부터 vrResult를 전달받는것을 가정
+         */
+//        this.vrResult = vrResult
+//
+//        if (currContext == null) {
+//            cancel()
+//            resultListener?.onCancel()
+//        }
+//        if (mediaIn.isStoreRecord) {
+//            if (skipStore) {
+//                skipStore = false
+//                mediaIn.finishStore("", cancel = true)
+//            } else {
+//                vrResult.result?.get(0)?.phrase?.let {
+//                    mediaIn.finishStore("${currContext?.dialogueMode?.name}_${it}", false)
+//
+//                } ?: { mediaIn.finishStore("", cancel = true) }
+//            }
+//            StringManager.getPcmList()
+//        }
+//        currContext?.onVRResult(vrResult)
 
-        if (currContext == null) {
-            cancel()
-            resultListener?.onCancel()
-        }
-        if (mediaIn.isStoreRecord) {
-            if (skipStore) {
-                skipStore = false
-                mediaIn.finishStore("", cancel = true)
-            } else {
-                vrResult.result?.get(0)?.phrase?.let {
-                    mediaIn.finishStore("${currContext?.dialogueMode?.name}_${it}", false)
+        val vrResultJsonString = "{ \"result\": [ { \"confidence\": 5018, \"intention\": \"Help\", \"phrase\": \"Help\", \"slot_count\": 0 } ] }"
+        val gson = Gson()
+        val vrResultType = object : TypeToken<VRResult>() {}.type
 
-                } ?: { mediaIn.finishStore("", cancel = true) }
-            }
-            StringManager.getPcmList()
-        }
-        currContext?.onVRResult(vrResult)
+        val parsedVRResult: VRResult = gson.fromJson(vrResultJsonString, vrResultType)
+
+        currContext?.onVRResult(parsedVRResult)
     }
 
 //    fun setTTSError(error: HTextToSpeechError) {

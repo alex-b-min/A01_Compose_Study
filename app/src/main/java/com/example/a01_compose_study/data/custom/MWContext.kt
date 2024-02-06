@@ -8,7 +8,6 @@ import com.example.a01_compose_study.data.VRResult
 import com.example.a01_compose_study.data.analyze.ParseDomainType
 import com.example.a01_compose_study.data.analyze.ParserFactory
 import com.example.a01_compose_study.domain.util.CustomLogger
-import com.example.a01_compose_study.domain.util.VRResultListener
 import com.example.a01_compose_study.presentation.data.UiState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

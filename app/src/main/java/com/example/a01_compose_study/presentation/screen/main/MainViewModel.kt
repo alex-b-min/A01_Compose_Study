@@ -2,16 +2,14 @@ package com.example.a01_compose_study.presentation.screen.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.a01_compose_study.data.DialogueMode
 import com.example.a01_compose_study.data.HVRError
-import com.example.a01_compose_study.data.custom.MWContext
 import com.example.a01_compose_study.data.custom.SealedParsedData
-import com.example.a01_compose_study.data.custom.VRmwManager
 import com.example.a01_compose_study.domain.model.HelpItemData
 import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.data.UiState
+import com.example.a01_compose_study.presentation.screen.ptt.VrmwManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharedFlow
@@ -22,9 +20,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
+    val vrmwManager: VrmwManager // MainViewModel에서 필요한 이유는, 음성인식 결과를 직접적으로 생성하기 위해
 ) : ViewModel() {
-
-    val vRmwManager = VRmwManager(MWContext(DialogueMode.MAINMENU))
 
     private val _sealedParsedData = UiState._sealedParsedData
     val sealedParsedData: SharedFlow<SealedParsedData> = UiState._sealedParsedData

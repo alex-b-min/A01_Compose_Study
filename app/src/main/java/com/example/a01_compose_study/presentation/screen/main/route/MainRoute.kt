@@ -32,6 +32,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.a01_compose_study.data.DialogueMode
 import com.example.a01_compose_study.data.HVRError
+import com.example.a01_compose_study.data.VRResult
 import com.example.a01_compose_study.data.custom.MWContext
 import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.model.SealedDomainType
@@ -278,7 +279,7 @@ fun MainRoute(
 //                                screenSizeType = ScreenSizeType.Small
 //                            )
 //                        )
-                        viewModel.vRmwManager.setVRError(HVRError.ERROR_HMI)
+                        viewModel.vrmwManager.setVRError(HVRError.ERROR_HMI)
                     }
                 }
             )
@@ -292,7 +293,7 @@ fun MainRoute(
                     multipleEventsCutter.processEvent {
                     }
                     scope.launch {
-                        viewModel.vRmwManager.setVRResult()
+                        viewModel.vrmwManager.setVRResult(VRResult())
                     }
                 }
             )
