@@ -23,8 +23,7 @@ class MainViewModel @Inject constructor(
     val vrmwManager: VrmwManager, // MainViewModel에서 필요한 이유는, 음성인식 결과를 직접적으로 생성하기 위해
 ) : ViewModel() {
 
-    private val _sealedParsedData = UiState._sealedParsedData
-    val sealedParsedData: SharedFlow<SealedParsedData> = UiState._sealedParsedData
+    private val sealedParsedData: SharedFlow<SealedParsedData> = UiState._sealedParsedData
 
     private val _domainUiState = UiState._domainUiState
     val domainUiState: StateFlow<DomainUiState> = UiState.domainUiState
