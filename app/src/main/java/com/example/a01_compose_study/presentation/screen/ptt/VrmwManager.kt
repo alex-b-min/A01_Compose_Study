@@ -2,6 +2,7 @@ package com.example.a01_compose_study.presentation.screen.ptt
 
 import android.content.Context
 import android.os.LocaleList
+import android.util.Log
 import com.example.a01_compose_study.data.DialogueMode
 import com.example.a01_compose_study.data.HLanguageType
 import com.example.a01_compose_study.data.HTextToSpeechError
@@ -267,7 +268,7 @@ class VrmwManager @Inject constructor(
         mwContext: MWContext, promptString: String = "", promptArgs: List<String> = listOf()
     ) {
 
-        stop()
+//      stop()
         CustomLogger.i("startVR")
         setContext(mwContext)
         currContext?.let { context ->
@@ -282,13 +283,14 @@ class VrmwManager @Inject constructor(
                 promptId.add("PID_CMN_COMM_01_01")
             }
             StringManager.printSttString("")
-            controller.callRecogStart(
-                context.dialogueMode.value,
-                promptId,
-                getDeviceId(),
-                promptArgs,
-                promptString = promptString
-            )
+            Log.e("subin","여기까지는 실행")
+//            controller.callRecogStart(
+//                context.dialogueMode.value,
+//                promptId,
+//                getDeviceId(),
+//                promptArgs,
+//                promptString = promptString
+//            )
         }
     }
 
