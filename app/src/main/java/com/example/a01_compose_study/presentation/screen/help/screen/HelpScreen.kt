@@ -87,7 +87,7 @@ fun HelpListWindow(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .clip(RoundedCornerShape(10.dp))
+            .clip(RoundedCornerShape(15.dp))
             .background(backgroundColor)
     ) {
         Column(
@@ -121,7 +121,7 @@ fun HelpDetailWindow(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .clip(RoundedCornerShape(10.dp))
+            .clip(RoundedCornerShape(15.dp))
             .background(backgroundColor)
     ) {
         Column {

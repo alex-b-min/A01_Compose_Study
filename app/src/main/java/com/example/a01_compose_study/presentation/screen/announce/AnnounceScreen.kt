@@ -20,7 +20,7 @@ fun AnnounceScreen(text: String) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .clip(RoundedCornerShape(10.dp))
+            .clip(RoundedCornerShape(15.dp))
             .background(Color.Black),
         contentAlignment = Alignment.Center,
     ) {
