@@ -19,7 +19,6 @@ class HelpViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _domainUiState = UiState._domainUiState
-
     private val _domainWindowVisible = UiState._domainWindowVisible
 
     fun onHelpEvent(event: HelpEvent) {

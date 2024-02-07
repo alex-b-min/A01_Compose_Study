@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.a01_compose_study.R
-import com.example.a01_compose_study.data.DialogueMode
 import com.example.a01_compose_study.data.HTextToSpeechState
 import com.example.a01_compose_study.data.HVRState
 import com.example.a01_compose_study.data.VrConfig
@@ -111,7 +110,6 @@ class PttViewModel @Inject constructor(
             }
 
             is PttEvent.StartVR -> {
-                currContext = MWContext(DialogueMode.MAINMENU)
                 currContext?.let { context ->
                     vrmwManager.startVR(context)
                 }
