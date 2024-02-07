@@ -3,29 +3,23 @@ package com.example.a01_compose_study.presentation.screen.ptt
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.example.a01_compose_study.R
 import com.example.a01_compose_study.data.HTextToSpeechState
-import com.example.a01_compose_study.data.HVRError
 import com.example.a01_compose_study.data.HVRState
 import com.example.a01_compose_study.data.VrConfig
 import com.example.a01_compose_study.data.custom.MWContext
 import com.example.a01_compose_study.data.custom.SealedParsedData
 import com.example.a01_compose_study.data.vr.MwStateMachine
+import com.example.a01_compose_study.domain.model.NoticeModel
 import com.example.a01_compose_study.domain.model.ScreenType
-import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.util.CustomLogger
-import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.data.ServiceState
 import com.example.a01_compose_study.presentation.data.UiState
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
-import com.example.a01_compose_study.presentation.screen.main.MainEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import java.util.Random
 import javax.inject.Inject
 
@@ -36,14 +30,7 @@ class PttViewModel @Inject constructor(
 
     private val _domainUiState = UiState._domainUiState
 
-    private val _sealedParsedData = UiState._sealedParsedData
-    val sealedParsedData: SharedFlow<SealedParsedData> = UiState._sealedParsedData
-
-    var promptId = mutableListOf<String>()
     var currContext: MWContext? = null
-    var vrState = HVRState.IDLE
-    var ttsState = HTextToSpeechState.IDLE
-    var m_stateMachine: MwStateMachine = MwStateMachine()
     val announceString = MutableStateFlow("")
     val vrConfig = MutableStateFlow(VrConfig())
     val guideString = MutableLiveData<String>()
@@ -52,7 +39,6 @@ class PttViewModel @Inject constructor(
 
     var onlineRandomCommands = mutableListOf("")
     var offlineRandomCommands = mutableListOf("")
-
 
     fun onPttEvent(event: PttEvent) {
         when (event) {
@@ -96,7 +82,6 @@ class PttViewModel @Inject constructor(
                     this.recognizing = true
                 }
 
-                CustomLogger.i("pttPrepare")
                 announceString.value = ""
 
                 makeRandomCommands()
@@ -111,13 +96,13 @@ class PttViewModel @Inject constructor(
                     guideString.postValue("${onlineRandomCommands[randomIndex]}")
                 }
 
-                //val notice = checkStarting()
+                val notice = checkStarting()
                 announceString.value = defaultAnnounceString
 
-//                if (notice != null) {
-//                    //launchNotice(notice, true)
-//                    return
-//                }
+                if (notice != null) {
+                    //launchNotice(notice, true)
+                    return
+                }
 
                 if (ServiceState.bluetoothState.hfpDevice.value.device.isNotEmpty() && !ServiceState.bluetoothState.hfpDevice.value.recognizing) {
                     vrmwManager.g2pController.updateCacheFiles(ServiceState.bluetoothState.hfpDevice.value.device)
@@ -177,8 +162,117 @@ class PttViewModel @Inject constructor(
             Log.d("@@ offlineRandomCommands", "$it")
         }
     }
+
     fun getString(id: Int, vararg args: Any?): String {
         return String.format(vrmwManager.context.getString(id), *args)
     }
+
+    fun checkStarting(): NoticeModel? {
+        defaultAnnounceString = getString(R.string.TID_CMN_COMM_01_02)
+
+        checkSupportLanguage()?.let {
+            return it
+        }
+        checkBootComplete()?.let {
+            return it
+        }
+        checkNaviComplete()?.let {
+            return it
+        }
+        checkOfflineMode()?.let {
+            return it
+        }
+
+        CustomLogger.i("checkStarting defaultAnnounceString : $defaultAnnounceString")
+
+
+        if (!defaultAnnounceString.equals(getString(R.string.TID_CMN_COMM_01_02))) {
+            guideString.postValue("")
+        }
+
+        return null
+    }
+
+    fun checkSupportLanguage(): NoticeModel? {
+        if (!(getVrConfig().isSupportASR || getVrConfig().isSupportServer)) {
+            return NoticeModel().apply {
+                noticeString = getString(R.string.TID_CMN_COMM_07_01)
+            }
+        }
+        return null
+    }
+
+    fun checkBootComplete(): NoticeModel? {
+        if (!ServiceState.systemState.isVRReady()) {
+            CustomLogger.e("checkBootComplete FALSE")
+            return NoticeModel().apply {
+                noticeString = getString(R.string.LID_SCR_0144)
+            }
+        }
+        return null
+    }
+
+    fun checkNaviComplete(): NoticeModel? {
+        if (!ServiceState.systemState.naviStatus.value) {
+            return NoticeModel().apply {
+
+                noticeString = getString(R.string.LID_SCR_0145)
+            }
+        }
+        return null
+    }
+
+    fun checkOfflineMode(): NoticeModel? {
+
+        // 네트워크 상태 체크는 하지 않음
+
+        if (ServiceState.settingState.isOfflineMode()) { // 0: offline on, 1: offline off , OnlineVR off , 2: offline off, OnlineVR on
+            //오프라인모드인데 서버 지원
+            if (getVrConfig().isSupportServer) {
+                // 메세지 변경
+                defaultAnnounceString = getString(R.string.TID_CCS_ERRO_02_09)
+
+            }
+
+            //오프라인 모드인데 임베디드 지원안함
+            if (!getVrConfig().isSupportASR) {
+                return NoticeModel().apply {
+                    noticeString = getString(R.string.TID_CMN_COMM_07_01)
+                }
+            }
+
+        } else { // 오프라인 모드 아닐때,  1: offline off , OnlineVR off , 2: offline off, OnlineVR on
+
+            //서버 가능, 서버 사용  2: server on, use server
+            if (ServiceState.settingState.offlineMode.value == 2) {
+                //OnlineVR On 인데 온라인 언어 지원안함?
+                // 임베디드만 사용하겠지 뭐
+            } else {
+                // OnlineVR OFF 일때  1: offline off , OnlineVR off
+                // OnlineVR OFF 인데 임베디드도 안되
+                if (!getVrConfig().isSupportASR) {
+                    return NoticeModel().apply {
+                        noticePromptId = "PID_CCS_ERRO_02_07"
+                        noticeString = getString(R.string.TID_CCS_ERRO_02_07)
+                    }
+                } else {
+
+                    //OnlineVR OFF 인데 임베디드는 되
+                    // embedded 지원 o, 서버지원 o // 서버 지원 되니까 더많은 기능 안내
+                    if (getVrConfig().isSupportServer) {
+                        defaultAnnounceString = getString(R.string.TID_CCS_ERRO_02_08)
+                    }
+                    // embedded 지원 o, 서버지원 x
+                    // 아무것도 안함
+                }
+            }
+        }
+        return null
+    }
+
+    fun getVrConfig(): VrConfig {
+        return vrConfig.value
+    }
+
 }
 
