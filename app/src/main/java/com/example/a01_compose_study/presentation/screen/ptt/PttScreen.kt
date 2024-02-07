@@ -149,7 +149,7 @@ fun ComposePttScreen(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = if (!(domainUiState.isError)) displayText else "ERROR_HMI",
+                text = if (!(domainUiState.isError)) displayText else domainUiState.errorText,
                 modifier = Modifier
 //                    .alpha(textAlpha)
                     .padding(bottom = 10.dp),
@@ -171,7 +171,7 @@ fun CustomSizeAlertDialogPreview() {
     ComposePttScreen(
         domainUiState = DomainUiState.PttWindow(
             domainType = SealedDomainType.Ptt,
-            text = "string",
+            errorText = "string",
             screenType = ScreenType.PttSpeak,
             screenSizeType = ScreenSizeType.Middle
         ),

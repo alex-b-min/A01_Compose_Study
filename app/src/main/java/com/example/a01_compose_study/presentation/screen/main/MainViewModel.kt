@@ -20,7 +20,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    val vrmwManager: VrmwManager // MainViewModel에서 필요한 이유는, 음성인식 결과를 직접적으로 생성하기 위해
+    val vrmwManager: VrmwManager, // MainViewModel에서 필요한 이유는, 음성인식 결과를 직접적으로 생성하기 위해
 ) : ViewModel() {
 
     private val _sealedParsedData = UiState._sealedParsedData
@@ -50,7 +50,8 @@ class MainViewModel @Inject constructor(
                             HVRError.ERROR_DIALOGUE_ASR_SERVER_UNAVAILABLE,
                             HVRError.ERROR_DIALOGUE_ASR_SERVER_CONNECTION,
                             HVRError.ERROR_DIALOGUE_ASR_NETWORK_NO_SIGNAL,
-                            HVRError.ERROR_DIALOGUE_ASR_SERVER_NO_RESPONSE, -> {
+                            HVRError.ERROR_DIALOGUE_ASR_SERVER_NO_RESPONSE,
+                            -> {
 //                               procServerErr(error, it)
                             }
 
@@ -61,7 +62,11 @@ class MainViewModel @Inject constructor(
                             HVRError.ERROR_HMI -> {
                                 _domainUiState.update { uiState ->
                                     when (uiState) {
-                                        is DomainUiState.PttWindow -> uiState.copy(isError = true)
+                                        is DomainUiState.PttWindow -> uiState.copy(
+                                            isError = true,
+                                            errorText = sealedParsedData.error.name
+                                        )
+
                                         else -> uiState
                                     }
                                 }
@@ -72,6 +77,7 @@ class MainViewModel @Inject constructor(
                             }
                         }
                     }
+
                     is SealedParsedData.HelpData -> {
                         onDomainEvent(
                             event = MainEvent.OpenDomainWindowEvent(
@@ -138,7 +144,7 @@ class MainViewModel @Inject constructor(
                                 domainType = event.domainType,
                                 screenType = event.screenType,
                                 isError = event.isError,
-                                text = event.data as String,
+                                errorText = event.data as String,
                                 screenSizeType = event.screenSizeType
                             )
                         }

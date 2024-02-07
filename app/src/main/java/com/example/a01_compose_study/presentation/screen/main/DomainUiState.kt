@@ -16,7 +16,7 @@ sealed class DomainUiState(
         val domainType: SealedDomainType,
         val screenType: ScreenType,
         val isError: Boolean = false,
-        val text: String = "",
+        val errorText: String = "",
         override val screenSizeType: ScreenSizeType = ScreenSizeType.Zero,
     ) : DomainUiState(screenSizeType)
 
