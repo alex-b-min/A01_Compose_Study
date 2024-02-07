@@ -20,8 +20,6 @@ class HelpViewModel @Inject constructor(
 
     private val _domainUiState = UiState._domainUiState
 
-    private val _vrUiState = UiState._vrUiState
-
     private val _domainWindowVisible = UiState._domainWindowVisible
 
     fun onHelpEvent(event: HelpEvent) {
@@ -41,14 +39,6 @@ class HelpViewModel @Inject constructor(
                     delay(500)
                     _domainUiState.update { domainUiState ->
                         DomainUiState.NoneWindow()
-                    }
-
-                    _vrUiState.update { vrUiState ->
-                        VRUiState.VRWindow(
-                            visible = true,
-                            isError = event.isError,
-                            screenSizeType = event.screenSizeType
-                        )
                     }
                 }
             }
