@@ -1,8 +1,10 @@
 package com.example.a01_compose_study.presentation.screen.ptt
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -12,6 +14,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,7 +44,12 @@ fun ComposePttScreen(
     // ==> 화면(Window)의 세로 크기는 가장 상단에 있는 AnimatedVisibility()의 높이를 조절하기로 규칙을 정함
     //    val targetFillMaxHeight by remember { mutableStateOf(Animatable(0f)) }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .clip(shape = RoundedCornerShape(15.dp))
+            .background(Color.Black)
+    ) {
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.BottomCenter
@@ -55,22 +63,22 @@ fun ComposePttScreen(
                     lottieImageAssetFolder = "bg_glow/images/error",
                     infiniteLoop = true
                 )
-                LottieRawAnimationHandler(
-                    modifier = Modifier.fillMaxSize(),
-                    rawResId = R.raw.error_loop,
-                    infiniteLoop = true,
-                    onFrameChanged = { currentFrame ->
-                        // 현재 프레임에 따라 글자 투명도(Alpha)가 변하도록 설정
-                        textAlpha = currentFrame.let {
-                            when (it) {
-                                in 0F..10F -> 0F
-                                in 10F..20F -> it.normalize(10F, 20F)
-                                in 20F..40F -> 1F - (it.normalize(20F, 40F) * 0.5F)
-                                else -> 0F
-                            }
-                        } ?: 0F
-                    }
-                )
+//                LottieRawAnimationHandler(
+//                    modifier = Modifier.fillMaxSize(),
+//                    rawResId = R.raw.error_loop,
+//                    infiniteLoop = true,
+//                    onFrameChanged = { currentFrame ->
+//                        // 현재 프레임에 따라 글자 투명도(Alpha)가 변하도록 설정
+//                        textAlpha = currentFrame.let {
+//                            when (it) {
+//                                in 0F..10F -> 0F
+//                                in 10F..20F -> it.normalize(10F, 20F)
+//                                in 20F..40F -> 1F - (it.normalize(20F, 40F) * 0.5F)
+//                                else -> 0F
+//                            }
+//                        } ?: 0F
+//                    }
+//                )
             } else {
                 LottieAssetAnimationHandler(
                     modifier = Modifier.fillMaxSize(),
@@ -141,7 +149,7 @@ fun ComposePttScreen(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = displayText,
+                text = if (!(domainUiState.isError)) displayText else "ERROR_HMI",
                 modifier = Modifier
 //                    .alpha(textAlpha)
                     .padding(bottom = 10.dp),
