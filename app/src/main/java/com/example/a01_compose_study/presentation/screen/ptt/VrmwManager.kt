@@ -28,7 +28,6 @@ import com.example.a01_compose_study.domain.state.BluetoothState
 import com.example.a01_compose_study.domain.state.MWState
 import com.example.a01_compose_study.domain.util.CustomLogger
 import com.example.a01_compose_study.domain.util.G2PController
-import com.example.a01_compose_study.domain.util.VRResultListener
 import com.example.a01_compose_study.presentation.data.ServiceState
 import com.example.a01_compose_study.presentation.util.StringManager
 import com.google.gson.Gson
@@ -59,8 +58,6 @@ class VrmwManager @Inject constructor(
     val gson = Gson()
     var vrResult: VRResult? = null
     var currContext: MWContext? = MWContext(DialogueMode.MAINMENU) //MWContext의 DialogueMode의 값 임의의 값 넣음
-    var resultListener: VRResultListener? = null
-    var skipStore = false
     private val languageCheckMap = mutableMapOf<String, CompletableDeferred<Any>>()
 
     var m_stateMachine: MwStateMachine = MwStateMachine()
