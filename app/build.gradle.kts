@@ -84,6 +84,8 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+    testImplementation("junit:junit:4.13.2")
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
 
     // media3
     implementation("androidx.media3:media3-common:1.2.1")
