@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
-
 /**
  궁금증
  * 1. 같은 디스패쳐(Dispatchers.IO)를 사용하는 각각의 코루틴에서 sleep을 사용하면 현재 작업을 진행중인 코루틴 외의 다른 코루틴은 작업을 하지 못하는걸까?
@@ -16,6 +15,7 @@ import org.junit.Test
 
  결과
  * 1. sleep() 함수를 사용하여 현재 코루틴이 완료될 때까지 다른 코루틴이 실행되지 않을 것으로 예상했지만, 비동기적으로 다른 코루틴과 동시에 실행되는 것처럼 보입니다.
+  또한 또한 각각의 코루틴에 동일하게 sleep 3초를 주고 실행 결과를 확인하면 먼저 데이터를 콜렉 하는 코루틴(먼저 데이터를 콜렉 하는 순서는 랜덤인 것 같음)이 가장 먼저 "데이터 수신 완료"를 호출하지 않는 것을 알 수 있습니다.
  * 2. 테스트 코드가 아닌 일반 코드에서 Logcat을 확인한 결과, 서로 다른 코루틴이라도 같은 디스패처(Dispatchers.IO)를 할당해도 각각의 코루틴은 서로 다른 스레드 / 같은 프로세스 에서 작동하는 것으로 확인되었습니다.
  */
 
@@ -36,7 +36,7 @@ class ExampleUnitTest {
 }
 
 // 데이터 발행 값 수집
-suspend fun collectData() {
+fun collectData() {
     CoroutineScope(Dispatchers.IO).launch(CoroutineName("Coroutine 1")) {
         dummyData.collect { dummyData ->
             println("${coroutineContext[CoroutineName]}: 데이터 수신 중...")
