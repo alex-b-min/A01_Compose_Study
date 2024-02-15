@@ -5,12 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.a01_compose_study.R
 import com.example.a01_compose_study.data.DialogueMode
-import com.example.a01_compose_study.data.HTextToSpeechState
-import com.example.a01_compose_study.data.HVRState
 import com.example.a01_compose_study.data.VrConfig
 import com.example.a01_compose_study.data.custom.MWContext
-import com.example.a01_compose_study.data.custom.SealedParsedData
-import com.example.a01_compose_study.data.vr.MwStateMachine
 import com.example.a01_compose_study.domain.model.NoticeModel
 import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.util.CustomLogger
@@ -19,7 +15,6 @@ import com.example.a01_compose_study.presentation.data.UiState
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.update
 import java.util.Random
 import javax.inject.Inject
@@ -108,6 +103,8 @@ class PttViewModel @Inject constructor(
                 if (ServiceState.bluetoothState.hfpDevice.value.device.isNotEmpty() && !ServiceState.bluetoothState.hfpDevice.value.recognizing) {
                     vrmwManager.g2pController.updateCacheFiles(ServiceState.bluetoothState.hfpDevice.value.device)
                 }
+
+                UiState.clearUiState()
             }
 
             is PttEvent.StartVR -> {
