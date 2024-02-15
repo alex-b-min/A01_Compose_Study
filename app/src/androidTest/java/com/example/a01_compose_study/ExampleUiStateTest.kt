@@ -21,17 +21,17 @@ import org.junit.Test
  */
 @ExperimentalTestApi
 class ExampleUiStateTest {
+    /**
+    궁금증
+     * 1. sealed class로 정의한 DomainUiState를 적용하면 Compose UI에 잘 적용이 되는지 테스트 하는게 가능 혹은 쉬울까?
+
+    결과
+     * 1. sealed class로 정의한 DomainUiState를 적용하면 Compose UI에 잘 적용이 되는지 테스트는 가능했지만 쉽게 할 수 있는지는 상대적인 거 같다.
+     */
 
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    /**
-     궁금증
-     * 1. sealed class로 정의한 DomainUiState를 적용하면 Compose UI에 잘 적용이 되는지 테스트 하는게 가능 혹은 쉬울까?
-
-     결과
-     * 1. sealed class로 정의한 DomainUiState를 적용하면 Compose UI에 잘 적용이 되는지 테스트는 가능했지만 쉽게 할 수 있는지는 상대적인 거 같다.
-     */
     @Test
     fun testUiState() {
         // 테스트 할 Help 더미 데이터 생성
@@ -71,9 +71,6 @@ class ExampleUiStateTest {
             )
         }
 
-        /**
-         *
-         */
         // HelpListWindow UI에 표시되는 텍스트와 testUiState의 데이터를 비교하여 UI가 올바르게 표시되는지 확인하는 코드
         testUiState.data.forEachIndexed { index, helpItemData ->
             composeTestRule.onNodeWithText(helpItemData.command).isDisplayed()
