@@ -197,12 +197,14 @@ class MainViewModel @Inject constructor(
                     }
                     domainUiState
                 }
+                UiState.pushUiState(domainUiState.value)
             }
         }
     }
 
     fun closeDomainWindow() {
         _domainWindowVisible.value = false
+        UiState.clearUiState()
     }
 
     fun openDomainWindow() {

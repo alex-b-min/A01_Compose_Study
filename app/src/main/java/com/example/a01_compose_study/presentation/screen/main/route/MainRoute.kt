@@ -1,6 +1,5 @@
 package com.example.a01_compose_study.presentation.screen.main.route
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing

@@ -7,6 +7,7 @@ import com.example.a01_compose_study.domain.util.ScreenSizeType
 
 sealed class DomainUiState(
     open val screenSizeType: ScreenSizeType = ScreenSizeType.Zero,
+    open val screenType: ScreenType = ScreenType.None,
 ) {
     data class NoneWindow(
         override val screenSizeType: ScreenSizeType = ScreenSizeType.Zero,
@@ -14,7 +15,7 @@ sealed class DomainUiState(
 
     data class PttWindow(
         val domainType: SealedDomainType,
-        val screenType: ScreenType,
+        override val  screenType: ScreenType,
         val isError: Boolean = false,
         val errorText: String = "",
         override val screenSizeType: ScreenSizeType = ScreenSizeType.Zero,
@@ -22,7 +23,7 @@ sealed class DomainUiState(
 
     data class HelpWindow(
         val domainType: SealedDomainType,
-        val screenType: ScreenType,
+        override val  screenType: ScreenType,
         val data: List<HelpItemData>,
         val detailData: HelpItemData = HelpItemData(command = ""),
         val isError: Boolean = false,
