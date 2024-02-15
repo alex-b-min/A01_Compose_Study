@@ -283,7 +283,6 @@ class VrmwManager @Inject constructor(
                 promptId.add("PID_CMN_COMM_01_01")
             }
             StringManager.printSttString("")
-            Log.e("subin","여기까지는 실행")
 //            controller.callRecogStart(
 //                context.dialogueMode.value,
 //                promptId,
