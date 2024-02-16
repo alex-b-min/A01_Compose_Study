@@ -1,6 +1,5 @@
 package com.example.a01_compose_study.presentation.screen.main
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.a01_compose_study.data.HVRError
@@ -199,7 +198,6 @@ class MainViewModel @Inject constructor(
                     domainUiState
                 }
                 UiState.pushUiState(domainUiState.value)
-                Log.d("subin","push ${UiState._domainUiStateStack}")
             }
         }
     }
