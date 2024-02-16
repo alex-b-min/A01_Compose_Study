@@ -13,4 +13,5 @@ sealed class ScreenSizeType {
     object Small: ScreenSizeType()
     object Middle: ScreenSizeType()
     object Large: ScreenSizeType()
+    object Full: ScreenSizeType()
 }

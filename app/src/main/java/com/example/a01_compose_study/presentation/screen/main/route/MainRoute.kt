@@ -1,6 +1,7 @@
 package com.example.a01_compose_study.presentation.screen.main.route
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -52,7 +53,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun MainRoute(
     viewModel: MainViewModel = hiltViewModel(),
-    pttViewModel: PttViewModel = hiltViewModel()
+    pttViewModel: PttViewModel = hiltViewModel(),
 ) {
     val domainUiState by viewModel.domainUiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
@@ -74,21 +75,40 @@ fun MainRoute(
     val domainWindowVisibleState by viewModel.domainWindowVisible.collectAsStateWithLifecycle()
 
     val targetFillMaxHeight by remember { mutableStateOf(Animatable(0f)) }
+    val targetFillMaxWidth by remember { mutableStateOf(Animatable(0f)) }
 
     LaunchedEffect(domainUiState) {
-        val newTargetValue = when (domainUiState.screenSizeType) {
+        val newTargetHeightValue = when (domainUiState.screenSizeType) {
             is ScreenSizeType.Zero -> 0f
             is ScreenSizeType.Small -> 0.15f
             is ScreenSizeType.Middle -> 0.268f
             is ScreenSizeType.Large -> 0.433f
+            is ScreenSizeType.Full -> 1f
         }
-        targetFillMaxHeight.animateTo(
-            targetValue = newTargetValue,
-            animationSpec = tween(
-                durationMillis = 800, // 애니메이션 지속 시간을 조정
-                easing = FastOutSlowInEasing // 선택적으로 easing 함수를 지정
+        val newTargetWidthValue = when (domainUiState.screenSizeType) {
+            is ScreenSizeType.Zero -> 0f
+            is ScreenSizeType.Full -> 1f
+            else -> 0.233f
+        }
+
+        scope.launch {
+            targetFillMaxHeight.animateTo(
+                targetValue = newTargetHeightValue,
+                animationSpec = tween(
+                    durationMillis = 800, // 애니메이션 지속 시간을 조정
+                    easing = FastOutSlowInEasing // 선택적으로 easing 함수를 지정
+                )
             )
-        )
+        }
+        scope.launch {
+            targetFillMaxWidth.animateTo(
+                targetValue = newTargetWidthValue,
+                animationSpec = tween(
+                    durationMillis = 800, // 애니메이션 지속 시간을 조정
+                    easing = FastOutSlowInEasing // 선택적으로 easing 함수를 지정
+                )
+            )
+        }
     }
 
     Box(
@@ -124,7 +144,7 @@ fun MainRoute(
                     modifier = Modifier
                         .offset(x = 10.dp, y = (10).dp)
                         .fillMaxHeight(targetFillMaxHeight.value)
-                        .fillMaxWidth(0.233f)
+                        .fillMaxWidth(targetFillMaxWidth.value)
                         .background(
                             color = Color.Transparent,
                             shape = RoundedCornerShape(15.dp)
@@ -257,7 +277,7 @@ fun MainRoute(
                 contentText = "PTT Close",
                 onClick = {
                     scope.launch {
-                        viewModel.closeDomainWindow()
+                        viewModel.onDomainEvent(MainEvent.CloseDomainWindowEvent)
                     }
                 }
             )
@@ -294,6 +314,48 @@ fun MainRoute(
                     scope.launch {
                         viewModel.vrmwManager.setVRResult(VRResult())
                     }
+                }
+            )
+
+            PttButton(
+                modifier = Modifier
+                    .fillMaxWidth(0.13f)
+                    .fillMaxHeight(0.25f),
+                contentText = "Size Up",
+                onClick = {
+                    val resultScreenSizeType = when (domainUiState.screenSizeType) {
+                        is ScreenSizeType.Zero -> ScreenSizeType.Zero
+                        is ScreenSizeType.Small -> ScreenSizeType.Middle
+                        is ScreenSizeType.Middle -> ScreenSizeType.Large
+                        is ScreenSizeType.Large -> ScreenSizeType.Full
+                        is ScreenSizeType.Full -> ScreenSizeType.Full
+                    }
+                    viewModel.onDomainEvent(
+                        MainEvent.ChangeDomainWindowSizeEvent(
+                            resultScreenSizeType
+                        )
+                    )
+                }
+            )
+
+            PttButton(
+                modifier = Modifier
+                    .fillMaxWidth(0.13f)
+                    .fillMaxHeight(0.25f),
+                contentText = "Size Down",
+                onClick = {
+                    val resultScreenSizeType = when (domainUiState.screenSizeType) {
+                        is ScreenSizeType.Zero -> ScreenSizeType.Zero
+                        is ScreenSizeType.Small -> ScreenSizeType.Small
+                        is ScreenSizeType.Middle -> ScreenSizeType.Small
+                        is ScreenSizeType.Large -> ScreenSizeType.Middle
+                        is ScreenSizeType.Full -> ScreenSizeType.Large
+                    }
+                    viewModel.onDomainEvent(
+                        MainEvent.ChangeDomainWindowSizeEvent(
+                            resultScreenSizeType
+                        )
+                    )
                 }
             )
         }
