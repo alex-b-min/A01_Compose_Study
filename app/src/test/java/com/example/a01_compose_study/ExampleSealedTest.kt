@@ -16,8 +16,22 @@ sealed class Result {
     // 다른 인스턴스(객체)의 값 참조 여부 가능 확인
     val referenceValue = DummyObject.dummy
 
-    data class Success(val message: String) : Result()
-    data class Error(val error: Throwable) : Result()
+    data class Success(val message: String) : Result() {
+        override fun toString(): String {
+            return super.toString()
+        }
+        fun examSuccess() {
+
+        }
+    }
+    data class Error(val error: Throwable) : Result() {
+        override fun toString(): String {
+            return super.toString()
+        }
+        fun examError() {
+
+        }
+    }
 }
 
 // sealed class인 Result의 하위 클래스에 대한 확장 함수를 정의
