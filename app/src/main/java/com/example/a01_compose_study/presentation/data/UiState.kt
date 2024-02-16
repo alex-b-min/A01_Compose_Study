@@ -1,5 +1,6 @@
 package com.example.a01_compose_study.presentation.data
 
+import android.util.Log
 import com.example.a01_compose_study.data.custom.SealedParsedData
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -22,6 +23,9 @@ object UiState {
 
     fun pushUiState(uiState: DomainUiState) {
         _domainUiStateStack.add(uiState)
+        _domainUiStateStack.forEachIndexed { index, domainUiState ->
+            Log.d("@@ _domainUiStateStack", "index: $index / data: $domainUiState")
+        }
     }
 
     fun popUiState() {

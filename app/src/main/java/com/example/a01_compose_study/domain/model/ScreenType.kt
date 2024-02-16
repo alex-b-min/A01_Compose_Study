@@ -1,6 +1,10 @@
 package com.example.a01_compose_study.domain.model
 
 sealed class ScreenType {
+    override fun toString(): String {
+        return javaClass.simpleName
+    }
+
     object None : ScreenType()
     object ContentScreen : ScreenType()
     object ServiceScreen : ScreenType()

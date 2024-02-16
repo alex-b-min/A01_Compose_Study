@@ -1,6 +1,10 @@
 package com.example.a01_compose_study.domain.model
 
 sealed class SealedDomainType(val text: String) {
+    override fun toString(): String {
+        return javaClass.simpleName
+    }
+
     object None : SealedDomainType("None")
     object Ptt : SealedDomainType("Ptt")
     object Announce : SealedDomainType("Announce")
