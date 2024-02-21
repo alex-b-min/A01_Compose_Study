@@ -38,6 +38,7 @@ import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.components.button.PttButton
+import com.example.a01_compose_study.presentation.components.lottie.LottieAssetAnimationHandler
 import com.example.a01_compose_study.presentation.screen.announce.AnnounceScreen
 import com.example.a01_compose_study.presentation.screen.help.screen.ComposeHelpScreen
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
@@ -114,6 +115,7 @@ fun MainRoute(
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .background(Color.Black)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null
@@ -140,7 +142,7 @@ fun MainRoute(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.BottomStart
             ) {
-                Column(
+                Box(
                     modifier = Modifier
                         .offset(x = 10.dp, y = (10).dp)
                         .fillMaxHeight(targetFillMaxHeight.value)
@@ -154,6 +156,19 @@ fun MainRoute(
                             indication = null
                         ) {},
                 ) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.BottomCenter
+                    ) {
+                        LottieAssetAnimationHandler(
+                            modifier = Modifier.fillMaxSize(),
+                            lottieJsonAssetPath = "bg_glow/09_tsd_frame_glow_l_lt.json",
+                            lottieImageAssetFolder = "bg_glow/images/default",
+                            infiniteLoop = true
+                        )
+                    }
+
+
                     when (domainUiState) {
                         is DomainUiState.NoneWindow -> {
                         }
@@ -167,11 +182,13 @@ fun MainRoute(
                         }
 
                         is DomainUiState.HelpWindow -> {
-                            ComposeHelpScreen(
-                                domainUiState = domainUiState as DomainUiState.HelpWindow,
-                                contentColor = Color.Gray,
-                                backgroundColor = Color.Black
-                            )
+                            Box(modifier = Modifier.fillMaxSize()) {
+                                ComposeHelpScreen(
+                                    domainUiState = domainUiState as DomainUiState.HelpWindow,
+                                    contentColor = Color.Gray,
+                                    backgroundColor = Color.Black
+                                )
+                            }
                         }
 
                         is DomainUiState.AnnounceWindow -> {

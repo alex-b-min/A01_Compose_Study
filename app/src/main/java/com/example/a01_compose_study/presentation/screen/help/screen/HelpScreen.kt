@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -16,6 +17,7 @@ import com.example.a01_compose_study.domain.model.HelpItemData
 import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.util.ScreenSizeType
+import com.example.a01_compose_study.presentation.components.lottie.LottieAssetAnimationHandler
 import com.example.a01_compose_study.presentation.components.top_bar.TopAppBarContent
 import com.example.a01_compose_study.presentation.screen.help.HelpEvent
 import com.example.a01_compose_study.presentation.screen.help.HelpViewModel
@@ -88,7 +90,7 @@ fun HelpListWindow(
         modifier = Modifier
             .fillMaxSize()
             .clip(RoundedCornerShape(15.dp))
-            .background(backgroundColor)
+            .background(Color.Transparent)
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),

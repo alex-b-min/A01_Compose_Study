@@ -3,6 +3,7 @@ package com.example.a01_compose_study.presentation.screen.help.screen
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -56,7 +57,7 @@ fun HelpList(
 //            onItemClick = onItemClick,
 //        )
 //    }
-    LazyColumn {
+    LazyColumn() {
         itemsIndexed(helpList) { index, helpItemData ->
             HelpListItem(
                 helpItemData = helpItemData,
@@ -105,8 +106,8 @@ fun HelpListItem(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(75.dp),
-                color = if (isSelected) Color.Gray.copy(alpha = 0.3f) else Color.Black,
-                backgroundColor = Color.Black
+                color = if (isSelected) Color.Black.copy(alpha = 0.5f) else Color.Transparent,
+                backgroundColor = Color.Transparent
             )
         }
 

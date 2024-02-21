@@ -1,5 +1,6 @@
 package com.example.a01_compose_study.presentation.screen.ptt
 
+import android.view.MotionEvent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,9 +14,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -29,6 +33,7 @@ import com.example.a01_compose_study.presentation.components.lottie.LottieRawAni
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
 import com.example.a01_compose_study.presentation.util.TextModifier.normalize
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ComposePttScreen(
     domainUiState: DomainUiState.PttWindow,
@@ -44,11 +49,28 @@ fun ComposePttScreen(
     // ==> 화면(Window)의 세로 크기는 가장 상단에 있는 AnimatedVisibility()의 높이를 조절하기로 규칙을 정함
     //    val targetFillMaxHeight by remember { mutableStateOf(Animatable(0f)) }
 
+    var isScrolling by remember { mutableStateOf(false) }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .clip(shape = RoundedCornerShape(15.dp))
-            .background(Color.Black)
+            .background(
+                if (isScrolling) Color.Red else Color.Black
+            )
+            .pointerInteropFilter {
+                when (it.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        // 터치 시작
+                        isScrolling = true
+                    }
+                    MotionEvent.ACTION_UP -> {
+                        // 터치 종료
+                        isScrolling = false
+                    }
+                }
+                true
+            }
     ) {
         Box(
             modifier = Modifier.fillMaxSize(),

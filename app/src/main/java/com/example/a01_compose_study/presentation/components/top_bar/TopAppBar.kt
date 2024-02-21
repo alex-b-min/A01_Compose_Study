@@ -19,7 +19,7 @@ fun TopAppBarContent(
     title: String = ""
 ) {
     TopAppBar(
-        backgroundColor = Color.Black,
+        backgroundColor = Color.Transparent,
         title = {
             Text(
                 text = title,

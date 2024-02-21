@@ -1,5 +1,6 @@
 package com.example.a01_compose_study.presentation.components.lottie
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -31,6 +32,8 @@ fun LottieAssetAnimationHandler(
         LottieCompositionSpec.Asset(listeningGlowPath.value),
         imageAssetsFolder = lottieImageAssetFolder
     )
+
+    Log.d("@@ 순서", "22222")
 
 //    val errorGlow by rememberLottieComposition(
 //        LottieCompositionSpec.Asset(errGlowPath.value),
