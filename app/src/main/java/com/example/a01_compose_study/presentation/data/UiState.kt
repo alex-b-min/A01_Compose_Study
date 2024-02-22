@@ -47,9 +47,9 @@ object UiState {
     }
 
     fun onVREvent(event: VREvent) {
+        Log.d("@@ vrUiState", "${vrUiState.value.active}")
         when(event) {
             is VREvent.ChangeVRUIEvent -> {
-                Log.d("@@ vrUiState 값은?1111", "${event.vrUiState.active} / ${event.vrUiState.isError}")
                 _VRUiState.update { vrUiState ->
                     event.vrUiState
                 }

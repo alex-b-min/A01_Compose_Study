@@ -33,8 +33,6 @@ fun LottieAssetAnimationHandler(
         imageAssetsFolder = lottieImageAssetFolder
     )
 
-    Log.d("@@ 순서", "22222")
-
 //    val errorGlow by rememberLottieComposition(
 //        LottieCompositionSpec.Asset(errGlowPath.value),
 //        imageAssetsFolder = "bg_glow/images/error"
