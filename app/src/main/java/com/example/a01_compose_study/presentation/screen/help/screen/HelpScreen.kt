@@ -1,15 +1,17 @@
 package com.example.a01_compose_study.presentation.screen.help.screen
 
+import android.view.MotionEvent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -17,16 +19,20 @@ import com.example.a01_compose_study.domain.model.HelpItemData
 import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.util.ScreenSizeType
-import com.example.a01_compose_study.presentation.components.lottie.LottieAssetAnimationHandler
 import com.example.a01_compose_study.presentation.components.top_bar.TopAppBarContent
+import com.example.a01_compose_study.presentation.data.UiState
+import com.example.a01_compose_study.presentation.data.UiState.onVREvent
 import com.example.a01_compose_study.presentation.screen.help.HelpEvent
 import com.example.a01_compose_study.presentation.screen.help.HelpViewModel
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
+import com.example.a01_compose_study.presentation.screen.main.VREvent
+import com.example.a01_compose_study.presentation.screen.main.route.VRUiState
 
 @Composable
 fun ComposeHelpScreen(
     viewModel: HelpViewModel = hiltViewModel(),
     domainUiState: DomainUiState.HelpWindow,
+    vrUiState: VRUiState,
     contentColor: Color,
     backgroundColor: Color,
 ) {
@@ -36,10 +42,13 @@ fun ComposeHelpScreen(
      * 이렇게 하게 되면 uiState가 변경되었기 때문에 아래의 if문에서 걸러 화면이 Recomposition이 이루어져 이동을 하게 된다.
      * ==> 뒤로가기 구현 : 현재 가지고 있는 uiState를 기반으로 다시 HelpDetailList 타입에서 HelpList 타입으로 바꾼다.
      */
+
+
     Box(modifier = Modifier.fillMaxSize()) {
         if (domainUiState.screenType is ScreenType.HelpList) {
             HelpListWindow(
                 domainUiState = domainUiState,
+                vrUiState = vrUiState,
                 backgroundColor = backgroundColor,
                 onDismiss = {
                     viewModel.onHelpEvent(HelpEvent.OnDismiss)
@@ -77,9 +86,11 @@ fun ComposeHelpScreen(
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun HelpListWindow(
     domainUiState: DomainUiState.HelpWindow,
+    vrUiState: VRUiState,
     backgroundColor: Color,
     onDismiss: () -> Unit,
     onBackButton: () -> Unit,
@@ -90,7 +101,34 @@ fun HelpListWindow(
         modifier = Modifier
             .fillMaxSize()
             .clip(RoundedCornerShape(15.dp))
-            .background(Color.Transparent)
+            .background(if (vrUiState.active) Color.Transparent else backgroundColor)
+            .pointerInteropFilter {
+                when (it.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        // 터치 시작
+                        onVREvent(
+                            VREvent.ChangeVRUIEvent(
+                                VRUiState.PttLoading(
+                                    active = true,
+                                    isError = false
+                                )
+                            )
+                        )
+                    }
+                    MotionEvent.ACTION_UP -> {
+                        // 터치 종료
+                        onVREvent(
+                            VREvent.ChangeVRUIEvent(
+                                VRUiState.PttLoading(
+                                    active = false,
+                                    isError = false
+                                )
+                            )
+                        )
+                    }
+                }
+                true
+            }
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -106,6 +144,7 @@ fun HelpListWindow(
 
             HelpList(
                 helpList = helpList,
+                backgroundColor = backgroundColor,
                 onItemClick = { helpItemData ->
                     onItemClick(helpItemData)
                 })
@@ -211,7 +250,8 @@ fun HelpListWindowPreview() {
             text = "HelpWindow",
             screenSizeType = ScreenSizeType.Large
         ),
-        backgroundColor = Color.Black,
+        vrUiState = VRUiState.PttNone(active = false, isError = false),
+        backgroundColor = Color.DarkGray,
         onDismiss = {
         },
         onBackButton = {

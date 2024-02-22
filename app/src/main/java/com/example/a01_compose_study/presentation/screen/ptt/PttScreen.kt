@@ -49,28 +49,11 @@ fun ComposePttScreen(
     // ==> 화면(Window)의 세로 크기는 가장 상단에 있는 AnimatedVisibility()의 높이를 조절하기로 규칙을 정함
     //    val targetFillMaxHeight by remember { mutableStateOf(Animatable(0f)) }
 
-    var isScrolling by remember { mutableStateOf(false) }
-
     Box(
         modifier = Modifier
             .fillMaxSize()
             .clip(shape = RoundedCornerShape(15.dp))
-            .background(
-                if (isScrolling) Color.Red else Color.Black
-            )
-            .pointerInteropFilter {
-                when (it.action) {
-                    MotionEvent.ACTION_DOWN -> {
-                        // 터치 시작
-                        isScrolling = true
-                    }
-                    MotionEvent.ACTION_UP -> {
-                        // 터치 종료
-                        isScrolling = false
-                    }
-                }
-                true
-            }
+            .background(Color.Black)
     ) {
         Box(
             modifier = Modifier.fillMaxSize(),

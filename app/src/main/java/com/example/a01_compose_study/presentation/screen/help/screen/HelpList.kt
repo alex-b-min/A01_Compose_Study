@@ -49,6 +49,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun HelpList(
     helpList: List<HelpItemData>,
+    backgroundColor: Color,
     onItemClick: (HelpItemData) -> Unit,
 ) {
 //    LazyColumnList(list = helpList) { helpItemData ->
@@ -61,6 +62,7 @@ fun HelpList(
         itemsIndexed(helpList) { index, helpItemData ->
             HelpListItem(
                 helpItemData = helpItemData,
+                backgroundColor = backgroundColor,
                 onItemClick = onItemClick,
             )
         }
@@ -80,6 +82,7 @@ fun HelpDetailList(helpItemData: HelpItemData) {
 @Composable
 fun HelpListItem(
     helpItemData: HelpItemData,
+    backgroundColor: Color,
     onItemClick: (HelpItemData) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
@@ -106,7 +109,7 @@ fun HelpListItem(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(75.dp),
-                color = if (isSelected) Color.Black.copy(alpha = 0.5f) else Color.Transparent,
+                color = if (isSelected) backgroundColor else Color.Transparent,
                 backgroundColor = Color.Transparent
             )
         }

@@ -1,6 +1,6 @@
 package com.example.a01_compose_study.presentation.screen.main
 
-import com.example.a01_compose_study.domain.util.ScreenSizeType
+import com.example.a01_compose_study.presentation.screen.main.route.VRUiState
 
 //sealed class VREvent {
 //
@@ -18,3 +18,9 @@ import com.example.a01_compose_study.domain.util.ScreenSizeType
 //        val screenSizeType: ScreenSizeType
 //    ) : VREvent()
 //}
+
+sealed class VREvent {
+    data class ChangeVRUIEvent(
+        val vrUiState: VRUiState
+    ) : VREvent()
+}

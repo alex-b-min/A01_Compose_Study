@@ -1,5 +1,6 @@
 package com.example.a01_compose_study.presentation.screen.main
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.a01_compose_study.data.HVRError
@@ -9,6 +10,7 @@ import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.data.UiState
+import com.example.a01_compose_study.presentation.screen.main.route.VRUiState
 import com.example.a01_compose_study.presentation.screen.ptt.VrmwManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -30,6 +32,9 @@ class MainViewModel @Inject constructor(
 
     private val _domainWindowVisible = UiState._domainWindowVisible
     val domainWindowVisible: StateFlow<Boolean> = UiState.domainWindowVisible
+
+    private val _vrUiState = UiState._VRUiState
+    val vrUiState: StateFlow<VRUiState> = UiState.vrUiState
 
     init {
         collectParsedData()
@@ -202,6 +207,17 @@ class MainViewModel @Inject constructor(
         }
     }
 
+//    fun onVREvent(event: VREvent) {
+//        when(event) {
+//            is VREvent.ChangeVRUIEvent -> {
+//                Log.d("@@ vrUiState 값은?1111", "${event.vrUiState.active} / ${event.vrUiState.isError}")
+//                _vrUiState.update { vrUiState ->
+//                    event.vrUiState
+//                }
+//            }
+//        }
+//    }
+
     fun closeDomainWindow() {
         _domainWindowVisible.value = false
         UiState.clearUiState()
@@ -210,4 +226,6 @@ class MainViewModel @Inject constructor(
     fun openDomainWindow() {
         _domainWindowVisible.value = true
     }
+
+
 }

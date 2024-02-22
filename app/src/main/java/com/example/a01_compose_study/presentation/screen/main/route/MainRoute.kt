@@ -1,7 +1,7 @@
 package com.example.a01_compose_study.presentation.screen.main.route
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -30,6 +31,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.a01_compose_study.R
 import com.example.a01_compose_study.data.DialogueMode
 import com.example.a01_compose_study.data.HVRError
 import com.example.a01_compose_study.data.VRResult
@@ -39,16 +41,20 @@ import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.components.button.PttButton
 import com.example.a01_compose_study.presentation.components.lottie.LottieAssetAnimationHandler
+import com.example.a01_compose_study.presentation.components.lottie.LottieRawAnimationHandler
+import com.example.a01_compose_study.presentation.data.UiState.onVREvent
 import com.example.a01_compose_study.presentation.screen.announce.AnnounceScreen
 import com.example.a01_compose_study.presentation.screen.help.screen.ComposeHelpScreen
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
 import com.example.a01_compose_study.presentation.screen.main.MainEvent
 import com.example.a01_compose_study.presentation.screen.main.MainViewModel
+import com.example.a01_compose_study.presentation.screen.main.VREvent
 import com.example.a01_compose_study.presentation.screen.ptt.ComposePttScreen
 import com.example.a01_compose_study.presentation.screen.ptt.PttEvent
 import com.example.a01_compose_study.presentation.screen.ptt.PttViewModel
 import com.example.a01_compose_study.presentation.util.MultipleEventsCutter
 import com.example.a01_compose_study.presentation.util.get
+import com.example.a01_compose_study.ui.theme.Black2
 import kotlinx.coroutines.launch
 
 @Composable
@@ -77,6 +83,8 @@ fun MainRoute(
 
     val targetFillMaxHeight by remember { mutableStateOf(Animatable(0f)) }
     val targetFillMaxWidth by remember { mutableStateOf(Animatable(0f)) }
+
+    val vrUiState by viewModel.vrUiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(domainUiState) {
         val newTargetHeightValue = when (domainUiState.screenSizeType) {
@@ -160,14 +168,57 @@ fun MainRoute(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.BottomCenter
                     ) {
-                        LottieAssetAnimationHandler(
-                            modifier = Modifier.fillMaxSize(),
-                            lottieJsonAssetPath = "bg_glow/09_tsd_frame_glow_l_lt.json",
-                            lottieImageAssetFolder = "bg_glow/images/default",
-                            infiniteLoop = true
-                        )
-                    }
+                        if (vrUiState.active) {
+                            if (vrUiState.isError) {
+                                LottieAssetAnimationHandler(
+                                    modifier = Modifier.fillMaxSize(),
+                                    lottieJsonAssetPath = "bg_glow/frame_error_glow_l_lt.json",
+                                    lottieImageAssetFolder = "bg_glow/images/error",
+                                    infiniteLoop = true
+                                )
+                            } else {
+                                LottieAssetAnimationHandler(
+                                    modifier = Modifier.fillMaxSize(),
+                                    lottieJsonAssetPath = "bg_glow/09_tsd_frame_glow_l_lt.json",
+                                    lottieImageAssetFolder = "bg_glow/images/default",
+                                    infiniteLoop = true
+                                )
 
+                                when (vrUiState) {
+                                    is VRUiState.PttNone -> {
+                                    }
+                                    is VRUiState.PttLoading -> {
+                                        LottieRawAnimationHandler(
+                                            modifier = Modifier.fillMaxSize(),
+                                            rawResId = R.raw.tsd_thinking_loop_fix_lt_03_2,
+                                            infiniteLoop = true,
+                                            onFrameChanged = { currentFrame ->
+                                            }
+                                        )
+                                    }
+                                    is VRUiState.PttListen -> {
+                                        LottieRawAnimationHandler(
+                                            modifier = Modifier.fillMaxSize(),
+                                            rawResId = R.raw.tsd_listening_passive_loop_lt_01_2,
+                                            infiniteLoop = true,
+                                            onFrameChanged = { currentFrame ->
+                                            }
+                                        )
+                                    }
+
+                                    is VRUiState.PttSpeak -> {
+                                        LottieRawAnimationHandler(
+                                            modifier = Modifier.fillMaxSize(),
+                                            rawResId = R.raw.loop,
+                                            infiniteLoop = true,
+                                            onFrameChanged = { currentFrame ->
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
 
                     when (domainUiState) {
                         is DomainUiState.NoneWindow -> {
@@ -185,8 +236,9 @@ fun MainRoute(
                             Box(modifier = Modifier.fillMaxSize()) {
                                 ComposeHelpScreen(
                                     domainUiState = domainUiState as DomainUiState.HelpWindow,
+                                    vrUiState = vrUiState,
                                     contentColor = Color.Gray,
-                                    backgroundColor = Color.Black
+                                    backgroundColor = Black2
                                 )
                             }
                         }
@@ -371,6 +423,92 @@ fun MainRoute(
                     viewModel.onDomainEvent(
                         MainEvent.ChangeDomainWindowSizeEvent(
                             resultScreenSizeType
+                        )
+                    )
+                }
+            )
+        }
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(end = 250.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.End
+        ) {
+
+
+            PttButton(
+                modifier = Modifier.fillMaxSize(0.13f),
+                contentText = "VR Loading",
+                onClick = {
+                    onVREvent(
+                        VREvent.ChangeVRUIEvent(
+                            VRUiState.PttLoading(
+                                active = true,
+                                isError = false
+                            )
+                        )
+                    )
+                }
+            )
+
+            PttButton(
+                modifier = Modifier.fillMaxSize(0.13f),
+                contentText = "VR Speak",
+                onClick = {
+                    onVREvent(
+                        VREvent.ChangeVRUIEvent(
+                            VRUiState.PttSpeak(
+                                active = true,
+                                isError = false
+                            )
+                        )
+                    )
+                }
+            )
+
+            PttButton(
+                modifier = Modifier.fillMaxSize(0.13f),
+                contentText = "VR Listen",
+                onClick = {
+                    onVREvent(
+                        VREvent.ChangeVRUIEvent(
+                            VRUiState.PttListen(
+                                active = true,
+                                isError = false
+                            )
+                        )
+                    )
+                }
+            )
+
+            PttButton(
+                modifier = Modifier.fillMaxSize(0.13f),
+                contentText = "VR Not",
+                onClick = {
+                    onVREvent(
+                        VREvent.ChangeVRUIEvent(
+                            VRUiState.PttNone(
+                                false,
+                                isError = false
+                            )
+                        )
+                    )
+                }
+            )
+
+            PttButton(
+                modifier = Modifier
+                    .fillMaxWidth(0.13f)
+                    .fillMaxHeight(0.3f),
+                contentText = "VR isError",
+                onClick = {
+                    onVREvent(
+                        VREvent.ChangeVRUIEvent(
+                            VRUiState.PttNone(
+                                true,
+                                isError = true
+                            )
                         )
                     )
                 }
