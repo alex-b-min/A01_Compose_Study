@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.a01_compose_study.R
 
@@ -19,13 +19,14 @@ fun TopAppBarContent(
     title: String = ""
 ) {
     TopAppBar(
+        elevation = 0.dp,
         backgroundColor = Color.Transparent,
         title = {
             Text(
                 text = title,
                 style = TextStyle(
                     color = Color.White,
-                    fontSize =25.sp,
+                    fontSize = 25.sp,
                 )
             )
         },
