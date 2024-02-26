@@ -82,7 +82,7 @@ class AppModule2 {
     ): CoroutineScope = CoroutineScope(SupervisorJob() + defaultDispatcher)
 }
 
-@Component(modules = [AppModule::class])
+@Component(modules = [ManagerModule::class])
 interface AppComponent {
     fun inject(mwContext: MWContext)
 }
