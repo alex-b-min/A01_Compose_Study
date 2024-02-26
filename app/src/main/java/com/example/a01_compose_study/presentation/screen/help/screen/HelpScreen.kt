@@ -166,15 +166,6 @@ fun HelpListWindow(
                 }
             }
     ) {
-        onVREvent(
-            VREvent.ChangeVRUIEvent(
-                VRUiState.PttLoading(
-                    active = true,
-                    isError = false
-                )
-            )
-        )
-
         Column(
             modifier = Modifier.fillMaxSize(),
         ) {

@@ -26,7 +26,7 @@ class PttViewModel @Inject constructor(
 
     private val _domainUiState = UiState._domainUiState
 
-    var currContext: MWContext? = null
+    var currContext = ServiceState.mwContext
     val announceString = MutableStateFlow("")
     val vrConfig = MutableStateFlow(VrConfig())
     val guideString = MutableLiveData<String>()
@@ -108,8 +108,8 @@ class PttViewModel @Inject constructor(
             }
 
             is PttEvent.StartVR -> {
-                currContext = MWContext(DialogueMode.MAINMENU)
-                currContext?.let { context ->
+                currContext = ServiceState.updateMWContext(DialogueMode.MAINMENU)
+                currContext.let { context ->
                     vrmwManager.startVR(context)
                 }
 

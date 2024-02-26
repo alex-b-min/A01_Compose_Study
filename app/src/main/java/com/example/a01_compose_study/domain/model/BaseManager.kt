@@ -1,62 +1,58 @@
 
-//package com.example.a01_compose_study.domain.model
-//
-//import android.content.Context
-//import android.content.Intent
-//import android.os.UserManager
-//import com.example.a01_compose_study.R
-//import com.example.a01_compose_study.data.DialogueMode
-//import com.example.a01_compose_study.data.DomainType
-//import com.example.a01_compose_study.data.HVRError
-//import com.example.a01_compose_study.data.MWContext
-//import com.example.a01_compose_study.data.ScreenData
-//import com.example.a01_compose_study.data.ScreenType
-//import com.example.a01_compose_study.data.Tags
-//import com.example.a01_compose_study.data.UserProfileNum
-//import com.example.a01_compose_study.data.UxPreset
-//import com.example.a01_compose_study.data.WindowMode
-//import com.example.a01_compose_study.domain.state.AdditionalInfo
-//import com.example.a01_compose_study.domain.state.BluetoothState
-//import com.example.a01_compose_study.domain.state.MWState
-//import com.example.a01_compose_study.domain.state.SettingState
-//import com.example.a01_compose_study.domain.state.SystemState
-//import com.example.a01_compose_study.domain.state.UIState
-//import com.example.a01_compose_study.domain.model.ParseDomainType
-//import com.example.a01_compose_study.domain.util.VRResultListener
-//import com.example.a01_compose_study.domain.getUserProfileHandle
-//import com.example.a01_compose_study.domain.util.CustomLogger
-//import kotlinx.coroutines.Runnable
-//import kotlinx.coroutines.delay
-//import kotlinx.coroutines.isActive
-//import java.util.Random
-//
-///**
-// * 각 매니저에서 공통적으로 사용하거나 거쳐야 할 로직을 구현
-// */
-//abstract class BaseManager constructor(
-//    val context: Context,
-//    val viewModel: ServiceViewModel,
-//    val vrmwManager: VrmwManager,
-//) : VRResultListener {
-//
-//    init {
-//        CustomLogger.i("BaseManager Constructor Hash[${this.hashCode()}]")
-//    }
-//
-//    open val TAG = this.javaClass.simpleName
-//
-//
-//    open fun sendBroadCast(intent: Intent) {
-//        context.sendBroadcast(intent)
-//    }
-//
-//    /**
-//     * 입력 mwcontext 에 대한 TimeOut 이벤트 처리
-//     * 누적 타임아웃 횟수 마다 표시 문구, 행동이 달라짐
-//     * 1 회 - 재요청
-//     * 2 회 이상 - 종료
-//     *
-//     */
+package com.example.a01_compose_study.domain.model
+
+import android.content.Context
+import android.content.Intent
+import android.os.UserManager
+import com.example.a01_compose_study.R
+import com.example.a01_compose_study.data.DialogueMode
+import com.example.a01_compose_study.data.DomainType
+import com.example.a01_compose_study.data.HVRError
+import com.example.a01_compose_study.data.ScreenType
+import com.example.a01_compose_study.data.Tags
+import com.example.a01_compose_study.data.UserProfileNum
+import com.example.a01_compose_study.data.UxPreset
+import com.example.a01_compose_study.data.WindowMode
+import com.example.a01_compose_study.data.custom.MWContext
+import com.example.a01_compose_study.domain.state.AdditionalInfo
+import com.example.a01_compose_study.domain.state.BluetoothState
+import com.example.a01_compose_study.domain.state.MWState
+import com.example.a01_compose_study.domain.state.SettingState
+import com.example.a01_compose_study.domain.state.SystemState
+import com.example.a01_compose_study.domain.util.CustomLogger
+import com.example.a01_compose_study.presentation.data.ServiceState.bluetoothState
+import com.example.a01_compose_study.presentation.screen.ptt.VrmwManager
+import kotlinx.coroutines.Runnable
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import java.util.Random
+
+/**
+ * 각 매니저에서 공통적으로 사용하거나 거쳐야 할 로직을 구현
+ */
+abstract class BaseManager(
+    val context: Context,
+    val vrmwManager: VrmwManager,
+) {
+
+    init {
+        CustomLogger.i("BaseManager Constructor Hash[${this.hashCode()}]")
+    }
+
+    open val TAG = this.javaClass.simpleName
+
+
+    open fun sendBroadCast(intent: Intent) {
+        context.sendBroadcast(intent)
+    }
+
+    /**
+     * 입력 mwcontext 에 대한 TimeOut 이벤트 처리
+     * 누적 타임아웃 횟수 마다 표시 문구, 행동이 달라짐
+     * 1 회 - 재요청
+     * 2 회 이상 - 종료
+     *
+     */
 //    fun procTimeOut(context: MWContext) {
 //        CustomLogger.e("procTimeOut: ${context.dialogueMode}")
 //        context.timeOutCnt++
@@ -111,22 +107,22 @@
 //            }
 //        }
 //    }
-//
-//    /**
-//     * 서버오류인 경우
-//     * 안내문구 출력 후 종료
-//     */
+
+    /**
+     * 서버오류인 경우
+     * 안내문구 출력 후 종료
+     */
 //    fun procServerErr(error: HVRError, context: MWContext) {
 //        CustomLogger.e("Server ERR:${error.name} ${context.dialogueMode}")
 //        val noticeModel = getServerErrPrompt(error)
 //        launchNotice(noticeModel, true)
 //    }
-//
-//    /***
-//     * 개통여부 체크
-//     * 231031 : Raul 말씀으로는 개통이 된 상태여야만 시스템에서 VR에 이벤트를 전달 해 줄 것이기 때문에
-//     * 개통여부 체크와 VR 동의 체크는 하지 않아도 된다고 함
-//     */
+
+    /***
+     * 개통여부 체크
+     * 231031 : Raul 말씀으로는 개통이 된 상태여야만 시스템에서 VR에 이벤트를 전달 해 줄 것이기 때문에
+     * 개통여부 체크와 VR 동의 체크는 하지 않아도 된다고 함
+     */
 //    fun ccsSubscribedCheck(): NoticeModel? {
 //        CustomLogger.i("ccsSubscribedCheck")
 //        if (!getSettingState().isCCUSubscribed()) {
@@ -138,13 +134,13 @@
 //        }
 //        return null
 //    }
-//
-//    /**
-//     * 서버체크전에 서버지원 언어인지 먼저 체크 하고,
-//     * 서버 지원 인 경우 온라인 여부를 체크,
-//     * 온라인이 아닐때, 오프라인 이면 오프라인 해제 요청
-//     * 오프라인이 아니면 온라인 켜라고 함
-//     */
+
+    /**
+     * 서버체크전에 서버지원 언어인지 먼저 체크 하고,
+     * 서버 지원 인 경우 온라인 여부를 체크,
+     * 온라인이 아닐때, 오프라인 이면 오프라인 해제 요청
+     * 오프라인이 아니면 온라인 켜라고 함
+     */
 //    fun onlineVRCheck(): NoticeModel? {
 //        CustomLogger.i("onlineVRCheck")
 //        if (!viewModel.getVrConfig().isSupportServer) {
@@ -170,42 +166,42 @@
 //        }
 //        return null
 //    }
-//
-//
-//    fun getServerErrPrompt(error: HVRError): NoticeModel {
-//
-//        when (error) {
-//            HVRError.ERROR_DIALOGUE_ASR_SERVER_NO_RESPONSE,
-//            HVRError.ERROR_DIALOGUE_ASR_SERVER_CONNECTION,
-//            HVRError.ERROR_DIALOGUE_ASR_SERVER_UNAVAILABLE,
-//            HVRError.ERROR_DIALOGUE_ASR_SERVER_RESPONSE -> {
-//                return NoticeModel().apply {
-//                    noticePromptId = "PID_CMN_COMM_02_17"
-//                    noticeString = getString(R.string.TID_CMN_COMM_02_17)
-//                }
-//            }
-//
-//            HVRError.ERROR_DIALOGUE_ASR_NETWORK_NO_SIGNAL -> {
-//                return NoticeModel().apply {
-//                    noticePromptId = "PID_CMN_COMM_02_18"
-//                    noticeString = getString(R.string.TID_CMN_COMM_02_18)
-//                }
-//            }
-//
-//            else -> {
-//                return NoticeModel().apply {
-//                    noticePromptId = "PID_CMN_COMM_02_17"
-//                    noticeString = getString(R.string.TID_CMN_COMM_02_17)
-//                }
-//            }
-//        }
-//
-//    }
-//
-//
-//    /**
-//     * 지원하지 않는 도메인 타입 안내
-//     */
+
+
+    fun getServerErrPrompt(error: HVRError): NoticeModel {
+
+        when (error) {
+            HVRError.ERROR_DIALOGUE_ASR_SERVER_NO_RESPONSE,
+            HVRError.ERROR_DIALOGUE_ASR_SERVER_CONNECTION,
+            HVRError.ERROR_DIALOGUE_ASR_SERVER_UNAVAILABLE,
+            HVRError.ERROR_DIALOGUE_ASR_SERVER_RESPONSE -> {
+                return NoticeModel().apply {
+                    noticePromptId = "PID_CMN_COMM_02_17"
+                    noticeString = getString(R.string.TID_CMN_COMM_02_17)
+                }
+            }
+
+            HVRError.ERROR_DIALOGUE_ASR_NETWORK_NO_SIGNAL -> {
+                return NoticeModel().apply {
+                    noticePromptId = "PID_CMN_COMM_02_18"
+                    noticeString = getString(R.string.TID_CMN_COMM_02_18)
+                }
+            }
+
+            else -> {
+                return NoticeModel().apply {
+                    noticePromptId = "PID_CMN_COMM_02_17"
+                    noticeString = getString(R.string.TID_CMN_COMM_02_17)
+                }
+            }
+        }
+
+    }
+
+
+    /**
+     * 지원하지 않는 도메인 타입 안내
+     */
 //    fun procUnknownDomain() {
 //        CustomLogger.i("")
 //        val noti = NoticeModel().apply {
@@ -214,12 +210,12 @@
 //        }
 //        launchNotice(noti, true)
 //    }
-//
-//
-//    /**
-//     * VR 오류 이벤트 처리
-//     * 현재 에러 타입, Dialog 타입에 따라 상황별 안내메세지 출력
-//     */
+
+
+    /**
+     * VR 오류 이벤트 처리
+     * 현재 에러 타입, Dialog 타입에 따라 상황별 안내메세지 출력
+     */
 //    override fun onVRError(error: HVRError) {
 //        CustomLogger.e(
 //            TAG,
@@ -256,16 +252,16 @@
 //        }
 //
 //    }
-//
-//
-//    fun getRandomList(list: List<String>): List<String> {
-//        val randomIndex = Random().nextInt(list.size)
-//        return listOf(list[randomIndex])
-//    }
-//
-//    /**
-//     * List타입 다이얼로그에서 의 리젝션 처리
-//     */
+
+
+    fun getRandomList(list: List<String>): List<String> {
+        val randomIndex = Random().nextInt(list.size)
+        return listOf(list[randomIndex])
+    }
+
+    /**
+     * List타입 다이얼로그에서 의 리젝션 처리
+     */
 //    open fun procListReject(context: MWContext) {
 //        CustomLogger.i("")
 //        context.rejectCnt++
@@ -306,10 +302,10 @@
 //            }
 //        }
 //    }
-//
-//    /**
-//     * 일반 타입의 dialog 리젝션 처리
-//     */
+
+    /**
+     * 일반 타입의 dialog 리젝션 처리
+     */
 //    open fun procReject(context: MWContext) {
 //        CustomLogger.i("")
 //        context.rejectCnt++
@@ -355,10 +351,10 @@
 //            }
 //        }
 //    }
-//
-//    /**
-//     * dialog 별 타임아웃 안내 문구를 가져온다.
-//     */
+
+    /**
+     * dialog 별 타임아웃 안내 문구를 가져온다.
+     */
 //    fun getTimeoutPrompt(dialog: DialogueMode): List<String>? {
 //        CustomLogger.i("")
 //        when (dialog) {
@@ -435,10 +431,10 @@
 //            }
 //        }
 //    }
-//
-//    /**
-//     * dialog 별 리젝션 안내 문구를 가져온다.
-//     */
+
+    /**
+     * dialog 별 리젝션 안내 문구를 가져온다.
+     */
 //    fun getRejectionPrompt(dialog: DialogueMode): List<String> {
 //        CustomLogger.i("")
 //
@@ -491,11 +487,11 @@
 //        }
 //
 //    }
-//
-//    /**
-//     * 리젝션 처리 시작 지점
-//     * 리스트 인경우 별도 안내 문구가 있으므로 분기 한다
-//     */
+
+    /**
+     * 리젝션 처리 시작 지점
+     * 리스트 인경우 별도 안내 문구가 있으므로 분기 한다
+     */
 //    open fun reject(promptId: List<String> = listOf()) {
 //        CustomLogger.i("")
 //        vrmwManager.currContext?.let {
@@ -510,10 +506,10 @@
 //            }
 //        }
 //    }
-//
-//    /**
-//     * 매니저에서 시스템 intent를 사용할 경우 대비
-//     */
+
+    /**
+     * 매니저에서 시스템 intent를 사용할 경우 대비
+     */
 //    open fun startIntent(intent: Intent, systemUser: Boolean = false) {
 //
 //        if (UserManager.supportsMultipleUsers()) {
@@ -543,13 +539,13 @@
 //            context.sendBroadcast(intent)
 //        }
 //    }
-//
-//    abstract fun init()
-//
-//
-//    /**
-//     * 사용불가 dialog 인지 체크 및 안내문구 반환
-//     */
+
+    abstract fun init()
+
+
+    /**
+     * 사용불가 dialog 인지 체크 및 안내문구 반환
+     */
 //    fun checkUnavailables(bundle: ParseBundle<out Any>): NoticeModel? {
 //        CustomLogger.i("")
 //
@@ -586,11 +582,11 @@
 //        CustomLogger.i("pass")
 //        return null
 //    }
-//
-//    /**
-//     * VR 결과 처리할때, 공통적으로 체크하는 항목
-//     * consume 플래그를 주어 consume이면 무시하는 로직 추가 필요
-//     */
+
+    /**
+     * VR 결과 처리할때, 공통적으로 체크하는 항목
+     * consume 플래그를 주어 consume이면 무시하는 로직 추가 필요
+     */
 //    override fun onReceiveBundle(bundle: ParseBundle<out Any>) {
 //        CustomLogger.i("BaseManager::onReceiveBundle")
 //        if (bundle.isBack) {
@@ -697,11 +693,11 @@
 //        }
 //
 //    }
-//
-//    /**
-//     * 조건상태가 맞지않은 경우에 발생시키는 에러 문구 출력및 종료
-//     * 안내문구 ID 가 없는 경우 음성출력 없이 문구만 출력 후 종료
-//     */
+
+    /**
+     * 조건상태가 맞지않은 경우에 발생시키는 에러 문구 출력및 종료
+     * 안내문구 ID 가 없는 경우 음성출력 없이 문구만 출력 후 종료
+     */
 //    open fun launchNotice(notice: NoticeModel, showError: Boolean, pendingEvent: Runnable? = null) {
 //        viewModel.addJob("launchNotice", interruptable = true) {
 //
@@ -745,7 +741,7 @@
 //            }
 //        }
 //    }
-//
+
 //    fun checkBootComplete(): NoticeModel? {
 //        if (!getSystemState().isVRReady()) {
 //            CustomLogger.e("checkBootComplete FALSE")
@@ -755,18 +751,18 @@
 //        }
 //        return null
 //    }
-//
+
 //    override fun onCancel() {
 //        CustomLogger.i("BaseManager::onCancel")
 //    }
-//
-//    fun getString(id: Int, vararg args: Any?): String {
-//        return String.format(context.getString(id), *args)
-//    }
-//
-//    fun getBluetoothState(): BluetoothState {
-//        return viewModel.bluetoothState
-//    }
+
+    fun getString(id: Int, vararg args: Any?): String {
+        return String.format(context.getString(id), *args)
+    }
+
+    fun getBluetoothState(): BluetoothState {
+        return bluetoothState
+    }
 //
 //    fun getSystemState(): SystemState {
 //        return viewModel.systemState
@@ -783,11 +779,11 @@
 //    fun getMWState(): MWState {
 //        return viewModel.mwState
 //    }
-//
-//    override fun toString(): String {
-//        return "HashCode[${this.hashCode()}], clsName[$TAG]"
-//    }
-//
+
+    override fun toString(): String {
+        return "HashCode[${this.hashCode()}], clsName[$TAG]"
+    }
+
 //    fun restartVR(): Boolean {
 //
 //        if (isBundleProcessing()) {
@@ -811,7 +807,7 @@
 //        }
 //        return false
 //    }
-//
+
 //    fun isBundleProcessing(): Boolean {
 //
 //        CustomLogger.e(
@@ -832,7 +828,7 @@
 //
 //        return false
 //    }
-//
+
 //    fun checkRestartVR(screenData: ScreenData?, mwState: MWState, uiState: UIState): Boolean {
 //        var mwContext: MWContext? = null
 //        screenData?.let { it ->
@@ -856,6 +852,6 @@
 //        }
 //        return false
 //    }
-//
-//    companion object
-//}
+
+    companion object
+}

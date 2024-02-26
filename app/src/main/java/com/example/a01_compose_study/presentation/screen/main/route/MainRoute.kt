@@ -1,5 +1,6 @@
 package com.example.a01_compose_study.presentation.screen.main.route
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -41,11 +42,14 @@ import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.components.button.PttButton
 import com.example.a01_compose_study.presentation.components.lottie.LottieAssetAnimationHandler
 import com.example.a01_compose_study.presentation.components.lottie.LottieRawAnimationHandler
+import com.example.a01_compose_study.presentation.data.ServiceState
+import com.example.a01_compose_study.presentation.data.UiState
 import com.example.a01_compose_study.presentation.screen.announce.AnnounceScreen
 import com.example.a01_compose_study.presentation.screen.help.screen.ComposeHelpScreen
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
 import com.example.a01_compose_study.presentation.screen.main.MainEvent
 import com.example.a01_compose_study.presentation.screen.main.MainViewModel
+import com.example.a01_compose_study.presentation.screen.main.VREvent
 import com.example.a01_compose_study.presentation.screen.ptt.ComposePttScreen
 import com.example.a01_compose_study.presentation.screen.ptt.PttEvent
 import com.example.a01_compose_study.presentation.screen.ptt.PttViewModel
@@ -63,7 +67,7 @@ fun MainRoute(
     val scope = rememberCoroutineScope()
     val multipleEventsCutter = remember { MultipleEventsCutter.get() }
 
-    val mwContext = MWContext(DialogueMode.MAINMENU)
+    val mwContext = ServiceState.mwContext
     val announceString by pttViewModel.announceString.collectAsStateWithLifecycle()
 
     /**
@@ -236,6 +240,14 @@ fun MainRoute(
                                     vrUiState = vrUiState,
                                     contentColor = Color.Gray,
                                     backgroundColor = Black2
+                                )
+                                UiState.onVREvent(
+                                    VREvent.ChangeVRUIEvent(
+                                        VRUiState.PttLoading(
+                                            active = true,
+                                            isError = false
+                                        )
+                                    )
                                 )
                             }
                         }

@@ -6,12 +6,13 @@ import com.example.a01_compose_study.domain.model.HelpVRData
 import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.util.ScreenSizeType
+import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class HelpManager {
+class HelpManager @Inject constructor() {
 
-    fun parsedData(bundle: ParseBundle<out Any>?): ProcHelpData {
+    fun parsedData(bundle: ParseBundle<out Any>): ProcHelpData {
         /**
          * ParseBundle<out Any>? 타입의 bundle을 HelpData로 파싱하는 로직이 담겨야함
          */

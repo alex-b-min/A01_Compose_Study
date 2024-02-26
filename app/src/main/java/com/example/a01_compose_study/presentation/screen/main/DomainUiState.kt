@@ -1,5 +1,6 @@
 package com.example.a01_compose_study.presentation.screen.main
 
+import com.example.a01_compose_study.data.Contact
 import com.example.a01_compose_study.domain.model.HelpItemData
 import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.model.SealedDomainType
@@ -41,6 +42,8 @@ sealed class DomainUiState(
     ) : DomainUiState(screenSizeType)
 
     data class CallWindow(
+        val data: List<Contact>,
+        val scrollIndex: Int?,
         override val screenSizeType: ScreenSizeType = ScreenSizeType.Zero,
     ) : DomainUiState(screenSizeType)
 

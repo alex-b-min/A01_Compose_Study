@@ -58,7 +58,7 @@ class VrmwManager @Inject constructor(
     val TAG: String? = this.javaClass.simpleName
     val gson = Gson()
     var vrResult: VRResult? = null
-    var currContext: MWContext? = MWContext(DialogueMode.MAINMENU) //MWContext의 DialogueMode의 값 임의의 값 넣음
+    var currContext: MWContext = ServiceState.mwContext //MWContext의 DialogueMode의 값 임의의 값 넣음
     private val languageCheckMap = mutableMapOf<String, CompletableDeferred<Any>>()
 
     var m_stateMachine: MwStateMachine = MwStateMachine()
@@ -103,16 +103,16 @@ class VrmwManager @Inject constructor(
                     return
                 }
             }
-            CustomLogger.i("setTTSState ${state.name} to ${currContext?.dialogueMode}")
+            CustomLogger.i("setTTSState ${state.name} to ${currContext.dialogueMode}")
             getMwState().ttsState.value = state
-            currContext?.onTTSState(state)
+            currContext.onTTSState(state)
         } catch (e: Exception) {
             e.message?.let { CustomLogger.e(it) }
         }
     }
 
     fun setVRState(state: HVRState, force: Boolean = false) {
-        CustomLogger.i("setVRState ${state.name} to ${currContext?.dialogueMode}")
+        CustomLogger.i("setVRState ${state.name} to ${currContext.dialogueMode}")
 
         if (!force) {
             if (getMwState().vrState.value == HVRState.TERMINATED) {
@@ -124,12 +124,12 @@ class VrmwManager @Inject constructor(
         if (state == HVRState.PREPARING) {
             getMwState().userSpeaking.value = false
         }
-        currContext?.onVRState(state)
+        currContext.onVRState(state)
     }
 
     fun setVRError(error: HVRError) {
 //        getMwState().vrError.value = (error)
-        currContext?.onVRError(error)
+        currContext.onVRError(error)
     }
 
     fun setVRResult(vrResult: VRResult) {
@@ -162,7 +162,7 @@ class VrmwManager @Inject constructor(
 
         val parsedVRResult: VRResult = gson.fromJson(vrResultJsonString, vrResultType)
 
-        currContext?.onVRResult(parsedVRResult)
+        currContext.onVRResult(parsedVRResult)
     }
 
 //    fun setTTSError(error: HTextToSpeechError) {
@@ -217,7 +217,7 @@ class VrmwManager @Inject constructor(
 
 
     fun cancel() {
-        currContext = null
+        currContext = ServiceState.updateMWContext(DialogueMode.NONE)
         setTTSState(HTextToSpeechState.IDLE)
         setVRState(HVRState.IDLE)
     }
@@ -256,7 +256,7 @@ class VrmwManager @Inject constructor(
     }
 
     fun resumeVR() {
-        currContext?.let {
+        currContext.let {
             StringManager.printSttString("")
             controller.callRecogStart(
                 it.dialogueMode.value, guidanceType = HVRGuidanceType.BEEP_START
@@ -271,7 +271,7 @@ class VrmwManager @Inject constructor(
 //      stop()
         CustomLogger.i("startVR")
         setContext(mwContext)
-        currContext?.let { context ->
+        currContext.let { context ->
             CustomLogger.i("currScenario set ${context.dialogueMode}")
             CustomLogger.i("currScenario run ${context.dialogueMode.value}")
             CustomLogger.i("mwContext.promptId ${mwContext.promptId}")
@@ -404,7 +404,7 @@ class VrmwManager @Inject constructor(
     }
 
     fun validateBundle(hashCode: Int): Boolean {
-        return currContext?.hashCode() == hashCode
+        return currContext.hashCode() == hashCode
     }
 
 //    fun printAnnounceString(string: String) {

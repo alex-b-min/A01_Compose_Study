@@ -27,11 +27,22 @@ object UiState {
     val _VRUiState = MutableStateFlow<VRUiState>(VRUiState.PttNone(active = false, isError = false))
     val vrUiState: StateFlow<VRUiState> = _VRUiState
 
-
+    /**
+     * 화면을 스택에 쌓음
+     */
     fun pushUiState(uiState: DomainUiState) {
         _domainUiStateStack.add(uiState)
         _domainUiStateStack.forEachIndexed { index, domainUiState ->
             Log.d("@@ _domainUiStateStack", "index: $index / data: $domainUiState")
+        }
+    }
+
+    /**
+     * 화면을 스택에 쌓지 않고 변화만 시킴
+     */
+    fun changeUiState(uiState: DomainUiState) {
+        _domainUiState.update { domainUiState ->
+            uiState.copyWithNewSizeType(domainUiState.screenSizeType)
         }
     }
 
@@ -55,5 +66,9 @@ object UiState {
                 }
             }
         }
+    }
+
+    fun getCurrDomainUiState(): StateFlow<DomainUiState> {
+        return domainUiState
     }
 }

@@ -7,12 +7,18 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.a01_compose_study.data.custom.DataProducer
 import com.example.a01_compose_study.presentation.screen.main.route.MainRoute
 import com.example.a01_compose_study.ui.theme.A01_Compose_StudyTheme
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var dataProducer: DataProducer
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -20,6 +26,8 @@ class MainActivity : ComponentActivity() {
                 MainRoute()
             }
         }
+
+//        dataProducer.managerInit()
     }
 }
 

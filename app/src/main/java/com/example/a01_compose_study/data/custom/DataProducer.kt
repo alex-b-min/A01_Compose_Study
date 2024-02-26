@@ -1,15 +1,13 @@
 package com.example.a01_compose_study.data.custom
 
 import android.util.Log
+import androidx.room.PrimaryKey
 import com.example.a01_compose_study.data.DialogueMode
-import com.example.a01_compose_study.data.HTextToSpeechState
-import com.example.a01_compose_study.data.HVRError
-import com.example.a01_compose_study.data.HVRState
 import com.example.a01_compose_study.data.VRResult
 import com.example.a01_compose_study.data.analyze.ParseDomainType
 import com.example.a01_compose_study.data.analyze.ParserFactory
-import com.example.a01_compose_study.domain.model.BaseManager
-import com.example.a01_compose_study.domain.util.CustomLogger
+import com.example.a01_compose_study.data.custom.call.CallManager
+import com.example.a01_compose_study.presentation.data.ServiceState
 import com.example.a01_compose_study.presentation.data.UiState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -18,16 +16,19 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 
-class MWContext(
-    val dialogueMode: DialogueMode,
+@Singleton
+class DataProducer @Inject constructor(
+    val helpManager: HelpManager,
+    val callManager: CallManager
 ) {
-    var dataProducer: DataProducer? = null
 
-    var vrState = HVRState.IDLE
-    var ttsState = HTextToSpeechState.IDLE
-    var promptId = mutableListOf<String>()
+    init {
+        managerInit()
+    }
 
-    var isSubContext = false
+    private fun managerInit() {
+        ServiceState.mwContext.dataProducer = this
+    }
 
     /**
      * 파싱된 데이터를 하나로 묶기 위한 StateFlow 타입의 sealedParsedData 전역변수
@@ -36,44 +37,6 @@ class MWContext(
     val sealedParsedData: SharedFlow<SealedParsedData> = UiState._sealedParsedData
 
     private val job = CoroutineScope(Dispatchers.Default)
-
-    init {
-        isSubContext = when (dialogueMode) {
-            DialogueMode.YESNO,
-            DialogueMode.CALLNAME,
-            DialogueMode.LIST,
-            -> {
-                true
-            }
-
-            else -> {
-                false
-            }
-        }
-    }
-
-    fun onTTSState(state: HTextToSpeechState) {
-        CustomLogger.i("setTTSState ${state.name}")
-        ttsState = state
-
-    }
-
-    fun onVRState(state: HVRState) {
-        CustomLogger.i("setVRState ${state.name}")
-        vrState = state
-
-    }
-
-    fun onVRError(error: HVRError) {
-        /**
-         * Error가 발생하는 상황에 대해,
-         * - 발화를 했을 때 인식하지 못할 때의 오류일 때(PTT 화면을 빨갛게 띄웠다가 다시 파란색으로 띄워야함
-         * - Domain Window 화면을 성공적으로 띄우고 나서의 오류일 때도 있나..?
-         */
-        job.launch {
-            _sealedParsedData.emit(SealedParsedData.ErrorData(error))
-        }
-    }
 
     fun onVRResult(vrResult: VRResult) {
         val bundle = ParserFactory().dataParsing(vrResult, dialogueMode = DialogueMode.HELP)
@@ -89,18 +52,15 @@ class MWContext(
                  * 참고로 Help의 경우,
                  * domainType/screenType/screenSizeType/data 의 데이터를 가져야하므로 ProcHelpData라는 데이터 클래스를 한 개 생성함
                  */
-                val procHelpData = dataProducer?.helpManager?.parsedData(bundle)
+                val procHelpData = helpManager.parsedData(bundle)
                 job.launch {
-                    procHelpData?.let { SealedParsedData.HelpData(it) }
-                        ?.let { _sealedParsedData.emit(it) }
+                    _sealedParsedData.emit(SealedParsedData.HelpData(procHelpData))
                 }
             }
-
             ParseDomainType.CALL -> {
-                val procCallData = dataProducer?.callManager?.parsedData(bundle)
+                val procHelpData = helpManager.parsedData(bundle)
                 job.launch {
-                    procCallData?.let { SealedParsedData.CallData(it) }
-                        ?.let { _sealedParsedData.emit(it) }
+                    _sealedParsedData.emit(SealedParsedData.HelpData(procHelpData))
                 }
             }
 

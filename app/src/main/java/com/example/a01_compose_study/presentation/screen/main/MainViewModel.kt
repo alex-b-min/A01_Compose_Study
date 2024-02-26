@@ -9,6 +9,7 @@ import com.example.a01_compose_study.domain.model.HelpItemData
 import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.util.ScreenSizeType
+import com.example.a01_compose_study.presentation.data.ServiceState
 import com.example.a01_compose_study.presentation.data.UiState
 import com.example.a01_compose_study.presentation.screen.main.route.VRUiState
 import com.example.a01_compose_study.presentation.screen.ptt.VrmwManager
@@ -178,7 +179,8 @@ class MainViewModel @Inject constructor(
 
                         SealedDomainType.Call -> {
                             DomainUiState.CallWindow(
-
+                                data = emptyList(),
+                                scrollIndex = 3,
                             )
                         }
 
