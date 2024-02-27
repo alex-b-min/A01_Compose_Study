@@ -2,7 +2,6 @@ package com.example.a01_compose_study.presentation.screen.ptt
 
 import android.content.Context
 import android.os.LocaleList
-import android.util.Log
 import com.example.a01_compose_study.data.DialogueMode
 import com.example.a01_compose_study.data.HLanguageType
 import com.example.a01_compose_study.data.HTextToSpeechError
@@ -30,6 +29,7 @@ import com.example.a01_compose_study.domain.state.MWState
 import com.example.a01_compose_study.domain.util.CustomLogger
 import com.example.a01_compose_study.domain.util.G2PController
 import com.example.a01_compose_study.presentation.data.ServiceState
+import com.example.a01_compose_study.presentation.screen.main.CustomVRResult
 import com.example.a01_compose_study.presentation.util.StringManager
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -132,7 +132,7 @@ class VrmwManager @Inject constructor(
         currContext.onVRError(error)
     }
 
-    fun setVRResult(vrResult: VRResult) {
+    fun setVRResult(vrResult: VRResult, customVRResult: CustomVRResult) {
         /**
          * onVRResult() 로부터 vrResult를 전달받는것을 가정
          */
@@ -162,7 +162,7 @@ class VrmwManager @Inject constructor(
 
         val parsedVRResult: VRResult = gson.fromJson(vrResultJsonString, vrResultType)
 
-        currContext.onVRResult(parsedVRResult)
+        currContext.onVRResult(parsedVRResult, customVRResult)
     }
 
 //    fun setTTSError(error: HTextToSpeechError) {
@@ -685,7 +685,7 @@ class VrmwManager @Inject constructor(
         }
         var tmpResult = result
         CoroutineScope(Dispatchers.Default).launch {
-            vrResult?.let { setVRResult(it) }
+//            vrResult?.let { setVRResult(it) }
         }
     }
 

@@ -1,5 +1,6 @@
-package com.example.a01_compose_study.presentation.screen.call
+package com.example.a01_compose_study.presentation.screen.call.screen
 
+import android.util.Log
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -18,6 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -31,7 +33,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -42,19 +43,34 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.a01_compose_study.R
 import com.example.a01_compose_study.data.Contact
-import com.example.a01_compose_study.domain.model.HelpItemData
-import com.example.a01_compose_study.presentation.screen.help.screen.HelpListItem
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
 fun CallList(
     contactList: List<Contact>,
+    selectedIndex: Int? = null,
     vrDynamicBackground: Color,
     fixedBackground: Color,
+    onCalling: () -> Unit,
     onItemClick: (Contact) -> Unit,
 ) {
-    LazyColumn() {
+    Log.d("@@ selectedIndex 실행횟수", "${selectedIndex}")
+    val scrollState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
+
+    if (selectedIndex != null) {
+        coroutineScope.launch {
+            scrollState.scrollToItem(selectedIndex-1)
+            delay(200)
+            onCalling()
+        }
+    } else {
+        coroutineScope.launch {
+            scrollState.scrollToItem(0)
+        }
+    }
+    LazyColumn(state = scrollState) {
         itemsIndexed(contactList) { index, callItem ->
             CallListItem(
                 contactItem = callItem,

@@ -3,6 +3,7 @@ package com.example.a01_compose_study.presentation.screen.main
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.a01_compose_study.data.Contact
 import com.example.a01_compose_study.data.HVRError
 import com.example.a01_compose_study.data.custom.SealedParsedData
 import com.example.a01_compose_study.data.custom.call.ProcCallData
@@ -24,7 +25,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     val vrmwManager: VrmwManager, // MainViewModel에서 필요한 이유는, 음성인식 결과를 직접적으로 생성하기 위해
-) : ViewModel() {
+    ) : ViewModel() {
 
     private val sealedParsedData: SharedFlow<SealedParsedData> = UiState._sealedParsedData
 
@@ -121,11 +122,23 @@ class MainViewModel @Inject constructor(
                             }
                             is ProcCallData.RecognizedContactListScreen -> {
                                 Log.d("@@ ProcCallData", "ContactListScreen - Contact List: ${sealedParsedData.procCallData.data}")
+                                onDomainEvent(
+                                    event = MainEvent.OpenDomainWindowEvent(
+                                        domainType = sealedParsedData.procCallData.sealedDomainType,
+                                        screenType = sealedParsedData.procCallData.screenType,
+                                        data = sealedParsedData.procCallData.data,
+                                        isError = false,
+                                        screenSizeType = sealedParsedData.procCallData.screenSizeType,
+                                    )
+                                )
                             }
                             is ProcCallData.AllContactListScreen -> {
                                 Log.d("@@ ProcCallData", "FullContactListScreen - Full Contact List: ${sealedParsedData.procCallData.data}")
                             }
                             is ProcCallData.ScrollIndex -> {
+                                if (sealedParsedData.procCallData.index != null) {
+                                    onDomainEvent(MainEvent.ChangeScrollIndexEvent(sealedParsedData.procCallData.index))
+                                }
                                 Log.d("@@ ProcCallData", "ScrollIndex - Index: ${sealedParsedData.procCallData.index}")
                             }
                             is ProcCallData.ProcYesNoOtherNumberResult -> {
@@ -133,7 +146,6 @@ class MainViewModel @Inject constructor(
                             }
                         }
                     }
-
                     else -> {
                     }
                 }
@@ -200,16 +212,21 @@ class MainViewModel @Inject constructor(
                             )
                         }
 
-                        SealedDomainType.MainMenu -> {
-                            DomainUiState.DomainMenuWindow(
-
+                        SealedDomainType.Call -> {
+                            val contactList = event.data as? List<Contact> ?: emptyList()
+                            Log.d("@@ contactList", "${contactList}")
+                            Log.d("@@ event", "${event}")
+                            DomainUiState.CallWindow(
+                                domainType = event.domainType,
+                                screenType = event.screenType,
+                                screenSizeType = event.screenSizeType,
+                                data = contactList,
                             )
                         }
 
-                        SealedDomainType.Call -> {
-                            DomainUiState.CallWindow(
-                                data = emptyList(),
-                                scrollIndex = 3,
+                        SealedDomainType.MainMenu -> {
+                            DomainUiState.DomainMenuWindow(
+
                             )
                         }
 
@@ -235,6 +252,12 @@ class MainViewModel @Inject constructor(
                 }
                 UiState.pushUiState(domainUiState.value)
             }
+            is MainEvent.ChangeScrollIndexEvent -> {
+                Log.d("@@  MainEvent.ChangeScrollIndexEvent", "수행 / ${event.selectedScrollIndex}")
+                _domainUiState.update { domainUiState ->
+                    domainUiState.copyWithNewScrollIndex(event.selectedScrollIndex)!!
+                }
+            }
         }
     }
 
@@ -257,6 +280,4 @@ class MainViewModel @Inject constructor(
     fun openDomainWindow() {
         _domainWindowVisible.value = true
     }
-
-
 }

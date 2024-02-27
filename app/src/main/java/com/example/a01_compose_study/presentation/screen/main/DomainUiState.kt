@@ -37,13 +37,17 @@ sealed class DomainUiState(
         override val screenSizeType: ScreenSizeType = ScreenSizeType.Small,
     ) : DomainUiState(screenSizeType)
 
-    data class DomainMenuWindow(
-        override val screenSizeType: ScreenSizeType = ScreenSizeType.Zero,
+    data class CallWindow(
+        val domainType: SealedDomainType,
+        val data: List<Contact>,
+        val detailData: Contact = Contact(),
+        val scrollIndex: Int? = null,
+        override val  screenType: ScreenType,
+        override val screenSizeType: ScreenSizeType,
     ) : DomainUiState(screenSizeType)
 
-    data class CallWindow(
-        val data: List<Contact>,
-        val scrollIndex: Int? = null,
+
+    data class DomainMenuWindow(
         override val screenSizeType: ScreenSizeType = ScreenSizeType.Zero,
     ) : DomainUiState(screenSizeType)
 
@@ -75,6 +79,14 @@ sealed class DomainUiState(
             is RadioWindow -> copy(screenSizeType = sizeType)
             is WeatherWindow -> copy(screenSizeType = sizeType)
             is SendMessageWindow -> copy(screenSizeType = sizeType)
+        }
+    }
+
+    fun copyWithNewScrollIndex(scrollIndex: Int): CallWindow? {
+        return if (this is CallWindow) {
+            copy(scrollIndex = scrollIndex)
+        } else {
+            null
         }
     }
 }

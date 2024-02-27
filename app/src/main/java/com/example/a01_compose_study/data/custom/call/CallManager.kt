@@ -52,6 +52,7 @@ class CallManager @Inject constructor(
             DialogueMode.LIST -> {
                 Log.d("@@ dialogueMode : ", "${DialogueMode.LIST}")
                 val commonModel = bundle.model as? CommonModel
+                commonModel?.index = 5 //임의로 발화 결과인 라인 넘버의 값을 할당함
 
                 commonModel?.let {
                     procListIntention(it)
@@ -123,12 +124,12 @@ class CallManager @Inject constructor(
                      * 인식된 이름을 통해 생성된 전화번호부 목록을 더미 데이터로 할당 하도록 함
                      */
 //                    val recognizedList : List<Contact> = emptyList() //인식된 전화번호부 목록 없음
-//                    val recognizedList : List<Contact> = fetchAllContacts() //인식된 전화번호부 목록 여러개
-                    val recognizedList : List<Contact> = fetchRecognizedContacts(1) //인식된 전화번호부 목록 1개
+                    val recognizedList : List<Contact> = fetchAllContacts() //인식된 전화번호부 목록 여러개
+//                    val recognizedList : List<Contact> = fetchRecognizedContacts(1) //인식된 전화번호부 목록 1개
 
                     // 인식된 이름으로 매칭되는 연락처가 여러개인 경우
                     if (recognizedList.size > 1) {
-                        return ProcCallData.RecognizedContactListScreen(data = fetchRecognizedContacts(5)) // 인덱스가 존재하는 전화번호부 목록 반환[DomainType.Call / ScreenType.List]
+                        return ProcCallData.RecognizedContactListScreen(data = fetchRecognizedContacts(10)) // 인덱스가 존재하는 전화번호부 목록 반환[DomainType.Call / ScreenType.List]
                         TODO("startVR(MWContext(DailogueMode.LIST) 실행")
                         // 인식된 이름으로 매칭되는 연락처가 없는 경우
                     } else if (recognizedList.isEmpty()) {
@@ -172,12 +173,12 @@ class CallManager @Inject constructor(
                     return if (callModel.data.size < serverIndex) {
                         ProcCallData.ListTTSRequest(promptId = "PID_CMN_COMM_02_31")
                     } else {
-                        ProcCallData.ScrollIndex(index = 3)
+                        ProcCallData.ScrollIndex(index = 5)
                     }
                 }
             }
         }
-        return ProcCallData.ScrollIndex(index = null)
+        return ProcCallData.ListTTSRequest(promptId = "PID_CMN_COMM_02_31")
     }
 
     /**

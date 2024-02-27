@@ -1,5 +1,6 @@
 package com.example.a01_compose_study.presentation.screen.main.route
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -42,8 +43,9 @@ import com.example.a01_compose_study.presentation.components.lottie.LottieRawAni
 import com.example.a01_compose_study.presentation.data.ServiceState
 import com.example.a01_compose_study.presentation.data.UiState
 import com.example.a01_compose_study.presentation.screen.announce.AnnounceScreen
-import com.example.a01_compose_study.presentation.screen.call.CallScreen
+import com.example.a01_compose_study.presentation.screen.call.screen.CallScreen
 import com.example.a01_compose_study.presentation.screen.help.screen.ComposeHelpScreen
+import com.example.a01_compose_study.presentation.screen.main.CustomVRResult
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
 import com.example.a01_compose_study.presentation.screen.main.MainEvent
 import com.example.a01_compose_study.presentation.screen.main.MainViewModel
@@ -133,6 +135,9 @@ fun MainRoute(
         /**
          * 하나의 AnimatedVisibility() 안에 여러 Window를 구성
          */
+        Log.d("@@ @@ dui","${domainUiState}")
+        Log.d("@@ @@ dwv","${domainWindowVisibleState}")
+
         AnimatedVisibility(
             visible = domainWindowVisibleState,
             modifier = Modifier.fillMaxWidth(),
@@ -145,6 +150,8 @@ fun MainRoute(
                 animationSpec = tween(1000)
             )
         ) {
+            Log.d("@@ @@ dui222","${domainUiState}")
+            Log.d("@@ @@ dwv222","${domainWindowVisibleState}")
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.BottomStart
@@ -186,6 +193,7 @@ fun MainRoute(
                                 when (vrUiState) {
                                     is VRUiState.PttNone -> {
                                     }
+
                                     is VRUiState.PttLoading -> {
                                         LottieRawAnimationHandler(
                                             modifier = Modifier.fillMaxSize(),
@@ -195,6 +203,7 @@ fun MainRoute(
                                             }
                                         )
                                     }
+
                                     is VRUiState.PttListen -> {
                                         LottieRawAnimationHandler(
                                             modifier = Modifier.fillMaxSize(),
@@ -218,7 +227,8 @@ fun MainRoute(
                             }
                         }
                     }
-
+                    Log.d("@@ @@ dui333","${domainUiState}")
+                    Log.d("@@ @@ dwv333","${domainWindowVisibleState}")
                     when (domainUiState) {
                         is DomainUiState.NoneWindow -> {
                         }
@@ -232,6 +242,7 @@ fun MainRoute(
                         }
 
                         is DomainUiState.HelpWindow -> {
+                            Log.d("@@ HelpWindow 진입", "몇번 실행?")
                             Box(modifier = Modifier.fillMaxSize()) {
                                 ComposeHelpScreen(
                                     domainUiState = domainUiState as DomainUiState.HelpWindow,
@@ -251,10 +262,12 @@ fun MainRoute(
                         }
 
                         is DomainUiState.AnnounceWindow -> {
+                            Log.d("@@ AnnounceWindow 진입", "몇번 실행?")
                             AnnounceScreen((domainUiState as DomainUiState.AnnounceWindow).text)
                         }
 
                         is DomainUiState.CallWindow -> {
+                            Log.d("@@ CallWindow 진입", "몇번 실행?")
                             Box(modifier = Modifier.fillMaxSize()) {
                                 CallScreen(
                                     domainUiState = domainUiState as DomainUiState.CallWindow,
@@ -262,6 +275,7 @@ fun MainRoute(
                                     vrDynamicBackground = if (vrUiState.active) Color.Transparent else Color.Black,
                                     fixedBackground = Black2
                                 )
+
 //                                UiState.onVREvent(
 //                                    VREvent.ChangeVRUIEvent(
 //                                        VRUiState.PttLoading(
@@ -398,15 +412,30 @@ fun MainRoute(
                 modifier = Modifier
                     .fillMaxWidth(0.13f)
                     .fillMaxHeight(0.2f),
-                contentText = "VR Result",
+                contentText = "VR Call Index List Result",
                 onClick = {
                     multipleEventsCutter.processEvent {
                     }
                     scope.launch {
-                        viewModel.vrmwManager.setVRResult(VRResult())
+                        viewModel.vrmwManager.setVRResult(VRResult(), CustomVRResult.CallIndexListResult)
                     }
                 }
             )
+
+            PttButton(
+                modifier = Modifier
+                    .fillMaxWidth(0.13f)
+                    .fillMaxHeight(0.2f),
+                contentText = "VR Line Number Result",
+                onClick = {
+                    multipleEventsCutter.processEvent {
+                    }
+                    scope.launch {
+                        viewModel.vrmwManager.setVRResult(VRResult(), CustomVRResult.ScrollIndexResult)
+                    }
+                }
+            )
+
 
             PttButton(
                 modifier = Modifier
@@ -535,6 +564,25 @@ fun MainRoute(
 //                    )
 //                }
 //            )
+
+            PttButton(
+                modifier = Modifier.fillMaxWidth(0.1f).fillMaxHeight(0.13f),
+                contentText = "Change ScrollIndex 5",
+                onClick = {
+                    viewModel.onDomainEvent(
+                        MainEvent.ChangeScrollIndexEvent(5)
+                    )
+                }
+            )
+            PttButton(
+                modifier = Modifier.fillMaxWidth(0.1f).fillMaxHeight(0.13f),
+                contentText = "Change ScrollIndex 10",
+                onClick = {
+                    viewModel.onDomainEvent(
+                        MainEvent.ChangeScrollIndexEvent(10)
+                    )
+                }
+            )
         }
     }
 }

@@ -8,15 +8,13 @@ import com.example.a01_compose_study.data.HVRState
 import com.example.a01_compose_study.data.VRResult
 import com.example.a01_compose_study.data.analyze.ParseDomainType
 import com.example.a01_compose_study.data.analyze.ParserFactory
-import com.example.a01_compose_study.domain.model.BaseManager
 import com.example.a01_compose_study.domain.util.CustomLogger
 import com.example.a01_compose_study.presentation.data.UiState
+import com.example.a01_compose_study.presentation.screen.main.CustomVRResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
-import javax.inject.Singleton
 
 class MWContext(
     val dialogueMode: DialogueMode,
@@ -75,12 +73,15 @@ class MWContext(
         }
     }
 
-    fun onVRResult(vrResult: VRResult) {
-//        val bundle = ParserFactory().dataParsing(vrResult, dialogueMode = DialogueMode.HELP)
-//        bundle?.type = ParseDomainType.HELP
+    fun onVRResult(vrResult: VRResult, customVRResult: CustomVRResult) {
+        val bundle = ParserFactory().dataParsing(vrResult, dialogueMode = DialogueMode.HELP)
+        bundle?.type = ParseDomainType.HELP
 
-        val bundle = ParserFactory().dataParsing(vrResult, dialogueMode = DialogueMode.CALL)
-        bundle?.type = ParseDomainType.CALL
+//        val bundle = when(customVRResult){
+//            CustomVRResult.CallIndexListResult -> ParserFactory().dataParsing(vrResult, dialogueMode = DialogueMode.CALL)
+//            CustomVRResult.ScrollIndexResult -> ParserFactory().dataParsing(vrResult, dialogueMode = DialogueMode.LIST)
+//        }
+//        bundle?.type = ParseDomainType.CALL
 
         when (bundle?.type) {
             ParseDomainType.HELP -> {
