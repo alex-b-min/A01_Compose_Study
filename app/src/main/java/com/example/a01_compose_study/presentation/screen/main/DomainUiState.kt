@@ -43,7 +43,7 @@ sealed class DomainUiState(
 
     data class CallWindow(
         val data: List<Contact>,
-        val scrollIndex: Int?,
+        val scrollIndex: Int? = null,
         override val screenSizeType: ScreenSizeType = ScreenSizeType.Zero,
     ) : DomainUiState(screenSizeType)
 

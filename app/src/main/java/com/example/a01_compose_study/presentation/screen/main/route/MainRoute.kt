@@ -1,6 +1,5 @@
 package com.example.a01_compose_study.presentation.screen.main.route
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -32,10 +31,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.a01_compose_study.R
-import com.example.a01_compose_study.data.DialogueMode
 import com.example.a01_compose_study.data.HVRError
 import com.example.a01_compose_study.data.VRResult
-import com.example.a01_compose_study.data.custom.MWContext
 import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.util.ScreenSizeType
@@ -45,6 +42,7 @@ import com.example.a01_compose_study.presentation.components.lottie.LottieRawAni
 import com.example.a01_compose_study.presentation.data.ServiceState
 import com.example.a01_compose_study.presentation.data.UiState
 import com.example.a01_compose_study.presentation.screen.announce.AnnounceScreen
+import com.example.a01_compose_study.presentation.screen.call.CallScreen
 import com.example.a01_compose_study.presentation.screen.help.screen.ComposeHelpScreen
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
 import com.example.a01_compose_study.presentation.screen.main.MainEvent
@@ -256,11 +254,26 @@ fun MainRoute(
                             AnnounceScreen((domainUiState as DomainUiState.AnnounceWindow).text)
                         }
 
-                        is DomainUiState.DomainMenuWindow -> {
-
+                        is DomainUiState.CallWindow -> {
+                            Box(modifier = Modifier.fillMaxSize()) {
+                                CallScreen(
+                                    domainUiState = domainUiState as DomainUiState.CallWindow,
+                                    vrUiState = vrUiState,
+                                    vrDynamicBackground = if (vrUiState.active) Color.Transparent else Color.Black,
+                                    fixedBackground = Black2
+                                )
+//                                UiState.onVREvent(
+//                                    VREvent.ChangeVRUIEvent(
+//                                        VRUiState.PttLoading(
+//                                            active = true,
+//                                            isError = false
+//                                        )
+//                                    )
+//                                )
+                            }
                         }
 
-                        is DomainUiState.CallWindow -> {
+                        is DomainUiState.DomainMenuWindow -> {
 
                         }
 

@@ -5,11 +5,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.a01_compose_study.data.HVRError
 import com.example.a01_compose_study.data.custom.SealedParsedData
+import com.example.a01_compose_study.data.custom.call.ProcCallData
 import com.example.a01_compose_study.domain.model.HelpItemData
 import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.util.ScreenSizeType
-import com.example.a01_compose_study.presentation.data.ServiceState
 import com.example.a01_compose_study.presentation.data.UiState
 import com.example.a01_compose_study.presentation.screen.main.route.VRUiState
 import com.example.a01_compose_study.presentation.screen.ptt.VrmwManager
@@ -103,6 +103,35 @@ class MainViewModel @Inject constructor(
                                 screenSizeType = sealedParsedData.procHelpData.screenSizeType,
                             )
                         )
+                    }
+
+                    is SealedParsedData.CallData -> {
+                        when (sealedParsedData.procCallData) {
+                            is ProcCallData.RejectRequest -> {
+                                Log.d("@@ ProcCallData", "RejectRequest")
+                            }
+                            is ProcCallData.ListTTSRequest -> {
+                                Log.d("@@ ProcCallData", "ListTTSRequest - Prompt ID: ${sealedParsedData.procCallData.promptId}")
+                            }
+                            is ProcCallData.NoticeTTSRequest -> {
+                                Log.d("@@ ProcCallData", "NoticeTTSRequest - Notice Model: ${sealedParsedData.procCallData.noticeModel}")
+                            }
+                            is ProcCallData.ProcCallNameScreen -> {
+                                Log.d("@@ ProcCallData", "ProcCallNameScreen - Contact: ${sealedParsedData.procCallData.data}")
+                            }
+                            is ProcCallData.RecognizedContactListScreen -> {
+                                Log.d("@@ ProcCallData", "ContactListScreen - Contact List: ${sealedParsedData.procCallData.data}")
+                            }
+                            is ProcCallData.AllContactListScreen -> {
+                                Log.d("@@ ProcCallData", "FullContactListScreen - Full Contact List: ${sealedParsedData.procCallData.data}")
+                            }
+                            is ProcCallData.ScrollIndex -> {
+                                Log.d("@@ ProcCallData", "ScrollIndex - Index: ${sealedParsedData.procCallData.index}")
+                            }
+                            is ProcCallData.ProcYesNoOtherNumberResult -> {
+                                Log.d("@@ ProcCallData", "YesNoOtherNumberResultProc - Result: ${sealedParsedData.procCallData.callYesNoOtherNumberResult}")
+                            }
+                        }
                     }
 
                     else -> {

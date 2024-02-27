@@ -8,9 +8,9 @@ sealed class ProcCallData {
     object RejectRequest : ProcCallData()
     data class ListTTSRequest(val promptId: String) : ProcCallData()
     data class NoticeTTSRequest(val noticeModel: NoticeModel) : ProcCallData()
-    data class ProcCallNameScreen(val data: Contact) : ProcCallData()
-    data class ContactListScreen(val data: List<Contact>) : ProcCallData()
-    data class FullContactListScreen(val data: List<Contact>) : ProcCallData()
+    data class ProcCallNameScreen(val data: Contact) : ProcCallData() // CallName 화면
+    data class RecognizedContactListScreen(val data: List<Contact>) : ProcCallData() // 인식된 전화번호부
+    data class AllContactListScreen(val data: List<Contact>) : ProcCallData() // 전체 전화번호부
     data class ScrollIndex(val index: Int?) : ProcCallData()
-    data class YesNoOtherNumberResultProc(val callYesNoOtherNumberResult: CallYesNoOtherNumberResult) : ProcCallData()
+    data class ProcYesNoOtherNumberResult(val callYesNoOtherNumberResult: CallYesNoOtherNumberResult) : ProcCallData()
 }

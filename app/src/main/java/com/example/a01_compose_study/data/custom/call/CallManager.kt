@@ -1,6 +1,7 @@
 package com.example.a01_compose_study.data.custom.call
 
 import android.content.Context
+import android.util.Log
 import com.example.a01_compose_study.R
 import com.example.a01_compose_study.data.Contact
 import com.example.a01_compose_study.data.DialogueMode
@@ -32,19 +33,24 @@ class CallManager @Inject constructor(
 
         return when (bundle.dialogueMode) {
             DialogueMode.CALL -> {
-                val callModel = bundle.model as? CallModel
+                Log.d("@@ dialogueMode : ", "${DialogueMode.CALL}")
 
-                callModel?.let {
-                    val appleCarPlayNoticeModel = createAppleCarPlayNoticeModel(context)
-                    val bluetoothProcessingNoticeModel = createBluetoothProcessingNoticeModel(context)
-                    val bluetoothNotConnectedNotPairingNoticeModel = createBluetoothNotConnectedNotPairingNoticeModel(context)
-                    val bluetoothNotConnectedYesPairingNoticeModel = createBluetoothNotConnectedYesPairingNoticeModel(context)
-                    procCallIntention(it, appleCarPlayNoticeModel, fetchContacts())
+                val callModel = CallModel("Sample Intent") //bundle의 model 값을 이용하는게 아닌 임의로 직접 CallModel을 생성해서 테스트함
+                callModel.items = fetchMutableRecognizedContacts(1)
+                Log.d("@@ CallModel", "${callModel}")
+
+                callModel.let {
+                    procCallIntention(
+                        callModel = it
+                    )
                 } ?: run {
+                    Log.d("@@ Call", "reject")
                     return ProcCallData.RejectRequest
                 }
             }
+
             DialogueMode.LIST -> {
+                Log.d("@@ dialogueMode : ", "${DialogueMode.LIST}")
                 val commonModel = bundle.model as? CommonModel
 
                 commonModel?.let {
@@ -53,16 +59,19 @@ class CallManager @Inject constructor(
                     return ProcCallData.RejectRequest
                 }
             }
-            DialogueMode.CALLNAME -> {
-                val commonModel = bundle.model as? CommonModel
 
-                commonModel?.let {
+            DialogueMode.CALLNAME -> {
+                Log.d("@@ dialogueMode : ", "${DialogueMode.CALLNAME}")
+                val commonModel = CommonModel("Yes") //bundle의 model 값을 이용하는게 아닌 임의로 직접 CommonModel을 생성해서 테스트함
+                commonModel.let {
                     procYesNoIntention(it)
                 } ?: run {
                     return ProcCallData.RejectRequest
                 }
             }
+
             else -> {
+                Log.d("@@ dialogueMode : ", "아무것도 아님")
                 return ProcCallData.RejectRequest
             }
         }
@@ -74,8 +83,6 @@ class CallManager @Inject constructor(
      */
     private fun procCallIntention(
         callModel: CallModel,
-        noticeModel: NoticeModel?,
-        tempList: List<Contact>,
     ): ProcCallData {
         /**
          * 1. 전화가 가능한 상태인지 조건 확인
@@ -85,14 +92,24 @@ class CallManager @Inject constructor(
          * 2-3. [인식된 이름 없음]: 전체 전화번호부 목록 화면 띄우기(전체 전화번호부 List 데이터 반환)
          */
 
+        Log.d("@@ callModel Size", "${callModel.items.size}")
         callModel.run {
             val notice = contactsManager.preConditionCheck(DomainType.Call)
 
-            if (noticeModel != null) {
-                // 오류 출력 안내(tts 요청도 해주어야함)
-                return ProcCallData.NoticeTTSRequest(noticeModel = noticeModel)
-            } else {
+            /**
+             * 원래는 위와 같이 contactsManager의 preConditionCheck()을 통해 noticeModel을 생성해야 하지만,
+             * 임의로 더미 데이터 noticeModel을 생성하여 테스트함
+             */
+//            val noticeModel: NoticeModel? = createNoticeModel(NoticeModelType.APPLE_CAR_PLAY, context)
+//            val noticeModel: NoticeModel? = createNoticeModel(NoticeModelType.BLUETOOTH_PROCESSING, context)
+//            val noticeModel: NoticeModel? = createNoticeModel(NoticeModelType.BLUETOOTH_NOT_CONNECTED_NOT_PAIRING, context)
+//            val noticeModel: NoticeModel? = createNoticeModel(NoticeModelType.BLUETOOTH_NOT_CONNECTED_YES_PAIRING, context)
+            val noticeModel: NoticeModel? = createNoticeModel(NoticeModelType.DEFAULT, context) //Notice Model이 null일 때
 
+            if (noticeModel != null) {
+                return ProcCallData.NoticeTTSRequest(noticeModel = noticeModel)
+                TODO("오류 출력 안내 vrmwManager.requestTTS() 실행")
+            } else {
                 /**
                  * 연락처 리스트를 생성할 때 startVR()를 해줘야 하는데 매개변수의 값으로 MWContex(DialogueMode)의 객체를 넣는다.
                  * - 인식된 연락처 생성 - DialogueMode.LIST 주입
@@ -101,35 +118,30 @@ class CallManager @Inject constructor(
                 // 인식된 이름이 있는 경우
                 if (callModel.items.size > 0) {
                     /**
-                     * 실제로 전화번호부가 만들어진는 과정 생략
+                     * [실제로 전화번호부가 만들어진는 과정 생략]
+                     * 기존에는 contactsManager의 makeContactList()를 통해서 인식된 이름을 통한 전화번호부 목록을 생성을 했지만,
+                     * 인식된 이름을 통해 생성된 전화번호부 목록을 더미 데이터로 할당 하도록 함
                      */
-//                    // 카테고리 검색 여부 판별을 위해 recogCategory에 type 값 할당
-//                    val items = callModel.getContactItems()
-//
-//                    recogCategory = items[0].type
-//
-//                    // 인식된 이름으로 연락처 몇 개가 검색 되는지 확인
-//                    val tempList = contactsManager.makeContactList(
-//                        items,
-//                        true,
-//                        category = recogCategory
-//                    )
+//                    val recognizedList : List<Contact> = emptyList() //인식된 전화번호부 목록 없음
+//                    val recognizedList : List<Contact> = fetchAllContacts() //인식된 전화번호부 목록 여러개
+                    val recognizedList : List<Contact> = fetchRecognizedContacts(1) //인식된 전화번호부 목록 1개
 
                     // 인식된 이름으로 매칭되는 연락처가 여러개인 경우
-                    if (tempList.size > 1) {
-                        ProcCallData.ContactListScreen(data = tempList) // 인덱스가 존재하는 전화번호부 목록 반환[DomainType.Call / ScreenType.List]
+                    if (recognizedList.size > 1) {
+                        return ProcCallData.RecognizedContactListScreen(data = fetchRecognizedContacts(5)) // 인덱스가 존재하는 전화번호부 목록 반환[DomainType.Call / ScreenType.List]
                         TODO("startVR(MWContext(DailogueMode.LIST) 실행")
                         // 인식된 이름으로 매칭되는 연락처가 없는 경우
-                    } else if (tempList.isEmpty()) {
-                        ProcCallData.FullContactListScreen(data = tempList) // 인덱스가 존재하지 않는 전체 전화번호부 목록 반환[DomainType.Call / ScreenType.List]
+                    } else if (recognizedList.isEmpty()) {
+                        Log.d("@@ tempList Empty", "${fetchAllContacts()}")
+                        return ProcCallData.AllContactListScreen(data = fetchAllContacts()) // 인덱스가 존재하지 않는 전체 전화번호부 목록 반환[DomainType.Call / ScreenType.List]
                         TODO("startVR(MWContext(DailogueMode.CALL) 실행")
                         // 인식된 이름으로 매칭되는 연락처 1개인 경우
                     } else {
-                        ProcCallData.ProcCallNameScreen(data = tempList[0]) // 하나의 전화번호 반환[DomainType.Call / ScreenType.YesNo]
+                        return ProcCallData.ProcCallNameScreen(data = matchContact()) // 하나의 전화번호 반환[DomainType.Call / ScreenType.YesNo]
                         TODO("startVR(DialogueMode.CALLNAME) 실행")
                     }
                 } else { // Call 만 발화한 상황
-                    ProcCallData.FullContactListScreen(data = tempList) // 인덱스가 존재하지 않는 전체 전화번호부 목록 반환[DomainType.Call, ScreenType.List]
+                    return ProcCallData.AllContactListScreen(data = fetchAllContacts()) // 인덱스가 존재하지 않는 전체 전화번호부 목록 반환[DomainType.Call, ScreenType.List]
                     TODO("startVR(DailogueMode.CALL) 실행")
                 }
             }
@@ -176,27 +188,20 @@ class CallManager @Inject constructor(
 
         return when (intention) {
             Intentions.Yes.value -> {
-                ProcCallData.YesNoOtherNumberResultProc(callYesNoOtherNumberResult = CallYesNoOtherNumberResult.Yes)
+                ProcCallData.ProcYesNoOtherNumberResult(callYesNoOtherNumberResult = CallYesNoOtherNumberResult.Yes)
             }
+
             Intentions.No.value -> {
-                ProcCallData.YesNoOtherNumberResultProc(callYesNoOtherNumberResult = CallYesNoOtherNumberResult.No)
+                ProcCallData.ProcYesNoOtherNumberResult(callYesNoOtherNumberResult = CallYesNoOtherNumberResult.No)
             }
+
             Intentions.OtherNumber.value -> {
-                // otherNumber 3개 이상일 경우, LIST 화면 전환
-                if (fetchContacts().size > 2) {
-                    ProcCallData.YesNoOtherNumberResultProc(
-                        callYesNoOtherNumberResult = CallYesNoOtherNumberResult.OtherNumberList(
-                            fetchContacts()
-                        )
-                    )
-                } else if (fetchContacts().size > 1) { // otherNumber가 2개 밖에 없을 시, 현재 번호 말고 다른 번호로 바로 표시
-                    ProcCallData.YesNoOtherNumberResultProc(
-                        callYesNoOtherNumberResult = CallYesNoOtherNumberResult.OtherNumber(
-                            fetchContact()
-                        )
-                    )
+                if (fetchAllContacts().size > 2) { // otherNumber 3개 이상일 경우, Category LIST 화면 전환
+                    ProcCallData.ProcYesNoOtherNumberResult(callYesNoOtherNumberResult = CallYesNoOtherNumberResult.OtherNumberList(fetchAllContacts()))
+                } else if (fetchAllContacts().size > 1) { // otherNumber가 2개 밖에 없을 시, 현재 번호 말고 다른 번호로 바로 표시
+                    ProcCallData.ProcYesNoOtherNumberResult(callYesNoOtherNumberResult = CallYesNoOtherNumberResult.OtherNumber(matchContact()))
                 } else { // otherNumber가 1개인 경우, 현재의 번호밖에 없는 상태니까 reject() 표시
-                    ProcCallData.YesNoOtherNumberResultProc(callYesNoOtherNumberResult = CallYesNoOtherNumberResult.Reject)
+                    ProcCallData.ProcYesNoOtherNumberResult(callYesNoOtherNumberResult = CallYesNoOtherNumberResult.Reject)
                 }
             }
             else -> {
@@ -206,15 +211,18 @@ class CallManager @Inject constructor(
     }
 }
 
-fun fetchContacts(): List<Contact> {
+/**
+ * 전체 전화번호부 목록 더미데이터
+ */
+fun fetchAllContacts(): List<Contact> {
     val result: MutableList<Contact> = mutableListOf()
     result.add(Contact(id = "1", name = "문재민", number = "010-1111-2222"))
-    result.add(Contact(id = "2", name = "문제민", number = "010-2222-3333"))
-    result.add(Contact(id = "3", name = "혜원 9838", number = "010-3333-4444"))
+    result.add(Contact(id = "2", name = "삐쓰까또레부르쥬미첼라햄페스츄리치즈나쵸스트링스파게티", number = "010-2222-3333"))
+    result.add(Contact(id = "3", name = "하늘별님구름햇님보다사랑스러우리", number = "010-3333-4444"))
     result.add(Contact(id = "4", name = "Alex", number = "010-4444-5555"))
-    result.add(Contact(id = "5", name = "Alexander Sandor", number = "010-4444-5555"))
+    result.add(Contact(id = "5", name = "Alexander Sandor Signiel ", number = "010-4444-5555"))
     result.add(Contact(id = "6", name = "포티투닷 이순신", number = "010-4444-5555"))
-    result.add(Contact(id = "7", name = "포티투닷 홍길동 책임연구원", number = "031-131"))
+    result.add(Contact(id = "7", name = "포티투닷 홍길동 책임연구원 하하하하하", number = "031-131"))
     result.add(Contact(id = "8", name = "엄마", number = "1509"))
     result.add(Contact(id = "9", name = "김혜원 어머님", number = "010-1111-5555"))
     result.add(Contact(id = "10", name = "홍길 동사무소", number = "010-4444-5555"))
@@ -229,8 +237,32 @@ fun fetchContacts(): List<Contact> {
     return result.toList()
 }
 
-fun fetchContact(): Contact {
-    return Contact(id = "4", name = "Alex", number = "010-4444-5555")
+/**
+ * 인덱스를 가진 인식된 전체번호부 목록 더미 데이터
+ */
+fun fetchRecognizedContacts(count: Int): List<Contact> {
+    val allContacts = fetchAllContacts().shuffled()
+    return allContacts.take(count).mapIndexed { index, contact ->
+        contact.copy(id = (index + 1).toString())
+    }
+}
+
+/**
+ * callModel의 items에 주입시키기 위한 더미 데이터(반환 타입이 MutableList<Any>)
+ */
+fun fetchMutableRecognizedContacts(count: Int): MutableList<Any> {
+    val allContacts = fetchAllContacts().shuffled()
+    val recognizedContacts = allContacts.take(count).mapIndexed { index, contact ->
+        contact.copy(id = (index + 1).toString())
+    }
+    return recognizedContacts.toMutableList()
+}
+
+/**
+ * 인식된 전화번호부 목록이 1개 더미 데이터
+ */
+fun matchContact(): Contact {
+    return Contact(id = "1", name = "Alex", number = "010-4444-5555")
 }
 
 fun createAppleCarPlayNoticeModel(context: Context): NoticeModel {
@@ -264,5 +296,23 @@ fun createBluetoothNotConnectedYesPairingNoticeModel(context: Context): NoticeMo
         noticePromptId = "PID_SCH_PHON_03_02"
         args["changeScreen"] = 0
         screenExist = true
+    }
+}
+
+enum class NoticeModelType {
+    APPLE_CAR_PLAY,
+    BLUETOOTH_PROCESSING,
+    BLUETOOTH_NOT_CONNECTED_NOT_PAIRING,
+    BLUETOOTH_NOT_CONNECTED_YES_PAIRING,
+    DEFAULT
+}
+
+fun createNoticeModel(type: NoticeModelType, context: Context): NoticeModel? {
+    return when (type) {
+        NoticeModelType.APPLE_CAR_PLAY -> createAppleCarPlayNoticeModel(context)
+        NoticeModelType.BLUETOOTH_PROCESSING -> createBluetoothProcessingNoticeModel(context)
+        NoticeModelType.BLUETOOTH_NOT_CONNECTED_NOT_PAIRING -> createBluetoothNotConnectedNotPairingNoticeModel(context)
+        NoticeModelType.BLUETOOTH_NOT_CONNECTED_YES_PAIRING -> createBluetoothNotConnectedYesPairingNoticeModel(context)
+        NoticeModelType.DEFAULT -> null
     }
 }

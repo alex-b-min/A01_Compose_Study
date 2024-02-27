@@ -76,8 +76,10 @@ class MWContext(
     }
 
     fun onVRResult(vrResult: VRResult) {
-        val bundle = ParserFactory().dataParsing(vrResult, dialogueMode = DialogueMode.HELP)
+//        val bundle = ParserFactory().dataParsing(vrResult, dialogueMode = DialogueMode.HELP)
 //        bundle?.type = ParseDomainType.HELP
+
+        val bundle = ParserFactory().dataParsing(vrResult, dialogueMode = DialogueMode.CALL)
         bundle?.type = ParseDomainType.CALL
 
         when (bundle?.type) {
@@ -98,6 +100,7 @@ class MWContext(
 
             ParseDomainType.CALL -> {
                 val procCallData = dataProducer?.callManager?.parsedData(bundle)
+                Log.d("@@ procCallData", "${procCallData}")
                 job.launch {
                     procCallData?.let { SealedParsedData.CallData(it) }
                         ?.let { _sealedParsedData.emit(it) }

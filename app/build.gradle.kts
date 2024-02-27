@@ -74,6 +74,7 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.activity:activity-compose:1.8.2")
     debugImplementation("androidx.compose.ui:ui-tooling")
+    implementation("androidx.constraintlayout:constraintlayout-compose:1.0.0-rc01")
 
     // Testing dependencies
     androidTestImplementation("androidx.arch.core:core-testing:2.2.0")
