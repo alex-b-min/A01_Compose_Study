@@ -1,12 +1,9 @@
 package com.example.a01_compose_study.presentation.data
 
-import com.example.a01_compose_study.data.DialogueMode
 import com.example.a01_compose_study.data.HLanguageType
 import com.example.a01_compose_study.data.HVRG2PMode
 import com.example.a01_compose_study.data.PhonebookDownloadState
 import com.example.a01_compose_study.data.VrConfig
-import com.example.a01_compose_study.data.custom.DataProducer
-import com.example.a01_compose_study.data.custom.MWContext
 import com.example.a01_compose_study.domain.state.BluetoothState
 import com.example.a01_compose_study.domain.state.MWState
 import com.example.a01_compose_study.domain.state.SettingState
@@ -14,7 +11,6 @@ import com.example.a01_compose_study.domain.state.SystemState
 import kotlinx.coroutines.flow.MutableStateFlow
 
 object ServiceState {
-    var mwContext = MWContext(DialogueMode.NONE)
     val bluetoothState = BluetoothState()
     val mwState = MWState()
     val systemState = SystemState()
@@ -31,9 +27,4 @@ object ServiceState {
         HVRG2PMode.SETTING to MutableStateFlow(-1),
         HVRG2PMode.NAVIGATION to MutableStateFlow(-1)
     )
-
-    fun updateMWContext(dialogueMode: DialogueMode): MWContext {
-        mwContext = MWContext(dialogueMode)
-        return mwContext
-    }
 }

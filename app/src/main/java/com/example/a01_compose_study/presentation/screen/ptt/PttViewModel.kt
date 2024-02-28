@@ -7,6 +7,7 @@ import com.example.a01_compose_study.R
 import com.example.a01_compose_study.data.DialogueMode
 import com.example.a01_compose_study.data.VrConfig
 import com.example.a01_compose_study.data.custom.MWContext
+import com.example.a01_compose_study.data.custom.ptt.PttManager
 import com.example.a01_compose_study.domain.model.NoticeModel
 import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.util.CustomLogger
@@ -21,12 +22,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PttViewModel @Inject constructor(
-    val vrmwManager: VrmwManager
+    val vrmwManager: VrmwManager,
+    val pttManager: PttManager
 ) : ViewModel() {
 
     private val _domainUiState = UiState._domainUiState
 
-    var currContext = ServiceState.mwContext
+//    var currContext = ServiceState.mwContext
     val announceString = MutableStateFlow("")
     val vrConfig = MutableStateFlow(VrConfig())
     val guideString = MutableLiveData<String>()
@@ -108,11 +110,10 @@ class PttViewModel @Inject constructor(
             }
 
             is PttEvent.StartVR -> {
-                currContext = ServiceState.updateMWContext(DialogueMode.MAINMENU)
-                currContext.let { context ->
-                    vrmwManager.startVR(context)
-                }
-
+//                currContext = ServiceState.updateMWContext(DialogueMode.MAINMENU)
+//                currContext.let { context ->
+//                    vrmwManager.startVR(context)
+//                }
             }
         }
     }

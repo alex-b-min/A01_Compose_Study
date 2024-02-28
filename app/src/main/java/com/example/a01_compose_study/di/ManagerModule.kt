@@ -4,9 +4,9 @@ import android.content.Context
 import com.example.a01_compose_study.data.custom.ContactsDummyProvider
 import com.example.a01_compose_study.data.custom.ContactsManager
 import com.example.a01_compose_study.data.custom.ContactsRepository
-import com.example.a01_compose_study.data.custom.DataProducer
 import com.example.a01_compose_study.data.custom.HelpManager
 import com.example.a01_compose_study.data.custom.call.CallManager
+import com.example.a01_compose_study.data.custom.ptt.PttManager
 import com.example.a01_compose_study.data.repository.help.HelpRepositoryImpl
 import com.example.a01_compose_study.domain.repository.domain.HelpRepository
 import com.example.a01_compose_study.domain.usecase.HelpUseCase
@@ -55,11 +55,14 @@ object ManagerModule {
     @Singleton
     fun provideCallManager(
         @ApplicationContext context: Context,
-        contactsManager: ContactsManager
+        contactsManager: ContactsManager,
+        coroutineScope: CoroutineScope,
+
     ): CallManager {
         return CallManager(
             context = context,
-            contactsManager = contactsManager
+            contactsManager = contactsManager,
+            coroutineScope = coroutineScope
         )
     }
 
@@ -86,13 +89,25 @@ object ManagerModule {
 
     @Provides
     @Singleton
-    fun provideDataProducer(
-        helpManager: HelpManager,
-        callManager: CallManager
-    ): DataProducer {
-        return DataProducer(
-            helpManager = helpManager,
-            callManager = callManager
+    fun providePttManager(
+        @ApplicationContext context: Context,
+        vrmwManager: VrmwManager,
+    ) : PttManager {
+        return PttManager(
+            context = context,
+            vrmwManager = vrmwManager
         )
     }
+
+//    @Provides
+//    @Singleton
+//    fun provideDataProducer(
+//        helpManager: HelpManager,
+//        callManager: CallManager
+//    ): DataProducer {
+//        return DataProducer(
+//            helpManager = helpManager,
+//            callManager = callManager
+//        )
+//    }
 }

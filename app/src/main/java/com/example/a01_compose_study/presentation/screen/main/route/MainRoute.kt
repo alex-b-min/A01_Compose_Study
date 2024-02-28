@@ -59,7 +59,7 @@ fun MainRoute(
 
     val multipleEventsCutter = remember { MultipleEventsCutter.get() }
 
-    val mwContext = ServiceState.mwContext
+//    val mwContext = ServiceState.mwContext
     val announceString by pttViewModel.announceString.collectAsStateWithLifecycle()
 
     /**
@@ -242,7 +242,7 @@ fun MainRoute(
                 )
 
                 pttViewModel.onPttEvent(PttEvent.PreparePtt)
-                pttViewModel.onPttEvent(PttEvent.StartVR(mwContext))
+//                pttViewModel.onPttEvent(PttEvent.StartVR(mwContext))
             }
         )
 

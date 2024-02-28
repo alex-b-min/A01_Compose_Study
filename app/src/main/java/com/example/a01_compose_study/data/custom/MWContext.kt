@@ -18,14 +18,14 @@ import kotlinx.coroutines.launch
 
 class MWContext(
     val dialogueMode: DialogueMode,
+    private val resultListener: VRResultListener,
 ) {
-    var dataProducer: DataProducer? = null
-
     var vrState = HVRState.IDLE
     var ttsState = HTextToSpeechState.IDLE
     var promptId = mutableListOf<String>()
 
     var isSubContext = false
+    var contextId = this.hashCode()
 
     /**
      * 파싱된 데이터를 하나로 묶기 위한 StateFlow 타입의 sealedParsedData 전역변수
@@ -74,45 +74,57 @@ class MWContext(
     }
 
     fun onVRResult(vrResult: VRResult, customVRResult: CustomVRResult) {
-        val bundle = ParserFactory().dataParsing(vrResult, dialogueMode = DialogueMode.HELP)
-        bundle?.type = ParseDomainType.HELP
+//        val bundle = ParserFactory().dataParsing(vrResult, dialogueMode = DialogueMode.HELP)
+//        bundle?.type = ParseDomainType.HELP
 
-//        val bundle = when(customVRResult){
-//            CustomVRResult.CallIndexListResult -> ParserFactory().dataParsing(vrResult, dialogueMode = DialogueMode.CALL)
-//            CustomVRResult.ScrollIndexResult -> ParserFactory().dataParsing(vrResult, dialogueMode = DialogueMode.LIST)
-//        }
-//        bundle?.type = ParseDomainType.CALL
-
-        when (bundle?.type) {
-            ParseDomainType.HELP -> {
-                /**
-                 * 기존에는 적절한 각 DomainManager의 onReceiveBundle()에 해당 bundle의 값을 넣어주는 방식
-                 * ==> 바뀐 방식은 아래와 같음
-                 * 각 DoaminManager에서 bundle의 값을 넣으면 파싱하여 적절한 데이터을 리턴해주는 함수를 구현한다.
-                 * 참고로 Help의 경우,
-                 * domainType/screenType/screenSizeType/data 의 데이터를 가져야하므로 ProcHelpData라는 데이터 클래스를 한 개 생성함
-                 */
-                val procHelpData = dataProducer?.helpManager?.parsedData(bundle)
-                job.launch {
-                    procHelpData?.let { SealedParsedData.HelpData(it) }
-                        ?.let { _sealedParsedData.emit(it) }
-                }
-            }
-
-            ParseDomainType.CALL -> {
-                val procCallData = dataProducer?.callManager?.parsedData(bundle)
-                Log.d("@@ procCallData", "${procCallData}")
-                job.launch {
-                    procCallData?.let { SealedParsedData.CallData(it) }
-                        ?.let { _sealedParsedData.emit(it) }
-                }
-            }
-
-            else -> {
-                /**
-                 * 다른 도메인 타입들에 대한 값들이 들어간다.
-                 */
-            }
+        val bundle = when(customVRResult){
+            CustomVRResult.CallIndexListResult -> ParserFactory().dataParsing(vrResult, dialogueMode = DialogueMode.CALL)
+            CustomVRResult.ScrollIndexResult -> ParserFactory().dataParsing(vrResult, dialogueMode = DialogueMode.LIST)
         }
+        bundle?.type = ParseDomainType.CALL
+
+        bundle?.let {
+            it.contextId = this.contextId
+
+            if (it.type == ParseDomainType.UNSUPPORTED_DOMAIN) {
+                resultListener.onVRError(HVRError.ERROR_HMI)
+            } else {
+                resultListener.onReceiveBundle(it)
+            }
+        } ?: run {
+            resultListener.onBundleParsingErr()
+        }
+
+//        when (bundle?.type) {
+//            ParseDomainType.HELP -> {
+//                /**
+//                 * 기존에는 적절한 각 DomainManager의 onReceiveBundle()에 해당 bundle의 값을 넣어주는 방식
+//                 * ==> 바뀐 방식은 아래와 같음
+//                 * 각 DoaminManager에서 bundle의 값을 넣으면 파싱하여 적절한 데이터을 리턴해주는 함수를 구현한다.
+//                 * 참고로 Help의 경우,
+//                 * domainType/screenType/screenSizeType/data 의 데이터를 가져야하므로 ProcHelpData라는 데이터 클래스를 한 개 생성함
+//                 */
+//                val procHelpData = dataProducer?.helpManager?.parsedData(bundle)
+//                job.launch {
+//                    procHelpData?.let { SealedParsedData.HelpData(it) }
+//                        ?.let { _sealedParsedData.emit(it) }
+//                }
+//            }
+//
+//            ParseDomainType.CALL -> {
+//                val procCallData = dataProducer?.callManager?.parsedData(bundle)
+//                Log.d("@@ procCallData", "${procCallData}")
+//                job.launch {
+//                    procCallData?.let { SealedParsedData.CallData(it) }
+//                        ?.let { _sealedParsedData.emit(it) }
+//                }
+//            }
+//
+//            else -> {
+//                /**
+//                 * 다른 도메인 타입들에 대한 값들이 들어간다.
+//                 */
+//            }
+//        }
     }
 }
