@@ -4,6 +4,7 @@ import android.content.Context
 import com.example.a01_compose_study.data.custom.ContactsDummyProvider
 import com.example.a01_compose_study.data.custom.ContactsManager
 import com.example.a01_compose_study.data.custom.ContactsRepository
+import com.example.a01_compose_study.data.custom.DataProducer
 import com.example.a01_compose_study.data.custom.HelpManager
 import com.example.a01_compose_study.data.custom.call.CallManager
 import com.example.a01_compose_study.data.custom.ptt.PttManager
@@ -56,7 +57,7 @@ object ManagerModule {
     fun provideCallManager(
         @ApplicationContext context: Context,
         contactsManager: ContactsManager,
-        coroutineScope: CoroutineScope,
+        @IOCoroutineScope coroutineScope: CoroutineScope,
 
     ): CallManager {
         return CallManager(
@@ -89,25 +90,29 @@ object ManagerModule {
 
     @Provides
     @Singleton
-    fun providePttManager(
-        @ApplicationContext context: Context,
-        vrmwManager: VrmwManager,
-    ) : PttManager {
-        return PttManager(
-            context = context,
-            vrmwManager = vrmwManager
+    fun provideDataProducer(
+        helpManager: HelpManager,
+        callManager: CallManager
+    ): DataProducer {
+        return DataProducer(
+            helpManager = helpManager,
+            callManager = callManager
         )
     }
 
-//    @Provides
-//    @Singleton
-//    fun provideDataProducer(
-//        helpManager: HelpManager,
-//        callManager: CallManager
-//    ): DataProducer {
-//        return DataProducer(
-//            helpManager = helpManager,
-//            callManager = callManager
-//        )
-//    }
+    @Provides
+    @Singleton
+    fun providePttManager(
+        @ApplicationContext context: Context,
+        vrmwManager: VrmwManager,
+        dataProducer: DataProducer
+    ) : PttManager {
+        return PttManager(
+            context = context,
+            vrmwManager = vrmwManager,
+            dataProducer = dataProducer
+        )
+    }
+
+
 }

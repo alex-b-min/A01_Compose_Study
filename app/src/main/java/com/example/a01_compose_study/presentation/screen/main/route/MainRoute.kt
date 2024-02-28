@@ -242,7 +242,7 @@ fun MainRoute(
                 )
 
                 pttViewModel.onPttEvent(PttEvent.PreparePtt)
-//                pttViewModel.onPttEvent(PttEvent.StartVR(mwContext))
+                pttViewModel.onPttEvent(PttEvent.StartVR())
             }
         )
 

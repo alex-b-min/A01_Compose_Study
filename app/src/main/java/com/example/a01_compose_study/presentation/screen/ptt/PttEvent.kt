@@ -9,7 +9,7 @@ sealed class PttEvent {
     object SetAnnounceType : PttEvent()
     object PreparePtt : PttEvent()
     data class StartVR(
-        val mwContext: MWContext,
+//        val mwContext: MWContext,
         val promptString: String = "",
         val promptArgs: List<String> = listOf()
     ) : PttEvent()

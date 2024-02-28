@@ -1,5 +1,6 @@
 package com.example.a01_compose_study.data.custom
 
+import com.example.a01_compose_study.data.HVRError
 import com.example.a01_compose_study.data.analyze.ParseBundle
 import com.example.a01_compose_study.domain.model.HelpItemData
 import com.example.a01_compose_study.domain.model.HelpVRData
@@ -10,7 +11,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class HelpManager @Inject constructor() {
+class HelpManager @Inject constructor() : VRResultListener{
 
     fun parsedData(bundle: ParseBundle<out Any>): ProcHelpData {
         /**
@@ -110,5 +111,21 @@ class HelpManager @Inject constructor() {
             }
         }
         return domainType
+    }
+
+    override fun onReceiveBundle(bundle: ParseBundle<out Any>) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onBundleParsingErr() {
+        TODO("Not yet implemented")
+    }
+
+    override fun onCancel() {
+        TODO("Not yet implemented")
+    }
+
+    override fun onVRError(error: HVRError) {
+        TODO("Not yet implemented")
     }
 }
