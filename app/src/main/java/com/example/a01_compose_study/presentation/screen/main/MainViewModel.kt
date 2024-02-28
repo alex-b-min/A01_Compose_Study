@@ -7,6 +7,8 @@ import com.example.a01_compose_study.data.Contact
 import com.example.a01_compose_study.data.HVRError
 import com.example.a01_compose_study.data.custom.SealedParsedData
 import com.example.a01_compose_study.data.custom.call.ProcCallData
+import com.example.a01_compose_study.data.custom.sendMsg.MsgData
+import com.example.a01_compose_study.data.custom.sendMsg.SendMsgDataType
 import com.example.a01_compose_study.domain.model.HelpItemData
 import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.model.SealedDomainType
@@ -146,6 +148,18 @@ class MainViewModel @Inject constructor(
                             }
                         }
                     }
+
+                    is SealedParsedData.SendMsgData -> {
+                        onDomainEvent(
+                            event = MainEvent.OpenDomainWindowEvent(
+                                domainType = sealedParsedData.procSendMsgData.domainType,
+                                screenType = sealedParsedData.procSendMsgData.screenType,
+                                data = sealedParsedData.procSendMsgData.data,
+                                isError = false,
+                                screenSizeType = ScreenSizeType.Large
+                            )
+                        )
+                    }
                     else -> {
                     }
                 }
@@ -222,6 +236,42 @@ class MainViewModel @Inject constructor(
                                 screenSizeType = event.screenSizeType,
                                 data = contactList,
                             )
+                        }
+
+                        SealedDomainType.SendMessage -> {
+                            DomainUiState.RadioWindow(
+
+                            )
+                            when (val eventData = event.data as SendMsgDataType) {
+                                is SendMsgDataType.SendMsgData -> {
+                                    DomainUiState.SendMessageWindow(
+                                        domainType = event.domainType,
+                                        screenType = event.screenType,
+                                        isError = event.isError,
+                                        msgData = eventData.msgData as MsgData,
+                                        screenData = eventData.screenData,
+                                    )
+                                }
+
+                                is SendMsgDataType.SendScreenData -> {
+                                    DomainUiState.SendScreenWindow(
+                                        screenData = eventData.screenData
+                                    )
+                                }
+
+                                is SendMsgDataType.SendListNum -> {
+                                    DomainUiState.SendListWindow(
+                                        index = eventData.index as Int
+                                    )
+                                }
+
+                                else -> {
+                                    val errorMsgData = eventData as SendMsgDataType.ErrorMsgData
+                                    DomainUiState.ErrorMsgWindow(
+                                        notice = errorMsgData.notice
+                                    )
+                                }
+                            }
                         }
 
                         SealedDomainType.MainMenu -> {

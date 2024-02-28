@@ -215,6 +215,8 @@ fun MainRoute(
             is DomainUiState.SendMessageWindow -> {
 
             }
+
+            else -> {}
         }
     }
 
