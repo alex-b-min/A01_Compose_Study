@@ -17,6 +17,7 @@ import com.example.a01_compose_study.domain.util.CustomLogger
 import com.example.a01_compose_study.presentation.data.ServiceState
 import com.example.a01_compose_study.presentation.screen.ptt.VrmwManager
 import kotlinx.coroutines.flow.MutableStateFlow
+import java.util.Random
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -37,8 +38,7 @@ class PttManager @Inject constructor(
 
     override fun onReceiveBundle(bundle: ParseBundle<out Any>) {
 
-
-        when(bundle.type) {
+        when (bundle.type) {
             ParseDomainType.CALL -> {
                 dataProducer.callManager.onReceiveBundle(bundle)
             }
@@ -83,8 +83,34 @@ class PttManager @Inject constructor(
 
     fun pttEvent() {
         val mwContext = MWContext(DialogueMode.MAINMENU, this)
-
         vrmwManager.startVR(mwContext)
+    }
+
+    fun pttPrepare() {
+        ServiceState.bluetoothState.hfpDevice.value.apply {
+            this.recognizing = true
+        }
+
+        announceString.value = ""
+        makeRandomCommands()
+
+        if (ServiceState.settingState.isOfflineMode() ||
+            !ServiceState.systemState.serverResponse.value ||
+            !vrConfig.value.isSupportServer
+        ) {
+            val randomIndex = Random().nextInt(offlineRandomCommands.size)
+            guideString.postValue("${offlineRandomCommands[randomIndex]}")
+        } else {
+            val randomIndex = Random().nextInt(onlineRandomCommands.size)
+            guideString.postValue("${onlineRandomCommands[randomIndex]}")
+        }
+
+        announceString.value = defaultAnnounceString
+
+        if (ServiceState.bluetoothState.hfpDevice.value.device.isNotEmpty() && !ServiceState.bluetoothState.hfpDevice.value.recognizing) {
+            vrmwManager.g2pController.updateCacheFiles(ServiceState.bluetoothState.hfpDevice.value.device)
+        }
+
     }
 
     fun makeRandomCommands() {
