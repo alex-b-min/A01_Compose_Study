@@ -1,26 +1,14 @@
 package com.example.a01_compose_study.presentation.screen.main.route
 
 import android.util.Log
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -64,217 +52,138 @@ fun MainRoute(
     pttViewModel: PttViewModel = hiltViewModel(),
 ) {
     val domainUiState by viewModel.domainUiState.collectAsStateWithLifecycle()
+    val domainWindowVisibleState by viewModel.domainWindowVisible.collectAsStateWithLifecycle()
+    val vrUiState by viewModel.vrUiState.collectAsStateWithLifecycle()
+
     val scope = rememberCoroutineScope()
+
     val multipleEventsCutter = remember { MultipleEventsCutter.get() }
 
     val mwContext = ServiceState.mwContext
     val announceString by pttViewModel.announceString.collectAsStateWithLifecycle()
 
     /**
-     * Compose에서 뷰를 조작하는 변수(visible)는 remember 타입으로 선언해야 합니다.
-     * 그러나 이 방법은 각 뷰의 가시성을 개별적으로 관리해야 합니다.
-     * 이 방식은 화면 전환 구조에는 적합하지만, 하나의 창 위에 여러 개의 뷰를 관리할 때 여러 개의 visible을 관리해야 하므로 적절하지 않습니다.
-     * 따라서 정확한 해결책은 아니지만, flow 타입의 visible 변수를 싱글톤으로 만들어 최상단의 뷰를 관리합니다.
-     * 이렇게 하면 하나의 AnimatedVisibility() 안에 여러 개의 창을 관리할 수 있습니다.
+     * 원래라고 하면은 Compose에서 뷰를 조작하는 변수(visible)는 remember 타입으로 선언해야 함..
+     * 그러나 이 방법은 각 뷰의 가시성을 개별적으로 관리해야 한다는 점임..
+     * 이 방식은 화면 전환 구조에는 적합하지만, 하나의 창 위에 여러 개의 뷰를 관리할 때 여러 개의 visible을 각각 관리를 해줘야 하므로 비효율적이라고 생각..
+     * 따라서 정확한 해결책은 아니지만, flow 타입의 visible 변수를 싱글톤으로 만들어 최상단의 뷰를 관리하려고 함..
+     * 이렇게 하면 하나의 AnimatedVisibility() 안에 여러 개의 창을 관리할 수 있다는 장점이 있음!
      * 실제로 이렇게 사용하게 된다면,
      * AnimatedVisibility() 안에서 UiState의 조건문을 타고 들어간 후
-     * 해당 Window를 닫기 위해선 가장 상단의 AnimatedVisibility()의 visible 변수를 false로 바꾸면 해당 Window가 닫히게 되는 효과를 얻을 수 있습니다.
+     * 해당 Window를 닫기 위해선 가장 상단의 AnimatedVisibility()의 visible 변수를 false로 바꾸면 해당 Window를 닫을 수 있다..
      */
-    val domainWindowVisibleState by viewModel.domainWindowVisible.collectAsStateWithLifecycle()
 
-    val targetFillMaxHeight by remember { mutableStateOf(Animatable(0f)) }
-    val targetFillMaxWidth by remember { mutableStateOf(Animatable(0f)) }
-
-    val vrUiState by viewModel.vrUiState.collectAsStateWithLifecycle()
-
-    LaunchedEffect(domainUiState) {
-        val newTargetHeightValue = when (domainUiState.screenSizeType) {
-            is ScreenSizeType.Zero -> 0f
-            is ScreenSizeType.Small -> 0.15f
-            is ScreenSizeType.Middle -> 0.268f
-            is ScreenSizeType.Large -> 0.433f
-            is ScreenSizeType.Full -> 1f
-        }
-        val newTargetWidthValue = when (domainUiState.screenSizeType) {
-            is ScreenSizeType.Zero -> 0f
-            is ScreenSizeType.Full -> 1f
-            else -> 0.233f
-        }
-
-        scope.launch {
-            targetFillMaxHeight.animateTo(
-                targetValue = newTargetHeightValue,
-                animationSpec = tween(
-                    durationMillis = 800, // 애니메이션 지속 시간을 조정
-                    easing = FastOutSlowInEasing // 선택적으로 easing 함수를 지정
-                )
-            )
-        }
-        scope.launch {
-            targetFillMaxWidth.animateTo(
-                targetValue = newTargetWidthValue,
-                animationSpec = tween(
-                    durationMillis = 800, // 애니메이션 지속 시간을 조정
-                    easing = FastOutSlowInEasing // 선택적으로 easing 함수를 지정
-                )
-            )
-        }
-    }
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black)
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null
-            ) {
-                viewModel.onDomainEvent(MainEvent.CloseDomainWindowEvent)
-            }
-    ) {
-        /**
-         * 하나의 AnimatedVisibility() 안에 여러 Window를 구성
-         */
-        Log.d("@@ @@ dui","${domainUiState}")
-        Log.d("@@ @@ dwv","${domainWindowVisibleState}")
-
-        AnimatedVisibility(
-            visible = domainWindowVisibleState,
-            modifier = Modifier.fillMaxWidth(),
-            enter = slideInVertically(
-                initialOffsetY = { it },
-                animationSpec = tween(1000)
-            ),
-            exit = slideOutVertically(
-                targetOffsetY = { it },
-                animationSpec = tween(1000)
-            )
+    WindowFrame(
+        domainUiState = domainUiState,
+        domainWindowVisible = domainWindowVisibleState,
+        onCloseDomainWindow = {
+            viewModel.onDomainEvent(MainEvent.CloseDomainWindowEvent)
+        }) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.BottomCenter
         ) {
-            Log.d("@@ @@ dui222","${domainUiState}")
-            Log.d("@@ @@ dwv222","${domainWindowVisibleState}")
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.BottomStart
-            ) {
-                Box(
-                    modifier = Modifier
-                        .offset(x = 10.dp, y = (10).dp)
-                        .fillMaxHeight(targetFillMaxHeight.value)
-                        .fillMaxWidth(targetFillMaxWidth.value)
-                        .background(
-                            color = Color.Transparent,
-                            shape = RoundedCornerShape(15.dp)
-                        )
-                        .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null
-                        ) {},
-                ) {
-                    Box(
+            if (vrUiState.active) {
+                if (vrUiState.isError) {
+                    LottieAssetAnimationHandler(
                         modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.BottomCenter
-                    ) {
-                        if (vrUiState.active) {
-                            if (vrUiState.isError) {
-                                LottieAssetAnimationHandler(
-                                    modifier = Modifier.fillMaxSize(),
-                                    lottieJsonAssetPath = "bg_glow/frame_error_glow_l_lt.json",
-                                    lottieImageAssetFolder = "bg_glow/images/error",
-                                    infiniteLoop = true
-                                )
-                            } else {
-                                LottieAssetAnimationHandler(
-                                    modifier = Modifier.fillMaxSize(),
-                                    lottieJsonAssetPath = "bg_glow/09_tsd_frame_glow_l_lt.json",
-                                    lottieImageAssetFolder = "bg_glow/images/default",
-                                    infiniteLoop = true
-                                )
+                        lottieJsonAssetPath = "bg_glow/frame_error_glow_l_lt.json",
+                        lottieImageAssetFolder = "bg_glow/images/error",
+                        infiniteLoop = true
+                    )
+                } else {
+                    LottieAssetAnimationHandler(
+                        modifier = Modifier.fillMaxSize(),
+                        lottieJsonAssetPath = "bg_glow/09_tsd_frame_glow_l_lt.json",
+                        lottieImageAssetFolder = "bg_glow/images/default",
+                        infiniteLoop = true
+                    )
 
-                                when (vrUiState) {
-                                    is VRUiState.PttNone -> {
-                                    }
+                    when (vrUiState) {
+                        is VRUiState.PttNone -> {
+                        }
 
-                                    is VRUiState.PttLoading -> {
-                                        LottieRawAnimationHandler(
-                                            modifier = Modifier.fillMaxSize(),
-                                            rawResId = R.raw.tsd_thinking_loop_fix_lt_03_2,
-                                            infiniteLoop = true,
-                                            onFrameChanged = { currentFrame ->
-                                            }
-                                        )
-                                    }
-
-                                    is VRUiState.PttListen -> {
-                                        LottieRawAnimationHandler(
-                                            modifier = Modifier.fillMaxSize(),
-                                            rawResId = R.raw.tsd_listening_passive_loop_lt_01_2,
-                                            infiniteLoop = true,
-                                            onFrameChanged = { currentFrame ->
-                                            }
-                                        )
-                                    }
-
-                                    is VRUiState.PttSpeak -> {
-                                        LottieRawAnimationHandler(
-                                            modifier = Modifier.fillMaxSize(),
-                                            rawResId = R.raw.loop,
-                                            infiniteLoop = true,
-                                            onFrameChanged = { currentFrame ->
-                                            }
-                                        )
-                                    }
+                        is VRUiState.PttLoading -> {
+                            LottieRawAnimationHandler(
+                                modifier = Modifier.fillMaxSize(),
+                                rawResId = R.raw.tsd_thinking_loop_fix_lt_03_2,
+                                infiniteLoop = true,
+                                onFrameChanged = { currentFrame ->
                                 }
-                            }
-                        }
-                    }
-                    Log.d("@@ @@ dui333","${domainUiState}")
-                    Log.d("@@ @@ dwv333","${domainWindowVisibleState}")
-                    when (domainUiState) {
-                        is DomainUiState.NoneWindow -> {
-                        }
-
-                        is DomainUiState.PttWindow -> {
-                            ComposePttScreen(
-                                domainUiState = domainUiState as DomainUiState.PttWindow,
-                                contentColor = Color.White,
-                                displayText = announceString
                             )
                         }
 
-                        is DomainUiState.HelpWindow -> {
-                            Log.d("@@ HelpWindow 진입", "몇번 실행?")
-                            Box(modifier = Modifier.fillMaxSize()) {
-                                ComposeHelpScreen(
-                                    domainUiState = domainUiState as DomainUiState.HelpWindow,
-                                    vrUiState = vrUiState,
-                                    contentColor = Color.Gray,
-                                    backgroundColor = Black2
-                                )
-                                UiState.onVREvent(
-                                    VREvent.ChangeVRUIEvent(
-                                        VRUiState.PttLoading(
-                                            active = true,
-                                            isError = false
-                                        )
-                                    )
-                                )
-                            }
+                        is VRUiState.PttListen -> {
+                            LottieRawAnimationHandler(
+                                modifier = Modifier.fillMaxSize(),
+                                rawResId = R.raw.tsd_listening_passive_loop_lt_01_2,
+                                infiniteLoop = true,
+                                onFrameChanged = { currentFrame ->
+                                }
+                            )
                         }
 
-                        is DomainUiState.AnnounceWindow -> {
-                            Log.d("@@ AnnounceWindow 진입", "몇번 실행?")
-                            AnnounceScreen((domainUiState as DomainUiState.AnnounceWindow).text)
+                        is VRUiState.PttSpeak -> {
+                            LottieRawAnimationHandler(
+                                modifier = Modifier.fillMaxSize(),
+                                rawResId = R.raw.loop,
+                                infiniteLoop = true,
+                                onFrameChanged = { currentFrame ->
+                                }
+                            )
                         }
+                    }
+                }
+            }
+        }
+        Log.d("@@ domainUiState When문 위에서 시작", "${domainUiState}")
+        Log.d("@@ domainUiState When문 위에서 시작", "${domainWindowVisibleState}")
+        when (domainUiState) {
+            is DomainUiState.NoneWindow -> {
+            }
 
-                        is DomainUiState.CallWindow -> {
-                            Log.d("@@ CallWindow 진입", "몇번 실행?")
-                            Box(modifier = Modifier.fillMaxSize()) {
-                                CallScreen(
-                                    domainUiState = domainUiState as DomainUiState.CallWindow,
-                                    vrUiState = vrUiState,
-                                    vrDynamicBackground = if (vrUiState.active) Color.Transparent else Color.Black,
-                                    fixedBackground = Black2
-                                )
+            is DomainUiState.PttWindow -> {
+                ComposePttScreen(
+                    domainUiState = domainUiState as DomainUiState.PttWindow,
+                    contentColor = Color.White,
+                    displayText = announceString
+                )
+            }
+
+            is DomainUiState.HelpWindow -> {
+                Log.d("@@ HelpWindow 진입", "몇번 실행?")
+                Box(modifier = Modifier.fillMaxSize()) {
+                    ComposeHelpScreen(
+                        domainUiState = domainUiState as DomainUiState.HelpWindow,
+                        vrUiState = vrUiState,
+                        contentColor = Color.Gray,
+                        backgroundColor = Black2
+                    )
+                    UiState.onVREvent(
+                        VREvent.ChangeVRUIEvent(
+                            VRUiState.PttLoading(
+                                active = true,
+                                isError = false
+                            )
+                        )
+                    )
+                }
+            }
+
+            is DomainUiState.AnnounceWindow -> {
+                Log.d("@@ AnnounceWindow 진입", "몇번 실행?")
+                AnnounceScreen((domainUiState as DomainUiState.AnnounceWindow).text)
+            }
+
+            is DomainUiState.CallWindow -> {
+                Log.d("@@ CallWindow 진입", "몇번 실행?")
+                Box(modifier = Modifier.fillMaxSize()) {
+                    CallScreen(
+                        domainUiState = domainUiState as DomainUiState.CallWindow,
+                        vrUiState = vrUiState,
+                        vrDynamicBackground = if (vrUiState.active) Color.Transparent else Color.Black,
+                        fixedBackground = Black2
+                    )
 
 //                                UiState.onVREvent(
 //                                    VREvent.ChangeVRUIEvent(
@@ -284,116 +193,114 @@ fun MainRoute(
 //                                        )
 //                                    )
 //                                )
-                            }
-                        }
-
-                        is DomainUiState.DomainMenuWindow -> {
-
-                        }
-
-                        is DomainUiState.NavigationWindow -> {
-
-                        }
-
-                        is DomainUiState.RadioWindow -> {
-
-                        }
-
-                        is DomainUiState.WeatherWindow -> {
-
-                        }
-
-                        is DomainUiState.SendMessageWindow -> {
-
-                        }
-                    }
                 }
             }
+
+            is DomainUiState.DomainMenuWindow -> {
+
+            }
+
+            is DomainUiState.NavigationWindow -> {
+
+            }
+
+            is DomainUiState.RadioWindow -> {
+
+            }
+
+            is DomainUiState.WeatherWindow -> {
+
+            }
+
+            is DomainUiState.SendMessageWindow -> {
+
+            }
         }
+    }
 
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            horizontalAlignment = Alignment.End
-        ) {
-            PttButton(
-                modifier = Modifier.fillMaxSize(0.13f),
-                contentText = "PTT Open",
-                onClick = {
-                    multipleEventsCutter.processEvent {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalAlignment = Alignment.End
+    ) {
+        PttButton(
+            modifier = Modifier.fillMaxSize(0.13f),
+            contentText = "PTT Open",
+            onClick = {
+                multipleEventsCutter.processEvent {
 
-                    }
+                }
 
+                viewModel.onDomainEvent(
+                    event = MainEvent.OpenDomainWindowEvent(
+                        domainType = SealedDomainType.Ptt,
+                        screenType = ScreenType.PttListen,
+                        data = announceString,
+                        isError = false,
+                        screenSizeType = ScreenSizeType.Small
+                    )
+                )
+
+                pttViewModel.onPttEvent(PttEvent.PreparePtt)
+                pttViewModel.onPttEvent(PttEvent.StartVR(mwContext))
+            }
+        )
+
+        PttButton(
+            modifier = Modifier.fillMaxSize(0.13f),
+            contentText = "PTT Speak",
+            onClick = {
+                scope.launch {
+                    pttViewModel.onPttEvent(PttEvent.SetSpeakType)
+                }
+            }
+        )
+
+        PttButton(
+            modifier = Modifier.fillMaxSize(0.13f),
+            contentText = "PTT Loading",
+            onClick = {
+                scope.launch {
+                    pttViewModel.onPttEvent(PttEvent.SetLoadingType)
+                }
+            }
+        )
+
+        PttButton(
+            modifier = Modifier.fillMaxSize(0.13f),
+            contentText = "PTT Announce",
+            onClick = {
+                scope.launch {
                     viewModel.onDomainEvent(
                         event = MainEvent.OpenDomainWindowEvent(
-                            domainType = SealedDomainType.Ptt,
-                            screenType = ScreenType.PttListen,
-                            data = announceString,
+                            domainType = SealedDomainType.Announce,
+                            screenType = ScreenType.PttAnounce,
+                            data = "Help",
                             isError = false,
                             screenSizeType = ScreenSizeType.Small
                         )
                     )
-
-                    pttViewModel.onPttEvent(PttEvent.PreparePtt)
-                    pttViewModel.onPttEvent(PttEvent.StartVR(mwContext))
                 }
-            )
+            }
+        )
 
-            PttButton(
-                modifier = Modifier.fillMaxSize(0.13f),
-                contentText = "PTT Speak",
-                onClick = {
-                    scope.launch {
-                        pttViewModel.onPttEvent(PttEvent.SetSpeakType)
-                    }
+        PttButton(
+            modifier = Modifier.fillMaxSize(0.13f),
+            contentText = "PTT Close",
+            onClick = {
+                scope.launch {
+                    viewModel.onDomainEvent(MainEvent.CloseDomainWindowEvent)
                 }
-            )
+            }
+        )
 
-            PttButton(
-                modifier = Modifier.fillMaxSize(0.13f),
-                contentText = "PTT Loading",
-                onClick = {
-                    scope.launch {
-                        pttViewModel.onPttEvent(PttEvent.SetLoadingType)
-                    }
-                }
-            )
-
-            PttButton(
-                modifier = Modifier.fillMaxSize(0.13f),
-                contentText = "PTT Announce",
-                onClick = {
-                    scope.launch {
-                        viewModel.onDomainEvent(
-                            event = MainEvent.OpenDomainWindowEvent(
-                                domainType = SealedDomainType.Announce,
-                                screenType = ScreenType.PttAnounce,
-                                data = "Help",
-                                isError = false,
-                                screenSizeType = ScreenSizeType.Small
-                            )
-                        )
-                    }
-                }
-            )
-
-            PttButton(
-                modifier = Modifier.fillMaxSize(0.13f),
-                contentText = "PTT Close",
-                onClick = {
-                    scope.launch {
-                        viewModel.onDomainEvent(MainEvent.CloseDomainWindowEvent)
-                    }
-                }
-            )
-
-            PttButton(
-                modifier = Modifier
-                    .fillMaxWidth(0.13f)
-                    .fillMaxHeight(0.2f),
-                contentText = "ERROR_HMI",
-                onClick = {
-                    multipleEventsCutter.processEvent {
+        PttButton(
+            modifier = Modifier
+                .fillMaxWidth(0.13f)
+                .fillMaxHeight(0.2f),
+            contentText = "ERROR_HMI",
+            onClick = {
+                multipleEventsCutter.processEvent {
 //                        viewModel.onDomainEvent(
 //                            event = MainEvent.OpenDomainWindowEvent(
 //                                domainType = SealedDomainType.Ptt,
@@ -403,89 +310,92 @@ fun MainRoute(
 //                                screenSizeType = ScreenSizeType.Small
 //                            )
 //                        )
-                        viewModel.vrmwManager.setVRError(HVRError.ERROR_HMI)
-                    }
+                    viewModel.vrmwManager.setVRError(HVRError.ERROR_HMI)
                 }
-            )
+            }
+        )
 
-            PttButton(
-                modifier = Modifier
-                    .fillMaxWidth(0.13f)
-                    .fillMaxHeight(0.2f),
-                contentText = "VR Call Index List Result",
-                onClick = {
-                    multipleEventsCutter.processEvent {
-                    }
-                    scope.launch {
-                        viewModel.vrmwManager.setVRResult(VRResult(), CustomVRResult.CallIndexListResult)
-                    }
-                }
-            )
-
-            PttButton(
-                modifier = Modifier
-                    .fillMaxWidth(0.13f)
-                    .fillMaxHeight(0.2f),
-                contentText = "VR Line Number Result",
-                onClick = {
-                    multipleEventsCutter.processEvent {
-                    }
-                    scope.launch {
-                        viewModel.vrmwManager.setVRResult(VRResult(), CustomVRResult.ScrollIndexResult)
-                    }
-                }
-            )
-
-
-            PttButton(
-                modifier = Modifier
-                    .fillMaxWidth(0.13f)
-                    .fillMaxHeight(0.25f),
-                contentText = "Size Up",
-                onClick = {
-                    val resultScreenSizeType = when (domainUiState.screenSizeType) {
-                        is ScreenSizeType.Zero -> ScreenSizeType.Zero
-                        is ScreenSizeType.Small -> ScreenSizeType.Middle
-                        is ScreenSizeType.Middle -> ScreenSizeType.Large
-                        is ScreenSizeType.Large -> ScreenSizeType.Full
-                        is ScreenSizeType.Full -> ScreenSizeType.Full
-                    }
-                    viewModel.onDomainEvent(
-                        MainEvent.ChangeDomainWindowSizeEvent(
-                            resultScreenSizeType
-                        )
-                    )
-                }
-            )
-
-            PttButton(
-                modifier = Modifier
-                    .fillMaxWidth(0.13f)
-                    .fillMaxHeight(0.25f),
-                contentText = "Size Down",
-                onClick = {
-                    val resultScreenSizeType = when (domainUiState.screenSizeType) {
-                        is ScreenSizeType.Zero -> ScreenSizeType.Zero
-                        is ScreenSizeType.Small -> ScreenSizeType.Small
-                        is ScreenSizeType.Middle -> ScreenSizeType.Small
-                        is ScreenSizeType.Large -> ScreenSizeType.Middle
-                        is ScreenSizeType.Full -> ScreenSizeType.Large
-                    }
-                    viewModel.onDomainEvent(
-                        MainEvent.ChangeDomainWindowSizeEvent(
-                            resultScreenSizeType
-                        )
-                    )
-                }
-            )
-        }
-        Column(
+        PttButton(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(end = 250.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            horizontalAlignment = Alignment.End
-        ) {
+                .fillMaxWidth(0.13f)
+                .fillMaxHeight(0.2f),
+            contentText = "VR Call Index List Result",
+            onClick = {
+                multipleEventsCutter.processEvent {
+                }
+                scope.launch {
+                    viewModel.vrmwManager.setVRResult(
+                        VRResult(),
+                        CustomVRResult.CallIndexListResult
+                    )
+                }
+            }
+        )
+
+        PttButton(
+            modifier = Modifier
+                .fillMaxWidth(0.13f)
+                .fillMaxHeight(0.2f),
+            contentText = "VR Line Number Result",
+            onClick = {
+                multipleEventsCutter.processEvent {
+                }
+                scope.launch {
+                    viewModel.vrmwManager.setVRResult(VRResult(), CustomVRResult.ScrollIndexResult)
+                }
+            }
+        )
+
+
+        PttButton(
+            modifier = Modifier
+                .fillMaxWidth(0.13f)
+                .fillMaxHeight(0.25f),
+            contentText = "Size Up",
+            onClick = {
+                val resultScreenSizeType = when (domainUiState.screenSizeType) {
+                    is ScreenSizeType.Zero -> ScreenSizeType.Zero
+                    is ScreenSizeType.Small -> ScreenSizeType.Middle
+                    is ScreenSizeType.Middle -> ScreenSizeType.Large
+                    is ScreenSizeType.Large -> ScreenSizeType.Full
+                    is ScreenSizeType.Full -> ScreenSizeType.Full
+                }
+                viewModel.onDomainEvent(
+                    MainEvent.ChangeDomainWindowSizeEvent(
+                        resultScreenSizeType
+                    )
+                )
+            }
+        )
+
+        PttButton(
+            modifier = Modifier
+                .fillMaxWidth(0.13f)
+                .fillMaxHeight(0.25f),
+            contentText = "Size Down",
+            onClick = {
+                val resultScreenSizeType = when (domainUiState.screenSizeType) {
+                    is ScreenSizeType.Zero -> ScreenSizeType.Zero
+                    is ScreenSizeType.Small -> ScreenSizeType.Small
+                    is ScreenSizeType.Middle -> ScreenSizeType.Small
+                    is ScreenSizeType.Large -> ScreenSizeType.Middle
+                    is ScreenSizeType.Full -> ScreenSizeType.Large
+                }
+                viewModel.onDomainEvent(
+                    MainEvent.ChangeDomainWindowSizeEvent(
+                        resultScreenSizeType
+                    )
+                )
+            }
+        )
+    }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(end = 250.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalAlignment = Alignment.End
+    ) {
 
 
 //            PttButton(
@@ -565,26 +475,30 @@ fun MainRoute(
 //                }
 //            )
 
-            PttButton(
-                modifier = Modifier.fillMaxWidth(0.1f).fillMaxHeight(0.13f),
-                contentText = "Change ScrollIndex 5",
-                onClick = {
-                    viewModel.onDomainEvent(
-                        MainEvent.ChangeScrollIndexEvent(5)
-                    )
-                }
-            )
-            PttButton(
-                modifier = Modifier.fillMaxWidth(0.1f).fillMaxHeight(0.13f),
-                contentText = "Change ScrollIndex 10",
-                onClick = {
-                    viewModel.onDomainEvent(
-                        MainEvent.ChangeScrollIndexEvent(10)
-                    )
-                }
-            )
-        }
+        PttButton(
+            modifier = Modifier
+                .fillMaxWidth(0.1f)
+                .fillMaxHeight(0.13f),
+            contentText = "Change ScrollIndex 5",
+            onClick = {
+                viewModel.onDomainEvent(
+                    MainEvent.ChangeScrollIndexEvent(5)
+                )
+            }
+        )
+        PttButton(
+            modifier = Modifier
+                .fillMaxWidth(0.1f)
+                .fillMaxHeight(0.13f),
+            contentText = "Change ScrollIndex 10",
+            onClick = {
+                viewModel.onDomainEvent(
+                    MainEvent.ChangeScrollIndexEvent(10)
+                )
+            }
+        )
     }
 }
+
 
 
