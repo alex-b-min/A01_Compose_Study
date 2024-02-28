@@ -1,7 +1,10 @@
 package com.example.a01_compose_study.presentation.screen.main
 
 import com.example.a01_compose_study.data.Contact
+import com.example.a01_compose_study.data.custom.sendMsg.MsgData
+import com.example.a01_compose_study.data.custom.sendMsg.ScreenData
 import com.example.a01_compose_study.domain.model.HelpItemData
+import com.example.a01_compose_study.domain.model.NoticeModel
 import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.util.ScreenSizeType
@@ -64,8 +67,25 @@ sealed class DomainUiState(
     ) : DomainUiState(screenSizeType)
 
     data class SendMessageWindow(
+        val domainType: SealedDomainType,
+        override val  screenType: ScreenType,
+        val msgData: MsgData,
+        val isError: Boolean = false,
+        val screenData: ScreenData,
         override val screenSizeType: ScreenSizeType = ScreenSizeType.Zero,
     ) : DomainUiState(screenSizeType)
+
+    data class SendListWindow(
+        val index: Int
+    ) : DomainUiState()
+
+    data class SendScreenWindow(
+        val screenData: ScreenData
+    ): DomainUiState()
+
+    data class ErrorMsgWindow(
+        val notice: NoticeModel
+    ): DomainUiState()
 
     fun copyWithNewSizeType(sizeType: ScreenSizeType): DomainUiState {
         return when (this) {
@@ -79,6 +99,9 @@ sealed class DomainUiState(
             is RadioWindow -> copy(screenSizeType = sizeType)
             is WeatherWindow -> copy(screenSizeType = sizeType)
             is SendMessageWindow -> copy(screenSizeType = sizeType)
+            is SendListWindow -> copy()
+            is SendScreenWindow -> copy()
+            is ErrorMsgWindow -> copy()
         }
     }
 

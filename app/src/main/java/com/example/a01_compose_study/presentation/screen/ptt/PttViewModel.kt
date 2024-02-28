@@ -54,6 +54,16 @@ class PttViewModel @Inject constructor(
             }
 
             is PttEvent.PreparePtt -> {
+                val notice = pttManager.checkStarting()
+                if (notice != null) {
+                    _domainUiState.update { domainUiState ->
+                        (domainUiState as? DomainUiState.PttWindow)?.copy(
+                            screenType = ScreenType.PttAnounce,
+                            errorText = notice.noticeString
+                        ) ?: domainUiState
+                    }
+                }
+                pttManager.pttPrepare()
                 UiState.clearUiState()
             }
 
