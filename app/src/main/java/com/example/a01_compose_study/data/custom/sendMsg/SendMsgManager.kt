@@ -122,7 +122,7 @@ class SendMsgManager @Inject constructor(
         if (errorNotice != null) {
             return ProcSendMsgData(
                 domainType = SealedDomainType.Announce,
-                screenType = ScreenType.PttAnounce,
+                screenType = ScreenType.Prepare,
                 data = SendMsgDataType.ErrorMsgData(
                     notice = errorNotice
                 )

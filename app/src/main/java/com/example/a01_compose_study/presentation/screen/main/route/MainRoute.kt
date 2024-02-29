@@ -268,7 +268,7 @@ fun MainRoute(
                     viewModel.onDomainEvent(
                         event = MainEvent.OpenDomainWindowEvent(
                             domainType = SealedDomainType.Announce,
-                            screenType = ScreenType.PttPrepare,
+                            screenType = ScreenType.Prepare,
                             data = "Help",
                             isError = false,
                             screenSizeType = ScreenSizeType.Small

@@ -96,7 +96,7 @@ class MainViewModel @Inject constructor(
                         onDomainEvent(
                             event = MainEvent.OpenDomainWindowEvent(
                                 domainType = SealedDomainType.Announce,
-                                screenType = ScreenType.PttPrepare,
+                                screenType = ScreenType.Prepare,
                                 data = sealedParsedData.procHelpData.domainType.text,
                                 isError = false,
                                 screenSizeType = ScreenSizeType.Small

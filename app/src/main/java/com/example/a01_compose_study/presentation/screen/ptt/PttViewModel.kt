@@ -65,7 +65,7 @@ class PttViewModel @Inject constructor(
                 _domainUiState.update { domainUiState ->
                     (domainUiState as? DomainUiState.PttWindow)?.copy(
                         isError = false,
-                        screenType = ScreenType.PttPrepare,
+                        screenType = ScreenType.Prepare,
                         guideText = guideString
                     ) ?: domainUiState
                 }
@@ -77,7 +77,7 @@ class PttViewModel @Inject constructor(
                     _domainUiState.update { domainUiState ->
                         (domainUiState as? DomainUiState.PttWindow)?.copy(
                             isError = false,
-                            screenType = ScreenType.PttPrepare,
+                            screenType = ScreenType.Prepare,
                             errorText = notice.noticeString
                         ) ?: domainUiState
                     }
