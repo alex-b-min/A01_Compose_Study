@@ -19,8 +19,6 @@ class PttViewModel @Inject constructor(
 
     private val _domainUiState = UiState._domainUiState
     val announceString = pttManager.announceString
-
-    val announceString = MutableStateFlow("")
     val vrConfig = MutableStateFlow(VrConfig())
     val guideString = MutableLiveData<String>()
 
