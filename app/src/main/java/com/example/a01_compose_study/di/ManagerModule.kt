@@ -48,8 +48,8 @@ object ManagerModule {
 
     @Provides
     @Singleton
-    fun provideHelpManager(): HelpManager {
-        return HelpManager()
+    fun provideHelpManager(@IOCoroutineScope coroutineScope: CoroutineScope,): HelpManager {
+        return HelpManager(coroutineScope)
     }
 
     @Provides

@@ -10,7 +10,7 @@ import com.example.a01_compose_study.data.analyze.ParseDomainType
 import com.example.a01_compose_study.data.analyze.ParserFactory
 import com.example.a01_compose_study.domain.util.CustomLogger
 import com.example.a01_compose_study.presentation.data.UiState
-import com.example.a01_compose_study.presentation.screen.main.CustomVRResult
+import com.example.a01_compose_study.presentation.screen.main.SelectVRResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharedFlow
@@ -73,16 +73,40 @@ class MWContext(
         }
     }
 
-    fun onVRResult(vrResult: VRResult, customVRResult: CustomVRResult) {
+    fun onVRResult(vrResult: VRResult, selectVRResult: SelectVRResult) {
         Log.d("@@ MWContext onVRResult", "${vrResult}")
 //        val bundle = ParserFactory().dataParsing(vrResult, dialogueMode = DialogueMode.HELP)
 //        bundle?.type = ParseDomainType.HELP
 
-        val bundle = when(customVRResult){
-            CustomVRResult.CallIndexListResult -> ParserFactory().dataParsing(vrResult, dialogueMode = DialogueMode.CALL)
-            CustomVRResult.ScrollIndexResult -> ParserFactory().dataParsing(vrResult, dialogueMode = DialogueMode.LIST)
+        val bundle = when (selectVRResult) {
+            SelectVRResult.HelpResult -> {
+                ParserFactory().dataParsing(vrResult, dialogueMode = dialogueMode)
+                    .also {
+                        it?.type = ParseDomainType.HELP
+                        it?.dialogueMode = DialogueMode.CALL
+                    }
+            }
+
+            SelectVRResult.PttResult -> {
+                null
+            }
+
+            SelectVRResult.CallIndexListResult -> {
+                ParserFactory().dataParsing(vrResult, dialogueMode = dialogueMode)
+                    .also {
+                        it?.type = ParseDomainType.CALL
+                        it?.dialogueMode = DialogueMode.CALL
+                    }
+            }
+
+            SelectVRResult.ScrollIndexResult -> {
+                ParserFactory().dataParsing(vrResult, dialogueMode = dialogueMode)
+                    .also {
+                        it?.type = ParseDomainType.CALL
+                        it?.dialogueMode = DialogueMode.LIST
+                    }
+            }
         }
-        bundle?.type = ParseDomainType.CALL
 
         bundle?.let {
             it.contextId = this.contextId

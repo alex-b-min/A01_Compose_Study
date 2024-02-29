@@ -29,7 +29,7 @@ import com.example.a01_compose_study.domain.state.MWState
 import com.example.a01_compose_study.domain.util.CustomLogger
 import com.example.a01_compose_study.domain.util.G2PController
 import com.example.a01_compose_study.presentation.data.ServiceState
-import com.example.a01_compose_study.presentation.screen.main.CustomVRResult
+import com.example.a01_compose_study.presentation.screen.main.SelectVRResult
 import com.example.a01_compose_study.presentation.util.StringManager
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -144,7 +144,10 @@ class VrmwManager @Inject constructor(
         currContext?.onVRError(error)
     }
 
-    fun setVRResult(vrResult: VRResult, customVRResult: CustomVRResult) {
+    /**
+     * currMwContext의 onVRResult()를 실행한다.
+     */
+    fun setVRResult(vrResult: VRResult, selectVRResult: SelectVRResult) {
         /**
          * onVRResult() 로부터 vrResult를 전달받는것을 가정
          */
@@ -168,13 +171,7 @@ class VrmwManager @Inject constructor(
 //        }
 //        currContext?.onVRResult(vrResult)
 
-        val vrResultJsonString = "{ \"result\": [ { \"confidence\": 5018, \"intention\": \"Help\", \"phrase\": \"Help\", \"slot_count\": 0 } ] }"
-        val gson = Gson()
-        val vrResultType = object : TypeToken<VRResult>() {}.type
-
-        val parsedVRResult: VRResult = gson.fromJson(vrResultJsonString, vrResultType)
-
-//        currContext?.onVRResult(parsedVRResult, customVRResult)
+        currContext?.onVRResult(vrResult, selectVRResult)
     }
 
 //    fun setTTSError(error: HTextToSpeechError) {
@@ -258,7 +255,7 @@ class VrmwManager @Inject constructor(
 
     fun resumeVR(context: MWContext, beep: Boolean = true) {
         context.let {
-            setContext(it)
+//            setContext(it)
             StringManager.printSttString("")
             controller.callRecogStart(
                 it.dialogueMode.value,
@@ -279,13 +276,14 @@ class VrmwManager @Inject constructor(
     }
 
     fun startVR(
-        mwContext: MWContext, promptString: String = "", promptArgs: List<String> = listOf()
+        mwContext: MWContext,  promptString: String = "", promptArgs: List<String> = listOf(),
+        selectVRResult: SelectVRResult,
     ) {
         Log.d("@@ VrmwManager startVR", "${mwContext}")
 
 //      stop()
         CustomLogger.i("startVR")
-        setContext(mwContext)
+        setContext(mwContext, selectVRResult)
         currContext.let { context ->
             CustomLogger.i("currScenario set ${context?.dialogueMode}")
             CustomLogger.i("currScenario run ${context?.dialogueMode?.value}")
@@ -399,7 +397,11 @@ class VrmwManager @Inject constructor(
 //        //runnable?.run()
 //    }
 
-    fun setContext(mwContext: MWContext) {
+    /**
+     * 음성인식에 대한 결과값을 만들수가 없어 임의로 더미데이터로 만드는 작업을 setContext에서 진행하고 있음..
+     * 그 후 setVRResult()에게 값을 넘겨주어 setVRResult()는 currMwContext의 onVRResult()를 실행한다.
+     */
+    fun setContext(mwContext: MWContext, selectVRResult: SelectVRResult) {
         Log.d("@@ VrmwManager setContext", "${mwContext}")
 
         currContext = mwContext
@@ -411,9 +413,8 @@ class VrmwManager @Inject constructor(
         val vrResultType = object : TypeToken<VRResult>() {}.type
 
         val parsedVRResult: VRResult = gson.fromJson(vrResultJsonString, vrResultType)
-        val customVRResult = CustomVRResult.ScrollIndexResult
 
-        currContext?.onVRResult(parsedVRResult, customVRResult)
+        setVRResult(vrResult = parsedVRResult, selectVRResult = selectVRResult)
     }
 
     fun vrStop() {

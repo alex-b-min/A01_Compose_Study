@@ -14,16 +14,12 @@ import com.example.a01_compose_study.data.custom.SealedParsedData
 import com.example.a01_compose_study.data.custom.VRResultListener
 import com.example.a01_compose_study.data.pasing.CallModel
 import com.example.a01_compose_study.data.pasing.CommonModel
-import com.example.a01_compose_study.di.ApplicationScope
-import com.example.a01_compose_study.di.IoDispatcher
 import com.example.a01_compose_study.domain.model.NoticeModel
 import com.example.a01_compose_study.presentation.data.UiState
 import com.example.a01_compose_study.presentation.data.UiState.getCurrDomainUiState
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -37,7 +33,6 @@ class CallManager @Inject constructor(
 ) : VRResultListener {
 
     private val _sealedParsedData = UiState._sealedParsedData
-    val sealedParsedData: SharedFlow<SealedParsedData> = UiState._sealedParsedData
 
     private var recogCategory = 0
 
@@ -50,8 +45,7 @@ class CallManager @Inject constructor(
             DialogueMode.CALL -> {
                 Log.d("@@ dialogueMode : ", "${DialogueMode.CALL}")
 
-                val callModel =
-                    CallModel("Sample Intent") //bundle의 model 값을 이용하는게 아닌 임의로 직접 CallModel을 생성해서 테스트함
+                val callModel = CallModel("Sample Intent") //bundle의 model 값을 이용하는게 아닌 임의로 직접 CallModel을 생성해서 테스트함
                 callModel.items = fetchMutableRecognizedContacts(1)
                 Log.d("@@ CallModel", "${callModel}")
 
@@ -244,6 +238,8 @@ class CallManager @Inject constructor(
 
     override fun onReceiveBundle(bundle: ParseBundle<out Any>) {
         coroutineScope.launch {
+            Log.d("@@ Call onReceiveBundle", "${bundle}")
+
             val procCallData = parsedData(bundle)
             Log.d("@@ procCallData", "${procCallData}")
             _sealedParsedData.emit(SealedParsedData.CallData(procCallData))
