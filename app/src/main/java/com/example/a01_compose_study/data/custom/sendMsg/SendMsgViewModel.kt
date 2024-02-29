@@ -44,6 +44,8 @@ class SendMsgViewModel @Inject constructor() : ViewModel(){
             is SendMsgEvent.SendMessageNo ->{
 
             }
+
+            else -> {}
         }
 
     }
