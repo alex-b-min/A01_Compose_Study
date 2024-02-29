@@ -423,6 +423,10 @@ fun MainRoute(
                 .fillMaxHeight(0.13f),
             contentText = "Change ScrollIndex 5",
             onClick = {
+                /**
+                 * 발화로 스크롤이 변경되는 환경이라면 CallViewModel의 Event에 있어야 하지만,
+                 * 현재 버튼 클릭으로 index 값을 직접 주입해야 하는 환경이 MainEvent에 임의로 정의해서 사용하고 있는 상황
+                 */
                 onDomainEvent(
                     MainEvent.ChangeScrollIndexEvent(5)
                 )

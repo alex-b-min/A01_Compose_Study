@@ -7,6 +7,4 @@ sealed class CallEvent {
     data class ChangeScrollIndexEvent(
         val selectedScrollIndex: Int
     ) : CallEvent()
-
-    object Calling : CallEvent()
 }

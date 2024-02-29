@@ -31,6 +31,7 @@ import com.example.a01_compose_study.domain.model.HelpItemData
 import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.util.ScreenSizeType
+import com.example.a01_compose_study.presentation.screen.call.CallBusinessEvent
 import com.example.a01_compose_study.presentation.screen.call.CallEvent
 import com.example.a01_compose_study.presentation.screen.call.CallViewModel
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
@@ -66,8 +67,7 @@ fun CallScreen(
 //                    }?.let { callViewModel.onCallEvent(it) }
 
                 },
-                onCalling = {
-                    callViewModel.onCallEvent(event = CallEvent.Calling)
+                onCalling = { callViewModel.onCallBusinessEvent(event = CallBusinessEvent.Calling)
                 },
                 onItemClick = { /*TODO*/ }
             )

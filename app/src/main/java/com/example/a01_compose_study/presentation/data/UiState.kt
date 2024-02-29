@@ -155,6 +155,10 @@ object UiState {
             }
 
             is MainEvent.ChangeScrollIndexEvent -> {
+                /**
+                 * 발화로 스크롤이 변경되는 환경이라면 CallViewModel의 Event에 있어야 하지만,
+                 * 현재 버튼 클릭으로 index 값에 대한 스크롤이 변경되는 환경이라 MainEvent에 임의로 정의해서 사용하고 있는 상황
+                 */
                 Log.d("@@  MainEvent.ChangeScrollIndexEvent", "수행 / ${event.selectedScrollIndex}")
                 _domainUiState.update { domainUiState ->
                     domainUiState.copyWithNewScrollIndex(event.selectedScrollIndex)!!

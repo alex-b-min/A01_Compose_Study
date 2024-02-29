@@ -45,6 +45,7 @@ sealed class DomainUiState(
         val domainType: SealedDomainType,
         val data: List<Contact>,
         val detailData: Contact = Contact(),
+        val isError: Boolean = false,
         val scrollIndex: Int? = null,
         override val  screenType: ScreenType,
         override val screenSizeType: ScreenSizeType,
