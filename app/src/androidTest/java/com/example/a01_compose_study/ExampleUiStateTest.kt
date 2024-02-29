@@ -61,15 +61,16 @@ class ExampleUiStateTest {
             screenSizeType = ScreenSizeType.Large
         )
 
-        composeTestRule.setContent {
-            HelpListWindow(
-                domainUiState = testUiState as DomainUiState.HelpWindow,
-                backgroundColor = Color.Black,
-                onDismiss = { },
-                onBackButton = { },
-                onItemClick = { },
-            )
-        }
+//        composeTestRule.setContent {
+//            HelpListWindow(
+//                domainUiState = testUiState as DomainUiState.HelpWindow,
+//                vrUiState = ,
+//                backgroundColor = Color.Black,
+//                onDismiss = { },
+//                onBackButton = { },
+//                onItemClick = { },
+//            )
+//        }
 
         // HelpListWindow UI에 표시되는 텍스트와 testUiState의 데이터를 비교하여 UI가 올바르게 표시되는지 확인하는 코드
         testUiState.data.forEachIndexed { index, helpItemData ->

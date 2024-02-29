@@ -14,6 +14,7 @@ import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.data.UiState
+import com.example.a01_compose_study.presentation.data.UiState.onDomainEvent
 import com.example.a01_compose_study.presentation.screen.main.route.VRUiState
 import com.example.a01_compose_study.presentation.screen.ptt.VrmwManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,6 +23,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -29,7 +31,6 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     val vrmwManager: VrmwManager, // MainViewModel에서 필요한 이유는, 음성인식 결과를 직접적으로 생성하기 위해
-//    private val job: CoroutineScope,
 ) : ViewModel() {
 
     private val sealedParsedData: SharedFlow<SealedParsedData> = UiState._sealedParsedData
@@ -52,7 +53,9 @@ class MainViewModel @Inject constructor(
 
     private fun collectParsedData() {
         viewModelScope.launch {
-            sealedParsedData.collect { sealedParsedData ->
+            sealedParsedData.onEach { sealedParsedData ->
+//                TODO("사전처리 작업이 있을 때 로직 추가")
+            }.collect { sealedParsedData ->
                 when (sealedParsedData) {
                     is SealedParsedData.ErrorData -> {
                         when (sealedParsedData.error) {
@@ -121,31 +124,19 @@ class MainViewModel @Inject constructor(
                             }
 
                             is ProcCallData.ListTTSRequest -> {
-                                Log.d(
-                                    "@@ ProcCallData",
-                                    "ListTTSRequest - Prompt ID: ${sealedParsedData.procCallData.promptId}"
-                                )
+                                Log.d("@@ ProcCallData", "ListTTSRequest - Prompt ID: ${sealedParsedData.procCallData.promptId}")
                             }
 
                             is ProcCallData.NoticeTTSRequest -> {
-                                Log.d(
-                                    "@@ ProcCallData",
-                                    "NoticeTTSRequest - Notice Model: ${sealedParsedData.procCallData.noticeModel}"
-                                )
+                                Log.d("@@ ProcCallData", "NoticeTTSRequest - Notice Model: ${sealedParsedData.procCallData.noticeModel}")
                             }
 
                             is ProcCallData.ProcCallNameScreen -> {
-                                Log.d(
-                                    "@@ ProcCallData",
-                                    "ProcCallNameScreen - Contact: ${sealedParsedData.procCallData.data}"
-                                )
+                                Log.d("@@ ProcCallData", "ProcCallNameScreen - Contact: ${sealedParsedData.procCallData.data}")
                             }
 
                             is ProcCallData.RecognizedContactListScreen -> {
-                                Log.d(
-                                    "@@ ProcCallData",
-                                    "ContactListScreen - Contact List: ${sealedParsedData.procCallData.data}"
-                                )
+                                Log.d("@@ ProcCallData", "ContactListScreen - Contact List: ${sealedParsedData.procCallData.data}")
                                 onDomainEvent(
                                     event = MainEvent.OpenDomainWindowEvent(
                                         domainType = sealedParsedData.procCallData.sealedDomainType,
@@ -159,26 +150,18 @@ class MainViewModel @Inject constructor(
 
                             is ProcCallData.AllContactListScreen -> {
                                 Log.d(
-                                    "@@ ProcCallData",
-                                    "FullContactListScreen - Full Contact List: ${sealedParsedData.procCallData.data}"
-                                )
+                                    "@@ ProcCallData", "FullContactListScreen - Full Contact List: ${sealedParsedData.procCallData.data}")
                             }
 
                             is ProcCallData.ScrollIndex -> {
                                 if (sealedParsedData.procCallData.index != null) {
                                     onDomainEvent(MainEvent.ChangeScrollIndexEvent(sealedParsedData.procCallData.index))
                                 }
-                                Log.d(
-                                    "@@ ProcCallData",
-                                    "ScrollIndex - Index: ${sealedParsedData.procCallData.index}"
-                                )
+                                Log.d("@@ ProcCallData", "ScrollIndex - Index: ${sealedParsedData.procCallData.index}")
                             }
 
                             is ProcCallData.ProcYesNoOtherNumberResult -> {
-                                Log.d(
-                                    "@@ ProcCallData",
-                                    "YesNoOtherNumberResultProc - Result: ${sealedParsedData.procCallData.callYesNoOtherNumberResult}"
-                                )
+                                Log.d("@@ ProcCallData", "YesNoOtherNumberResultProc - Result: ${sealedParsedData.procCallData.callYesNoOtherNumberResult}")
                             }
                         }
                     }

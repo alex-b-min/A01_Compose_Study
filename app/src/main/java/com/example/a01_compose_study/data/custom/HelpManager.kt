@@ -1,5 +1,6 @@
 package com.example.a01_compose_study.data.custom
 
+import android.util.Log
 import com.example.a01_compose_study.data.HVRError
 import com.example.a01_compose_study.data.analyze.ParseBundle
 import com.example.a01_compose_study.domain.model.HelpItemData
@@ -7,11 +8,19 @@ import com.example.a01_compose_study.domain.model.HelpVRData
 import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.util.ScreenSizeType
+import com.example.a01_compose_study.presentation.data.UiState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class HelpManager @Inject constructor() : VRResultListener{
+class HelpManager @Inject constructor(
+    private val coroutineScope: CoroutineScope,
+) : VRResultListener{
+
+    private val _sealedParsedData = UiState._sealedParsedData
 
     fun parsedData(bundle: ParseBundle<out Any>): ProcHelpData {
         /**
@@ -114,18 +123,24 @@ class HelpManager @Inject constructor() : VRResultListener{
     }
 
     override fun onReceiveBundle(bundle: ParseBundle<out Any>) {
-        TODO("Not yet implemented")
+        coroutineScope.launch {
+            Log.d("@@ Call onReceiveBundle", "${bundle}")
+
+            val procHelpData = parsedData(bundle)
+            Log.d("@@ procCallData", "${procHelpData}")
+            _sealedParsedData.emit(SealedParsedData.HelpData(procHelpData))
+        }
     }
 
     override fun onBundleParsingErr() {
-        TODO("Not yet implemented")
+//        TODO("Not yet implemented")
     }
 
     override fun onCancel() {
-        TODO("Not yet implemented")
+//        TODO("Not yet implemented")
     }
 
     override fun onVRError(error: HVRError) {
-        TODO("Not yet implemented")
+//        TODO("Not yet implemented")
     }
 }

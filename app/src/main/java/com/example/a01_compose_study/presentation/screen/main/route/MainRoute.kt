@@ -27,11 +27,12 @@ import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.components.button.PttButton
 import com.example.a01_compose_study.presentation.components.lottie.LottieAssetAnimationHandler
 import com.example.a01_compose_study.presentation.components.lottie.LottieRawAnimationHandler
-import com.example.a01_compose_study.presentation.data.UiState
+import com.example.a01_compose_study.presentation.data.UiState.onDomainEvent
+import com.example.a01_compose_study.presentation.data.UiState.onVREvent
+import com.example.a01_compose_study.presentation.screen.SelectVRResult
 import com.example.a01_compose_study.presentation.screen.announce.AnnounceScreen
 import com.example.a01_compose_study.presentation.screen.call.screen.CallScreen
 import com.example.a01_compose_study.presentation.screen.help.screen.ComposeHelpScreen
-import com.example.a01_compose_study.presentation.screen.main.CustomVRResult
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
 import com.example.a01_compose_study.presentation.screen.main.MainEvent
 import com.example.a01_compose_study.presentation.screen.main.MainViewModel
@@ -58,7 +59,6 @@ fun MainRoute(
 
     val multipleEventsCutter = remember { MultipleEventsCutter.get() }
 
-//    val mwContext = ServiceState.mwContext
     val announceString by pttViewModel.announceString.collectAsStateWithLifecycle()
 
     /**
@@ -76,65 +76,15 @@ fun MainRoute(
         domainUiState = domainUiState,
         domainWindowVisible = domainWindowVisibleState,
         onCloseDomainWindow = {
-            viewModel.onDomainEvent(MainEvent.CloseDomainWindowEvent)
+            onDomainEvent(MainEvent.CloseDomainWindowEvent)
         }) {
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.BottomCenter
         ) {
-            if (vrUiState.active) {
-                if (vrUiState.isError) {
-                    LottieAssetAnimationHandler(
-                        modifier = Modifier.fillMaxSize(),
-                        lottieJsonAssetPath = "bg_glow/frame_error_glow_l_lt.json",
-                        lottieImageAssetFolder = "bg_glow/images/error",
-                        infiniteLoop = true
-                    )
-                } else {
-                    LottieAssetAnimationHandler(
-                        modifier = Modifier.fillMaxSize(),
-                        lottieJsonAssetPath = "bg_glow/09_tsd_frame_glow_l_lt.json",
-                        lottieImageAssetFolder = "bg_glow/images/default",
-                        infiniteLoop = true
-                    )
-
-                    when (vrUiState) {
-                        is VRUiState.PttNone -> {
-                        }
-
-                        is VRUiState.PttLoading -> {
-                            LottieRawAnimationHandler(
-                                modifier = Modifier.fillMaxSize(),
-                                rawResId = R.raw.tsd_thinking_loop_fix_lt_03_2,
-                                infiniteLoop = true,
-                                onFrameChanged = { currentFrame ->
-                                }
-                            )
-                        }
-
-                        is VRUiState.PttListen -> {
-                            LottieRawAnimationHandler(
-                                modifier = Modifier.fillMaxSize(),
-                                rawResId = R.raw.tsd_listening_passive_loop_lt_01_2,
-                                infiniteLoop = true,
-                                onFrameChanged = { currentFrame ->
-                                }
-                            )
-                        }
-
-                        is VRUiState.PttSpeak -> {
-                            LottieRawAnimationHandler(
-                                modifier = Modifier.fillMaxSize(),
-                                rawResId = R.raw.loop,
-                                infiniteLoop = true,
-                                onFrameChanged = { currentFrame ->
-                                }
-                            )
-                        }
-                    }
-                }
-            }
+            VrUiAnimationHandler(vrUiState)
         }
+
         Log.d("@@ domainUiState When문 위에서 시작", "${domainUiState}")
         Log.d("@@ domainUiState When문 위에서 시작", "${domainWindowVisibleState}")
         when (domainUiState) {
@@ -142,6 +92,7 @@ fun MainRoute(
             }
 
             is DomainUiState.PttWindow -> {
+                Log.d("@@ PttWindow 진입", "몇번 실행?")
                 ComposePttScreen(
                     domainUiState = domainUiState as DomainUiState.PttWindow,
                     contentColor = Color.White,
@@ -158,7 +109,7 @@ fun MainRoute(
                         contentColor = Color.Gray,
                         backgroundColor = Black2
                     )
-                    UiState.onVREvent(
+                    onVREvent(
                         VREvent.ChangeVRUIEvent(
                             VRUiState.PttLoading(
                                 active = true,
@@ -183,6 +134,14 @@ fun MainRoute(
                         vrDynamicBackground = if (vrUiState.active) Color.Transparent else Color.Black,
                         fixedBackground = Black2
                     )
+//                    onVREvent(
+//                        VREvent.ChangeVRUIEvent(
+//                            VRUiState.PttLoading(
+//                                active = true,
+//                                isError = false
+//                            )
+//                        )
+//                    )
                 }
             }
 
@@ -221,16 +180,7 @@ fun MainRoute(
             modifier = Modifier.fillMaxSize(0.13f),
             contentText = "PTT Open",
             onClick = {
-                viewModel.onDomainEvent(
-                    event = MainEvent.OpenDomainWindowEvent(
-                        domainType = SealedDomainType.Ptt,
-                        screenType = ScreenType.PttListen,
-                        data = announceString,
-                        isError = false,
-                        screenSizeType = ScreenSizeType.Small
-                    )
-                )
-                pttViewModel.onPttEvent(PttEvent.StartVR())
+                pttViewModel.onPttEvent(PttEvent.StartVR(SelectVRResult.PttResult))
             }
         )
 
@@ -265,7 +215,7 @@ fun MainRoute(
             contentText = "PTT Announce",
             onClick = {
                 scope.launch {
-                    viewModel.onDomainEvent(
+                    onDomainEvent(
                         event = MainEvent.OpenDomainWindowEvent(
                             domainType = SealedDomainType.Announce,
                             screenType = ScreenType.Prepare,
@@ -283,8 +233,16 @@ fun MainRoute(
             contentText = "PTT Close",
             onClick = {
                 scope.launch {
-                    viewModel.onDomainEvent(MainEvent.CloseDomainWindowEvent)
+                    onDomainEvent(MainEvent.CloseDomainWindowEvent)
                 }
+            }
+        )
+
+        PttButton(
+            modifier = Modifier.fillMaxSize(0.13f),
+            contentText = "PTT Help",
+            onClick = {
+                pttViewModel.onPttEvent(PttEvent.StartVR(SelectVRResult.HelpResult))
             }
         )
 
@@ -312,38 +270,6 @@ fun MainRoute(
         PttButton(
             modifier = Modifier
                 .fillMaxWidth(0.13f)
-                .fillMaxHeight(0.2f),
-            contentText = "VR Call Index List Result",
-            onClick = {
-                multipleEventsCutter.processEvent {
-                }
-                scope.launch {
-                    viewModel.vrmwManager.setVRResult(
-                        VRResult(),
-                        CustomVRResult.CallIndexListResult
-                    )
-                }
-            }
-        )
-
-        PttButton(
-            modifier = Modifier
-                .fillMaxWidth(0.13f)
-                .fillMaxHeight(0.2f),
-            contentText = "VR Line Number Result",
-            onClick = {
-                multipleEventsCutter.processEvent {
-                }
-                scope.launch {
-                    viewModel.vrmwManager.setVRResult(VRResult(), CustomVRResult.ScrollIndexResult)
-                }
-            }
-        )
-
-
-        PttButton(
-            modifier = Modifier
-                .fillMaxWidth(0.13f)
                 .fillMaxHeight(0.25f),
             contentText = "Size Up",
             onClick = {
@@ -354,7 +280,7 @@ fun MainRoute(
                     is ScreenSizeType.Large -> ScreenSizeType.Full
                     is ScreenSizeType.Full -> ScreenSizeType.Full
                 }
-                viewModel.onDomainEvent(
+                onDomainEvent(
                     MainEvent.ChangeDomainWindowSizeEvent(
                         resultScreenSizeType
                     )
@@ -375,7 +301,7 @@ fun MainRoute(
                     is ScreenSizeType.Large -> ScreenSizeType.Middle
                     is ScreenSizeType.Full -> ScreenSizeType.Large
                 }
-                viewModel.onDomainEvent(
+                onDomainEvent(
                     MainEvent.ChangeDomainWindowSizeEvent(
                         resultScreenSizeType
                     )
@@ -471,22 +397,44 @@ fun MainRoute(
 
         PttButton(
             modifier = Modifier
-                .fillMaxWidth(0.1f)
+                .fillMaxWidth(0.12f)
+                .fillMaxHeight(0.13f),
+            contentText = "VR Call Index List Result",
+            onClick = {
+                pttViewModel.onPttEvent(PttEvent.StartVR(SelectVRResult.CallIndexListResult))
+            }
+        )
+
+        PttButton(
+            modifier = Modifier
+                .fillMaxWidth(0.12f)
+                .fillMaxHeight(0.13f),
+            contentText = "VR Line Number Result",
+            onClick = {
+                scope.launch {
+                    viewModel.vrmwManager.setVRResult(VRResult(), SelectVRResult.ScrollIndexResult)
+                }
+            }
+        )
+
+        PttButton(
+            modifier = Modifier
+                .fillMaxWidth(0.12f)
                 .fillMaxHeight(0.13f),
             contentText = "Change ScrollIndex 5",
             onClick = {
-                viewModel.onDomainEvent(
+                onDomainEvent(
                     MainEvent.ChangeScrollIndexEvent(5)
                 )
             }
         )
         PttButton(
             modifier = Modifier
-                .fillMaxWidth(0.1f)
+                .fillMaxWidth(0.12f)
                 .fillMaxHeight(0.13f),
             contentText = "Change ScrollIndex 10",
             onClick = {
-                viewModel.onDomainEvent(
+                onDomainEvent(
                     MainEvent.ChangeScrollIndexEvent(10)
                 )
             }
@@ -494,5 +442,69 @@ fun MainRoute(
     }
 }
 
+/**
+ * 계속해서 리컴포지션이 발생되는 오류가 있음 추후 수정해야함..
+ */
+@Composable
+fun VrUiAnimationHandler(vrUiState: VRUiState) {
+    when {
+        vrUiState.active && vrUiState.isError -> {
+            LottieAssetAnimationHandler(
+                modifier = Modifier.fillMaxSize(),
+                lottieJsonAssetPath = "bg_glow/frame_error_glow_l_lt.json",
+                lottieImageAssetFolder = "bg_glow/images/error",
+                infiniteLoop = true
+            )
+        }
+
+        vrUiState.active -> {
+            LottieAssetAnimationHandler(
+                modifier = Modifier.fillMaxSize(),
+                lottieJsonAssetPath = "bg_glow/09_tsd_frame_glow_l_lt.json",
+                lottieImageAssetFolder = "bg_glow/images/default",
+                infiniteLoop = true
+            )
+            when (vrUiState) {
+                is VRUiState.PttLoading -> {
+                    LottieRawAnimationHandler(
+                        modifier = Modifier.fillMaxSize(),
+                        rawResId = R.raw.tsd_thinking_loop_fix_lt_03_2,
+                        infiniteLoop = true,
+                        onFrameChanged = { currentFrame ->
+                            // 필요한 경우 처리
+                        }
+                    )
+                }
+
+                is VRUiState.PttListen -> {
+                    LottieRawAnimationHandler(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        rawResId = R.raw.tsd_listening_passive_loop_lt_01_2,
+                        infiniteLoop = true,
+                        onFrameChanged = { currentFrame ->
+                            // 필요한 경우 처리
+                        }
+                    )
+                }
+
+                is VRUiState.PttSpeak -> {
+                    LottieRawAnimationHandler(
+                        modifier = Modifier.fillMaxSize(),
+                        rawResId = R.raw.loop,
+                        infiniteLoop = true,
+                        onFrameChanged = { currentFrame ->
+                            // 필요한 경우 처리
+                        }
+                    )
+                }
+
+                else -> {
+                    // 다른 상태에 대한 처리
+                }
+            }
+        }
+    }
+}
 
 

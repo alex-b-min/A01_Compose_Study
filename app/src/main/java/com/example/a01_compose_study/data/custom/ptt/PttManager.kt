@@ -15,9 +15,9 @@ import com.example.a01_compose_study.data.custom.VRResultListener
 import com.example.a01_compose_study.domain.model.NoticeModel
 import com.example.a01_compose_study.domain.util.CustomLogger
 import com.example.a01_compose_study.presentation.data.ServiceState
+import com.example.a01_compose_study.presentation.screen.SelectVRResult
 import com.example.a01_compose_study.presentation.screen.ptt.VrmwManager
 import kotlinx.coroutines.flow.MutableStateFlow
-import java.util.Random
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -70,21 +70,21 @@ class PttManager @Inject constructor(
     }
 
     override fun onBundleParsingErr() {
-        TODO("BaseManager 클래스를 만들어 공통적으로 처리")
+//        TODO("BaseManager 클래스를 만들어 공통적으로 처리")
     }
 
     override fun onCancel() {
-        TODO("BaseManager 클래스를 만들어 공통적으로 처리")
+//        TODO("BaseManager 클래스를 만들어 공통적으로 처리")
     }
 
     override fun onVRError(error: HVRError) {
-        TODO("BaseManager 클래스를 만들어 공통적으로 처리")
+//        TODO("BaseManager 클래스를 만들어 공통적으로 처리")
     }
 
-    fun pttEvent() {
+    fun pttEvent(selectVRResult: SelectVRResult) {
         val mwContext = MWContext(DialogueMode.MAINMENU, this)
         Log.d("@@ PttManager pttEvent", "${mwContext}")
-        vrmwManager.startVR(mwContext)
+        vrmwManager.startVR(mwContext = mwContext, selectVRResult = selectVRResult)
     }
 
 //    fun pttPrepare() {
@@ -178,30 +178,33 @@ class PttManager @Inject constructor(
         return String.format(vrmwManager.context.getString(id), *args)
     }
 
+    /**
+     * 기기 연동 환경이 되어 있지 않으므로 NoticeModel을 null로 고정한다.
+     */
     fun checkStarting(): NoticeModel? {
-        defaultAnnounceString = getString(R.string.TID_CMN_COMM_01_02)
-
-        checkSupportLanguage()?.let {
-            return it
-        }
-        checkBootComplete()?.let {
-            return it
-        }
-        checkNaviComplete()?.let {
-            return it
-        }
-        checkOfflineMode()?.let {
-            return it
-        }
-
-        CustomLogger.i("checkStarting defaultAnnounceString : $defaultAnnounceString")
-
-
-        if (!defaultAnnounceString.equals(getString(R.string.TID_CMN_COMM_01_02))) {
-            guideString.postValue("")
-        }
-
         return null
+
+//        defaultAnnounceString = getString(R.string.TID_CMN_COMM_01_02)
+//
+//        checkSupportLanguage()?.let {
+//            return it
+//        }
+//        checkBootComplete()?.let {
+//            return it
+//        }
+//        checkNaviComplete()?.let {
+//            return it
+//        }
+//        checkOfflineMode()?.let {
+//            return it
+//        }
+//
+//        CustomLogger.i("checkStarting defaultAnnounceString : $defaultAnnounceString")
+//
+//
+//        if (!defaultAnnounceString.equals(getString(R.string.TID_CMN_COMM_01_02))) {
+//            guideString.postValue("")
+//        }
     }
 
     fun checkSupportLanguage(): NoticeModel? {

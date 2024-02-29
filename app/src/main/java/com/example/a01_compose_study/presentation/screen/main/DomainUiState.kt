@@ -23,7 +23,7 @@ sealed class DomainUiState(
         val isError: Boolean = false,
         val errorText: String = "",
         val guideText: String = "",
-        override val screenSizeType: ScreenSizeType = ScreenSizeType.Zero,
+        override val screenSizeType: ScreenSizeType = ScreenSizeType.Middle,
     ) : DomainUiState(screenSizeType)
 
     data class HelpWindow(
@@ -33,7 +33,7 @@ sealed class DomainUiState(
         val detailData: HelpItemData = HelpItemData(command = ""),
         val isError: Boolean = false,
         val text: String = "",
-        override val screenSizeType: ScreenSizeType = ScreenSizeType.Zero,
+        override val screenSizeType: ScreenSizeType = ScreenSizeType.Small,
     ) : DomainUiState(screenSizeType)
 
     data class AnnounceWindow(
