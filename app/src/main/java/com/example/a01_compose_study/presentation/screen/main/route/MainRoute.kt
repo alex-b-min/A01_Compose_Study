@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -28,7 +27,6 @@ import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.components.button.PttButton
 import com.example.a01_compose_study.presentation.components.lottie.LottieAssetAnimationHandler
 import com.example.a01_compose_study.presentation.components.lottie.LottieRawAnimationHandler
-import com.example.a01_compose_study.presentation.data.ServiceState
 import com.example.a01_compose_study.presentation.data.UiState
 import com.example.a01_compose_study.presentation.screen.announce.AnnounceScreen
 import com.example.a01_compose_study.presentation.screen.call.screen.CallScreen
@@ -184,15 +182,6 @@ fun MainRoute(
                         vrDynamicBackground = if (vrUiState.active) Color.Transparent else Color.Black,
                         fixedBackground = Black2
                     )
-
-//                                UiState.onVREvent(
-//                                    VREvent.ChangeVRUIEvent(
-//                                        VRUiState.PttLoading(
-//                                            active = true,
-//                                            isError = false
-//                                        )
-//                                    )
-//                                )
                 }
             }
 
@@ -229,10 +218,6 @@ fun MainRoute(
             modifier = Modifier.fillMaxSize(0.13f),
             contentText = "PTT Open",
             onClick = {
-                multipleEventsCutter.processEvent {
-
-                }
-
                 viewModel.onDomainEvent(
                     event = MainEvent.OpenDomainWindowEvent(
                         domainType = SealedDomainType.Ptt,
@@ -242,9 +227,15 @@ fun MainRoute(
                         screenSizeType = ScreenSizeType.Small
                     )
                 )
-
-//                pttViewModel.onPttEvent(PttEvent.PreparePtt)
                 pttViewModel.onPttEvent(PttEvent.StartVR())
+            }
+        )
+
+        PttButton(
+            modifier = Modifier.fillMaxSize(0.13f),
+            contentText = "PTT Prepare",
+            onClick = {
+                pttViewModel.onPttEvent(PttEvent.PreparePtt)
             }
         )
 
@@ -252,9 +243,7 @@ fun MainRoute(
             modifier = Modifier.fillMaxSize(0.13f),
             contentText = "PTT Speak",
             onClick = {
-                scope.launch {
-                    pttViewModel.onPttEvent(PttEvent.SetSpeakType)
-                }
+                pttViewModel.onPttEvent(PttEvent.SetSpeakType)
             }
         )
 
@@ -276,7 +265,7 @@ fun MainRoute(
                     viewModel.onDomainEvent(
                         event = MainEvent.OpenDomainWindowEvent(
                             domainType = SealedDomainType.Announce,
-                            screenType = ScreenType.PttAnounce,
+                            screenType = ScreenType.PttPrepare,
                             data = "Help",
                             isError = false,
                             screenSizeType = ScreenSizeType.Small

@@ -16,6 +16,9 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieAnimatable
 import com.airbnb.lottie.compose.rememberLottieComposition
 
+/**
+ * Asset은 배경화면
+ */
 @Composable
 fun LottieAssetAnimationHandler(
     modifier: Modifier,

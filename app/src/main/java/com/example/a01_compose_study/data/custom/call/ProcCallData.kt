@@ -1,7 +1,6 @@
 package com.example.a01_compose_study.data.custom.call
 
 import com.example.a01_compose_study.data.Contact
-import com.example.a01_compose_study.data.custom.SealedParsedData
 import com.example.a01_compose_study.domain.model.NoticeModel
 import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.model.SealedDomainType
@@ -15,7 +14,7 @@ sealed class ProcCallData(
 
     object RejectRequest : ProcCallData(
         sealedDomainType = SealedDomainType.Announce,
-        screenType = ScreenType.PttAnounce
+        screenType = ScreenType.PttPrepare
     )
 
     data class ListTTSRequest(val promptId: String) : ProcCallData(screenType = ScreenType.CallList)

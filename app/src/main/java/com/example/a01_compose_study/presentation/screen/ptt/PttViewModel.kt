@@ -26,6 +26,9 @@ class PttViewModel @Inject constructor(
     var onlineRandomCommands = mutableListOf("")
     var offlineRandomCommands = mutableListOf("")
 
+    /**
+     * DomainUiState-PttWindow 타입을 유지한 채 Ptt의 상태에 따라 screenType만을 변경하여 UI 구성
+     */
     fun onPttEvent(event: PttEvent) {
         when (event) {
             is PttEvent.SetListenType -> {
@@ -55,30 +58,31 @@ class PttViewModel @Inject constructor(
                 }
             }
 
-            is PttEvent.SetAnnounceType -> {
+            is PttEvent.PreparePtt -> {
+                val guideString = pttManager.pttPrepare()
+
                 _domainUiState.update { domainUiState ->
                     (domainUiState as? DomainUiState.PttWindow)?.copy(
-                        screenType = ScreenType.PttAnounce
+                        isError = false,
+                        screenType = ScreenType.PttPrepare,
+                        guideText = guideString
                     ) ?: domainUiState
                 }
             }
 
-            is PttEvent.PreparePtt -> {
+            is PttEvent.StartVR -> {
                 val notice = pttManager.checkStarting()
                 if (notice != null) {
                     _domainUiState.update { domainUiState ->
                         (domainUiState as? DomainUiState.PttWindow)?.copy(
-                            screenType = ScreenType.PttAnounce,
+                            isError = false,
+                            screenType = ScreenType.PttPrepare,
                             errorText = notice.noticeString
                         ) ?: domainUiState
                     }
+                } else {
+                    pttManager.pttEvent()
                 }
-                pttManager.pttPrepare()
-                UiState.clearUiState()
-            }
-
-            is PttEvent.StartVR -> {
-                pttManager.pttEvent()
             }
         }
     }
