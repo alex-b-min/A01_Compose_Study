@@ -8,6 +8,7 @@ import com.example.a01_compose_study.data.custom.DataProducer
 import com.example.a01_compose_study.data.custom.HelpManager
 import com.example.a01_compose_study.data.custom.call.CallManager
 import com.example.a01_compose_study.data.custom.ptt.PttManager
+import com.example.a01_compose_study.data.custom.sendMsg.SendMsgManager
 import com.example.a01_compose_study.data.repository.help.HelpRepositoryImpl
 import com.example.a01_compose_study.domain.repository.domain.HelpRepository
 import com.example.a01_compose_study.domain.usecase.HelpUseCase
@@ -20,6 +21,7 @@ import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
@@ -114,5 +116,15 @@ object ManagerModule {
         )
     }
 
-
+    @Provides
+    @Singleton
+    fun provideSendMsgManager(
+        contactsManager: ContactsManager,
+        @IOCoroutineScope ioCoroutineScope: CoroutineScope,
+    ): SendMsgManager {
+        return SendMsgManager(
+            contactsManager = contactsManager,
+            job = ioCoroutineScope,
+        )
+    }
 }

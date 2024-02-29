@@ -19,6 +19,7 @@ class PttViewModel @Inject constructor(
 
     private val _domainUiState = UiState._domainUiState
     val announceString = pttManager.announceString
+
     val vrConfig = MutableStateFlow(VrConfig())
     val guideString = MutableLiveData<String>()
 
@@ -64,7 +65,7 @@ class PttViewModel @Inject constructor(
                 _domainUiState.update { domainUiState ->
                     (domainUiState as? DomainUiState.PttWindow)?.copy(
                         isError = false,
-                        screenType = ScreenType.PttPrepare,
+                        screenType = ScreenType.Prepare,
                         guideText = guideString
                     ) ?: domainUiState
                 }
@@ -76,7 +77,7 @@ class PttViewModel @Inject constructor(
                     _domainUiState.update { domainUiState ->
                         (domainUiState as? DomainUiState.PttWindow)?.copy(
                             isError = false,
-                            screenType = ScreenType.PttPrepare,
+                            screenType = ScreenType.Prepare,
                             errorText = notice.noticeString
                         ) ?: domainUiState
                     }

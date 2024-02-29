@@ -80,6 +80,7 @@ class AppModule2 {
     fun providesApplicationScope(
         @DefaultDispatcher defaultDispatcher: CoroutineDispatcher,
     ): CoroutineScope = CoroutineScope(SupervisorJob() + defaultDispatcher)
+
 }
 
 @Component(modules = [ManagerModule::class])

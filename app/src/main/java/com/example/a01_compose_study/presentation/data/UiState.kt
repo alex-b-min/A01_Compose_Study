@@ -27,6 +27,10 @@ object UiState {
     val _VRUiState = MutableStateFlow<VRUiState>(VRUiState.PttNone(active = false, isError = false))
     val vrUiState: StateFlow<VRUiState> = _VRUiState
 
+    val _sendUiData = MutableSharedFlow<Any>()
+    val sendUiData: SharedFlow<Any> = _sendUiData
+
+
     /**
      * 화면을 스택에 쌓음
      */

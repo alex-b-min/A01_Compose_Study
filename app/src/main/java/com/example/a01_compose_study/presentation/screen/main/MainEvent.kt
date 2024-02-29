@@ -30,4 +30,8 @@ sealed class MainEvent() {
     data class ChangeScrollIndexEvent(
         val selectedScrollIndex: Int
     ) : MainEvent()
+
+    data class SendDataEvent(
+        val data: Any,
+    ): MainEvent()
 }

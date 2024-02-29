@@ -11,7 +11,7 @@ sealed class ScreenType {
     object PttListen : ScreenType()
     object PttSpeak : ScreenType()
     object PttLoading : ScreenType()
-    object PttPrepare : ScreenType()
+    object Prepare : ScreenType()
     object Notice : ScreenType()
     object List : ScreenType()
     object YesNo : ScreenType()
