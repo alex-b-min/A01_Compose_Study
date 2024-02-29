@@ -13,6 +13,9 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieAnimatable
 import com.airbnb.lottie.compose.rememberLottieComposition
 
+/**
+ * Raw는 인식 애니메이션
+ * */
 @Composable
 fun LottieRawAnimationHandler(
     modifier: Modifier,

@@ -1,6 +1,5 @@
 package com.example.a01_compose_study.presentation.screen.ptt
 
-import android.view.MotionEvent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,12 +13,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -33,7 +29,6 @@ import com.example.a01_compose_study.presentation.components.lottie.LottieRawAni
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
 import com.example.a01_compose_study.presentation.util.TextModifier.normalize
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ComposePttScreen(
     domainUiState: DomainUiState.PttWindow,
@@ -68,83 +63,81 @@ fun ComposePttScreen(
                     lottieImageAssetFolder = "bg_glow/images/error",
                     infiniteLoop = true
                 )
-//                LottieRawAnimationHandler(
-//                    modifier = Modifier.fillMaxSize(),
-//                    rawResId = R.raw.error_loop,
-//                    infiniteLoop = true,
-//                    onFrameChanged = { currentFrame ->
-//                        // 현재 프레임에 따라 글자 투명도(Alpha)가 변하도록 설정
-//                        textAlpha = currentFrame.let {
-//                            when (it) {
-//                                in 0F..10F -> 0F
-//                                in 10F..20F -> it.normalize(10F, 20F)
-//                                in 20F..40F -> 1F - (it.normalize(20F, 40F) * 0.5F)
-//                                else -> 0F
-//                            }
-//                        } ?: 0F
-//                    }
-//                )
             } else {
+                //error에 따른 애니메이션 재생 분기
                 LottieAssetAnimationHandler(
                     modifier = Modifier.fillMaxSize(),
                     lottieJsonAssetPath = "bg_glow/09_tsd_frame_glow_l_lt.json",
                     lottieImageAssetFolder = "bg_glow/images/default",
                     infiniteLoop = true
                 )
-                if (domainUiState.screenType is ScreenType.PttListen) {
-                    LottieRawAnimationHandler(
-                        modifier = Modifier.fillMaxSize(),
-                        rawResId = R.raw.tsd_listening_passive_loop_lt_01_2,
-                        infiniteLoop = true,
-                        onFrameChanged = { currentFrame ->
-                            // 현재 프레임에 따라 글자 투명도(Alpha)가 변하도록 설정
-                            textAlpha = currentFrame.let {
-                                when (it) {
-                                    in 0F..10F -> 0F
-                                    in 10F..20F -> it.normalize(10F, 20F)
-                                    in 20F..40F -> 1F - (it.normalize(20F, 40F) * 0.5F)
-                                    else -> 0F
-                                }
-                            } ?: 0F
-                        }
-                    )
-                } else if (domainUiState.screenType is ScreenType.PttLoading) {
-                    LottieRawAnimationHandler(
-                        modifier = Modifier.fillMaxSize(),
-                        rawResId = R.raw.tsd_thinking_loop_fix_lt_03_2,
-                        infiniteLoop = true,
-                        onFrameChanged = { currentFrame ->
-                            // 현재 프레임에 따라 글자 투명도(Alpha)가 변하도록 설정
-                            textAlpha = currentFrame.let {
-                                when (it) {
-                                    in 0F..10F -> 0F
-                                    in 10F..20F -> it.normalize(10F, 20F)
-                                    in 20F..40F -> 1F - (it.normalize(20F, 40F) * 0.5F)
-                                    else -> 0F
-                                }
-                            } ?: 0F
-                        }
-                    )
 
-
-                } else if (domainUiState.screenType is ScreenType.PttSpeak) {
-                    // Lottie Animation 배경 재생
-                    LottieRawAnimationHandler(
-                        modifier = Modifier.fillMaxSize(),
-                        rawResId = R.raw.loop,
-                        infiniteLoop = true,
-                        onFrameChanged = { currentFrame ->
-                            // 현재 프레임에 따라 글자 투명도(Alpha)가 변하도록 설정
-                            textAlpha = currentFrame.let {
-                                when (it) {
-                                    in 0F..10F -> 0F
-                                    in 10F..20F -> it.normalize(10F, 20F)
-                                    in 20F..40F -> 1F - (it.normalize(20F, 40F) * 0.5F)
-                                    else -> 0F
-                                }
-                            } ?: 0F
-                        }
+                //guideText의 유무를 체크해서 해서 Text를 띄움
+                if (domainUiState.guideText != "") {
+                    Text(
+                        text = domainUiState.guideText,
+                        modifier = Modifier.align(Alignment.Center),
+                        color = contentColor
                     )
+                }
+
+                when(domainUiState.screenType) {
+                    is ScreenType.PttListen -> {
+                        LottieRawAnimationHandler(
+                            modifier = Modifier.fillMaxSize(),
+                            rawResId = R.raw.tsd_listening_passive_loop_lt_01_2,
+                            infiniteLoop = true,
+                            onFrameChanged = { currentFrame ->
+                                // 현재 프레임에 따라 글자 투명도(Alpha)가 변하도록 설정
+                                textAlpha = currentFrame.let {
+                                    when (it) {
+                                        in 0F..10F -> 0F
+                                        in 10F..20F -> it.normalize(10F, 20F)
+                                        in 20F..40F -> 1F - (it.normalize(20F, 40F) * 0.5F)
+                                        else -> 0F
+                                    }
+                                } ?: 0F
+                            }
+                        )
+                    }
+                    is ScreenType.PttLoading -> {
+                        LottieRawAnimationHandler(
+                            modifier = Modifier.fillMaxSize(),
+                            rawResId = R.raw.tsd_thinking_loop_fix_lt_03_2,
+                            infiniteLoop = true,
+                            onFrameChanged = { currentFrame ->
+                                // 현재 프레임에 따라 글자 투명도(Alpha)가 변하도록 설정
+                                textAlpha = currentFrame.let {
+                                    when (it) {
+                                        in 0F..10F -> 0F
+                                        in 10F..20F -> it.normalize(10F, 20F)
+                                        in 20F..40F -> 1F - (it.normalize(20F, 40F) * 0.5F)
+                                        else -> 0F
+                                    }
+                                } ?: 0F
+                            }
+                        )
+                    }
+                    is ScreenType.PttSpeak -> {
+                        LottieRawAnimationHandler(
+                            modifier = Modifier.fillMaxSize(),
+                            rawResId = R.raw.loop,
+                            infiniteLoop = true,
+                            onFrameChanged = { currentFrame ->
+                                // 현재 프레임에 따라 글자 투명도(Alpha)가 변하도록 설정
+                                textAlpha = currentFrame.let {
+                                    when (it) {
+                                        in 0F..10F -> 0F
+                                        in 10F..20F -> it.normalize(10F, 20F)
+                                        in 20F..40F -> 1F - (it.normalize(20F, 40F) * 0.5F)
+                                        else -> 0F
+                                    }
+                                } ?: 0F
+                            }
+                        )
+                    }
+                    else -> {
+                    }
                 }
             }
         }

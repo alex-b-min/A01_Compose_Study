@@ -87,31 +87,45 @@ class PttManager @Inject constructor(
         vrmwManager.startVR(mwContext)
     }
 
-    fun pttPrepare() {
-        ServiceState.bluetoothState.hfpDevice.value.apply {
-            this.recognizing = true
-        }
+//    fun pttPrepare() {
+//        ServiceState.bluetoothState.hfpDevice.value.apply {
+//            this.recognizing = true
+//        }
+//
+//        announceString.value = ""
+//        makeRandomCommands()
+//
+//        if (ServiceState.settingState.isOfflineMode() ||
+//            !ServiceState.systemState.serverResponse.value ||
+//            !vrConfig.value.isSupportServer
+//        ) {
+//            val randomIndex = Random().nextInt(offlineRandomCommands.size)
+//            guideString.postValue("${offlineRandomCommands[randomIndex]}")
+//        } else {
+//            val randomIndex = Random().nextInt(onlineRandomCommands.size)
+//            guideString.postValue("${onlineRandomCommands[randomIndex]}")
+//        }
+//
+//        announceString.value = defaultAnnounceString
+//
+//        if (ServiceState.bluetoothState.hfpDevice.value.device.isNotEmpty() && !ServiceState.bluetoothState.hfpDevice.value.recognizing) {
+//            vrmwManager.g2pController.updateCacheFiles(ServiceState.bluetoothState.hfpDevice.value.device)
+//        }
+//
+//    }
 
-        announceString.value = ""
+    fun pttPrepare(): String {
+        CustomLogger.i("pttPrepare")
+
         makeRandomCommands()
 
-        if (ServiceState.settingState.isOfflineMode() ||
-            !ServiceState.systemState.serverResponse.value ||
-            !vrConfig.value.isSupportServer
-        ) {
-            val randomIndex = Random().nextInt(offlineRandomCommands.size)
-            guideString.postValue("${offlineRandomCommands[randomIndex]}")
-        } else {
-            val randomIndex = Random().nextInt(onlineRandomCommands.size)
-            guideString.postValue("${onlineRandomCommands[randomIndex]}")
-        }
+        val randomCommand = "추후 온라인/오프라인에 대한 명령어를 넣어야함"
 
-        announceString.value = defaultAnnounceString
+        /**
+         * 반환값을
+         */
 
-        if (ServiceState.bluetoothState.hfpDevice.value.device.isNotEmpty() && !ServiceState.bluetoothState.hfpDevice.value.recognizing) {
-            vrmwManager.g2pController.updateCacheFiles(ServiceState.bluetoothState.hfpDevice.value.device)
-        }
-
+        return randomCommand
     }
 
     fun makeRandomCommands() {
