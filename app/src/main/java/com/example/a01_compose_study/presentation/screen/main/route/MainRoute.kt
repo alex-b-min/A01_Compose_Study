@@ -77,7 +77,12 @@ fun MainRoute(
         onCloseDomainWindow = {
             onDomainEvent(MainEvent.CloseDomainWindowEvent)
         }) {
-        VrUiAnimationHandler(vrUiState = vrUiState)
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.BottomCenter
+        ) {
+            VrUiAnimationHandler(vrUiState)
+        }
 
         Log.d("@@ domainUiState When문 위에서 시작", "${domainUiState}")
         Log.d("@@ domainUiState When문 위에서 시작", "${domainWindowVisibleState}")
@@ -128,14 +133,14 @@ fun MainRoute(
                         vrDynamicBackground = if (vrUiState.active) Color.Transparent else Color.Black,
                         fixedBackground = Black2
                     )
-                    onVREvent(
-                        VREvent.ChangeVRUIEvent(
-                            VRUiState.PttLoading(
-                                active = true,
-                                isError = false
-                            )
-                        )
-                    )
+//                    onVREvent(
+//                        VREvent.ChangeVRUIEvent(
+//                            VRUiState.PttLoading(
+//                                active = true,
+//                                isError = false
+//                            )
+//                        )
+//                    )
                 }
             }
 
@@ -403,8 +408,6 @@ fun MainRoute(
                 .fillMaxHeight(0.13f),
             contentText = "VR Line Number Result",
             onClick = {
-                multipleEventsCutter.processEvent {
-                }
                 scope.launch {
                     viewModel.vrmwManager.setVRResult(VRResult(), SelectVRResult.ScrollIndexResult)
                 }
@@ -441,64 +444,60 @@ fun MainRoute(
  */
 @Composable
 fun VrUiAnimationHandler(vrUiState: VRUiState) {
+    when {
+        vrUiState.active && vrUiState.isError -> {
+            LottieAssetAnimationHandler(
+                modifier = Modifier.fillMaxSize(),
+                lottieJsonAssetPath = "bg_glow/frame_error_glow_l_lt.json",
+                lottieImageAssetFolder = "bg_glow/images/error",
+                infiniteLoop = true
+            )
+        }
 
-    Box(contentAlignment = Alignment.BottomCenter) {
-        when {
-            vrUiState.active && vrUiState.isError -> {
-                LottieAssetAnimationHandler(
-                    modifier = Modifier.fillMaxSize(),
-                    lottieJsonAssetPath = "bg_glow/frame_error_glow_l_lt.json",
-                    lottieImageAssetFolder = "bg_glow/images/error",
-                    infiniteLoop = true
-                )
-            }
+        vrUiState.active -> {
+            LottieAssetAnimationHandler(
+                modifier = Modifier.fillMaxSize(),
+                lottieJsonAssetPath = "bg_glow/09_tsd_frame_glow_l_lt.json",
+                lottieImageAssetFolder = "bg_glow/images/default",
+                infiniteLoop = true
+            )
+            when (vrUiState) {
+                is VRUiState.PttLoading -> {
+                    LottieRawAnimationHandler(
+                        modifier = Modifier.fillMaxSize(),
+                        rawResId = R.raw.tsd_thinking_loop_fix_lt_03_2,
+                        infiniteLoop = true,
+                        onFrameChanged = { currentFrame ->
+                            // 필요한 경우 처리
+                        }
+                    )
+                }
 
-            vrUiState.active -> {
-                LottieAssetAnimationHandler(
-                    modifier = Modifier.fillMaxSize(),
-                    lottieJsonAssetPath = "bg_glow/09_tsd_frame_glow_l_lt.json",
-                    lottieImageAssetFolder = "bg_glow/images/default",
-                    infiniteLoop = true
-                )
-                when (vrUiState) {
-                    is VRUiState.PttLoading -> {
-                        LottieRawAnimationHandler(
-                            modifier = Modifier.fillMaxSize(),
-                            rawResId = R.raw.tsd_thinking_loop_fix_lt_03_2,
-                            infiniteLoop = true,
-                            onFrameChanged = { currentFrame ->
-                                // 필요한 경우 처리
-                            }
-                        )
-                    }
+                is VRUiState.PttListen -> {
+                    LottieRawAnimationHandler(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        rawResId = R.raw.tsd_listening_passive_loop_lt_01_2,
+                        infiniteLoop = true,
+                        onFrameChanged = { currentFrame ->
+                            // 필요한 경우 처리
+                        }
+                    )
+                }
 
-                    is VRUiState.PttListen -> {
-                        LottieRawAnimationHandler(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .align(Alignment.Center),
-                            rawResId = R.raw.tsd_listening_passive_loop_lt_01_2,
-                            infiniteLoop = true,
-                            onFrameChanged = { currentFrame ->
-                                // 필요한 경우 처리
-                            }
-                        )
-                    }
+                is VRUiState.PttSpeak -> {
+                    LottieRawAnimationHandler(
+                        modifier = Modifier.fillMaxSize(),
+                        rawResId = R.raw.loop,
+                        infiniteLoop = true,
+                        onFrameChanged = { currentFrame ->
+                            // 필요한 경우 처리
+                        }
+                    )
+                }
 
-                    is VRUiState.PttSpeak -> {
-                        LottieRawAnimationHandler(
-                            modifier = Modifier.fillMaxSize(),
-                            rawResId = R.raw.loop,
-                            infiniteLoop = true,
-                            onFrameChanged = { currentFrame ->
-                                // 필요한 경우 처리
-                            }
-                        )
-                    }
-
-                    else -> {
-                        // 다른 상태에 대한 처리
-                    }
+                else -> {
+                    // 다른 상태에 대한 처리
                 }
             }
         }
