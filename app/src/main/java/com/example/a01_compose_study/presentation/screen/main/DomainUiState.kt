@@ -70,23 +70,12 @@ sealed class DomainUiState(
     data class SendMessageWindow(
         val domainType: SealedDomainType,
         override val  screenType: ScreenType,
-        val msgData: MsgData,
+        val msgData: MsgData? = null,
+        val selectListItem: Contact? = null,
         val isError: Boolean = false,
         val screenData: ScreenData,
         override val screenSizeType: ScreenSizeType = ScreenSizeType.Zero,
     ) : DomainUiState(screenSizeType)
-
-    data class SendListWindow(
-        val index: Int
-    ) : DomainUiState()
-
-    data class SendScreenWindow(
-        val screenData: ScreenData
-    ): DomainUiState()
-
-    data class ErrorMsgWindow(
-        val notice: NoticeModel
-    ): DomainUiState()
 
     fun copyWithNewSizeType(sizeType: ScreenSizeType): DomainUiState {
         return when (this) {
@@ -100,9 +89,6 @@ sealed class DomainUiState(
             is RadioWindow -> copy(screenSizeType = sizeType)
             is WeatherWindow -> copy(screenSizeType = sizeType)
             is SendMessageWindow -> copy(screenSizeType = sizeType)
-            is SendListWindow -> copy()
-            is SendScreenWindow -> copy()
-            is ErrorMsgWindow -> copy()
         }
     }
 

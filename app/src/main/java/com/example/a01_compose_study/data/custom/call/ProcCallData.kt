@@ -14,7 +14,7 @@ sealed class ProcCallData(
 
     object RejectRequest : ProcCallData(
         sealedDomainType = SealedDomainType.Announce,
-        screenType = ScreenType.PttPrepare
+        screenType = ScreenType.Prepare
     )
 
     data class ListTTSRequest(val promptId: String) : ProcCallData(screenType = ScreenType.CallList)

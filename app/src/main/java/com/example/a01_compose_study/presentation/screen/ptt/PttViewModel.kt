@@ -27,6 +27,7 @@ class PttViewModel @Inject constructor(
 
     private val _domainUiState = UiState._domainUiState
     val announceString = pttManager.announceString
+
     val vrConfig = MutableStateFlow(VrConfig())
     val guideString = MutableLiveData<String>()
 
@@ -72,7 +73,7 @@ class PttViewModel @Inject constructor(
                 _domainUiState.update { domainUiState ->
                     (domainUiState as? DomainUiState.PttWindow)?.copy(
                         isError = false,
-                        screenType = ScreenType.PttPrepare,
+                        screenType = ScreenType.Prepare,
                         guideText = guideString
                     ) ?: domainUiState
                 }
@@ -87,12 +88,19 @@ class PttViewModel @Inject constructor(
                     onDomainEvent(
                         event = MainEvent.OpenDomainWindowEvent(
                             domainType = SealedDomainType.Ptt,
-                            screenType = ScreenType.PttPrepare,
+                            screenType = ScreenType.Prepare,
                             data = notice.noticeString,
                             isError = false,
                             screenSizeType = ScreenSizeType.Small
                         )
                     )
+                    _domainUiState.update { domainUiState ->
+                        (domainUiState as? DomainUiState.PttWindow)?.copy(
+                            isError = false,
+                            screenType = ScreenType.Prepare,
+                            errorText = notice.noticeString
+                        ) ?: domainUiState
+                    }
                 } else {
                     if (event.selectVRResult == SelectVRResult.PttResult) {
                         /**
@@ -101,7 +109,7 @@ class PttViewModel @Inject constructor(
                         onDomainEvent(
                             event = MainEvent.OpenDomainWindowEvent(
                                 domainType = SealedDomainType.Ptt,
-                                screenType = ScreenType.PttPrepare,
+                                screenType = ScreenType.Prepare,
                                 data = null,
                                 isError = false,
                                 screenSizeType = ScreenSizeType.Small
@@ -118,7 +126,7 @@ class PttViewModel @Inject constructor(
                             onDomainEvent(
                                 event = MainEvent.OpenDomainWindowEvent(
                                     domainType = SealedDomainType.Ptt,
-                                    screenType = ScreenType.PttPrepare,
+                                    screenType = ScreenType.Prepare,
                                     data = "",
                                     isError = false,
                                     screenSizeType = ScreenSizeType.Small

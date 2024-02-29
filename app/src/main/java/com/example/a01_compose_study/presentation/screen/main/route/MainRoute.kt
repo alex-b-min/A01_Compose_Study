@@ -40,6 +40,7 @@ import com.example.a01_compose_study.presentation.screen.main.VREvent
 import com.example.a01_compose_study.presentation.screen.ptt.ComposePttScreen
 import com.example.a01_compose_study.presentation.screen.ptt.PttEvent
 import com.example.a01_compose_study.presentation.screen.ptt.PttViewModel
+import com.example.a01_compose_study.presentation.screen.sendMsg.SendMsgScreen
 import com.example.a01_compose_study.presentation.util.MultipleEventsCutter
 import com.example.a01_compose_study.presentation.util.get
 import com.example.a01_compose_study.ui.theme.Black2
@@ -161,7 +162,9 @@ fun MainRoute(
             }
 
             is DomainUiState.SendMessageWindow -> {
-
+                SendMsgScreen(
+                    domainUiState = domainUiState as DomainUiState.SendMessageWindow
+                )
             }
 
             else -> {}
@@ -215,7 +218,7 @@ fun MainRoute(
                     onDomainEvent(
                         event = MainEvent.OpenDomainWindowEvent(
                             domainType = SealedDomainType.Announce,
-                            screenType = ScreenType.PttPrepare,
+                            screenType = ScreenType.Prepare,
                             data = "Help",
                             isError = false,
                             screenSizeType = ScreenSizeType.Small

@@ -115,39 +115,14 @@ object UiState {
                         }
 
                         SealedDomainType.SendMessage -> {
-                            DomainUiState.RadioWindow(
-
+                            val eventData = event.data as SendMsgDataType.SendMsgData
+                            DomainUiState.SendMessageWindow(
+                                domainType = event.domainType,
+                                screenType = event.screenType,
+                                isError = event.isError,
+                                msgData = eventData.msgData as MsgData,
+                                screenData = eventData.screenData,
                             )
-                            when (val eventData = event.data as SendMsgDataType) {
-                                is SendMsgDataType.SendMsgData -> {
-                                    DomainUiState.SendMessageWindow(
-                                        domainType = event.domainType,
-                                        screenType = event.screenType,
-                                        isError = event.isError,
-                                        msgData = eventData.msgData as MsgData,
-                                        screenData = eventData.screenData,
-                                    )
-                                }
-
-                                is SendMsgDataType.SendScreenData -> {
-                                    DomainUiState.SendScreenWindow(
-                                        screenData = eventData.screenData
-                                    )
-                                }
-
-                                is SendMsgDataType.SendListNum -> {
-                                    DomainUiState.SendListWindow(
-                                        index = eventData.index as Int
-                                    )
-                                }
-
-                                else -> {
-                                    val errorMsgData = eventData as SendMsgDataType.ErrorMsgData
-                                    DomainUiState.ErrorMsgWindow(
-                                        notice = errorMsgData.notice
-                                    )
-                                }
-                            }
                         }
 
                         SealedDomainType.MainMenu -> {
@@ -185,8 +160,17 @@ object UiState {
                     domainUiState.copyWithNewScrollIndex(event.selectedScrollIndex)!!
                 }
             }
+
+            is MainEvent.SendDataEvent -> {
+                CoroutineScope(Dispatchers.Default).launch {
+                    _sendUiData.emit(event.data)
+                }
+            }
         }
     }
+
+    val _sendUiData = MutableSharedFlow<Any>()
+    val sendUiData: SharedFlow<Any> = _sendUiData
 
     /**
      * 화면을 스택에 쌓음
