@@ -3,6 +3,7 @@ package com.example.a01_compose_study.data.custom.sendMsg
 
 import com.example.a01_compose_study.data.Contact
 import com.example.a01_compose_study.data.DialogueMode
+import com.example.a01_compose_study.data.DomainType
 
 import com.example.a01_compose_study.data.HVRError
 import com.example.a01_compose_study.data.Intentions
@@ -17,6 +18,7 @@ import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.util.CustomLogger
 import com.example.a01_compose_study.presentation.data.UiState
 import com.example.a01_compose_study.presentation.data.UiState._sealedParsedData
+import com.example.a01_compose_study.presentation.screen.main.DomainUiState
 import com.example.a01_compose_study.presentation.util.StringManager.printSttString
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,6 +41,7 @@ class SendMsgManager @Inject constructor(
     fun init() {
 
     }
+
     override fun onReceiveBundle(bundle: ParseBundle<out Any>) {
         job.launch {
             _sealedParsedData.emit(SealedParsedData.SendMsgData(parsedData(bundle)))
@@ -64,8 +67,7 @@ class SendMsgManager @Inject constructor(
          */
         when (bundle.dialogueMode) {
             DialogueMode.SEND_MESSAGE -> {
-                //  return procSendMsgIntention(bundle)
-                return procMessageNameIntention(bundle)
+                return procSendMsgIntention(bundle)
             }
 
             DialogueMode.SEND_MESSAGE_NAME -> {
@@ -108,124 +110,123 @@ class SendMsgManager @Inject constructor(
     }
 
 
-//    private fun procSendMsgIntention(bundle: ParseBundle<out Any?>): ProcSendMsgData {
-//        /**
-//         * 실제 ParseBundle<out Any>?의 bundle을 통해 ProcSendMsgData 객체를 생성하는 로직이 담겨야함
-//         */
-//        val sendMsgModel = bundle.model as? SendMsgModel
-//        val errorNotice = contactsManager.preConditionCheck(DomainType.SendMessage)
-//
-//        initSendMsgValue()
-//
-//        if (errorNotice != null) {
-//            return ProcSendMsgData(
-//                domainType = SealedDomainType.Announce,
-//                screenType = ScreenType.PttAnounce,
-//                data = SendMsgDataType.ErrorMsgData(
-//                    notice = errorNotice
-//                )
-//            )
-//        } else {
-//            sendMsgModel?.let {
-//
-//                // 시나리오에 Msg 유무 체크
-//                checkMessageExistence(sendMsgModel)
-//
-//                // 인식된 name이 있는 경우
-//                if (sendMsgModel.items.size > 0) {
-//
-//                    // sendMsgModel.items의 name으로 연락처 몇 개가 검색 되는지 확인
-////                    val nameCheckList =
-////                        contactsManager.makeContactList(sendMsgModel.getContactItems(), true)
-//
-////                    // Name으로 찾은 이름이 여러 명
-////                    if (nameCheckList.size > 1) {
-////                        sendMsgContactList = nameCheckList.toMutableList()
-////                        // getListRunnable(bundle).run()
-////                        return ProcSendMsgData(
-////                            screenType = ScreenType.MessageSelectNameList,
-////                            data = SendMsgDataType.SendMsgData(
-////                                msgData = MsgData(contacts = sendMsgContactList),
-////                            )
-////                        )
-////                    }
-////                    // 검색된 결과가 없는 경우 - 전체 전화번호부 표시
-////                    else if (nameCheckList.size == 0) {
-////                        // 기존 전화번호부에서 리스트 생성
-//////                        sendMsgContactList = contactsManager.makePhoneBookContactList()
-////                        //getNoResultListRunnable().run()
-////                       // sendMsgContactList = contactsManager.makePhoneBookContactList()
-////                        return ProcSendMsgData(
-////                            screenType = ScreenType.MessageAllList,
-////                            data = SendMsgDataType.SendMsgData(msgData = null)
-////                        )
-////                    }
-////                    // name으로 검색된 연락처가 1개
-////                    else {
-////                        // 1명의 전화번호부에 Category가 1개 이상 있는지 확인 하기 위해
-////                        // 위 if 조건과 filter가 다르므로 sendMsgContactList가 바뀌어야 함.
-//////                        sendMsgContactList =
-//////                            contactsManager.makeContactList(
-//////                                sendMsgModel.getContactItems(),
-//////                                false
-//////                            )
-////                        // 1명의 전화번호부에 Category가 여러 개
-////                        if (sendMsgContactList.size > 1) {
-////                            //getCategoryListRunnable().run()
-////                            isCategoryListScreen.value = true
-////                            return ProcSendMsgData(
-////                                screenType = ScreenType.MessageSelectCategoryList,
-////                                data = SendMsgDataType.SendMsgData(
-////                                    msgData = MsgData(contacts = sendMsgContactList),
-////                                )
-////                            )
-////                        }
-////                        // 1명의 전화번호부에 Category가 1개
-////                        else {
-////                            selectedPhonebookItem = sendMsgContactList[0]
-////                            if (messageValue.value != "") {
-////                                // getMessageChangeRunnable(sendMsgModel).run()
-////                                return ProcSendMsgData(
-////                                    screenType = ScreenType.SendMessage,
-////                                    data = SendMsgDataType.SendMsgData(
-////                                        msgData = MsgData(
-////                                            name = sendMsgModel.getContactItems()[0].name,
-////                                            msg = sendMsgModel.messageValue
-////                                        ),
-////                                    )
-////                                )
-////                            } else {
-////                                // getMessageNameRunnable().run()
-////                                return ProcSendMsgData(
-////                                    screenType = ScreenType.SayMessage,
-////                                    data = SendMsgDataType.SendMsgData(
-////                                        msgData = MsgData(name = sendMsgModel.getContactItems()[0].name),
-////                                    )
-////                                )
-////                            }
-////                        }
-////                    }
-//                }
-//                // Send Message만 발화 시 Embedded Intention / Server Intention에 slot count 0 - 전체 전화번호부 표시
-//                else {
-////                    sendMsgContactList = contactsManager.makePhoneBookContactList()
-//                    // getContactListRunnable().run()
-//                    return ProcSendMsgData(
-//                        screenType = ScreenType.MessageAllList,
-//                        data = SendMsgDataType.SendMsgData(msgData = null)
-//                    )
-//
-//                }
-//            } ?: run {
-//                // TODO : reject()
-//                return ProcSendMsgData(
-//                    data = SendMsgDataType.SendScreenData(
-//                        screenData = ScreenData.POP
-//                    )
-//                )
-//            }
-//        }
-//    }
+    private fun procSendMsgIntention(bundle: ParseBundle<out Any?>): ProcSendMsgData {
+        /**
+         * 실제 ParseBundle<out Any>?의 bundle을 통해 ProcSendMsgData 객체를 생성하는 로직이 담겨야함
+         */
+        val sendMsgModel = bundle.model as? SendMsgModel
+        val errorNotice = contactsManager.preConditionCheck(DomainType.SendMessage)
+
+        initSendMsgValue()
+
+        if (errorNotice != null) {
+            return ProcSendMsgData(
+                domainType = SealedDomainType.Announce,
+                screenType = ScreenType.PttAnounce,
+                data = SendMsgDataType.ErrorMsgData(
+                    notice = errorNotice
+                )
+            )
+        } else {
+            sendMsgModel?.let {
+
+                // 시나리오에 Msg 유무 체크
+                checkMessageExistence(sendMsgModel)
+
+                // 인식된 name이 있는 경우
+                if (sendMsgModel.items.size > 0) {
+
+                    // sendMsgModel.items의 name으로 연락처 몇 개가 검색 되는지 확인
+                    val nameCheckList =
+                        contactsManager.makeContactList(sendMsgModel.getContactItems(), true)
+
+                    // Name으로 찾은 이름이 여러 명
+                    if (nameCheckList.size > 1) {
+                        sendMsgContactList = nameCheckList.toMutableList()
+                        // getListRunnable(bundle).run()
+                        return ProcSendMsgData(
+                            screenType = ScreenType.MessageSelectNameList,
+                            data = SendMsgDataType.SendMsgData(
+                                msgData = MsgData(contacts = sendMsgContactList),
+                            )
+                        )
+                    }
+                    // 검색된 결과가 없는 경우 - 전체 전화번호부 표시
+                    else if (nameCheckList.size == 0) {
+                        // 기존 전화번호부에서 리스트 생성
+                        sendMsgContactList = contactsManager.makePhoneBookContactList()
+                        //getNoResultListRunnable().run()
+                        return ProcSendMsgData(
+                            screenType = ScreenType.MessageAllList,
+                            data = SendMsgDataType.SendMsgData(msgData = null)
+                        )
+                    }
+                    // name으로 검색된 연락처가 1개
+                    else {
+                        // 1명의 전화번호부에 Category가 1개 이상 있는지 확인 하기 위해
+                        // 위 if 조건과 filter가 다르므로 sendMsgContactList가 바뀌어야 함.
+                        sendMsgContactList =
+                            contactsManager.makeContactList(
+                                sendMsgModel.getContactItems(),
+                                false
+                            )
+                        // 1명의 전화번호부에 Category가 여러 개
+                        if (sendMsgContactList.size > 1) {
+                            //getCategoryListRunnable().run()
+                            isCategoryListScreen.value = true
+                            return ProcSendMsgData(
+                                screenType = ScreenType.MessageSelectCategoryList,
+                                data = SendMsgDataType.SendMsgData(
+                                    msgData = MsgData(contacts = sendMsgContactList),
+                                )
+                            )
+                        }
+                        // 1명의 전화번호부에 Category가 1개
+                        else {
+                            selectedPhonebookItem = sendMsgContactList[0]
+                            if (messageValue.value != "") {
+                                // getMessageChangeRunnable(sendMsgModel).run()
+                                return ProcSendMsgData(
+                                    screenType = ScreenType.SendMessage,
+                                    data = SendMsgDataType.SendMsgData(
+                                        msgData = MsgData(
+                                            name = sendMsgModel.getContactItems()[0].name,
+                                            msg = sendMsgModel.messageValue
+                                        ),
+                                    )
+                                )
+                            } else {
+                                // getMessageNameRunnable().run()
+                                return ProcSendMsgData(
+                                    screenType = ScreenType.SayMessage,
+                                    data = SendMsgDataType.SendMsgData(
+                                        msgData = MsgData(name = sendMsgModel.getContactItems()[0].name),
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
+                // Send Message만 발화 시 Embedded Intention / Server Intention에 slot count 0 - 전체 전화번호부 표시
+                else {
+                    sendMsgContactList = contactsManager.makePhoneBookContactList()
+                    // getContactListRunnable().run()
+                    return ProcSendMsgData(
+                        screenType = ScreenType.MessageAllList,
+                        data = SendMsgDataType.SendMsgData(msgData = null)
+                    )
+
+                }
+            } ?: run {
+                // TODO : reject()
+                return ProcSendMsgData(
+                    data = SendMsgDataType.SendScreenData(
+                        screenData = ScreenData.POP
+                    )
+                )
+            }
+        }
+    }
 
     private fun procMessageNameIntention(bundle: ParseBundle<out Any?>): ProcSendMsgData {
         val commonModel = bundle.model as? CommonModel
@@ -439,5 +440,15 @@ class SendMsgManager @Inject constructor(
             firstRecogMessage.value = false
         }
         isCategoryListScreen.value = false
+    }
+
+    fun handleScreenData(screenData: ScreenData, uiState: DomainUiState){
+        when(screenData){
+            ScreenData.PUSH -> UiState.pushUiState(uiState)
+            ScreenData.POP -> UiState.popUiState()
+            ScreenData.CHANGE -> UiState.popUiState()
+            ScreenData.REJECT -> TODO()
+            ScreenData.BtPhoneAppRun -> TODO()
+        }
     }
 }

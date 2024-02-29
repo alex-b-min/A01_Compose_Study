@@ -17,6 +17,8 @@ import com.example.a01_compose_study.presentation.data.UiState
 import com.example.a01_compose_study.presentation.screen.main.route.VRUiState
 import com.example.a01_compose_study.presentation.screen.ptt.VrmwManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -27,7 +29,8 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     val vrmwManager: VrmwManager, // MainViewModel에서 필요한 이유는, 음성인식 결과를 직접적으로 생성하기 위해
-    ) : ViewModel() {
+//    private val job: CoroutineScope,
+) : ViewModel() {
 
     private val sealedParsedData: SharedFlow<SealedParsedData> = UiState._sealedParsedData
 
@@ -39,6 +42,9 @@ class MainViewModel @Inject constructor(
 
     private val _vrUiState = UiState._VRUiState
     val vrUiState: StateFlow<VRUiState> = UiState.vrUiState
+
+    private val _sendUiData = UiState._sendUiData
+    val sendUiData: SharedFlow<Any> = _sendUiData
 
     init {
         collectParsedData()
@@ -113,17 +119,33 @@ class MainViewModel @Inject constructor(
                             is ProcCallData.RejectRequest -> {
                                 Log.d("@@ ProcCallData", "RejectRequest")
                             }
+
                             is ProcCallData.ListTTSRequest -> {
-                                Log.d("@@ ProcCallData", "ListTTSRequest - Prompt ID: ${sealedParsedData.procCallData.promptId}")
+                                Log.d(
+                                    "@@ ProcCallData",
+                                    "ListTTSRequest - Prompt ID: ${sealedParsedData.procCallData.promptId}"
+                                )
                             }
+
                             is ProcCallData.NoticeTTSRequest -> {
-                                Log.d("@@ ProcCallData", "NoticeTTSRequest - Notice Model: ${sealedParsedData.procCallData.noticeModel}")
+                                Log.d(
+                                    "@@ ProcCallData",
+                                    "NoticeTTSRequest - Notice Model: ${sealedParsedData.procCallData.noticeModel}"
+                                )
                             }
+
                             is ProcCallData.ProcCallNameScreen -> {
-                                Log.d("@@ ProcCallData", "ProcCallNameScreen - Contact: ${sealedParsedData.procCallData.data}")
+                                Log.d(
+                                    "@@ ProcCallData",
+                                    "ProcCallNameScreen - Contact: ${sealedParsedData.procCallData.data}"
+                                )
                             }
+
                             is ProcCallData.RecognizedContactListScreen -> {
-                                Log.d("@@ ProcCallData", "ContactListScreen - Contact List: ${sealedParsedData.procCallData.data}")
+                                Log.d(
+                                    "@@ ProcCallData",
+                                    "ContactListScreen - Contact List: ${sealedParsedData.procCallData.data}"
+                                )
                                 onDomainEvent(
                                     event = MainEvent.OpenDomainWindowEvent(
                                         domainType = sealedParsedData.procCallData.sealedDomainType,
@@ -134,32 +156,82 @@ class MainViewModel @Inject constructor(
                                     )
                                 )
                             }
+
                             is ProcCallData.AllContactListScreen -> {
-                                Log.d("@@ ProcCallData", "FullContactListScreen - Full Contact List: ${sealedParsedData.procCallData.data}")
+                                Log.d(
+                                    "@@ ProcCallData",
+                                    "FullContactListScreen - Full Contact List: ${sealedParsedData.procCallData.data}"
+                                )
                             }
+
                             is ProcCallData.ScrollIndex -> {
                                 if (sealedParsedData.procCallData.index != null) {
                                     onDomainEvent(MainEvent.ChangeScrollIndexEvent(sealedParsedData.procCallData.index))
                                 }
-                                Log.d("@@ ProcCallData", "ScrollIndex - Index: ${sealedParsedData.procCallData.index}")
+                                Log.d(
+                                    "@@ ProcCallData",
+                                    "ScrollIndex - Index: ${sealedParsedData.procCallData.index}"
+                                )
                             }
+
                             is ProcCallData.ProcYesNoOtherNumberResult -> {
-                                Log.d("@@ ProcCallData", "YesNoOtherNumberResultProc - Result: ${sealedParsedData.procCallData.callYesNoOtherNumberResult}")
+                                Log.d(
+                                    "@@ ProcCallData",
+                                    "YesNoOtherNumberResultProc - Result: ${sealedParsedData.procCallData.callYesNoOtherNumberResult}"
+                                )
                             }
                         }
                     }
 
                     is SealedParsedData.SendMsgData -> {
-                        onDomainEvent(
-                            event = MainEvent.OpenDomainWindowEvent(
-                                domainType = sealedParsedData.procSendMsgData.domainType,
-                                screenType = sealedParsedData.procSendMsgData.screenType,
-                                data = sealedParsedData.procSendMsgData.data,
-                                isError = false,
-                                screenSizeType = ScreenSizeType.Large
-                            )
-                        )
+//                        onDomainEvent(
+//                            event = MainEvent.OpenDomainWindowEvent(
+//                                domainType = sealedParsedData.procSendMsgData.domainType,
+//                                screenType = sealedParsedData.procSendMsgData.screenType,
+//                                data = sealedParsedData.procSendMsgData.data,
+//                                isError = false,
+//                                screenSizeType = ScreenSizeType.Large
+//                            )
+//                        )
+                        when (sealedParsedData.procSendMsgData.data) {
+                            is SendMsgDataType.SendMsgData -> {
+                                onDomainEvent(
+                                    event = MainEvent.OpenDomainWindowEvent(
+                                        domainType = sealedParsedData.procSendMsgData.domainType,
+                                        screenType = sealedParsedData.procSendMsgData.screenType,
+                                        data = sealedParsedData.procSendMsgData.data,
+                                        isError = false,
+                                        screenSizeType = ScreenSizeType.Large
+                                    )
+                                )
+                            }
+
+                            is SendMsgDataType.SendScreenData -> {
+                                onDomainEvent(
+                                    event = MainEvent.SendDataEvent(
+                                        data = sealedParsedData.procSendMsgData.data.screenData
+                                    )
+                                )
+                            }
+
+                            is SendMsgDataType.SendListNum -> {
+                                onDomainEvent(
+                                    event = MainEvent.SendDataEvent(
+                                        data = sealedParsedData.procSendMsgData.data.index ?: -1
+                                    )
+                                )
+                            }
+
+                            is SendMsgDataType.ErrorMsgData -> {
+                                onDomainEvent(
+                                    event = MainEvent.SendDataEvent(
+                                        data = sealedParsedData.procSendMsgData.data.notice
+                                    )
+                                )
+                            }
+                        }
                     }
+
                     else -> {
                     }
                 }
@@ -239,39 +311,14 @@ class MainViewModel @Inject constructor(
                         }
 
                         SealedDomainType.SendMessage -> {
-                            DomainUiState.RadioWindow(
-
+                            val eventData = event.data as SendMsgDataType.SendMsgData
+                            DomainUiState.SendMessageWindow(
+                                domainType = event.domainType,
+                                screenType = event.screenType,
+                                isError = event.isError,
+                                msgData = eventData.msgData as MsgData,
+                                screenData = eventData.screenData,
                             )
-                            when (val eventData = event.data as SendMsgDataType) {
-                                is SendMsgDataType.SendMsgData -> {
-                                    DomainUiState.SendMessageWindow(
-                                        domainType = event.domainType,
-                                        screenType = event.screenType,
-                                        isError = event.isError,
-                                        msgData = eventData.msgData as MsgData,
-                                        screenData = eventData.screenData,
-                                    )
-                                }
-
-                                is SendMsgDataType.SendScreenData -> {
-                                    DomainUiState.SendScreenWindow(
-                                        screenData = eventData.screenData
-                                    )
-                                }
-
-                                is SendMsgDataType.SendListNum -> {
-                                    DomainUiState.SendListWindow(
-                                        index = eventData.index as Int
-                                    )
-                                }
-
-                                else -> {
-                                    val errorMsgData = eventData as SendMsgDataType.ErrorMsgData
-                                    DomainUiState.ErrorMsgWindow(
-                                        notice = errorMsgData.notice
-                                    )
-                                }
-                            }
                         }
 
                         SealedDomainType.MainMenu -> {
@@ -302,10 +349,17 @@ class MainViewModel @Inject constructor(
                 }
                 UiState.pushUiState(domainUiState.value)
             }
+
             is MainEvent.ChangeScrollIndexEvent -> {
                 Log.d("@@  MainEvent.ChangeScrollIndexEvent", "수행 / ${event.selectedScrollIndex}")
                 _domainUiState.update { domainUiState ->
                     domainUiState.copyWithNewScrollIndex(event.selectedScrollIndex)!!
+                }
+            }
+
+            is MainEvent.SendDataEvent -> {
+                CoroutineScope(Dispatchers.Default).launch {
+                    _sendUiData.emit(event.data)
                 }
             }
         }
