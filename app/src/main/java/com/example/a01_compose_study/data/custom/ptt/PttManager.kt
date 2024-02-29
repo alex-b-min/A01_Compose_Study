@@ -15,10 +15,9 @@ import com.example.a01_compose_study.data.custom.VRResultListener
 import com.example.a01_compose_study.domain.model.NoticeModel
 import com.example.a01_compose_study.domain.util.CustomLogger
 import com.example.a01_compose_study.presentation.data.ServiceState
-import com.example.a01_compose_study.presentation.screen.main.SelectVRResult
+import com.example.a01_compose_study.presentation.screen.SelectVRResult
 import com.example.a01_compose_study.presentation.screen.ptt.VrmwManager
 import kotlinx.coroutines.flow.MutableStateFlow
-import java.util.Random
 import javax.inject.Inject
 import javax.inject.Singleton
 

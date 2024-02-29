@@ -1,4 +1,4 @@
-package com.example.a01_compose_study.presentation.screen.main
+package com.example.a01_compose_study.presentation.screen
 
 sealed class SelectVRResult {
     /**

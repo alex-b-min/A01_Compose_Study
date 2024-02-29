@@ -29,7 +29,7 @@ import com.example.a01_compose_study.domain.state.MWState
 import com.example.a01_compose_study.domain.util.CustomLogger
 import com.example.a01_compose_study.domain.util.G2PController
 import com.example.a01_compose_study.presentation.data.ServiceState
-import com.example.a01_compose_study.presentation.screen.main.SelectVRResult
+import com.example.a01_compose_study.presentation.screen.SelectVRResult
 import com.example.a01_compose_study.presentation.util.StringManager
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -276,7 +276,7 @@ class VrmwManager @Inject constructor(
     }
 
     fun startVR(
-        mwContext: MWContext,  promptString: String = "", promptArgs: List<String> = listOf(),
+        mwContext: MWContext, promptString: String = "", promptArgs: List<String> = listOf(),
         selectVRResult: SelectVRResult,
     ) {
         Log.d("@@ VrmwManager startVR", "${mwContext}")

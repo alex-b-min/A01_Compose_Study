@@ -27,13 +27,12 @@ import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.components.button.PttButton
 import com.example.a01_compose_study.presentation.components.lottie.LottieAssetAnimationHandler
 import com.example.a01_compose_study.presentation.components.lottie.LottieRawAnimationHandler
-import com.example.a01_compose_study.presentation.data.UiState
 import com.example.a01_compose_study.presentation.data.UiState.onDomainEvent
 import com.example.a01_compose_study.presentation.data.UiState.onVREvent
 import com.example.a01_compose_study.presentation.screen.announce.AnnounceScreen
 import com.example.a01_compose_study.presentation.screen.call.screen.CallScreen
 import com.example.a01_compose_study.presentation.screen.help.screen.ComposeHelpScreen
-import com.example.a01_compose_study.presentation.screen.main.SelectVRResult
+import com.example.a01_compose_study.presentation.screen.SelectVRResult
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
 import com.example.a01_compose_study.presentation.screen.main.MainEvent
 import com.example.a01_compose_study.presentation.screen.main.MainViewModel

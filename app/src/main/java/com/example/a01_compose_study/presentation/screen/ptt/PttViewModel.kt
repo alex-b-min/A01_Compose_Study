@@ -12,7 +12,7 @@ import com.example.a01_compose_study.presentation.data.UiState
 import com.example.a01_compose_study.presentation.data.UiState.onDomainEvent
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
 import com.example.a01_compose_study.presentation.screen.main.MainEvent
-import com.example.a01_compose_study.presentation.screen.main.SelectVRResult
+import com.example.a01_compose_study.presentation.screen.SelectVRResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow

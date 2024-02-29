@@ -1,7 +1,6 @@
 package com.example.a01_compose_study.presentation.screen.ptt
 
-import com.example.a01_compose_study.data.custom.MWContext
-import com.example.a01_compose_study.presentation.screen.main.SelectVRResult
+import com.example.a01_compose_study.presentation.screen.SelectVRResult
 
 sealed class PttEvent {
 
