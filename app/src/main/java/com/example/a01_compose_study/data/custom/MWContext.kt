@@ -74,6 +74,7 @@ class MWContext(
     }
 
     fun onVRResult(vrResult: VRResult, customVRResult: CustomVRResult) {
+        Log.d("@@ MWContext onVRResult", "${vrResult}")
 //        val bundle = ParserFactory().dataParsing(vrResult, dialogueMode = DialogueMode.HELP)
 //        bundle?.type = ParseDomainType.HELP
 

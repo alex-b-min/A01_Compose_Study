@@ -37,8 +37,8 @@ class PttManager @Inject constructor(
     var defaultAnnounceString = getString(R.string.TID_CMN_COMM_01_02)
 
     override fun onReceiveBundle(bundle: ParseBundle<out Any>) {
-
-        when (bundle.type) {
+        Log.d("@@ PttManager onReceiveBundle", "${bundle}")
+        when(bundle.type) {
             ParseDomainType.CALL -> {
                 dataProducer.callManager.onReceiveBundle(bundle)
             }
@@ -83,6 +83,7 @@ class PttManager @Inject constructor(
 
     fun pttEvent() {
         val mwContext = MWContext(DialogueMode.MAINMENU, this)
+        Log.d("@@ PttManager pttEvent", "${mwContext}")
         vrmwManager.startVR(mwContext)
     }
 

@@ -2,7 +2,7 @@ package com.example.a01_compose_study.presentation.screen.ptt
 
 import android.content.Context
 import android.os.LocaleList
-import com.example.a01_compose_study.data.DialogueMode
+import android.util.Log
 import com.example.a01_compose_study.data.HLanguageType
 import com.example.a01_compose_study.data.HTextToSpeechError
 import com.example.a01_compose_study.data.HTextToSpeechEvent
@@ -39,6 +39,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.util.Locale
@@ -61,6 +63,9 @@ class VrmwManager @Inject constructor(
     var vrResult: VRResult? = null
     var currContext: MWContext?= null //MWContext의 DialogueMode의 값 임의의 값 넣음
     private val languageCheckMap = mutableMapOf<String, CompletableDeferred<Any>>()
+
+    val testMwContext = MutableStateFlow<MWContext?>(null)
+    val testJob = CoroutineScope(Dispatchers.IO)
 
     var m_stateMachine: MwStateMachine = MwStateMachine()
 
@@ -94,6 +99,12 @@ class VrmwManager @Inject constructor(
         mediaIn.setMediaInListener(mediaIn)
         CustomLogger.i("call setMediaOutListener")
         mediaOut.setMediaOutListener(mediaOut)
+
+        testJob.launch {
+            testMwContext.collectLatest {
+
+            }
+        }
     }
 
     fun setTTSState(state: HTextToSpeechState, force: Boolean = false) {
@@ -163,7 +174,7 @@ class VrmwManager @Inject constructor(
 
         val parsedVRResult: VRResult = gson.fromJson(vrResultJsonString, vrResultType)
 
-        currContext?.onVRResult(parsedVRResult, customVRResult)
+//        currContext?.onVRResult(parsedVRResult, customVRResult)
     }
 
 //    fun setTTSError(error: HTextToSpeechError) {
@@ -270,6 +281,7 @@ class VrmwManager @Inject constructor(
     fun startVR(
         mwContext: MWContext, promptString: String = "", promptArgs: List<String> = listOf()
     ) {
+        Log.d("@@ VrmwManager startVR", "${mwContext}")
 
 //      stop()
         CustomLogger.i("startVR")
@@ -388,7 +400,20 @@ class VrmwManager @Inject constructor(
 //    }
 
     fun setContext(mwContext: MWContext) {
+        Log.d("@@ VrmwManager setContext", "${mwContext}")
+
         currContext = mwContext
+        testMwContext.value = mwContext
+
+
+        val vrResultJsonString = "{ \"result\": [ { \"confidence\": 5018, \"intention\": \"Help\", \"phrase\": \"Help\", \"slot_count\": 0 } ] }"
+        val gson = Gson()
+        val vrResultType = object : TypeToken<VRResult>() {}.type
+
+        val parsedVRResult: VRResult = gson.fromJson(vrResultJsonString, vrResultType)
+        val customVRResult = CustomVRResult.ScrollIndexResult
+
+        currContext?.onVRResult(parsedVRResult, customVRResult)
     }
 
     fun vrStop() {
