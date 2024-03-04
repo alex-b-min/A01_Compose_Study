@@ -36,7 +36,20 @@ fun CallScreen(
     fixedBackground: Color,
 ) {
     if (domainUiState.screenType is ScreenType.CallList) {
-
+        Box(modifier = Modifier.fillMaxSize()) {
+            CallListWindow(
+                domainUiState = domainUiState,
+                vrUiState = vrUiState,
+                vrDynamicBackground = vrDynamicBackground,
+                fixedBackground = fixedBackground,
+                onDismiss = { /*TODO*/ },
+                onBackButton = { /*TODO*/ },
+                onCalling = {
+                    callViewModel.onCallBusinessEvent(event = CallBusinessEvent.Calling)
+                },
+                onItemClick = { /*TODO*/ }
+            )
+        }
     }
 
     else if (domainUiState.screenType is ScreenType.CallIndexedList) {
@@ -56,6 +69,49 @@ fun CallScreen(
         }
     } else if (domainUiState.screenType is ScreenType.CallYesNo) {
 
+    }
+}
+
+@Composable
+fun CallListWindow(
+    domainUiState: DomainUiState.CallWindow,
+    vrUiState: VRUiState,
+    vrDynamicBackground: Color,
+    fixedBackground: Color,
+    onDismiss: () -> Unit,
+    onBackButton: () -> Unit,
+    onCalling: () -> Unit,
+    onItemClick: (HelpItemData) -> Unit,
+) {
+    val contactList = domainUiState.data
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .clip(RoundedCornerShape(15.dp))
+            .background(vrDynamicBackground)
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_close),
+                contentDescription = null,
+                tint = Color.Gray,
+                modifier = Modifier
+                    .padding(end = 8.dp, top = 8.dp)
+                    .clickable {
+                    }
+            )
+
+            CallList(
+                contactList = contactList,
+                vrDynamicBackground = vrDynamicBackground,
+                fixedBackground = fixedBackground,
+                onCalling = onCalling,
+                onItemClick = {
+                })
+        }
     }
 }
 
@@ -92,7 +148,7 @@ fun CallIndexedListWindow(
                     }
             )
 
-            CallList(
+            CallIndexedList(
                 contactList = contactList,
                 vrDynamicBackground = vrDynamicBackground,
                 selectedIndex = selectedIndex,
@@ -104,9 +160,30 @@ fun CallIndexedListWindow(
     }
 }
 
+
 @Preview
 @Composable
 fun CallListWindowPreview() {
+    CallListWindow(
+        domainUiState = DomainUiState.CallWindow(
+            domainType = SealedDomainType.Call,
+            data = fetchAllContacts(),
+            screenType = ScreenType.CallIndexedList,
+            screenSizeType = ScreenSizeType.Middle
+        ),
+        vrUiState = VRUiState.PttSpeak(active = true, isError = false),
+        vrDynamicBackground = Color.Black,
+        fixedBackground = Color.Black,
+        onDismiss = {},
+        onBackButton = {},
+        onCalling = { },
+        onItemClick = {}
+    )
+}
+
+@Preview
+@Composable
+fun CallIndexedListWindowPreview() {
     CallIndexedListWindow(
         domainUiState = DomainUiState.CallWindow(
             domainType = SealedDomainType.Call,

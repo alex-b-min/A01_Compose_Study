@@ -1,5 +1,6 @@
 package com.example.a01_compose_study.presentation.screen.call.screen
 
+import android.util.Log
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -18,6 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -30,6 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -44,16 +47,32 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
-fun CallList(
+fun CallIndexedList(
     contactList: List<Contact>,
+    selectedIndex: Int? = null,
     vrDynamicBackground: Color,
     fixedBackground: Color,
     onCalling: () -> Unit,
     onItemClick: (Contact) -> Unit,
 ) {
-    LazyColumn() {
+    Log.d("@@ selectedIndex 실행횟수", "${selectedIndex}")
+    val scrollState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
+
+    if (selectedIndex != null) {
+        coroutineScope.launch {
+            scrollState.scrollToItem(selectedIndex-1)
+            delay(200)
+            onCalling()
+        }
+    } else {
+        coroutineScope.launch {
+            scrollState.scrollToItem(0)
+        }
+    }
+    LazyColumn(state = scrollState) {
         itemsIndexed(contactList) { index, callItem ->
-            CallListItem(
+            CallIndexedListItem(
                 contactItem = callItem,
                 vrDynamicBackground = vrDynamicBackground,
                 fixedBackground = fixedBackground,
@@ -64,7 +83,7 @@ fun CallList(
 }
 
 @Composable
-fun CallListItem(
+fun CallIndexedListItem(
     contactItem: Contact,
     vrDynamicBackground: Color,
     fixedBackground: Color,
@@ -144,6 +163,26 @@ fun CallListItem(
                                         .defaultMinSize(minHeight = dimensionResource(R.dimen.dp_32)),
                                     horizontalArrangement = Arrangement.spacedBy(20.dp),
                                 ) {
+                                    val context = LocalContext.current
+
+                                    Column(
+                                        modifier = Modifier
+                                            .alignByBaseline()
+                                    ) {
+                                        Text(
+                                            text = "${contactItem.id}.",
+                                            color = Color.White,
+                                            maxLines = 3,
+                                            overflow = TextOverflow.Ellipsis,
+                                            style = MaterialTheme.typography.h5.plus(
+                                                TextStyle(
+                                                    letterSpacing = (-0.48).sp, lineHeight = 32.sp
+                                                )
+                                            ),
+                                            textAlign = TextAlign.Start
+                                        )
+                                    }
+
                                     Column(
                                         modifier = Modifier
                                             .alignByBaseline()
@@ -202,10 +241,10 @@ fun CallListItem(
 
 @Preview
 @Composable
-fun CallListItemPreview() {
+fun CallIndexedListItemPreview() {
     val contact = Contact(id = "1", name = "문재민", number = "010-1111-2222")
 
-    CallListItem(contactItem = contact,
+    CallIndexedListItem(contactItem = contact,
         vrDynamicBackground = Color.Black,
         fixedBackground = Color.Black,
         onItemClick = {
