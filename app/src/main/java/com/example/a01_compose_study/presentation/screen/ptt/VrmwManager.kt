@@ -61,7 +61,7 @@ class VrmwManager @Inject constructor(
     val TAG: String? = this.javaClass.simpleName
     val gson = Gson()
     var vrResult: VRResult? = null
-    var currContext: MWContext?= null //MWContext의 DialogueMode의 값 임의의 값 넣음
+    var currContext: MWContext? = null //MWContext의 DialogueMode의 값 임의의 값 넣음
     private val languageCheckMap = mutableMapOf<String, CompletableDeferred<Any>>()
 
     val testMwContext = MutableStateFlow<MWContext?>(null)
@@ -351,6 +351,12 @@ class VrmwManager @Inject constructor(
 //
 //    }
 
+    fun requestTTs(
+        promptId: List<String> = listOf(),
+        runnable: java.lang.Runnable? = null,
+    ) {
+
+    }
 
 //    fun requestTTS(
 //        promptId: List<String> = listOf(),
@@ -408,7 +414,8 @@ class VrmwManager @Inject constructor(
         testMwContext.value = mwContext
 
 
-        val vrResultJsonString = "{ \"result\": [ { \"confidence\": 5018, \"intention\": \"Help\", \"phrase\": \"Help\", \"slot_count\": 0 } ] }"
+        val vrResultJsonString =
+            "{ \"result\": [ { \"confidence\": 5018, \"intention\": \"Help\", \"phrase\": \"Help\", \"slot_count\": 0 } ] }"
         val gson = Gson()
         val vrResultType = object : TypeToken<VRResult>() {}.type
 
@@ -795,7 +802,7 @@ class VrmwManager @Inject constructor(
     }
 
     override fun onVRLanguageSupportedReceived(
-        available: Int, languageType: Int, online: Int, keywordSpotAvailable: Int
+        available: Int, languageType: Int, online: Int, keywordSpotAvailable: Int,
     ) {
 //        CustomLogger.i("Main onVRLanguageSupportedReceived available: $available, languageType: $languageType, online: $online, keywordSpotAvailable: $keywordSpotAvailable")
 ////        languageCheckMap["VRLanguageSupported"]?.complete(intArrayOf(available, online))

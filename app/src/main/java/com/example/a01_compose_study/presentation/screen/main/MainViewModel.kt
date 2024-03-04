@@ -167,10 +167,20 @@ class MainViewModel @Inject constructor(
                             }
 
                             is ProcCallData.ScrollIndex -> {
-                                if (sealedParsedData.procCallData.index != null) {
-                                    onDomainEvent(MainEvent.ChangeScrollIndexEvent(sealedParsedData.procCallData.index))
+                                val newIndex = sealedParsedData.procCallData.index
+                                val currentScrollIndex = domainUiState.value.scrollIndex
+
+                                if (newIndex != null && currentScrollIndex != null) {
+                                    if (newIndex < currentScrollIndex) {
+                                        onDomainEvent(MainEvent.ChangeScrollIndexEvent(newIndex))
+                                    } else {
+                                        pttManager.vrmwManager.requestTTs(
+                                            promptId = listOf("PID_CMN_COMM_02_31"),
+                                            runnable = { vrmwManager.resumeVR() }
+                                        )
+                                    }
+                                    Log.d("@@ ProcCallData", "ScrollIndex - Index: ${sealedParsedData.procCallData.index}")
                                 }
-                                Log.d("@@ ProcCallData", "ScrollIndex - Index: ${sealedParsedData.procCallData.index}")
                             }
 
                             is ProcCallData.ProcYesNoOtherNumberResult -> {
