@@ -35,16 +35,12 @@ class SendMsgManager @Inject constructor(
     private val btCall: BtCall,
 ) : VRResultListener {
 
-    var selectedPhonebookItem: Contact? = null
+    private var selectedPhonebookItem: Contact? = null
     private var sendMsgContactList = mutableListOf<Contact>()
     private var messageValue = MutableStateFlow("")
     private var isCategoryListScreen = MutableStateFlow(false)
     private var firstRecogMessage = MutableStateFlow(false)
-
-    fun init() {
-
-    }
-
+    private var changeMsgInitiated: Boolean = false
     override fun onReceiveBundle(bundle: ParseBundle<out Any>) {
         job.launch {
             _sealedParsedData.emit(SealedParsedData.SendMsgData(parsedData(bundle)))
@@ -138,7 +134,6 @@ class SendMsgManager @Inject constructor(
                             screenType = ScreenType.MessageAllList,
                             data = SendMsgDataType.SendMsgData(msgData = null)
                         )
-
                     }
 
                     1 -> {
@@ -208,13 +203,14 @@ class SendMsgManager @Inject constructor(
             printSttString(it.prompt)
 
             if (Intentions.No.isEqual(intention)) {
-                return handlePopIntention()
+                // list 선택 시 Message 없음
+                return handlePopIntention(clearMsg = true)
             }
             // 로직상 무조건 no만 할 수 있어서 여기로 올 수 없음
             return ProcSendMsgData(
                 screenType = ScreenType.ScreenStack,
                 data = SendMsgDataType.SendScreenData(
-                    screenData = ScreenData.REJECT
+                    screenData = ScreenData.REJECT,
                 )
             )
         }
@@ -225,10 +221,18 @@ class SendMsgManager @Inject constructor(
             printSttString(it.prompt)
 
             if (Intentions.No.isEqual(intention)) {
-                return handlePopIntention()
+                // 즉 cm이 있거나 send가 없으면 데이터 없음
+                // 반대로 하면 cm이 없으면서 send가 있면 데이터 있음 -> checkScreenStack(send)
+                // name 시나리오 : say - send - no - say - no  - list -> 데이터 유지
+                // name 시나리오 : say - send - cm - say- no - list -> 데이터 없음
+                // name 시나리오 : say - no -list -> 데이터 없음
+                // name,msg 시나리오 : send - cm - say - no - list -> 데이터 없음
+                if (!changeMsgInitiated && checkUiStateStack(ScreenType.SendMessage)) return handlePopIntention()
+                return handlePopIntention(clearMsg = true)
             }
+
             // Message 발화 시 넘어 오는 intention
-            else if (Intentions.MessageContent.isEqual(intention)) {
+            if (Intentions.MessageContent.isEqual(intention)) {
                 messageValue.value = it.messageValue
                 // Send Message <Name, Msg> 시나리오에서 Change Message 후 Message 발화하여 다시 MessageChange 화면
                 // "No" 발화 시 MessageName이 아닌 상황별 List나 PTT를 띄워야 함
@@ -268,7 +272,16 @@ class SendMsgManager @Inject constructor(
         return handlePopIntention()
     }
 
-    private fun handlePopIntention(): ProcSendMsgData {
+    private fun handlePopIntention(clearMsg: Boolean = false): ProcSendMsgData {
+        if (clearMsg) {
+            return ProcSendMsgData(
+                screenType = ScreenType.ScreenStack,
+                data = SendMsgDataType.SendScreenData(
+                    screenData = ScreenData.POP,
+                    clearMsg = true
+                )
+            )
+        }
         return ProcSendMsgData(
             screenType = ScreenType.ScreenStack,
             data = SendMsgDataType.SendScreenData(
@@ -286,16 +299,6 @@ class SendMsgManager @Inject constructor(
         )
     }
 
-
-    fun handleScreenData(screenData: ScreenData, uiState: DomainUiState) {
-        when (screenData) {
-            ScreenData.PUSH -> UiState.pushUiState(uiState)
-            ScreenData.POP -> UiState.popUiState()
-            ScreenData.CHANGE -> UiState.popUiState()
-            ScreenData.REJECT -> TODO()
-            ScreenData.BtPhoneAppRun -> TODO()
-        }
-    }
 
     private fun procMessageChangeIntention(bundle: ParseBundle<out Any?>): ProcSendMsgData {
 
@@ -315,6 +318,10 @@ class SendMsgManager @Inject constructor(
                 )
 
             } else {
+                // name,msg 시나리오 : send - no - list -> 데이터 유지
+                // # No 발화시 List화면 / PTT화면 (List선택시 Message유지)
+                // name,msg 시나리오 : send - cm - say- msg - no - list -> 데이터 유지
+                //Send Message <Name, Msg> 시나리오
                 return handlePopIntention()
             }
         }
@@ -326,6 +333,7 @@ class SendMsgManager @Inject constructor(
             if (Intentions.ChangeSMS.isEqual(intention)) {
                 //onChangeMessage()
                 // sayMessage 화면전환 / data -> Name
+                changeMsgInitiated = true
                 if (checkUiStateStack(ScreenType.SayMessage)) {
                     // popScreen & vrmwManager.stop
                     return handlePopIntention()

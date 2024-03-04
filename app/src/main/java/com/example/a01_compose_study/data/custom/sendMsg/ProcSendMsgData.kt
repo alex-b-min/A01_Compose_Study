@@ -18,7 +18,8 @@ sealed class SendMsgDataType {
     ) : SendMsgDataType()
 
     data class SendScreenData(
-        val screenData: ScreenData
+        val screenData: ScreenData,
+        val clearMsg: Boolean = false,
     ) : SendMsgDataType()
 
     //open domain event말고 다른 이벤트 고려
@@ -58,7 +59,7 @@ enum class ScreenData {
     POP,
     CHANGE,
     REJECT,
-    BtPhoneAppRun
+    BtPhoneAppRun,
 }
 
 data class MsgData(

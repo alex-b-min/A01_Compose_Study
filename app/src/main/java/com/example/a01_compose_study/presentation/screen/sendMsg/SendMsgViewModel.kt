@@ -73,13 +73,14 @@ class SendMsgViewModel @Inject constructor(
             is SendMsgEvent.SendMessageNo -> {
                 UiState.popUiState()
             }
+
             else -> {
 
             }
         }
     }
 
-    fun observeSendMsgData(){
+    fun observeSendMsgData() {
         CoroutineScope(Dispatchers.Main).launch {
             UiState._sendMsgUiData.collect { data ->
                 handleSendMsgData(data)
@@ -91,17 +92,19 @@ class SendMsgViewModel @Inject constructor(
         val screenType = sendMsgData.first
         val data = sendMsgData.second
 
-        when (screenType){
+        when (screenType) {
             is ScreenType.List -> {
                 // TODO procListIntention
             }
+
             is ScreenType.ScreenStack -> {
                 val screenData = data as? ScreenData
                 if (screenData != null) {
                     handleScreenData(screenData, _domainUiState.value)
                 }
             }
-            else ->{
+
+            else -> {
                 // Reject
             }
         }
