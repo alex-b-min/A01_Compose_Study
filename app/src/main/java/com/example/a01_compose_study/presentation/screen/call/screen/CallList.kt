@@ -48,7 +48,6 @@ fun CallList(
     contactList: List<Contact>,
     vrDynamicBackground: Color,
     fixedBackground: Color,
-    onCalling: () -> Unit,
     onItemClick: (Contact) -> Unit,
 ) {
     LazyColumn() {
@@ -94,7 +93,7 @@ fun CallListItem(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(75.dp),
-                color = vrDynamicBackground,
+                color = if (isSelected) Color.DarkGray else Color.Transparent,
                 backgroundColor = Color.Transparent
             )
         }

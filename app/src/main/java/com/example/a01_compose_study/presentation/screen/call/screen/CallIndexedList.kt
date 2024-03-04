@@ -52,28 +52,42 @@ fun CallIndexedList(
     selectedIndex: Int? = null,
     vrDynamicBackground: Color,
     fixedBackground: Color,
-    onCalling: () -> Unit,
     onItemClick: (Contact) -> Unit,
 ) {
     Log.d("@@ selectedIndex 실행횟수", "${selectedIndex}")
     val scrollState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
 
-    if (selectedIndex != null) {
-        coroutineScope.launch {
-            scrollState.scrollToItem(selectedIndex-1)
-            delay(200)
-            onCalling()
-        }
-    } else {
-        coroutineScope.launch {
-            scrollState.scrollToItem(0)
+    /**
+     * selectedIndex에 해당하는 Contact를 가져옴
+     */
+    val selectedContact: Contact? = selectedIndex?.let {
+        if (it >= 0 && it < contactList.size) {
+            contactList[it]
+        } else {
+            null
         }
     }
+
+    /**
+     * LazyColumn 스크롤 처리
+     */
+    coroutineScope.launch {
+        val scrollIndex = selectedIndex ?: 0
+        scrollState.animateScrollToItem(scrollIndex)
+    }
+
     LazyColumn(state = scrollState) {
         itemsIndexed(contactList) { index, callItem ->
+            /**
+             * selectedContact(선택한 아이템)의 id와 수신객체인 callItem의 id가 일치하는지의 Boolean값
+             * 일치한다면, YesNo 화면으로 게이지 채워지고 자동으로 넘어가고
+             * 일치하지 않는다면, 아무일도 벌어지지 않는다.
+             */
+            val isSelected = callItem.id == selectedContact?.id
             CallIndexedListItem(
                 contactItem = callItem,
+                selectedContact = if (isSelected) selectedContact else null,
                 vrDynamicBackground = vrDynamicBackground,
                 fixedBackground = fixedBackground,
                 onItemClick = onItemClick,
@@ -85,6 +99,7 @@ fun CallIndexedList(
 @Composable
 fun CallIndexedListItem(
     contactItem: Contact,
+    selectedContact: Contact? = null,
     vrDynamicBackground: Color,
     fixedBackground: Color,
     onItemClick: (Contact) -> Unit,
@@ -92,6 +107,15 @@ fun CallIndexedListItem(
     val scope = rememberCoroutineScope()
 
     var isSelected by remember { mutableStateOf(false) }
+
+    scope.launch {
+        if (selectedContact != null) {
+            Log.d("@@ SelectedContact", "${selectedContact}")
+            isSelected = true
+            delay(850)
+            onItemClick(selectedContact)
+        }
+    }
 
     val progress by animateFloatAsState(
         targetValue = if (isSelected) 1f else 0f,
@@ -113,7 +137,7 @@ fun CallIndexedListItem(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(75.dp),
-                color = vrDynamicBackground,
+                color = if (isSelected) Color.DarkGray else Color.Transparent,
                 backgroundColor = Color.Transparent
             )
         }
@@ -244,7 +268,9 @@ fun CallIndexedListItem(
 fun CallIndexedListItemPreview() {
     val contact = Contact(id = "1", name = "문재민", number = "010-1111-2222")
 
-    CallIndexedListItem(contactItem = contact,
+    CallIndexedListItem(
+        contactItem = contact,
+        selectedContact = null,
         vrDynamicBackground = Color.Black,
         fixedBackground = Color.Black,
         onItemClick = {

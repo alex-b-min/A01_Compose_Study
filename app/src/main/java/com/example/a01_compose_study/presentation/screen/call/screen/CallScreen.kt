@@ -1,5 +1,6 @@
 package com.example.a01_compose_study.presentation.screen.call.screen
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -20,14 +21,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.a01_compose_study.R
+import com.example.a01_compose_study.data.Contact
 import com.example.a01_compose_study.data.custom.call.fetchAllContacts
-import com.example.a01_compose_study.domain.model.HelpItemData
 import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.data.UiState.closeDomainWindow
 import com.example.a01_compose_study.presentation.data.UiState.popUiState
-import com.example.a01_compose_study.presentation.screen.call.CallBusinessEvent
+import com.example.a01_compose_study.presentation.screen.call.CallEvent
 import com.example.a01_compose_study.presentation.screen.call.CallViewModel
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
 import com.example.a01_compose_study.presentation.screen.main.route.VRUiState
@@ -49,15 +50,12 @@ fun CallScreen(
                 fixedBackground = fixedBackground,
                 onDismiss = { closeDomainWindow() },
                 onBackButton = { popUiState() },
-                onCalling = {
-                    callViewModel.onCallBusinessEvent(event = CallBusinessEvent.Calling)
-                },
-                onItemClick = { /*TODO*/ }
+                onItemClick = { contact ->
+                    callViewModel.onCallEvent(CallEvent.ContactListItemOnClick(selectedContactItem = contact))
+                }
             )
         }
-    }
-
-    else if (domainUiState.screenType is ScreenType.CallIndexedList) {
+    } else if (domainUiState.screenType is ScreenType.CallIndexedList) {
         Box(modifier = Modifier.fillMaxSize()) {
             CallIndexedListWindow(
                 domainUiState = domainUiState,
@@ -66,14 +64,13 @@ fun CallScreen(
                 fixedBackground = fixedBackground,
                 onDismiss = { closeDomainWindow() },
                 onBackButton = { popUiState() },
-                onCalling = {
-                    callViewModel.onCallBusinessEvent(event = CallBusinessEvent.Calling)
-                },
-                onItemClick = { /*TODO*/ }
+                onItemClick = { contact ->
+                    callViewModel.onCallEvent(CallEvent.ContactListItemOnClick(selectedContactItem = contact))
+                }
             )
         }
     } else if (domainUiState.screenType is ScreenType.CallYesNo) {
-
+        Log.d("@@ CallYesNo", "${domainUiState.detailData}")
     }
 }
 
@@ -85,8 +82,7 @@ fun CallListWindow(
     fixedBackground: Color,
     onDismiss: () -> Unit,
     onBackButton: () -> Unit,
-    onCalling: () -> Unit,
-    onItemClick: (HelpItemData) -> Unit,
+    onItemClick: (Contact) -> Unit,
 ) {
     val contactList = domainUiState.data
 
@@ -109,7 +105,7 @@ fun CallListWindow(
                     tint = Color.Gray,
                     modifier = Modifier
                         .clickable {
-                            onDismiss()
+                            onBackButton()
                         }
                 )
                 Icon(
@@ -127,8 +123,8 @@ fun CallListWindow(
                 contactList = contactList,
                 vrDynamicBackground = vrDynamicBackground,
                 fixedBackground = fixedBackground,
-                onCalling = onCalling,
-                onItemClick = {
+                onItemClick = { contact ->
+                    onItemClick(contact)
                 })
         }
     }
@@ -142,8 +138,7 @@ fun CallIndexedListWindow(
     fixedBackground: Color,
     onDismiss: () -> Unit,
     onBackButton: () -> Unit,
-    onCalling: () -> Unit,
-    onItemClick: (HelpItemData) -> Unit,
+    onItemClick: (Contact) -> Unit,
 ) {
     val contactList = domainUiState.data
     val selectedIndex = domainUiState.scrollIndex
@@ -167,7 +162,7 @@ fun CallIndexedListWindow(
                     tint = Color.Gray,
                     modifier = Modifier
                         .clickable {
-                            onDismiss()
+                            onBackButton()
                         }
                 )
                 Icon(
@@ -186,8 +181,8 @@ fun CallIndexedListWindow(
                 vrDynamicBackground = vrDynamicBackground,
                 selectedIndex = selectedIndex,
                 fixedBackground = fixedBackground,
-                onCalling = onCalling,
-                onItemClick = {
+                onItemClick = { contact ->
+                    onItemClick(contact)
                 })
         }
     }
@@ -209,7 +204,6 @@ fun CallListWindowPreview() {
         fixedBackground = Color.Black,
         onDismiss = {},
         onBackButton = {},
-        onCalling = { },
         onItemClick = {}
     )
 }
@@ -229,7 +223,6 @@ fun CallIndexedListWindowPreview() {
         fixedBackground = Color.Black,
         onDismiss = {},
         onBackButton = {},
-        onCalling = { },
         onItemClick = {}
     )
 }
