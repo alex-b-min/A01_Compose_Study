@@ -1,10 +1,12 @@
 package com.example.a01_compose_study.presentation.screen.call
 
-import com.example.a01_compose_study.domain.model.HelpItemData
-import com.example.a01_compose_study.domain.util.ScreenSizeType
+import com.example.a01_compose_study.data.Contact
 
 sealed class CallEvent {
-    data class ChangeScrollIndexEvent(
-        val selectedScrollIndex: Int
+
+    object OnCallBack : CallEvent()
+
+    data class ContactListItemOnClick(
+        val selectedContactItem: Contact
     ) : CallEvent()
 }
