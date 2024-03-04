@@ -6,6 +6,7 @@ import com.example.a01_compose_study.data.custom.ContactsManager
 import com.example.a01_compose_study.data.custom.ContactsRepository
 import com.example.a01_compose_study.data.custom.DataProducer
 import com.example.a01_compose_study.data.custom.HelpManager
+import com.example.a01_compose_study.data.custom.call.BtCall
 import com.example.a01_compose_study.data.custom.call.CallManager
 import com.example.a01_compose_study.data.custom.ptt.PttManager
 import com.example.a01_compose_study.data.custom.sendMsg.SendMsgManager
@@ -118,13 +119,25 @@ object ManagerModule {
 
     @Provides
     @Singleton
+    fun provideBtCall(
+        @ApplicationContext context: Context,
+    ):BtCall{
+        return BtCall(
+            context = context
+        )
+    }
+
+    @Provides
+    @Singleton
     fun provideSendMsgManager(
         contactsManager: ContactsManager,
         @IOCoroutineScope ioCoroutineScope: CoroutineScope,
+        btCall: BtCall,
     ): SendMsgManager {
         return SendMsgManager(
             contactsManager = contactsManager,
             job = ioCoroutineScope,
+            btCall = btCall
         )
     }
 }

@@ -6,6 +6,7 @@ sealed class ScreenType {
     }
 
     object None : ScreenType()
+    object ScreenStack : ScreenType()
     object ContentScreen : ScreenType()
     object ServiceScreen : ScreenType()
     object PttListen : ScreenType()

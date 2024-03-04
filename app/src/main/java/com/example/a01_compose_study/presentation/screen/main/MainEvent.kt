@@ -32,6 +32,8 @@ sealed class MainEvent() {
     ) : MainEvent()
 
     data class SendDataEvent(
+        val domainType: SealedDomainType,
+        val screenType: ScreenType,
         val data: Any,
     ): MainEvent()
 }

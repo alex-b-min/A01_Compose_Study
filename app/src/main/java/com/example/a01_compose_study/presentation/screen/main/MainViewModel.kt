@@ -44,8 +44,8 @@ class MainViewModel @Inject constructor(
     private val _vrUiState = UiState._VRUiState
     val vrUiState: StateFlow<VRUiState> = UiState.vrUiState
 
-    private val _sendUiData = UiState._sendUiData
-    val sendUiData: SharedFlow<Any> = _sendUiData
+    private val _sendMsgData = UiState._sendMsgUiData
+    val sendMsgData: SharedFlow< Any> = _sendMsgData
 
     init {
         collectParsedData()
@@ -167,15 +167,6 @@ class MainViewModel @Inject constructor(
                     }
 
                     is SealedParsedData.SendMsgData -> {
-//                        onDomainEvent(
-//                            event = MainEvent.OpenDomainWindowEvent(
-//                                domainType = sealedParsedData.procSendMsgData.domainType,
-//                                screenType = sealedParsedData.procSendMsgData.screenType,
-//                                data = sealedParsedData.procSendMsgData.data,
-//                                isError = false,
-//                                screenSizeType = ScreenSizeType.Large
-//                            )
-//                        )
                         when (sealedParsedData.procSendMsgData.data) {
                             is SendMsgDataType.SendMsgData -> {
                                 onDomainEvent(
@@ -192,6 +183,8 @@ class MainViewModel @Inject constructor(
                             is SendMsgDataType.SendScreenData -> {
                                 onDomainEvent(
                                     event = MainEvent.SendDataEvent(
+                                        domainType = sealedParsedData.procSendMsgData.domainType,
+                                        screenType = sealedParsedData.procSendMsgData.screenType,
                                         data = sealedParsedData.procSendMsgData.data.screenData
                                     )
                                 )
@@ -200,6 +193,8 @@ class MainViewModel @Inject constructor(
                             is SendMsgDataType.SendListNum -> {
                                 onDomainEvent(
                                     event = MainEvent.SendDataEvent(
+                                        domainType = SealedDomainType.SendMessage,
+                                        screenType = sealedParsedData.procSendMsgData.screenType,
                                         data = sealedParsedData.procSendMsgData.data.index ?: -1
                                     )
                                 )
@@ -207,8 +202,12 @@ class MainViewModel @Inject constructor(
 
                             is SendMsgDataType.ErrorMsgData -> {
                                 onDomainEvent(
-                                    event = MainEvent.SendDataEvent(
-                                        data = sealedParsedData.procSendMsgData.data.notice
+                                    event = MainEvent.OpenDomainWindowEvent(
+                                        domainType = sealedParsedData.procSendMsgData.domainType,
+                                        screenType = sealedParsedData.procSendMsgData.screenType,
+                                        data = sealedParsedData.procSendMsgData.data.notice,
+                                        isError = false,
+                                        screenSizeType = ScreenSizeType.Large
                                     )
                                 )
                             }
@@ -341,24 +340,19 @@ class MainViewModel @Inject constructor(
             }
 
             is MainEvent.SendDataEvent -> {
-                CoroutineScope(Dispatchers.Default).launch {
-                    _sendUiData.emit(event.data)
+                when(event.domainType){
+                    is SealedDomainType.SendMessage -> {
+                        CoroutineScope(Dispatchers.Default).launch {
+                            _sendMsgData.emit( event.screenType to event.data)
+                        }
+                    }
+                    else -> {
+
+                    }
                 }
             }
         }
     }
-
-//    fun onVREvent(event: VREvent) {
-//        when(event) {
-//            is VREvent.ChangeVRUIEvent -> {
-//                Log.d("@@ vrUiState 값은?1111", "${event.vrUiState.active} / ${event.vrUiState.isError}")
-//                _vrUiState.update { vrUiState ->
-//                    event.vrUiState
-//                }
-//            }
-//        }
-//    }
-
     fun closeDomainWindow() {
         _domainWindowVisible.value = false
         UiState.clearUiState()
