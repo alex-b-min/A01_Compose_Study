@@ -36,8 +36,12 @@ fun CallScreen(
     fixedBackground: Color,
 ) {
     if (domainUiState.screenType is ScreenType.CallList) {
+
+    }
+
+    else if (domainUiState.screenType is ScreenType.CallIndexedList) {
         Box(modifier = Modifier.fillMaxSize()) {
-            CallListWindow(
+            CallIndexedListWindow(
                 domainUiState = domainUiState,
                 vrUiState = vrUiState,
                 vrDynamicBackground = vrDynamicBackground,
@@ -56,7 +60,7 @@ fun CallScreen(
 }
 
 @Composable
-fun CallListWindow(
+fun CallIndexedListWindow(
     domainUiState: DomainUiState.CallWindow,
     vrUiState: VRUiState,
     vrDynamicBackground: Color,
@@ -103,11 +107,11 @@ fun CallListWindow(
 @Preview
 @Composable
 fun CallListWindowPreview() {
-    CallListWindow(
+    CallIndexedListWindow(
         domainUiState = DomainUiState.CallWindow(
             domainType = SealedDomainType.Call,
             data = fetchAllContacts(),
-            screenType = ScreenType.CallList,
+            screenType = ScreenType.CallIndexedList,
             screenSizeType = ScreenSizeType.Middle
         ),
         vrUiState = VRUiState.PttSpeak(active = true, isError = false),

@@ -36,6 +36,8 @@ sealed class ScreenType {
     object SmallText : ScreenType()
     object MediumText : ScreenType()
     object LargeText : ScreenType()
+    object CallIndexedList : ScreenType()
     object CallList : ScreenType()
+
     object CallYesNo : ScreenType()
 }

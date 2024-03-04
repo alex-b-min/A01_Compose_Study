@@ -17,12 +17,12 @@ sealed class ProcCallData(
         screenType = ScreenType.Prepare
     )
 
-    data class ListTTSRequest(val promptId: String) : ProcCallData(screenType = ScreenType.CallList)
-    data class NoticeTTSRequest(val noticeModel: NoticeModel) : ProcCallData(screenType = ScreenType.CallList)
+    data class ListTTSRequest(val promptId: String) : ProcCallData(screenType = ScreenType.CallIndexedList)
+    data class NoticeTTSRequest(val noticeModel: NoticeModel) : ProcCallData(screenType = ScreenType.CallIndexedList)
     data class ProcCallNameScreen(val data: Contact) : ProcCallData(screenType = ScreenType.CallYesNo) // CallName 화면
-    data class RecognizedContactListScreen(val data: List<Contact>) : ProcCallData(screenType = ScreenType.CallList) // 인식된 전화번호부
-    data class AllContactListScreen(val data: List<Contact>) : ProcCallData(screenType = ScreenType.CallList) // 전체 전화번호부
-    data class ScrollIndex(val index: Int?) : ProcCallData(screenType = ScreenType.CallList)
+    data class RecognizedContactListScreen(val data: List<Contact>) : ProcCallData(screenType = ScreenType.CallIndexedList) // 인식된 전화번호부
+    data class AllContactListScreen(val data: List<Contact>) : ProcCallData(screenType = ScreenType.CallIndexedList) // 전체 전화번호부
+    data class ScrollIndex(val index: Int?) : ProcCallData(screenType = ScreenType.CallIndexedList)
     data class ProcYesNoOtherNumberResult(val callYesNoOtherNumberResult: CallYesNoOtherNumberResult) :
-        ProcCallData(screenType = ScreenType.CallList)
+        ProcCallData(screenType = ScreenType.CallIndexedList)
 }
