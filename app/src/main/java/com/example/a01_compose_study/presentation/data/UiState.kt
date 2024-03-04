@@ -151,17 +151,13 @@ object UiState {
                     }
                     domainUiState
                 }
-                UiState.pushUiState(domainUiState.value)
+                pushUiState(domainUiState.value)
             }
 
             is MainEvent.ChangeScrollIndexEvent -> {
-                /**
-                 * 발화로 스크롤이 변경되는 환경이라면 CallViewModel의 Event에 있어야 하지만,
-                 * 현재 버튼 클릭으로 index 값에 대한 스크롤이 변경되는 환경이라 MainEvent에 임의로 정의해서 사용하고 있는 상황
-                 */
                 Log.d("@@  MainEvent.ChangeScrollIndexEvent", "수행 / ${event.selectedScrollIndex}")
                 _domainUiState.update { domainUiState ->
-                    domainUiState.copyWithNewScrollIndex(event.selectedScrollIndex)!!
+                    domainUiState.copyWithNewScrollIndex(event.selectedScrollIndex)
                 }
             }
 
@@ -187,7 +183,7 @@ object UiState {
     }
 
     /**
-     * 화면을 스택에 쌓지 않고 변화만 시킴
+     * 화면을 스택에 쌓지 않고 스크린 사이즈만 변화 시킴
      */
     fun changeUiState(uiState: DomainUiState) {
         _domainUiState.update { domainUiState ->
@@ -227,6 +223,6 @@ object UiState {
 
     fun closeDomainWindow() {
         _domainWindowVisible.value = false
-        UiState.clearUiState()
+        clearUiState()
     }
 }
