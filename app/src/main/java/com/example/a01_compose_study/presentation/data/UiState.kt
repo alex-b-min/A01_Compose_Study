@@ -1,26 +1,18 @@
 package com.example.a01_compose_study.presentation.data
 
 import android.util.Log
-import com.example.a01_compose_study.data.Contact
 import com.example.a01_compose_study.data.custom.SealedParsedData
-import com.example.a01_compose_study.data.custom.sendMsg.MsgData
-import com.example.a01_compose_study.data.custom.sendMsg.SendMsgDataType
-import com.example.a01_compose_study.domain.model.HelpItemData
 import com.example.a01_compose_study.domain.model.SealedDomainType
-import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
-import com.example.a01_compose_study.presentation.screen.main.MainEvent
 import com.example.a01_compose_study.presentation.screen.main.VREvent
 import com.example.a01_compose_study.presentation.screen.main.route.VRUiState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 object UiState {
 
@@ -39,146 +31,19 @@ object UiState {
     val vrUiState: StateFlow<VRUiState> = _VRUiState
 
     val coroutineScope = CoroutineScope(Dispatchers.IO)
-    fun onDomainEvent(event: MainEvent) {
-        when (event) {
-            is MainEvent.CloseDomainWindowEvent -> {
-                coroutineScope.launch {
-                    closeDomainWindow()
-                    delay(500)
-                    onDomainEvent(MainEvent.NoneDomainWindowEvent())
-                }
-
-            }
-
-            is MainEvent.NoneDomainWindowEvent -> {
-                _domainUiState.update { uiState ->
-                    DomainUiState.NoneWindow(event.screenSizeType)
-                }
-            }
-
-            is MainEvent.ChangeDomainWindowSizeEvent -> {
-                /**
-                 * [버튼을 클릭하여 직접적으로 버튼 사이즈 조절할 때 사용]
-                 * 현재 데이터는 유지한 체 ScreenSizeType 프로퍼티만 변경하기
-                 * ==> 즉, 현재 화면에서 직접적으로 화면 크기를 변경하게 할 수 있음
-                 * MainUiState에 미리 copyWithNewSizeType()라는 함수를 정의하여 기존 데이터는 유지한 체 screenSizeType 만을 변경하여 사용하도록 함.
-                 */
-                _domainUiState.update { uiState ->
-                    uiState.copyWithNewSizeType(event.screenSizeType)
-                }
-            }
-
-            is MainEvent.OpenDomainWindowEvent -> {
-                openDomainWindow()
-                _domainUiState.update { uiState ->
-                    val domainUiState = when (event.domainType) {
-                        SealedDomainType.None -> {
-                            DomainUiState.NoneWindow()
-                        }
-
-                        SealedDomainType.Ptt -> {
-                            DomainUiState.PttWindow(
-                                domainType = event.domainType,
-                                screenType = event.screenType,
-                                isError = event.isError,
-                                screenSizeType = event.screenSizeType
-                            )
-                        }
-
-                        SealedDomainType.Help -> {
-                            val helpData = event.data as? List<HelpItemData> ?: emptyList()
-                            DomainUiState.HelpWindow(
-                                domainType = event.domainType,
-                                screenType = event.screenType,
-                                data = helpData,
-                                text = event.domainType.text,
-                                screenSizeType = ScreenSizeType.Large
-                            )
-                        }
-
-                        SealedDomainType.Announce -> {
-                            DomainUiState.AnnounceWindow(
-                                text = event.data as String
-                            )
-                        }
-
-                        SealedDomainType.Call -> {
-                            val contactList = event.data as? List<Contact> ?: emptyList()
-                            Log.d("@@ contactList", "${contactList}")
-                            Log.d("@@ event", "${event}")
-                            DomainUiState.CallWindow(
-                                domainType = event.domainType,
-                                screenType = event.screenType,
-                                screenSizeType = event.screenSizeType,
-                                data = contactList,
-                            )
-                        }
-
-                        SealedDomainType.SendMessage -> {
-                            val eventData = event.data as SendMsgDataType.SendMsgData
-                            DomainUiState.SendMessageWindow(
-                                domainType = event.domainType,
-                                screenType = event.screenType,
-                                isError = event.isError,
-                                msgData = eventData.msgData as MsgData,
-                                screenData = eventData.screenData,
-                            )
-                        }
-
-                        SealedDomainType.MainMenu -> {
-                            DomainUiState.DomainMenuWindow(
-
-                            )
-                        }
-
-                        SealedDomainType.Navigation -> {
-                            DomainUiState.NavigationWindow(
-
-                            )
-                        }
-
-                        SealedDomainType.Radio -> {
-                            DomainUiState.RadioWindow(
-
-                            )
-                        }
-
-                        else -> {
-                            DomainUiState.WeatherWindow(
-
-                            )
-                        }
-                    }
-                    domainUiState
-                }
-                pushUiState(domainUiState.value)
-            }
-
-            is MainEvent.ChangeScrollIndexEvent -> {
-                Log.d("@@  MainEvent.ChangeScrollIndexEvent", "수행 / ${event.selectedScrollIndex}")
-                _domainUiState.update { domainUiState ->
-                    domainUiState.copyWithNewScrollIndex(event.selectedScrollIndex)
-                }
-            }
-
-            is MainEvent.SendDataEvent -> {
-                CoroutineScope(Dispatchers.Default).launch {
-                    _sendUiData.emit(event.data)
-                }
-            }
-        }
-    }
 
     val _sendUiData = MutableSharedFlow<Any>()
     val sendUiData: SharedFlow<Any> = _sendUiData
 
     /**
-     * 화면을 스택에 쌓음
+     * domainUiState의 domainType이 Ptt,None 타입이 아닐때만 스택에 추가함
      */
     fun pushUiState(uiState: DomainUiState) {
-        _domainUiStateStack.add(uiState)
-        _domainUiStateStack.forEachIndexed { index, domainUiState ->
-            Log.d("@@ _domainUiStateStack", "index: $index / data: $domainUiState")
+        if (domainUiState.value.domainType != SealedDomainType.Ptt && domainUiState.value.domainType != SealedDomainType.None) {
+            _domainUiStateStack.add(uiState)
+            _domainUiStateStack.forEachIndexed { index, domainUiState ->
+                Log.d("@@ _domainUiStateStack", "index: $index / data: $domainUiState")
+            }
         }
     }
 
@@ -191,20 +56,22 @@ object UiState {
         }
     }
 
+    /**
+     * 스택 사이즈가 1일때 백버튼을 누른다면 Window를 닫아버리고,
+     * 스택 사이즈가 0보다 클 때(1 이상)는 가장 마지막에 쌓여있는 스택을 삭제한다.
+     */
     fun popUiState() {
-        if (_domainUiStateStack.size > 1) {
+        if (_domainUiStateStack.size == 1) {
+            closeDomainWindow()
+        } else if (_domainUiStateStack.size > 0) {
             _domainUiStateStack.removeAt(_domainUiStateStack.size - 1)
             _domainUiState.value = _domainUiStateStack.last()
         }
     }
 
-    fun clearUiState() {
-        _domainUiStateStack.clear()
-    }
-
     fun onVREvent(event: VREvent) {
         Log.d("@@ vrUiState", "${vrUiState.value.active}")
-        when(event) {
+        when (event) {
             is VREvent.ChangeVRUIEvent -> {
                 _VRUiState.update { vrUiState ->
                     event.vrUiState
@@ -224,5 +91,9 @@ object UiState {
     fun closeDomainWindow() {
         _domainWindowVisible.value = false
         clearUiState()
+    }
+
+    fun clearUiState() {
+        _domainUiStateStack.clear()
     }
 }

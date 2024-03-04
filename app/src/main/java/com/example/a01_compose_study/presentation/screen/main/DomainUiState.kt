@@ -11,25 +11,27 @@ import com.example.a01_compose_study.domain.util.ScreenSizeType
 sealed class DomainUiState(
     open val screenSizeType: ScreenSizeType = ScreenSizeType.Zero,
     open val screenType: ScreenType = ScreenType.None,
-    open val scrollIndex: Int? = null
+    open val scrollIndex: Int? = null,
+    open val domainType: SealedDomainType = SealedDomainType.None
 ) {
     data class NoneWindow(
         override val screenSizeType: ScreenSizeType = ScreenSizeType.Zero,
-        override val scrollIndex: Int? = null
-    ) : DomainUiState(screenSizeType)
+        override val scrollIndex: Int? = null,
+        override val domainType: SealedDomainType = SealedDomainType.None
+    ) : DomainUiState(screenSizeType, scrollIndex = scrollIndex, domainType = domainType)
 
     data class PttWindow(
-        val domainType: SealedDomainType,
+        override val domainType: SealedDomainType = SealedDomainType.Ptt,
         override val screenType: ScreenType,
         val isError: Boolean = false,
         val errorText: String = "",
         val guideText: String = "",
         override val screenSizeType: ScreenSizeType = ScreenSizeType.Middle,
         override val scrollIndex: Int? = null
-    ) : DomainUiState(screenSizeType, screenType, scrollIndex)
+    ) : DomainUiState(screenSizeType, screenType, scrollIndex, domainType)
 
     data class HelpWindow(
-        val domainType: SealedDomainType,
+        override val domainType: SealedDomainType,
         override val screenType: ScreenType,
         val data: List<HelpItemData>,
         val detailData: HelpItemData = HelpItemData(command = ""),
@@ -37,46 +39,51 @@ sealed class DomainUiState(
         val text: String = "",
         override val screenSizeType: ScreenSizeType = ScreenSizeType.Small,
         override val scrollIndex: Int? = null
-    ) : DomainUiState(screenSizeType, screenType, scrollIndex)
+    ) : DomainUiState(screenSizeType, screenType, scrollIndex, domainType)
 
     data class AnnounceWindow(
         val text: String,
         override val screenSizeType: ScreenSizeType = ScreenSizeType.Small,
-        override val scrollIndex: Int? = null
-    ) : DomainUiState(screenSizeType, scrollIndex = scrollIndex)
+        override val scrollIndex: Int? = null,
+        override val domainType: SealedDomainType = SealedDomainType.None
+    ) : DomainUiState(screenSizeType, scrollIndex = scrollIndex, domainType = domainType)
 
     data class CallWindow(
-        val domainType: SealedDomainType,
+        override val domainType: SealedDomainType,
         val data: List<Contact>,
         val detailData: Contact = Contact(),
         val isError: Boolean = false,
         override val scrollIndex: Int? = null,
         override val screenType: ScreenType,
         override val screenSizeType: ScreenSizeType,
-    ) : DomainUiState(screenSizeType, screenType, scrollIndex)
+    ) : DomainUiState(screenSizeType, screenType, scrollIndex, domainType)
 
     data class DomainMenuWindow(
         override val screenSizeType: ScreenSizeType = ScreenSizeType.Zero,
-        override val scrollIndex: Int? = null
-    ) : DomainUiState(screenSizeType)
+        override val scrollIndex: Int? = null,
+        override val domainType: SealedDomainType = SealedDomainType.None
+    ) : DomainUiState(screenSizeType, scrollIndex = scrollIndex, domainType = domainType)
 
     data class NavigationWindow(
         override val screenSizeType: ScreenSizeType = ScreenSizeType.Zero,
-        override val scrollIndex: Int? = null
-    ) : DomainUiState(screenSizeType)
+        override val scrollIndex: Int? = null,
+        override val domainType: SealedDomainType = SealedDomainType.None
+    ) : DomainUiState(screenSizeType, scrollIndex = scrollIndex, domainType = domainType)
 
     data class RadioWindow(
         override val screenSizeType: ScreenSizeType = ScreenSizeType.Zero,
-        override val scrollIndex: Int? = null
-    ) : DomainUiState(screenSizeType)
+        override val scrollIndex: Int? = null,
+        override val domainType: SealedDomainType = SealedDomainType.None
+    ) : DomainUiState(screenSizeType, scrollIndex = scrollIndex, domainType = domainType)
 
     data class WeatherWindow(
         override val screenSizeType: ScreenSizeType = ScreenSizeType.Zero,
-        override val scrollIndex: Int? = null
-    ) : DomainUiState(screenSizeType)
+        override val scrollIndex: Int? = null,
+        override val domainType: SealedDomainType = SealedDomainType.None
+    ) : DomainUiState(screenSizeType, scrollIndex = scrollIndex, domainType = domainType)
 
     data class SendMessageWindow(
-        val domainType: SealedDomainType,
+        override val domainType: SealedDomainType,
         override val screenType: ScreenType,
         val msgData: MsgData? = null,
         val selectListItem: Contact? = null,
@@ -84,7 +91,7 @@ sealed class DomainUiState(
         val screenData: ScreenData,
         override val screenSizeType: ScreenSizeType = ScreenSizeType.Zero,
         override val scrollIndex: Int? = null
-    ) : DomainUiState(screenSizeType, screenType, scrollIndex)
+    ) : DomainUiState(screenSizeType, screenType, scrollIndex, domainType)
 
     fun copyWithNewSizeType(sizeType: ScreenSizeType): DomainUiState {
         return when (this) {

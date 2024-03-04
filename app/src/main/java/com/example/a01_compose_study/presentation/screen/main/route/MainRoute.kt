@@ -27,8 +27,6 @@ import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.components.button.PttButton
 import com.example.a01_compose_study.presentation.components.lottie.LottieAssetAnimationHandler
 import com.example.a01_compose_study.presentation.components.lottie.LottieRawAnimationHandler
-import com.example.a01_compose_study.presentation.data.UiState.onDomainEvent
-import com.example.a01_compose_study.presentation.data.UiState.onVREvent
 import com.example.a01_compose_study.presentation.screen.SelectVRResult
 import com.example.a01_compose_study.presentation.screen.announce.AnnounceScreen
 import com.example.a01_compose_study.presentation.screen.call.screen.CallScreen
@@ -36,10 +34,8 @@ import com.example.a01_compose_study.presentation.screen.help.screen.ComposeHelp
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
 import com.example.a01_compose_study.presentation.screen.main.MainEvent
 import com.example.a01_compose_study.presentation.screen.main.MainViewModel
-import com.example.a01_compose_study.presentation.screen.main.VREvent
 import com.example.a01_compose_study.presentation.screen.ptt.ComposePttScreen
 import com.example.a01_compose_study.presentation.screen.ptt.PttEvent
-import com.example.a01_compose_study.presentation.screen.ptt.PttViewModel
 import com.example.a01_compose_study.presentation.screen.sendMsg.SendMsgScreen
 import com.example.a01_compose_study.presentation.util.MultipleEventsCutter
 import com.example.a01_compose_study.presentation.util.get
@@ -49,7 +45,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun MainRoute(
     viewModel: MainViewModel = hiltViewModel(),
-    pttViewModel: PttViewModel = hiltViewModel(),
+//    pttViewModel: PttViewModel = hiltViewModel(),
 ) {
     val domainUiState by viewModel.domainUiState.collectAsStateWithLifecycle()
     val domainWindowVisibleState by viewModel.domainWindowVisible.collectAsStateWithLifecycle()
@@ -59,7 +55,7 @@ fun MainRoute(
 
     val multipleEventsCutter = remember { MultipleEventsCutter.get() }
 
-    val announceString by pttViewModel.announceString.collectAsStateWithLifecycle()
+    val announceString by viewModel.announceString.collectAsStateWithLifecycle()
 
     /**
      * 원래라고 하면은 Compose에서 뷰를 조작하는 변수(visible)는 remember 타입으로 선언해야 함..
@@ -76,7 +72,7 @@ fun MainRoute(
         domainUiState = domainUiState,
         domainWindowVisible = domainWindowVisibleState,
         onCloseDomainWindow = {
-            onDomainEvent(MainEvent.CloseDomainWindowEvent)
+            viewModel.onDomainEvent(MainEvent.CloseDomainWindowEvent)
         }) {
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -109,14 +105,14 @@ fun MainRoute(
                         contentColor = Color.Gray,
                         backgroundColor = Black2
                     )
-                    onVREvent(
-                        VREvent.ChangeVRUIEvent(
-                            VRUiState.PttLoading(
-                                active = true,
-                                isError = false
-                            )
-                        )
-                    )
+//                    onVREvent(
+//                        VREvent.ChangeVRUIEvent(
+//                            VRUiState.PttLoading(
+//                                active = true,
+//                                isError = false
+//                            )
+//                        )
+//                    )
                 }
             }
 
@@ -180,7 +176,7 @@ fun MainRoute(
             modifier = Modifier.fillMaxSize(0.13f),
             contentText = "PTT Open",
             onClick = {
-                pttViewModel.onPttEvent(PttEvent.StartVR(SelectVRResult.PttResult))
+                viewModel.onPttEvent(PttEvent.StartVR(SelectVRResult.PttResult))
             }
         )
 
@@ -188,7 +184,7 @@ fun MainRoute(
             modifier = Modifier.fillMaxSize(0.13f),
             contentText = "PTT Prepare",
             onClick = {
-                pttViewModel.onPttEvent(PttEvent.PreparePtt)
+                viewModel.onPttEvent(PttEvent.PreparePtt)
             }
         )
 
@@ -196,7 +192,7 @@ fun MainRoute(
             modifier = Modifier.fillMaxSize(0.13f),
             contentText = "PTT Speak",
             onClick = {
-                pttViewModel.onPttEvent(PttEvent.SetSpeakType)
+                viewModel.onPttEvent(PttEvent.SetSpeakType)
             }
         )
 
@@ -205,7 +201,7 @@ fun MainRoute(
             contentText = "PTT Loading",
             onClick = {
                 scope.launch {
-                    pttViewModel.onPttEvent(PttEvent.SetLoadingType)
+                    viewModel.onPttEvent(PttEvent.SetLoadingType)
                 }
             }
         )
@@ -215,7 +211,7 @@ fun MainRoute(
             contentText = "PTT Announce",
             onClick = {
                 scope.launch {
-                    onDomainEvent(
+                    viewModel.onDomainEvent(
                         event = MainEvent.OpenDomainWindowEvent(
                             domainType = SealedDomainType.Announce,
                             screenType = ScreenType.Prepare,
@@ -233,7 +229,7 @@ fun MainRoute(
             contentText = "PTT Close",
             onClick = {
                 scope.launch {
-                    onDomainEvent(MainEvent.CloseDomainWindowEvent)
+                    viewModel.onDomainEvent(MainEvent.CloseDomainWindowEvent)
                 }
             }
         )
@@ -242,7 +238,7 @@ fun MainRoute(
             modifier = Modifier.fillMaxSize(0.13f),
             contentText = "PTT Help",
             onClick = {
-                pttViewModel.onPttEvent(PttEvent.StartVR(SelectVRResult.HelpResult))
+                viewModel.onPttEvent(PttEvent.StartVR(SelectVRResult.HelpResult))
             }
         )
 
@@ -280,7 +276,7 @@ fun MainRoute(
                     is ScreenSizeType.Large -> ScreenSizeType.Full
                     is ScreenSizeType.Full -> ScreenSizeType.Full
                 }
-                onDomainEvent(
+                viewModel.onDomainEvent(
                     MainEvent.ChangeDomainWindowSizeEvent(
                         resultScreenSizeType
                     )
@@ -301,7 +297,7 @@ fun MainRoute(
                     is ScreenSizeType.Large -> ScreenSizeType.Middle
                     is ScreenSizeType.Full -> ScreenSizeType.Large
                 }
-                onDomainEvent(
+                viewModel.onDomainEvent(
                     MainEvent.ChangeDomainWindowSizeEvent(
                         resultScreenSizeType
                     )
@@ -400,7 +396,7 @@ fun MainRoute(
                 .fillMaxHeight(0.13f),
             contentText = "VR Call List Result",
             onClick = {
-                pttViewModel.onPttEvent(PttEvent.StartVR(SelectVRResult.CallListResult))
+                viewModel.onPttEvent(PttEvent.StartVR(SelectVRResult.CallListResult))
             }
         )
 
@@ -410,7 +406,7 @@ fun MainRoute(
                 .fillMaxHeight(0.13f),
             contentText = "VR Call Index List Result",
             onClick = {
-                pttViewModel.onPttEvent(PttEvent.StartVR(SelectVRResult.CallIndexListResult))
+                viewModel.onPttEvent(PttEvent.StartVR(SelectVRResult.CallIndexListResult))
             }
         )
 
@@ -436,7 +432,7 @@ fun MainRoute(
                  * 발화로 스크롤이 변경되는 환경이라면 CallViewModel의 Event에 있어야 하지만,
                  * 현재 버튼 클릭으로 index 값을 직접 주입해야 하는 환경이 MainEvent에 임의로 정의해서 사용하고 있는 상황
                  */
-                onDomainEvent(
+                viewModel.onDomainEvent(
                     MainEvent.ChangeScrollIndexEvent(5)
                 )
             }
@@ -447,7 +443,7 @@ fun MainRoute(
                 .fillMaxHeight(0.13f),
             contentText = "Change ScrollIndex 10",
             onClick = {
-                onDomainEvent(
+                viewModel.onDomainEvent(
                     MainEvent.ChangeScrollIndexEvent(10)
                 )
             }

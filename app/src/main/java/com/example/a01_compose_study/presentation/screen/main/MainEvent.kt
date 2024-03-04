@@ -3,7 +3,6 @@ package com.example.a01_compose_study.presentation.screen.main
 import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.util.ScreenSizeType
-import com.example.a01_compose_study.presentation.screen.call.CallEvent
 
 sealed class MainEvent() {
     object CloseDomainWindowEvent : MainEvent()
