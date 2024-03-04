@@ -2,9 +2,12 @@ package com.example.a01_compose_study.presentation.screen.call.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
@@ -22,6 +25,8 @@ import com.example.a01_compose_study.domain.model.HelpItemData
 import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.util.ScreenSizeType
+import com.example.a01_compose_study.presentation.data.UiState.closeDomainWindow
+import com.example.a01_compose_study.presentation.data.UiState.popUiState
 import com.example.a01_compose_study.presentation.screen.call.CallBusinessEvent
 import com.example.a01_compose_study.presentation.screen.call.CallViewModel
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
@@ -42,8 +47,8 @@ fun CallScreen(
                 vrUiState = vrUiState,
                 vrDynamicBackground = vrDynamicBackground,
                 fixedBackground = fixedBackground,
-                onDismiss = { /*TODO*/ },
-                onBackButton = { /*TODO*/ },
+                onDismiss = { closeDomainWindow() },
+                onBackButton = { popUiState() },
                 onCalling = {
                     callViewModel.onCallBusinessEvent(event = CallBusinessEvent.Calling)
                 },
@@ -59,8 +64,8 @@ fun CallScreen(
                 vrUiState = vrUiState,
                 vrDynamicBackground = vrDynamicBackground,
                 fixedBackground = fixedBackground,
-                onDismiss = { /*TODO*/ },
-                onBackButton = { /*TODO*/ },
+                onDismiss = { closeDomainWindow() },
+                onBackButton = { popUiState() },
                 onCalling = {
                     callViewModel.onCallBusinessEvent(event = CallBusinessEvent.Calling)
                 },
@@ -92,18 +97,32 @@ fun CallListWindow(
             .background(vrDynamicBackground)
     ) {
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
         ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_close),
-                contentDescription = null,
-                tint = Color.Gray,
-                modifier = Modifier
-                    .padding(end = 8.dp, top = 8.dp)
-                    .clickable {
-                    }
-            )
-
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_guidance_btn_back),
+                    contentDescription = null,
+                    tint = Color.Gray,
+                    modifier = Modifier
+                        .clickable {
+                            onDismiss()
+                        }
+                )
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_close),
+                    contentDescription = null,
+                    tint = Color.Gray,
+                    modifier = Modifier
+                        .padding(end = 10.dp, top = 10.dp)
+                        .clickable {
+                            onDismiss()
+                        }
+                )
+            }
             CallList(
                 contactList = contactList,
                 vrDynamicBackground = vrDynamicBackground,
@@ -136,18 +155,32 @@ fun CallIndexedListWindow(
             .background(vrDynamicBackground)
     ) {
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
         ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_close),
-                contentDescription = null,
-                tint = Color.Gray,
-                modifier = Modifier
-                    .padding(end = 8.dp, top = 8.dp)
-                    .clickable {
-                    }
-            )
-
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_guidance_btn_back),
+                    contentDescription = null,
+                    tint = Color.Gray,
+                    modifier = Modifier
+                        .clickable {
+                            onDismiss()
+                        }
+                )
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_close),
+                    contentDescription = null,
+                    tint = Color.Gray,
+                    modifier = Modifier
+                        .padding(end = 10.dp, top = 10.dp)
+                        .clickable {
+                            onDismiss()
+                        }
+                )
+            }
             CallIndexedList(
                 contactList = contactList,
                 vrDynamicBackground = vrDynamicBackground,
