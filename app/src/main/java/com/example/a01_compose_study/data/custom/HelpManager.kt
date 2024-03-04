@@ -9,8 +9,8 @@ import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.data.UiState
+import com.example.a01_compose_study.presentation.screen.SelectVRResult
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -122,7 +122,7 @@ class HelpManager @Inject constructor(
         return domainType
     }
 
-    override fun onReceiveBundle(bundle: ParseBundle<out Any>) {
+    override fun onReceiveBundle(bundle: ParseBundle<out Any>, selectVRResult: SelectVRResult) {
         coroutineScope.launch {
             Log.d("@@ Call onReceiveBundle", "${bundle}")
 

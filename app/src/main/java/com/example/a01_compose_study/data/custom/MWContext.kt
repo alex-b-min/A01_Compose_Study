@@ -73,6 +73,10 @@ class MWContext(
         }
     }
 
+    /**
+     * bundle의 type : 어떤 매니저에게 전달할지를 결정하는 변수
+     * bundle의 dialogue : 해당 매니저에서 구체적인 파싱 작업을 위해 dialogue 값을 활용하는 변수
+     */
     fun onVRResult(vrResult: VRResult, selectVRResult: SelectVRResult) {
         Log.d("@@ MWContext onVRResult", "${vrResult}")
 //        val bundle = ParserFactory().dataParsing(vrResult, dialogueMode = DialogueMode.HELP)
@@ -91,7 +95,23 @@ class MWContext(
                 null
             }
 
+            SelectVRResult.CallListResult -> {
+                ParserFactory().dataParsing(vrResult, dialogueMode = dialogueMode)
+                    .also {
+                        it?.type = ParseDomainType.CALL
+                        it?.dialogueMode = DialogueMode.CALL
+                    }
+            }
+
             SelectVRResult.CallIndexListResult -> {
+                ParserFactory().dataParsing(vrResult, dialogueMode = dialogueMode)
+                    .also {
+                        it?.type = ParseDomainType.CALL
+                        it?.dialogueMode = DialogueMode.CALL
+                    }
+            }
+
+            SelectVRResult.CallRecognizedContact -> {
                 ParserFactory().dataParsing(vrResult, dialogueMode = dialogueMode)
                     .also {
                         it?.type = ParseDomainType.CALL
@@ -114,7 +134,7 @@ class MWContext(
             if (it.type == ParseDomainType.UNSUPPORTED_DOMAIN) {
                 resultListener.onVRError(HVRError.ERROR_HMI)
             } else {
-                resultListener.onReceiveBundle(it)
+                resultListener.onReceiveBundle(bundle = it, selectVRResult = selectVRResult)
             }
         } ?: run {
             resultListener.onBundleParsingErr()

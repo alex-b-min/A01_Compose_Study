@@ -149,8 +149,16 @@ class MainViewModel @Inject constructor(
                             }
 
                             is ProcCallData.AllContactListScreen -> {
-                                Log.d(
-                                    "@@ ProcCallData", "FullContactListScreen - Full Contact List: ${sealedParsedData.procCallData.data}")
+                                Log.d("@@ ProcCallData", "FullContactListScreen - Full Contact List: ${sealedParsedData.procCallData.data}")
+                                onDomainEvent(
+                                    event = MainEvent.OpenDomainWindowEvent(
+                                        domainType = sealedParsedData.procCallData.sealedDomainType,
+                                        screenType = sealedParsedData.procCallData.screenType,
+                                        data = sealedParsedData.procCallData.data,
+                                        isError = false,
+                                        screenSizeType = sealedParsedData.procCallData.screenSizeType,
+                                    )
+                                )
                             }
 
                             is ProcCallData.ScrollIndex -> {
@@ -220,26 +228,5 @@ class MainViewModel @Inject constructor(
                 }
             }
         }
-    }
-
-
-//    fun onVREvent(event: VREvent) {
-//        when(event) {
-//            is VREvent.ChangeVRUIEvent -> {
-//                Log.d("@@ vrUiState 값은?1111", "${event.vrUiState.active} / ${event.vrUiState.isError}")
-//                _vrUiState.update { vrUiState ->
-//                    event.vrUiState
-//                }
-//            }
-//        }
-//    }
-
-    fun closeDomainWindow() {
-        _domainWindowVisible.value = false
-        UiState.clearUiState()
-    }
-
-    fun openDomainWindow() {
-        _domainWindowVisible.value = true
     }
 }

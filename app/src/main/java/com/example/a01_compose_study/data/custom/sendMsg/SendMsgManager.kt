@@ -18,6 +18,7 @@ import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.util.CustomLogger
 import com.example.a01_compose_study.presentation.data.UiState
 import com.example.a01_compose_study.presentation.data.UiState._sealedParsedData
+import com.example.a01_compose_study.presentation.screen.SelectVRResult
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
 import com.example.a01_compose_study.presentation.util.StringManager.printSttString
 import kotlinx.coroutines.CoroutineScope
@@ -42,7 +43,7 @@ class SendMsgManager @Inject constructor(
 
     }
 
-    override fun onReceiveBundle(bundle: ParseBundle<out Any>) {
+    override fun onReceiveBundle(bundle: ParseBundle<out Any>, selectVRResult: SelectVRResult) {
         job.launch {
             _sealedParsedData.emit(SealedParsedData.SendMsgData(parsedData(bundle)))
         }

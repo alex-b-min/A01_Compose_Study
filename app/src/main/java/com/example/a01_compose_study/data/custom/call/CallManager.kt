@@ -17,10 +17,10 @@ import com.example.a01_compose_study.data.pasing.CommonModel
 import com.example.a01_compose_study.domain.model.NoticeModel
 import com.example.a01_compose_study.presentation.data.UiState
 import com.example.a01_compose_study.presentation.data.UiState.getCurrDomainUiState
+import com.example.a01_compose_study.presentation.screen.SelectVRResult
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -36,7 +36,7 @@ class CallManager @Inject constructor(
 
     private var recogCategory = 0
 
-    fun parsedData(bundle: ParseBundle<out Any>): ProcCallData {
+    fun parsedData(bundle: ParseBundle<out Any>, selectVRResult: SelectVRResult): ProcCallData {
         /**
          * ParseBundle<out Any>? 타입의 bundle을 HelpData로 파싱하는 로직이 담겨야함
          */
@@ -51,7 +51,8 @@ class CallManager @Inject constructor(
 
                 callModel.let {
                     procCallIntention(
-                        callModel = it
+                        callModel = it,
+                        selectVRResult = selectVRResult
                     )
                 } ?: run {
                     Log.d("@@ Call", "reject")
@@ -95,6 +96,7 @@ class CallManager @Inject constructor(
      */
     private fun procCallIntention(
         callModel: CallModel,
+        selectVRResult: SelectVRResult
     ): ProcCallData {
         /**
          * 1. 전화가 가능한 상태인지 조건 확인
@@ -116,8 +118,7 @@ class CallManager @Inject constructor(
 //            val noticeModel: NoticeModel? = createNoticeModel(NoticeModelType.BLUETOOTH_PROCESSING, context)
 //            val noticeModel: NoticeModel? = createNoticeModel(NoticeModelType.BLUETOOTH_NOT_CONNECTED_NOT_PAIRING, context)
 //            val noticeModel: NoticeModel? = createNoticeModel(NoticeModelType.BLUETOOTH_NOT_CONNECTED_YES_PAIRING, context)
-            val noticeModel: NoticeModel? =
-                createNoticeModel(NoticeModelType.DEFAULT, context) //Notice Model이 null일 때
+            val noticeModel: NoticeModel? = createNoticeModel(NoticeModelType.DEFAULT, context) //Notice Model이 null일 때
 
             if (noticeModel != null) {
                 return ProcCallData.NoticeTTSRequest(noticeModel = noticeModel)
@@ -135,8 +136,14 @@ class CallManager @Inject constructor(
                      * 기존에는 contactsManager의 makeContactList()를 통해서 인식된 이름을 통한 전화번호부 목록을 생성을 했지만,
                      * 인식된 이름을 통해 생성된 전화번호부 목록을 더미 데이터로 할당 하도록 함
                      */
+                    val recognizedList = when(selectVRResult) {
+                        is SelectVRResult.CallListResult -> emptyList()
+                        is SelectVRResult.CallIndexListResult -> fetchRecognizedContacts(8)
+                        is SelectVRResult.CallRecognizedContact -> fetchRecognizedContacts(1)
+                        else -> emptyList()
+                    }
 //                    val recognizedList : List<Contact> = emptyList() //인식된 전화번호부 목록 없음
-                    val recognizedList: List<Contact> = fetchAllContacts() //인식된 전화번호부 목록 여러개
+//                    val recognizedList: List<Contact> = fetchAllContacts() //인식된 전화번호부 목록 여러개
 //                    val recognizedList : List<Contact> = fetchRecognizedContacts(1) //인식된 전화번호부 목록 1개
 
                     // 인식된 이름으로 매칭되는 연락처가 여러개인 경우
@@ -236,11 +243,11 @@ class CallManager @Inject constructor(
         }
     }
 
-    override fun onReceiveBundle(bundle: ParseBundle<out Any>) {
+    override fun onReceiveBundle(bundle: ParseBundle<out Any>, selectVRResult: SelectVRResult) {
         coroutineScope.launch {
             Log.d("@@ Call onReceiveBundle", "${bundle}")
 
-            val procCallData = parsedData(bundle)
+            val procCallData = parsedData(bundle, selectVRResult)
             Log.d("@@ procCallData", "${procCallData}")
             _sealedParsedData.emit(SealedParsedData.CallData(procCallData))
         }

@@ -394,6 +394,15 @@ fun MainRoute(
 //                    )
 //                }
 //            )
+        PttButton(
+            modifier = Modifier
+                .fillMaxWidth(0.12f)
+                .fillMaxHeight(0.13f),
+            contentText = "VR Call List Result",
+            onClick = {
+                pttViewModel.onPttEvent(PttEvent.StartVR(SelectVRResult.CallListResult))
+            }
+        )
 
         PttButton(
             modifier = Modifier

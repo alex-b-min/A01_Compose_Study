@@ -36,11 +36,11 @@ class PttManager @Inject constructor(
 
     var defaultAnnounceString = getString(R.string.TID_CMN_COMM_01_02)
 
-    override fun onReceiveBundle(bundle: ParseBundle<out Any>) {
+    override fun onReceiveBundle(bundle: ParseBundle<out Any>, selectVRResult: SelectVRResult) {
         Log.d("@@ PttManager onReceiveBundle", "${bundle}")
         when(bundle.type) {
             ParseDomainType.CALL -> {
-                dataProducer.callManager.onReceiveBundle(bundle)
+                dataProducer.callManager.onReceiveBundle(bundle = bundle, selectVRResult = selectVRResult)
             }
 
             ParseDomainType.NAVI -> {
@@ -60,7 +60,7 @@ class PttManager @Inject constructor(
             }
 
             ParseDomainType.HELP -> {
-                dataProducer.helpManager.onReceiveBundle(bundle)
+                dataProducer.helpManager.onReceiveBundle(bundle, selectVRResult)
             }
 
             else -> {

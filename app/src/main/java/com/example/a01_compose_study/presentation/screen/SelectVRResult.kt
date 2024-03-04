@@ -7,6 +7,8 @@ sealed class SelectVRResult {
      */
     object HelpResult : SelectVRResult()
     object PttResult : SelectVRResult()
+    object CallListResult : SelectVRResult()
     object CallIndexListResult : SelectVRResult()
     object ScrollIndexResult : SelectVRResult()
+    object CallRecognizedContact : SelectVRResult()
 }
