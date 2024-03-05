@@ -2,6 +2,8 @@ package com.example.a01_compose_study.presentation.screen.help
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.a01_compose_study.data.DialogueMode
+import com.example.a01_compose_study.data.custom.MWContext
 import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.presentation.data.UiState
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
@@ -26,7 +28,7 @@ class HelpViewModel @Inject constructor(
                         screenType = ScreenType.HelpDetailList,
                         detailData = event.selectedHelpItem
                     ) ?: domainUiState
-                    UiState.pushUiState(updatedState)
+                    UiState.pushUiState(Pair(updatedState,null))
                     updatedState
                 }
             }

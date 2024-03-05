@@ -1,10 +1,8 @@
 package com.example.a01_compose_study.presentation.data
 
 import android.util.Log
-import com.example.a01_compose_study.data.DialogueMode
 import com.example.a01_compose_study.data.custom.MWContext
 import com.example.a01_compose_study.data.custom.SealedParsedData
-import com.example.a01_compose_study.data.custom.VRResultListener
 import com.example.a01_compose_study.data.custom.sendMsg.ScreenData
 import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
@@ -41,17 +39,22 @@ object UiState {
     /**
      * 화면을 스택에 쌓음
      */
-    fun pushUiState(domainUiPair:Pair<DomainUiState,MWContext>) {
+//    fun pushUiState(domainUiState: DomainUiState,mwContext: MWContext? = null) {
+//        val domainUiPair:Pair<DomainUiState,MWContext?> = Pair(domainUiState,mwContext)
+//        _domainUiStateStack.add(domainUiPair)
+//        _domainUiStateStack.forEachIndexed { index, domainUiState ->
+//            Log.d("@@ _domainUiStateStack", "index: $index / data: $domainUiState")
+//        }
+//    }
+        fun pushUiState(domainUiPair:Pair<DomainUiState,MWContext?>) {
+//        val domainUiPair:Pair<DomainUiState,MWContext?> = Pair(domainUiState,mwContext)
         _domainUiStateStack.add(domainUiPair)
-        _domainUiStateStack.forEachIndexed { index, domainUiState ->
-            Log.d("@@ _domainUiStateStack", "index: $index / data: $domainUiState")
-        }
     }
 
     /**
      * 화면을 스택에 쌓지 않고 변화만 시킴
      */
-    fun changeUiState(domainUiPair:Pair<DomainUiState,MWContext>) {
+    fun changeUiState(domainUiPair:Pair<DomainUiState,MWContext?>) {
         val uiState = domainUiPair.first
         val mwContext = domainUiPair.second
         _domainUiState.update { domainUiState ->
@@ -106,7 +109,7 @@ object UiState {
         return domainUiState
     }
 
-    fun handleScreenData(screenData: ScreenData, domainUiPair:Pair<DomainUiState,MWContext>) {
+    fun handleScreenData(screenData: ScreenData, domainUiPair:Pair<DomainUiState,MWContext?>) {
         when (screenData) {
             ScreenData.PUSH -> pushUiState(domainUiPair)
             ScreenData.POP -> popUiState()

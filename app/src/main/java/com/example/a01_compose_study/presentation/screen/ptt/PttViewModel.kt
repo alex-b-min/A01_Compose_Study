@@ -9,10 +9,10 @@ import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.data.UiState
-import com.example.a01_compose_study.presentation.data.UiState.onDomainEvent
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
 import com.example.a01_compose_study.presentation.screen.main.MainEvent
 import com.example.a01_compose_study.presentation.screen.SelectVRResult
+import com.example.a01_compose_study.presentation.screen.main.MainViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,6 +23,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PttViewModel @Inject constructor(
     val pttManager: PttManager,
+    val mainViewModel: MainViewModel,
 ) : ViewModel() {
 
     private val _domainUiState = UiState._domainUiState
@@ -85,10 +86,11 @@ class PttViewModel @Inject constructor(
                     /**
                      * Notice 띄우기
                      */
-                    onDomainEvent(
+                    mainViewModel.onDomainEvent(
                         event = MainEvent.OpenDomainWindowEvent(
                             domainType = SealedDomainType.Ptt,
                             screenType = ScreenType.Prepare,
+                            mwContext = null,
                             data = notice.noticeString,
                             isError = false,
                             screenSizeType = ScreenSizeType.Small
@@ -106,11 +108,12 @@ class PttViewModel @Inject constructor(
                         /**
                          * Ptt 버튼 클릭
                          */
-                        onDomainEvent(
+                        mainViewModel.onDomainEvent(
                             event = MainEvent.OpenDomainWindowEvent(
                                 domainType = SealedDomainType.Ptt,
                                 screenType = ScreenType.Prepare,
-                                data = null,
+                                mwContext = null,
+                                data = "",
                                 isError = false,
                                 screenSizeType = ScreenSizeType.Small
                             )
@@ -123,10 +126,11 @@ class PttViewModel @Inject constructor(
                             /**
                              * onDomainEvent()을 통해 맨 처음의 화면만을 바꿔주는 역할
                              */
-                            onDomainEvent(
+                            mainViewModel.onDomainEvent(
                                 event = MainEvent.OpenDomainWindowEvent(
                                     domainType = SealedDomainType.Ptt,
                                     screenType = ScreenType.Prepare,
+                                    mwContext = null,
                                     data = "",
                                     isError = false,
                                     screenSizeType = ScreenSizeType.Small
@@ -144,7 +148,7 @@ class PttViewModel @Inject constructor(
                             onPttEvent(PttEvent.SetLoadingType)
                             delay(1500)
 
-                            pttManager.pttEvent(selectVRResult = event.selectVRResult)
+                            pttManager.pttEvent(selectVRResult = SelectVRResult.SendMsgResult)
                         }
                     }
                 }

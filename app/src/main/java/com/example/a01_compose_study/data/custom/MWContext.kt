@@ -99,6 +99,14 @@ class MWContext(
                     }
             }
 
+            SelectVRResult.SendMsgResult -> {
+                ParserFactory().dataParsing(vrResult, dialogueMode = dialogueMode)
+                    .also {
+                        it?.type = ParseDomainType.SEND_MESSAGE
+                        it?.dialogueMode = DialogueMode.SEND_MESSAGE
+                    }
+            }
+
             SelectVRResult.ScrollIndexResult -> {
                 ParserFactory().dataParsing(vrResult, dialogueMode = dialogueMode)
                     .also {

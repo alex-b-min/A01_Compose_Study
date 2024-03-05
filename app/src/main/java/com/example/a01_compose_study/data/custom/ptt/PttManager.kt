@@ -56,7 +56,7 @@ class PttManager @Inject constructor(
             }
 
             ParseDomainType.SEND_MESSAGE -> {
-                TODO("SEND_MESSAGE 매니저 추가")
+                dataProducer.sendMsgManager.onReceiveBundle(bundle)
             }
 
             ParseDomainType.HELP -> {

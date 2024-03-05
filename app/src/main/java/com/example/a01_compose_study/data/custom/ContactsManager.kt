@@ -32,6 +32,7 @@ import com.example.a01_compose_study.presentation.data.ServiceState.systemState
 import com.example.a01_compose_study.presentation.data.ServiceState.vrConfig
 import com.example.a01_compose_study.presentation.data.UiState.changeUiState
 import com.example.a01_compose_study.presentation.data.UiState.domainUiState
+import com.example.a01_compose_study.presentation.data.UiState.mwContext
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
 import com.example.a01_compose_study.presentation.screen.ptt.VrmwManager
 import com.example.a01_compose_study.presentation.util.StringUtils
@@ -1161,7 +1162,7 @@ class ContactsManager @Inject constructor(
         }
 //        launchNotice(noticeModel, false)
 
-        changeUiState(DomainUiState.AnnounceWindow(noticeModel.noticeString))
+        changeUiState(Pair(DomainUiState.AnnounceWindow(noticeModel.noticeString), mwContext.value))
         TODO("조건 상태가 맞지 않을 경우 해당 noticeModel의 문구를 출력 시키도록 해야함")
     }
 

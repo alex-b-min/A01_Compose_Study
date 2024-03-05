@@ -10,9 +10,7 @@ import com.example.a01_compose_study.data.custom.call.BtCall
 import com.example.a01_compose_study.data.custom.call.CallManager
 import com.example.a01_compose_study.data.custom.ptt.PttManager
 import com.example.a01_compose_study.data.custom.sendMsg.SendMsgManager
-import com.example.a01_compose_study.data.repository.help.HelpRepositoryImpl
-import com.example.a01_compose_study.domain.repository.domain.HelpRepository
-import com.example.a01_compose_study.domain.usecase.HelpUseCase
+import com.example.a01_compose_study.presentation.screen.main.MainViewModel
 import com.example.a01_compose_study.presentation.screen.ptt.VrmwManager
 import dagger.Module
 import dagger.Provides
@@ -22,7 +20,6 @@ import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
@@ -93,13 +90,25 @@ object ManagerModule {
 
     @Provides
     @Singleton
+    fun provideMainViewModel(
+        vrmwManager: VrmwManager,
+    ):MainViewModel{
+        return MainViewModel(
+            vrmwManager = vrmwManager,
+        )
+    }
+
+    @Provides
+    @Singleton
     fun provideDataProducer(
         helpManager: HelpManager,
-        callManager: CallManager
+        callManager: CallManager,
+        sendMsgManager: SendMsgManager,
     ): DataProducer {
         return DataProducer(
             helpManager = helpManager,
-            callManager = callManager
+            callManager = callManager,
+            sendMsgManager = sendMsgManager
         )
     }
 
@@ -116,6 +125,7 @@ object ManagerModule {
             dataProducer = dataProducer
         )
     }
+
 
     @Provides
     @Singleton

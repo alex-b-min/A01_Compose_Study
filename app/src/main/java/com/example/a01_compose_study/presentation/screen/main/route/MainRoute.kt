@@ -27,7 +27,6 @@ import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.components.button.PttButton
 import com.example.a01_compose_study.presentation.components.lottie.LottieAssetAnimationHandler
 import com.example.a01_compose_study.presentation.components.lottie.LottieRawAnimationHandler
-import com.example.a01_compose_study.presentation.data.UiState.onDomainEvent
 import com.example.a01_compose_study.presentation.data.UiState.onVREvent
 import com.example.a01_compose_study.presentation.screen.SelectVRResult
 import com.example.a01_compose_study.presentation.screen.announce.AnnounceScreen
@@ -40,7 +39,7 @@ import com.example.a01_compose_study.presentation.screen.main.VREvent
 import com.example.a01_compose_study.presentation.screen.ptt.ComposePttScreen
 import com.example.a01_compose_study.presentation.screen.ptt.PttEvent
 import com.example.a01_compose_study.presentation.screen.ptt.PttViewModel
-import com.example.a01_compose_study.presentation.screen.sendMsg.SendMsgScreen
+import com.example.a01_compose_study.presentation.screen.sendMsg.screen.SendMsgScreen
 import com.example.a01_compose_study.presentation.util.MultipleEventsCutter
 import com.example.a01_compose_study.presentation.util.get
 import com.example.a01_compose_study.ui.theme.Black2
@@ -76,7 +75,7 @@ fun MainRoute(
         domainUiState = domainUiState,
         domainWindowVisible = domainWindowVisibleState,
         onCloseDomainWindow = {
-            onDomainEvent(MainEvent.CloseDomainWindowEvent)
+            viewModel.onDomainEvent(MainEvent.CloseDomainWindowEvent)
         }) {
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -190,7 +189,7 @@ fun MainRoute(
                         screenSizeType = ScreenSizeType.Small
                     )
                 )
-                pttViewModel.onPttEvent(PttEvent.StartVR())
+                pttViewModel.onPttEvent(PttEvent.StartVR(selectVRResult = SelectVRResult.SendMsgResult))
             }
         )
 
@@ -225,7 +224,7 @@ fun MainRoute(
             contentText = "PTT Announce",
             onClick = {
                 scope.launch {
-                    onDomainEvent(
+                    viewModel.onDomainEvent(
                         event = MainEvent.OpenDomainWindowEvent(
                             domainType = SealedDomainType.Announce,
                             screenType = ScreenType.Prepare,
@@ -244,7 +243,7 @@ fun MainRoute(
             contentText = "PTT Close",
             onClick = {
                 scope.launch {
-                    onDomainEvent(MainEvent.CloseDomainWindowEvent)
+                    viewModel.onDomainEvent(MainEvent.CloseDomainWindowEvent)
                 }
             }
         )
@@ -291,7 +290,7 @@ fun MainRoute(
                     is ScreenSizeType.Large -> ScreenSizeType.Full
                     is ScreenSizeType.Full -> ScreenSizeType.Full
                 }
-                onDomainEvent(
+                viewModel.onDomainEvent(
                     MainEvent.ChangeDomainWindowSizeEvent(
                         resultScreenSizeType
                     )
@@ -312,7 +311,7 @@ fun MainRoute(
                     is ScreenSizeType.Large -> ScreenSizeType.Middle
                     is ScreenSizeType.Full -> ScreenSizeType.Large
                 }
-                onDomainEvent(
+                viewModel.onDomainEvent(
                     MainEvent.ChangeDomainWindowSizeEvent(
                         resultScreenSizeType
                     )
@@ -434,7 +433,7 @@ fun MainRoute(
                 .fillMaxHeight(0.13f),
             contentText = "Change ScrollIndex 5",
             onClick = {
-                onDomainEvent(
+                viewModel.onDomainEvent(
                     MainEvent.ChangeScrollIndexEvent(5)
                 )
             }
@@ -445,7 +444,7 @@ fun MainRoute(
                 .fillMaxHeight(0.13f),
             contentText = "Change ScrollIndex 10",
             onClick = {
-                onDomainEvent(
+                viewModel.onDomainEvent(
                     MainEvent.ChangeScrollIndexEvent(10)
                 )
             }

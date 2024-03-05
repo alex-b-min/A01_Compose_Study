@@ -6,6 +6,7 @@ import com.example.a01_compose_study.data.custom.sendMsg.SendMsgEvent
 import com.example.a01_compose_study.data.custom.sendMsg.SendMsgManager
 import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.presentation.data.UiState
+import com.example.a01_compose_study.presentation.data.UiState._mwContext
 import com.example.a01_compose_study.presentation.data.UiState.handleScreenData
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -35,7 +36,7 @@ class SendMsgViewModel @Inject constructor(
                     else -> error("Current state is not SendMessageWindow")
                 }
 
-                handleScreenData(screenData, _domainUiState.value)
+                handleScreenData(screenData, Pair(_domainUiState.value, _mwContext.value))
 
                 _domainUiState.update { domainUiState ->
                     val updatedState = (domainUiState as? DomainUiState.SendMessageWindow)?.copy(
@@ -100,7 +101,7 @@ class SendMsgViewModel @Inject constructor(
             is ScreenType.ScreenStack -> {
                 val screenData = data as? ScreenData
                 if (screenData != null) {
-                    handleScreenData(screenData, _domainUiState.value)
+                    handleScreenData(screenData, Pair(_domainUiState.value, _mwContext.value))
                 }
             }
 

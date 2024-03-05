@@ -7,6 +7,7 @@ import com.example.a01_compose_study.data.VRResult
 import com.example.a01_compose_study.data.analyze.ParseDomainType
 import com.example.a01_compose_study.data.analyze.ParserFactory
 import com.example.a01_compose_study.data.custom.call.CallManager
+import com.example.a01_compose_study.data.custom.sendMsg.SendMsgManager
 import com.example.a01_compose_study.presentation.data.ServiceState
 import com.example.a01_compose_study.presentation.data.UiState
 import kotlinx.coroutines.CoroutineScope
@@ -19,6 +20,7 @@ import javax.inject.Singleton
 @Singleton
 class DataProducer @Inject constructor(
     val helpManager: HelpManager,
-    val callManager: CallManager
+    val callManager: CallManager,
+    val sendMsgManager: SendMsgManager,
 ) {
 }

@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.a01_compose_study.data.Contact
 import com.example.a01_compose_study.data.HVRError
+import com.example.a01_compose_study.data.custom.MWContext
 import com.example.a01_compose_study.data.custom.SealedParsedData
 import com.example.a01_compose_study.data.custom.call.ProcCallData
 import com.example.a01_compose_study.data.custom.sendMsg.MsgData
@@ -14,7 +15,6 @@ import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.data.UiState
-import com.example.a01_compose_study.presentation.data.UiState.onDomainEvent
 import com.example.a01_compose_study.presentation.screen.main.route.VRUiState
 import com.example.a01_compose_study.presentation.screen.ptt.VrmwManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -37,6 +37,9 @@ class MainViewModel @Inject constructor(
 
     private val _domainUiState = UiState._domainUiState
     val domainUiState: StateFlow<DomainUiState> = UiState.domainUiState
+
+    private val _mwContext = UiState._mwContext
+    val mwContext: StateFlow<MWContext?> = UiState.mwContext
 
     private val _domainWindowVisible = UiState._domainWindowVisible
     val domainWindowVisible: StateFlow<Boolean> = UiState.domainWindowVisible
@@ -334,7 +337,7 @@ class MainViewModel @Inject constructor(
                     }
                     domainUiState
                 }
-                UiState.pushUiState(domainUiState.value)
+                UiState.pushUiState(Pair(domainUiState.value,mwContext.value))
             }
 
             is MainEvent.ChangeScrollIndexEvent -> {

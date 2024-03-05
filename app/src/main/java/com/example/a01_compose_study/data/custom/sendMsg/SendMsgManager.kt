@@ -82,15 +82,15 @@ class SendMsgManager @Inject constructor(
                     procListIntention(it)
                 } ?: run {
                     // TODO : reject()
-                    return handlePopIntention()
+                    return handleRejectIntention()
                 }
                 // TODO : reject()
-                return handlePopIntention()
+                return handleRejectIntention()
             }
 
             else -> {
                 // TODO : reject()
-                return handlePopIntention()
+                return handleRejectIntention()
             }
         }
     }
@@ -111,8 +111,7 @@ class SendMsgManager @Inject constructor(
                     notice = errorNotice
                 ),
                 mwContext = MWContext(
-                    DialogueMode.NONE,
-                    this@SendMsgManager
+                    DialogueMode.NONE, this@SendMsgManager
                 )
             )
         }
@@ -124,6 +123,9 @@ class SendMsgManager @Inject constructor(
                 sendMsgContactList = contactsManager.makePhoneBookContactList()
                 return ProcSendMsgData(
                     screenType = ScreenType.MessageAllList,
+                    mwContext = MWContext(
+                        DialogueMode.SEND_MESSAGE, this@SendMsgManager
+                    ),
                     data = SendMsgDataType.SendMsgData(msgData = null)
                 )
             } else {
@@ -136,6 +138,9 @@ class SendMsgManager @Inject constructor(
                         sendMsgContactList = nameCheckList.toMutableList()
                         return ProcSendMsgData(
                             screenType = ScreenType.MessageAllList,
+                            mwContext = MWContext(
+                                DialogueMode.SEND_MESSAGE, this@SendMsgManager
+                            ),
                             data = SendMsgDataType.SendMsgData(msgData = null)
                         )
                     }
@@ -147,6 +152,9 @@ class SendMsgManager @Inject constructor(
                     else -> {
                         return ProcSendMsgData(
                             screenType = ScreenType.MessageSelectNameList,
+                            mwContext = MWContext(
+                                DialogueMode.LIST, this@SendMsgManager
+                            ),
                             data = SendMsgDataType.SendMsgData(
                                 msgData = MsgData(contacts = sendMsgContactList),
                             )
@@ -157,43 +165,6 @@ class SendMsgManager @Inject constructor(
         } ?: run {
             // TODO : reject()
             return handlePopIntention()
-        }
-    }
-
-
-    private fun handleCategory(sendMsgModel: SendMsgModel): ProcSendMsgData {
-        sendMsgContactList = contactsManager.makeContactList(sendMsgModel.getContactItems(), false)
-        if (sendMsgContactList.size > 1) {
-            //getCategoryListRunnable().run()
-            isCategoryListScreen.value = true
-            return ProcSendMsgData(
-                screenType = ScreenType.MessageSelectCategoryList,
-                data = SendMsgDataType.SendMsgData(
-                    msgData = MsgData(contacts = sendMsgContactList),
-                )
-            )
-        }
-        // 1명의 전화번호부에 Category가 1개
-        else {
-            selectedPhonebookItem = sendMsgContactList[0]
-            if (messageValue.value != "") {
-                // getMessageChangeRunnable(sendMsgModel).run()
-                return ProcSendMsgData(
-                    screenType = ScreenType.SendMessage, data = SendMsgDataType.SendMsgData(
-                        msgData = MsgData(
-                            name = sendMsgModel.getContactItems()[0].name,
-                            msg = sendMsgModel.messageValue
-                        ),
-                    )
-                )
-            } else {
-                // getMessageNameRunnable().run()
-                return ProcSendMsgData(
-                    screenType = ScreenType.SayMessage, data = SendMsgDataType.SendMsgData(
-                        msgData = MsgData(name = sendMsgModel.getContactItems()[0].name),
-                    )
-                )
-            }
         }
     }
 
@@ -211,15 +182,10 @@ class SendMsgManager @Inject constructor(
                 return handlePopIntention(clearMsg = true)
             }
             // 로직상 무조건 no만 할 수 있어서 여기로 올 수 없음
-            return ProcSendMsgData(
-                screenType = ScreenType.ScreenStack,
-                data = SendMsgDataType.SendScreenData(
-                    screenData = ScreenData.REJECT,
-                )
-            )
+            return handleRejectIntention()
         }
 
-        sendMsgModel?.let {
+        sendMsgModel?.let { it ->
             val intention = it.intention.replace(" ", "")
 
             printSttString(it.prompt)
@@ -247,6 +213,10 @@ class SendMsgManager @Inject constructor(
                         return ProcSendMsgData(
                             domainType = SealedDomainType.SendMessage,
                             screenType = ScreenType.SendMessage,
+                            mwContext = MWContext(
+                                dialogueMode = DialogueMode.SEND_MESSAGE_NAME_CHANGE,
+                                resultListener = this@SendMsgManager
+                            ),
                             data = SendMsgDataType.SendMsgData(
                                 msgData = MsgData(name = it.name, msg = messageValue.value),
                                 screenData = ScreenData.CHANGE
@@ -263,6 +233,10 @@ class SendMsgManager @Inject constructor(
                         return ProcSendMsgData(
                             domainType = SealedDomainType.SendMessage,
                             screenType = ScreenType.SendMessage,
+                            mwContext = MWContext(
+                                dialogueMode = DialogueMode.SEND_MESSAGE_NAME_CHANGE,
+                                resultListener = this@SendMsgManager
+                            ),
                             data = SendMsgDataType.SendMsgData(
                                 msgData = MsgData(name = it.name, msg = messageValue.value),
                             )
@@ -271,36 +245,8 @@ class SendMsgManager @Inject constructor(
                 }
             }
         }
-
         // TODO reject()
         return handlePopIntention()
-    }
-
-    private fun handlePopIntention(clearMsg: Boolean = false): ProcSendMsgData {
-        if (clearMsg) {
-            return ProcSendMsgData(
-                screenType = ScreenType.ScreenStack,
-                data = SendMsgDataType.SendScreenData(
-                    screenData = ScreenData.POP,
-                    clearMsg = true
-                )
-            )
-        }
-        return ProcSendMsgData(
-            screenType = ScreenType.ScreenStack,
-            data = SendMsgDataType.SendScreenData(
-                screenData = ScreenData.POP
-            )
-        )
-    }
-
-    private fun handleRejectIntention(): ProcSendMsgData {
-        return ProcSendMsgData(
-            screenType = ScreenType.ScreenStack,
-            data = SendMsgDataType.SendScreenData(
-                screenData = ScreenData.REJECT
-            )
-        )
     }
 
 
@@ -320,14 +266,11 @@ class SendMsgManager @Inject constructor(
                         screenData = ScreenData.BtPhoneAppRun
                     )
                 )
-
-            } else {
-                // name,msg 시나리오 : send - no - list -> 데이터 유지
-                // # No 발화시 List화면 / PTT화면 (List선택시 Message유지)
-                // name,msg 시나리오 : send - cm - say- msg - no - list -> 데이터 유지
-                //Send Message <Name, Msg> 시나리오
-                return handlePopIntention()
-            }
+            } else return handlePopIntention()
+            // name,msg 시나리오 : send - no - list -> 데이터 유지
+            // # No 발화시 List화면 / PTT화면 (List선택시 Message유지)
+            // name,msg 시나리오 : send - cm - say- msg - no - list -> 데이터 유지
+            //Send Message <Name, Msg> 시나리오
         }
 
         sendMsgModel?.let {
@@ -348,6 +291,10 @@ class SendMsgManager @Inject constructor(
                     return ProcSendMsgData(
                         domainType = SealedDomainType.SendMessage,
                         screenType = ScreenType.SayMessage,
+                        mwContext = MWContext(
+                            dialogueMode = DialogueMode.SEND_MESSAGE_NAME,
+                            resultListener = this@SendMsgManager
+                        ),
                         data = SendMsgDataType.SendMsgData(
                             msgData = MsgData(name = selectedPhonebookItem!!.name),
                             screenData = ScreenData.CHANGE
@@ -368,9 +315,74 @@ class SendMsgManager @Inject constructor(
     private fun procListIntention(data: CommonModel): ProcSendMsgData {
         // data만 넘겨주고 초점 맞추는 로직은 viewModel에서 구현
         return ProcSendMsgData(
-            screenType = ScreenType.List,
-            data = SendMsgDataType.SendListNum(
+            screenType = ScreenType.List, data = SendMsgDataType.SendListNum(
                 index = data.index
+            )
+        )
+    }
+
+
+    private fun handleCategory(sendMsgModel: SendMsgModel): ProcSendMsgData {
+        sendMsgContactList = contactsManager.makeContactList(sendMsgModel.getContactItems(), false)
+        if (sendMsgContactList.size > 1) {
+            //getCategoryListRunnable().run()
+            isCategoryListScreen.value = true
+            return ProcSendMsgData(
+                screenType = ScreenType.MessageSelectCategoryList, mwContext = MWContext(
+                    DialogueMode.LIST, this@SendMsgManager
+                ), data = SendMsgDataType.SendMsgData(
+                    msgData = MsgData(contacts = sendMsgContactList),
+                )
+            )
+        }
+        // 1명의 전화번호부에 Category가 1개
+        else {
+            selectedPhonebookItem = sendMsgContactList[0]
+            if (messageValue.value != "") {
+                // getMessageNameRunnable().run()
+                return ProcSendMsgData(
+                    screenType = ScreenType.SayMessage, mwContext = MWContext(
+                        DialogueMode.SEND_MESSAGE_NAME, this@SendMsgManager
+                    ), data = SendMsgDataType.SendMsgData(
+                        msgData = MsgData(name = sendMsgModel.getContactItems()[0].name),
+                    )
+                )
+            } else {
+                // getMessageChangeRunnable(sendMsgModel).run()
+                return ProcSendMsgData(
+                    screenType = ScreenType.SendMessage, mwContext = MWContext(
+                        DialogueMode.SEND_MESSAGE_NAME_CHANGE, this@SendMsgManager
+                    ), data = SendMsgDataType.SendMsgData(
+                        msgData = MsgData(
+                            name = sendMsgModel.getContactItems()[0].name,
+                            msg = sendMsgModel.messageValue
+                        ),
+                    )
+                )
+            }
+        }
+    }
+
+
+    private fun handlePopIntention(clearMsg: Boolean = false): ProcSendMsgData {
+        if (clearMsg) {
+            return ProcSendMsgData(
+                screenType = ScreenType.ScreenStack, data = SendMsgDataType.SendScreenData(
+                    screenData = ScreenData.POP, clearMsg = true
+                )
+            )
+        }
+        return ProcSendMsgData(
+            screenType = ScreenType.ScreenStack, data = SendMsgDataType.SendScreenData(
+                screenData = ScreenData.POP
+            )
+        )
+    }
+
+    private fun handleRejectIntention(): ProcSendMsgData {
+        return ProcSendMsgData(
+            screenType = ScreenType.ScreenStack, data = SendMsgDataType.SendScreenData(
+                screenData = ScreenData.REJECT
             )
         )
     }
@@ -379,7 +391,8 @@ class SendMsgManager @Inject constructor(
     private fun checkUiStateStack(screenType: ScreenType): Boolean {
         var checkResult = false
 
-        for (uiState in UiState._domainUiStateStack) {
+        for (domainUiPair in UiState._domainUiStateStack) {
+            val uiState = domainUiPair.first
             if (uiState.screenType == screenType) checkResult = true
         }
         return checkResult
@@ -420,84 +433,3 @@ class SendMsgManager @Inject constructor(
         }
     }
 }
-
-//            // 인식된 name이 있는 경우
-//            if (sendMsgModel.items.isNotEmpty()) {
-//                // sendMsgModel.items의 name으로 연락처 몇 개가 검색 되는지 확인
-//                val nameCheckList = contactsManager.makeContactList(sendMsgModel.getContactItems(), true)
-//
-//                // Name으로 찾은 이름이 여러 명
-//                if (nameCheckList.size > 1) {
-//                    sendMsgContactList = nameCheckList.toMutableList()
-//                    // getListRunnable(bundle).run()
-//                    return ProcSendMsgData(
-//                        screenType = ScreenType.MessageSelectNameList,
-//                        data = SendMsgDataType.SendMsgData(
-//                            msgData = MsgData(contacts = sendMsgContactList),
-//                        )
-//                    )
-//                }
-//                // 검색된 결과가 없는 경우 - 전체 전화번호부 표시
-//                else if (nameCheckList.size == 0) {
-//                    // 기존 전화번호부에서 리스트 생성
-//                    sendMsgContactList = contactsManager.makePhoneBookContactList()
-//                    //getNoResultListRunnable().run()
-//                    return ProcSendMsgData(
-//                        screenType = ScreenType.MessageAllList,
-//                        data = SendMsgDataType.SendMsgData(msgData = null)
-//                    )
-//                }
-//                // name으로 검색된 연락처가 1개
-//                else {
-//                    // 1명의 전화번호부에 Category가 1개 이상 있는지 확인 하기 위해
-//                    // 위 if 조건과 filter가 다르므로 sendMsgContactList가 바뀌어야 함.
-//                    sendMsgContactList =
-//                        contactsManager.makeContactList(
-//                            sendMsgModel.getContactItems(),
-//                            false
-//                        )
-//                    // 1명의 전화번호부에 Category가 여러 개
-//                    if (sendMsgContactList.size > 1) {
-//                        //getCategoryListRunnable().run()
-//                        isCategoryListScreen.value = true
-//                        return ProcSendMsgData(
-//                            screenType = ScreenType.MessageSelectCategoryList,
-//                            data = SendMsgDataType.SendMsgData(
-//                                msgData = MsgData(contacts = sendMsgContactList),
-//                            )
-//                        )
-//                    }
-//                    // 1명의 전화번호부에 Category가 1개
-//                    else {
-//                        selectedPhonebookItem = sendMsgContactList[0]
-//                        if (messageValue.value != "") {
-//                            // getMessageChangeRunnable(sendMsgModel).run()
-//                            return ProcSendMsgData(
-//                                screenType = ScreenType.SendMessage,
-//                                data = SendMsgDataType.SendMsgData(
-//                                    msgData = MsgData(
-//                                        name = sendMsgModel.getContactItems()[0].name,
-//                                        msg = sendMsgModel.messageValue
-//                                    ),
-//                                )
-//                            )
-//                        } else {
-//                            // getMessageNameRunnable().run()
-//                            return ProcSendMsgData(
-//                                screenType = ScreenType.SayMessage,
-//                                data = SendMsgDataType.SendMsgData(
-//                                    msgData = MsgData(name = sendMsgModel.getContactItems()[0].name),
-//                                )
-//                            )
-//                        }
-//                    }
-//                }
-//            }
-//             //Send Message만 발화 시 Embedded Intention / Server Intention에 slot count 0 - 전체 전화번호부 표시
-//
-//            sendMsgContactList = contactsManager.makePhoneBookContactList()
-//            // getContactListRunnable().run()
-//            return ProcSendMsgData(
-//                screenType = ScreenType.MessageAllList,
-//                data = SendMsgDataType.SendMsgData(msgData = null)
-//            )

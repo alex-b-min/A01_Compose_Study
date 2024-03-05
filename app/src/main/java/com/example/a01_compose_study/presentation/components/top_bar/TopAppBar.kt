@@ -16,7 +16,8 @@ import com.example.a01_compose_study.R
 fun TopAppBarContent(
     onNavigationIconClick: () -> Unit = {},
     onActionIconClick: () -> Unit = {},
-    title: String = ""
+    title: String = "",
+    showNavigationIcon: Boolean = true
 ) {
     TopAppBar(
         elevation = 0.dp,
@@ -31,13 +32,14 @@ fun TopAppBarContent(
             )
         },
         navigationIcon = {
+            if (showNavigationIcon) {
             IconButton(onClick = onNavigationIconClick) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_guidance_btn_back),
                     contentDescription = null,
                     tint = Color.Gray
                 )
-            }
+            }}
         },
         actions = {
             IconButton(onClick = onActionIconClick) {

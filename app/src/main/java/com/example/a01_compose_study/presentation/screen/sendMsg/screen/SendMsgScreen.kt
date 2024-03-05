@@ -1,4 +1,4 @@
-package com.example.a01_compose_study.presentation.screen.sendMsg
+package com.example.a01_compose_study.presentation.screen.sendMsg.screen
 
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -8,7 +8,7 @@ import com.example.a01_compose_study.presentation.screen.main.DomainUiState
 @Composable
 fun SendMsgScreen (
     viewModel: HelpViewModel = hiltViewModel(),
-    domainUiState: DomainUiState.SendMessageWindow
+    domainUiState: DomainUiState.SendMessageWindow,
 ){
 
 }
