@@ -27,6 +27,7 @@ import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.components.button.PttButton
 import com.example.a01_compose_study.presentation.components.lottie.LottieAssetAnimationHandler
 import com.example.a01_compose_study.presentation.components.lottie.LottieRawAnimationHandler
+import com.example.a01_compose_study.presentation.data.UiState.onVREvent
 import com.example.a01_compose_study.presentation.screen.SelectVRResult
 import com.example.a01_compose_study.presentation.screen.announce.AnnounceScreen
 import com.example.a01_compose_study.presentation.screen.call.screen.CallScreen
@@ -34,6 +35,7 @@ import com.example.a01_compose_study.presentation.screen.help.screen.ComposeHelp
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
 import com.example.a01_compose_study.presentation.screen.main.MainEvent
 import com.example.a01_compose_study.presentation.screen.main.MainViewModel
+import com.example.a01_compose_study.presentation.screen.main.VREvent
 import com.example.a01_compose_study.presentation.screen.ptt.ComposePttScreen
 import com.example.a01_compose_study.presentation.screen.ptt.PttEvent
 import com.example.a01_compose_study.presentation.screen.sendMsg.SendMsgScreen
@@ -105,14 +107,6 @@ fun MainRoute(
                         contentColor = Color.Gray,
                         backgroundColor = Black2
                     )
-//                    onVREvent(
-//                        VREvent.ChangeVRUIEvent(
-//                            VRUiState.PttLoading(
-//                                active = true,
-//                                isError = false
-//                            )
-//                        )
-//                    )
                 }
             }
 
@@ -130,14 +124,6 @@ fun MainRoute(
                         vrDynamicBackground = if (vrUiState.active) Color.Transparent else Color.Black,
                         fixedBackground = Black2
                     )
-//                    onVREvent(
-//                        VREvent.ChangeVRUIEvent(
-//                            VRUiState.PttLoading(
-//                                active = true,
-//                                isError = false
-//                            )
-//                        )
-//                    )
                 }
             }
 
@@ -312,84 +298,91 @@ fun MainRoute(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalAlignment = Alignment.End
     ) {
+        PttButton(
+            modifier = Modifier.fillMaxSize(0.13f),
+            contentText = "VR Loading",
+            onClick = {
+                onVREvent(
+                    VREvent.ChangeVRUIEvent(
+                        VRUiState.PttLoading(
+                            active = true,
+                            isError = false
+                        )
+                    )
+                )
+            }
+        )
 
+        PttButton(
+            modifier = Modifier.fillMaxSize(0.13f),
+            contentText = "VR Speak",
+            onClick = {
+                onVREvent(
+                    VREvent.ChangeVRUIEvent(
+                        VRUiState.PttSpeak(
+                            active = true,
+                            isError = false
+                        )
+                    )
+                )
+            }
+        )
 
-//            PttButton(
-//                modifier = Modifier.fillMaxSize(0.13f),
-//                contentText = "VR Loading",
-//                onClick = {
-//                    onVREvent(
-//                        VREvent.ChangeVRUIEvent(
-//                            VRUiState.PttLoading(
-//                                active = true,
-//                                isError = false
-//                            )
-//                        )
-//                    )
-//                }
-//            )
-//
-//            PttButton(
-//                modifier = Modifier.fillMaxSize(0.13f),
-//                contentText = "VR Speak",
-//                onClick = {
-//                    onVREvent(
-//                        VREvent.ChangeVRUIEvent(
-//                            VRUiState.PttSpeak(
-//                                active = true,
-//                                isError = false
-//                            )
-//                        )
-//                    )
-//                }
-//            )
-//
-//            PttButton(
-//                modifier = Modifier.fillMaxSize(0.13f),
-//                contentText = "VR Listen",
-//                onClick = {
-//                    onVREvent(
-//                        VREvent.ChangeVRUIEvent(
-//                            VRUiState.PttListen(
-//                                active = true,
-//                                isError = false
-//                            )
-//                        )
-//                    )
-//                }
-//            )
-//
-//            PttButton(
-//                modifier = Modifier.fillMaxSize(0.13f),
-//                contentText = "VR Not",
-//                onClick = {
-//                    onVREvent(
-//                        VREvent.ChangeVRUIEvent(
-//                            VRUiState.PttNone(
-//                                false,
-//                                isError = false
-//                            )
-//                        )
-//                    )
-//                }
-//            )
-//
-//            PttButton(
-//                modifier = Modifier
-//                    .fillMaxWidth(0.13f)
-//                    .fillMaxHeight(0.3f),
-//                contentText = "VR isError",
-//                onClick = {
-//                    onVREvent(
-//                        VREvent.ChangeVRUIEvent(
-//                            VRUiState.PttNone(
-//                                true,
-//                                isError = true
-//                            )
-//                        )
-//                    )
-//                }
-//            )
+        PttButton(
+            modifier = Modifier.fillMaxSize(0.13f),
+            contentText = "VR Listen",
+            onClick = {
+                onVREvent(
+                    VREvent.ChangeVRUIEvent(
+                        VRUiState.PttListen(
+                            active = true,
+                            isError = false
+                        )
+                    )
+                )
+            }
+        )
+
+        PttButton(
+            modifier = Modifier.fillMaxSize(0.13f),
+            contentText = "VR Not",
+            onClick = {
+                onVREvent(
+                    VREvent.ChangeVRUIEvent(
+                        VRUiState.PttNone(
+                            false,
+                            isError = false
+                        )
+                    )
+                )
+            }
+        )
+
+        PttButton(
+            modifier = Modifier
+                .fillMaxWidth(0.13f)
+                .fillMaxHeight(0.3f),
+            contentText = "VR isError",
+            onClick = {
+                onVREvent(
+                    VREvent.ChangeVRUIEvent(
+                        VRUiState.PttNone(
+                            true,
+                            isError = true
+                        )
+                    )
+                )
+            }
+        )
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(end = 470.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalAlignment = Alignment.End
+    ) {
         PttButton(
             modifier = Modifier
                 .fillMaxWidth(0.12f)

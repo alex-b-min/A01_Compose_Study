@@ -57,6 +57,7 @@ object UiState {
      * domainUiState의 domainType이 Ptt,None 타입이 아닐때만 스택에 추가함
      * MWContext의 값이 nullable 한 타입으로 null이 들어올 수 있으며,
      * mwContextState를 최신 데이터로 업데이트 하는 시점은 domainUiState와 같이 스택에 쌓이는 타이밍에 업데이트 함
+     * 추가적으로 화면을 이동하였으니 VR 화면을 띄워주도록함(이 로직은 적절한 시점에 호출해야하는데 어디인지는 추후에 정할것.)
      */
     fun pushUiStateMwContext(pairUiStateMwContext: Pair<DomainUiState, MWContext?>) {
         if (domainUiState.value.domainType != SealedDomainType.Ptt && domainUiState.value.domainType != SealedDomainType.None) {
@@ -65,6 +66,14 @@ object UiState {
                 _mwContextState.value = domainUiStateMwContext.second
                 Log.d("@@// UiStateMwContext Push", "index: $index / mwContext: ${domainUiStateMwContext.second} / domainUiState: ${domainUiStateMwContext.first}")
             }
+            onVREvent(
+                VREvent.ChangeVRUIEvent(
+                    VRUiState.PttLoading(
+                        active = true,
+                        isError = false
+                    )
+                )
+            )
         }
     }
 
