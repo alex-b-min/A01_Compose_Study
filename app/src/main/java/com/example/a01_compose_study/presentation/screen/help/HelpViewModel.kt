@@ -26,7 +26,7 @@ class HelpViewModel @Inject constructor(
                         screenType = ScreenType.HelpDetailList,
                         detailData = event.selectedHelpItem
                     ) ?: domainUiState
-                    UiState.pushUiState(updatedState)
+                    UiState.pushUiStateMwContext(pairUiStateMwContext = Pair(first = updatedState, second = null))
                     updatedState
                 }
             }

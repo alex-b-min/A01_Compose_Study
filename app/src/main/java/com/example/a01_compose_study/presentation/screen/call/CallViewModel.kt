@@ -28,7 +28,7 @@ class CallViewModel @Inject constructor(
                         screenType = ScreenType.CallYesNo,
                         detailData = event.selectedContactItem
                     ) ?: domainUiState
-                    UiState.pushUiState(updatedState)
+                    UiState.pushUiStateMwContext(pairUiStateMwContext = Pair(first = updatedState, second = null))
                     updatedState
                 }
             }

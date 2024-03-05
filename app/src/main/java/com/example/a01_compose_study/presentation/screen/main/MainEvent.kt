@@ -1,5 +1,6 @@
 package com.example.a01_compose_study.presentation.screen.main
 
+import com.example.a01_compose_study.data.custom.MWContext
 import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.util.ScreenSizeType
@@ -15,6 +16,7 @@ sealed class MainEvent() {
     ) : MainEvent()
 
     data class OpenDomainWindowEvent(
+        val mwContext: MWContext? = null,
         val domainType: SealedDomainType,
         val screenType: ScreenType,
         val data: Any?,
@@ -27,6 +29,7 @@ sealed class MainEvent() {
     ) : MainEvent()
 
     data class ChangeScrollIndexEvent(
+        val mwContext: MWContext? = null,
         val selectedScrollIndex: Int,
     ) : MainEvent()
 

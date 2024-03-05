@@ -10,6 +10,7 @@ import com.example.a01_compose_study.data.HVRError
 import com.example.a01_compose_study.data.Intentions
 import com.example.a01_compose_study.data.analyze.ParseBundle
 import com.example.a01_compose_study.data.custom.ContactsManager
+import com.example.a01_compose_study.data.custom.MWContext
 import com.example.a01_compose_study.data.custom.SealedParsedData
 import com.example.a01_compose_study.data.custom.VRResultListener
 import com.example.a01_compose_study.data.pasing.CallModel
@@ -96,7 +97,7 @@ class CallManager @Inject constructor(
      */
     private fun procCallIntention(
         callModel: CallModel,
-        selectVRResult: SelectVRResult
+        selectVRResult: SelectVRResult,
     ): ProcCallData {
         /**
          * 1. 전화가 가능한 상태인지 조건 확인
@@ -121,7 +122,10 @@ class CallManager @Inject constructor(
             val noticeModel: NoticeModel? = createNoticeModel(NoticeModelType.DEFAULT, context) //Notice Model이 null일 때
 
             if (noticeModel != null) {
-                return ProcCallData.NoticeTTSRequest(noticeModel = noticeModel)
+                return ProcCallData.NoticeTTSRequest(
+                    noticeModel = noticeModel,
+                    mwContext = MWContext(DialogueMode.CALL, this@CallManager)
+                )
                 TODO("오류 출력 안내 vrmwManager.requestTTS() 실행")
             } else {
                 /**
@@ -136,7 +140,7 @@ class CallManager @Inject constructor(
                      * 기존에는 contactsManager의 makeContactList()를 통해서 인식된 이름을 통한 전화번호부 목록을 생성을 했지만,
                      * 인식된 이름을 통해 생성된 전화번호부 목록을 더미 데이터로 할당 하도록 함
                      */
-                    val recognizedList = when(selectVRResult) {
+                    val recognizedList = when (selectVRResult) {
                         is SelectVRResult.CallListResult -> emptyList()
                         is SelectVRResult.CallIndexListResult -> fetchRecognizedContacts(8)
                         is SelectVRResult.CallRecognizedContact -> fetchRecognizedContacts(1)
@@ -151,21 +155,31 @@ class CallManager @Inject constructor(
                         return ProcCallData.RecognizedContactListScreen(
                             data = fetchRecognizedContacts(
                                 10
-                            )
+                            ),
+                            mwContext = MWContext(DialogueMode.CALL, this@CallManager)
                         ) // 인덱스가 존재하는 전화번호부 목록 반환[DomainType.Call / ScreenType.List]
                         TODO("startVR(MWContext(DailogueMode.LIST) 실행")
                         // 인식된 이름으로 매칭되는 연락처가 없는 경우
                     } else if (recognizedList.isEmpty()) {
                         Log.d("@@ tempList Empty", "${fetchAllContacts()}")
-                        return ProcCallData.AllContactListScreen(data = fetchAllContacts()) // 인덱스가 존재하지 않는 전체 전화번호부 목록 반환[DomainType.Call / ScreenType.List]
+                        return ProcCallData.AllContactListScreen(
+                            data = fetchAllContacts(),
+                            mwContext = MWContext(DialogueMode.CALL, this@CallManager)
+                        ) // 인덱스가 존재하지 않는 전체 전화번호부 목록 반환[DomainType.Call / ScreenType.List]
                         TODO("startVR(MWContext(DailogueMode.CALL) 실행")
                         // 인식된 이름으로 매칭되는 연락처 1개인 경우
                     } else {
-                        return ProcCallData.ProcCallNameScreen(data = matchContact()) // 하나의 전화번호 반환[DomainType.Call / ScreenType.YesNo]
+                        return ProcCallData.ProcCallNameScreen(
+                            data = matchContact(),
+                            mwContext = MWContext(DialogueMode.CALL, this@CallManager)
+                        ) // 하나의 전화번호 반환[DomainType.Call / ScreenType.YesNo]
                         TODO("startVR(DialogueMode.CALLNAME) 실행")
                     }
                 } else { // Call 만 발화한 상황
-                    return ProcCallData.AllContactListScreen(data = fetchAllContacts()) // 인덱스가 존재하지 않는 전체 전화번호부 목록 반환[DomainType.Call, ScreenType.List]
+                    return ProcCallData.AllContactListScreen(
+                        data = fetchAllContacts(),
+                        mwContext = MWContext(DialogueMode.CALL, this@CallManager)
+                    ) // 인덱스가 존재하지 않는 전체 전화번호부 목록 반환[DomainType.Call, ScreenType.List]
                     TODO("startVR(DailogueMode.CALL) 실행")
                 }
             }
@@ -194,14 +208,23 @@ class CallManager @Inject constructor(
                      * - 작다면 해당 ScrollIndex를 반환(추후 ScrollIndex의 값은 스크롤을 움직이는 값으로 사용됨)
                      */
                     return if (callModel.data.size < serverIndex) {
-                        ProcCallData.ListTTSRequest(promptId = "PID_CMN_COMM_02_31")
+                        ProcCallData.ListTTSRequest(
+                            promptId = "PID_CMN_COMM_02_31",
+                            mwContext = MWContext(DialogueMode.LIST, this@CallManager)
+                        )
                     } else {
-                        ProcCallData.ScrollIndex(index = 5)
+                        ProcCallData.ScrollIndex(
+                            index = 5,
+                            mwContext = MWContext(DialogueMode.LIST, this@CallManager)
+                        )
                     }
                 }
             }
         }
-        return ProcCallData.ListTTSRequest(promptId = "PID_CMN_COMM_02_31")
+        return ProcCallData.ListTTSRequest(
+            promptId = "PID_CMN_COMM_02_31",
+            mwContext = MWContext(DialogueMode.LIST, this@CallManager)
+        )
     }
 
     /**
@@ -212,11 +235,17 @@ class CallManager @Inject constructor(
 
         return when (intention) {
             Intentions.Yes.value -> {
-                ProcCallData.ProcYesNoOtherNumberResult(callYesNoOtherNumberResult = CallYesNoOtherNumberResult.Yes)
+                ProcCallData.ProcYesNoOtherNumberResult(
+                    callYesNoOtherNumberResult = CallYesNoOtherNumberResult.Yes,
+                    mwContext = MWContext(DialogueMode.CALLNAME, this@CallManager)
+                )
             }
 
             Intentions.No.value -> {
-                ProcCallData.ProcYesNoOtherNumberResult(callYesNoOtherNumberResult = CallYesNoOtherNumberResult.No)
+                ProcCallData.ProcYesNoOtherNumberResult(
+                    callYesNoOtherNumberResult = CallYesNoOtherNumberResult.No,
+                    mwContext = MWContext(DialogueMode.CALLNAME, this@CallManager)
+                )
             }
 
             Intentions.OtherNumber.value -> {
@@ -224,16 +253,21 @@ class CallManager @Inject constructor(
                     ProcCallData.ProcYesNoOtherNumberResult(
                         callYesNoOtherNumberResult = CallYesNoOtherNumberResult.OtherNumberList(
                             fetchAllContacts()
-                        )
+                        ),
+                        mwContext = MWContext(DialogueMode.LIST, this@CallManager)
                     )
                 } else if (fetchAllContacts().size > 1) { // otherNumber가 2개 밖에 없을 시, 현재 번호 말고 다른 번호로 바로 표시
                     ProcCallData.ProcYesNoOtherNumberResult(
                         callYesNoOtherNumberResult = CallYesNoOtherNumberResult.OtherNumber(
                             matchContact()
-                        )
+                        ),
+                        mwContext = MWContext(DialogueMode.LIST, this@CallManager)
                     )
                 } else { // otherNumber가 1개인 경우, 현재의 번호밖에 없는 상태니까 reject() 표시
-                    ProcCallData.ProcYesNoOtherNumberResult(callYesNoOtherNumberResult = CallYesNoOtherNumberResult.Reject)
+                    ProcCallData.ProcYesNoOtherNumberResult(
+                        callYesNoOtherNumberResult = CallYesNoOtherNumberResult.Reject,
+                        mwContext = MWContext(DialogueMode.LIST, this@CallManager)
+                    )
                 }
             }
 

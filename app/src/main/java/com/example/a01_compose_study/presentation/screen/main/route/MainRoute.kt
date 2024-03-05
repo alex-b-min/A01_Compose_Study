@@ -433,7 +433,7 @@ fun MainRoute(
                  * 현재 버튼 클릭으로 index 값을 직접 주입해야 하는 환경이 MainEvent에 임의로 정의해서 사용하고 있는 상황
                  */
                 viewModel.onDomainEvent(
-                    MainEvent.ChangeScrollIndexEvent(5 - 1)
+                    MainEvent.ChangeScrollIndexEvent(selectedScrollIndex = 5 - 1)
                 )
             }
         )
@@ -444,7 +444,7 @@ fun MainRoute(
             contentText = "Change ScrollIndex 8",
             onClick = {
                 viewModel.onDomainEvent(
-                    MainEvent.ChangeScrollIndexEvent(8 - 1)
+                    MainEvent.ChangeScrollIndexEvent(selectedScrollIndex = 8 - 1)
                 )
             }
         )

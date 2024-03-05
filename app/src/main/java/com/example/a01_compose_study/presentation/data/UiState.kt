@@ -1,6 +1,7 @@
 package com.example.a01_compose_study.presentation.data
 
 import android.util.Log
+import com.example.a01_compose_study.data.custom.MWContext
 import com.example.a01_compose_study.data.custom.SealedParsedData
 import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
@@ -22,10 +23,15 @@ object UiState {
     val _domainUiState = MutableStateFlow<DomainUiState>(DomainUiState.NoneWindow())
     val domainUiState: StateFlow<DomainUiState> = _domainUiState
 
+    val _mwContextState = MutableStateFlow<MWContext?>(null)
+    val mwContextState: StateFlow<MWContext?> = _mwContextState
+
     val _domainWindowVisible = MutableStateFlow<Boolean>(false)
     val domainWindowVisible: StateFlow<Boolean> = _domainWindowVisible
 
     val _domainUiStateStack = mutableListOf<DomainUiState>()
+
+    val domainUiStateMwContextStack = mutableListOf<Pair<DomainUiState, MWContext?>>()
 
     val _VRUiState = MutableStateFlow<VRUiState>(VRUiState.PttNone(active = false, isError = false))
     val vrUiState: StateFlow<VRUiState> = _VRUiState
@@ -42,7 +48,22 @@ object UiState {
         if (domainUiState.value.domainType != SealedDomainType.Ptt && domainUiState.value.domainType != SealedDomainType.None) {
             _domainUiStateStack.add(uiState)
             _domainUiStateStack.forEachIndexed { index, domainUiState ->
-                Log.d("@@ _domainUiStateStack", "index: $index / data: $domainUiState")
+                Log.d("@@@@ _domainUiStateStack", "index: $index / data: $domainUiState")
+            }
+        }
+    }
+
+    /**
+     * domainUiState의 domainType이 Ptt,None 타입이 아닐때만 스택에 추가함
+     * MWContext의 값이 nullable 한 타입으로 null이 들어올 수 있으며,
+     * mwContextState를 최신 데이터로 업데이트 하는 시점은 domainUiState와 같이 스택에 쌓이는 타이밍에 업데이트 함
+     */
+    fun pushUiStateMwContext(pairUiStateMwContext: Pair<DomainUiState, MWContext?>) {
+        if (domainUiState.value.domainType != SealedDomainType.Ptt && domainUiState.value.domainType != SealedDomainType.None) {
+            domainUiStateMwContextStack.add(pairUiStateMwContext)
+            domainUiStateMwContextStack.forEachIndexed { index, domainUiStateMwContext ->
+                _mwContextState.value = domainUiStateMwContext.second
+                Log.d("@@// UiStateMwContext Push", "index: $index / mwContext: ${domainUiStateMwContext.second} / domainUiState: ${domainUiStateMwContext.first}")
             }
         }
     }
@@ -57,15 +78,27 @@ object UiState {
     }
 
     /**
-     * 스택 사이즈가 1일때 백버튼을 누른다면 Window를 닫아버리고,
-     * 스택 사이즈가 0보다 클 때(1 이상)는 가장 마지막에 쌓여있는 스택을 삭제한다.
+     * 뒤로가기와 같은 기능을 위한 popUiState()함수
      */
     fun popUiState() {
-        if (_domainUiStateStack.size == 1) {
+        val removeData = domainUiStateMwContextStack.removeLastOrNull()
+
+        if (removeData != null) { // 지운 데이터가 존재 한다면
+            // 지운 후 스택의 마지막 값이 존재하지 않는다면, closeDomainWIndow() 실행
+            val (lastDomainUiState, lastMwContext) = domainUiStateMwContextStack.lastOrNull() ?: run {
+                closeDomainWindow()
+                return
+            }
+            // 지운 후 스택의 마지막 값이 존재한다면, 값 업데이트
+            _domainUiState.value = lastDomainUiState
+            _mwContextState.value = lastMwContext
+        } else { // 지운 데이터가 존재하지 않는다면
             closeDomainWindow()
-        } else if (_domainUiStateStack.size > 0) {
-            _domainUiStateStack.removeAt(_domainUiStateStack.size - 1)
-            _domainUiState.value = _domainUiStateStack.last()
+        }
+
+        domainUiStateMwContextStack.forEachIndexed { index, domainUiStateMwContext ->
+            val (domainUiState, mwContext) = domainUiStateMwContext
+            Log.d("@@// UiStateMwContext POP", "index: $index / mwContext: $mwContext / domainUiState: $domainUiState")
         }
     }
 
@@ -94,6 +127,6 @@ object UiState {
     }
 
     fun clearUiState() {
-        _domainUiStateStack.clear()
+        domainUiStateMwContextStack.clear()
     }
 }

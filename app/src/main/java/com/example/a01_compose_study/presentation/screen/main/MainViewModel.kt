@@ -144,6 +144,7 @@ class MainViewModel @Inject constructor(
                                 Log.d("@@ ProcCallData", "ContactListScreen - Contact List: ${sealedParsedData.procCallData.data}")
                                 onDomainEvent(
                                     event = MainEvent.OpenDomainWindowEvent(
+                                        mwContext = sealedParsedData.procCallData.mwContext,
                                         domainType = sealedParsedData.procCallData.sealedDomainType,
                                         screenType = sealedParsedData.procCallData.screenType,
                                         data = sealedParsedData.procCallData.data,
@@ -157,6 +158,7 @@ class MainViewModel @Inject constructor(
                                 Log.d("@@ ProcCallData", "FullContactListScreen - Full Contact List: ${sealedParsedData.procCallData.data}")
                                 onDomainEvent(
                                     event = MainEvent.OpenDomainWindowEvent(
+                                        mwContext = sealedParsedData.procCallData.mwContext,
                                         domainType = sealedParsedData.procCallData.sealedDomainType,
                                         screenType = sealedParsedData.procCallData.screenType,
                                         data = sealedParsedData.procCallData.data,
@@ -172,7 +174,9 @@ class MainViewModel @Inject constructor(
 
                                 if (newIndex != null && currentScrollIndex != null) {
                                     if (newIndex < currentScrollIndex) {
-                                        onDomainEvent(MainEvent.ChangeScrollIndexEvent(newIndex))
+                                        onDomainEvent(MainEvent.ChangeScrollIndexEvent(
+                                            mwContext = sealedParsedData.procCallData.mwContext,
+                                            selectedScrollIndex = newIndex))
                                     } else {
                                         pttManager.vrmwManager.requestTTs(
                                             promptId = listOf("PID_CMN_COMM_02_31"),
@@ -357,7 +361,9 @@ class MainViewModel @Inject constructor(
                     }
                     domainUiState
                 }
-                UiState.pushUiState(UiState.domainUiState.value)
+//                UiState.pushUiState(UiState.domainUiState.value)
+                UiState.pushUiStateMwContext(Pair(first = UiState.domainUiState.value, second = event.mwContext))
+
             }
 
             is MainEvent.ChangeScrollIndexEvent -> {
