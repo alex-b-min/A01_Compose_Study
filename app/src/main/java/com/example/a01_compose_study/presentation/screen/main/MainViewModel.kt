@@ -45,7 +45,7 @@ class MainViewModel @Inject constructor(
     val vrUiState: StateFlow<VRUiState> = UiState.vrUiState
 
     private val _sendMsgData = UiState._sendMsgUiData
-    val sendMsgData: SharedFlow< Any> = _sendMsgData
+    val sendMsgData: SharedFlow<Any> = _sendMsgData
 
     init {
         collectParsedData()
@@ -100,6 +100,7 @@ class MainViewModel @Inject constructor(
                             event = MainEvent.OpenDomainWindowEvent(
                                 domainType = SealedDomainType.Announce,
                                 screenType = ScreenType.Prepare,
+                                mwContext = sealedParsedData.procHelpData.mwContext,
                                 data = sealedParsedData.procHelpData.domainType.text,
                                 isError = false,
                                 screenSizeType = ScreenSizeType.Small
@@ -110,6 +111,7 @@ class MainViewModel @Inject constructor(
                             event = MainEvent.OpenDomainWindowEvent(
                                 domainType = sealedParsedData.procHelpData.domainType,
                                 screenType = sealedParsedData.procHelpData.screenType,
+                                mwContext = sealedParsedData.procHelpData.mwContext,
                                 data = sealedParsedData.procHelpData.data,
                                 isError = false,
                                 screenSizeType = sealedParsedData.procHelpData.screenSizeType,
@@ -141,6 +143,7 @@ class MainViewModel @Inject constructor(
                                     event = MainEvent.OpenDomainWindowEvent(
                                         domainType = sealedParsedData.procCallData.sealedDomainType,
                                         screenType = sealedParsedData.procCallData.screenType,
+                                        mwContext = sealedParsedData.procCallData.mwContext,
                                         data = sealedParsedData.procCallData.data,
                                         isError = false,
                                         screenSizeType = sealedParsedData.procCallData.screenSizeType,
@@ -173,6 +176,7 @@ class MainViewModel @Inject constructor(
                                     event = MainEvent.OpenDomainWindowEvent(
                                         domainType = sealedParsedData.procSendMsgData.domainType,
                                         screenType = sealedParsedData.procSendMsgData.screenType,
+                                        mwContext = sealedParsedData.procSendMsgData.mwContext,
                                         data = sealedParsedData.procSendMsgData.data,
                                         isError = false,
                                         screenSizeType = ScreenSizeType.Large
@@ -205,6 +209,7 @@ class MainViewModel @Inject constructor(
                                     event = MainEvent.OpenDomainWindowEvent(
                                         domainType = sealedParsedData.procSendMsgData.domainType,
                                         screenType = sealedParsedData.procSendMsgData.screenType,
+                                        mwContext = sealedParsedData.procSendMsgData.mwContext,
                                         data = sealedParsedData.procSendMsgData.data.notice,
                                         isError = false,
                                         screenSizeType = ScreenSizeType.Large
@@ -340,12 +345,13 @@ class MainViewModel @Inject constructor(
             }
 
             is MainEvent.SendDataEvent -> {
-                when(event.domainType){
+                when (event.domainType) {
                     is SealedDomainType.SendMessage -> {
                         CoroutineScope(Dispatchers.Default).launch {
-                            _sendMsgData.emit( event.screenType to event.data)
+                            _sendMsgData.emit(event.screenType to event.data)
                         }
                     }
+
                     else -> {
 
                     }
@@ -353,6 +359,7 @@ class MainViewModel @Inject constructor(
             }
         }
     }
+
     fun closeDomainWindow() {
         _domainWindowVisible.value = false
         UiState.clearUiState()

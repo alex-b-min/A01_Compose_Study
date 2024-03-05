@@ -4,11 +4,11 @@ package com.example.a01_compose_study.data.custom.sendMsg
 import com.example.a01_compose_study.data.Contact
 import com.example.a01_compose_study.data.DialogueMode
 import com.example.a01_compose_study.data.DomainType
-
 import com.example.a01_compose_study.data.HVRError
 import com.example.a01_compose_study.data.Intentions
 import com.example.a01_compose_study.data.analyze.ParseBundle
 import com.example.a01_compose_study.data.custom.ContactsManager
+import com.example.a01_compose_study.data.custom.MWContext
 import com.example.a01_compose_study.data.custom.SealedParsedData
 import com.example.a01_compose_study.data.custom.VRResultListener
 import com.example.a01_compose_study.data.custom.call.BtCall
@@ -19,7 +19,6 @@ import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.util.CustomLogger
 import com.example.a01_compose_study.presentation.data.UiState
 import com.example.a01_compose_study.presentation.data.UiState._sealedParsedData
-import com.example.a01_compose_study.presentation.screen.main.DomainUiState
 import com.example.a01_compose_study.presentation.util.StringManager.printSttString
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -110,6 +109,10 @@ class SendMsgManager @Inject constructor(
                 screenType = ScreenType.Prepare,
                 data = SendMsgDataType.ErrorMsgData(
                     notice = errorNotice
+                ),
+                mwContext = MWContext(
+                    DialogueMode.NONE,
+                    this@SendMsgManager
                 )
             )
         }
@@ -127,6 +130,7 @@ class SendMsgManager @Inject constructor(
 
                 val nameCheckList =
                     contactsManager.makeContactList(sendMsgModel.getContactItems(), true)
+
                 when (nameCheckList.size) {
                     0 -> {
                         sendMsgContactList = nameCheckList.toMutableList()
@@ -139,7 +143,7 @@ class SendMsgManager @Inject constructor(
                     1 -> {
                         return handleCategory(sendMsgModel)
                     }
-
+                    // 검색된 이름 여러개
                     else -> {
                         return ProcSendMsgData(
                             screenType = ScreenType.MessageSelectNameList,

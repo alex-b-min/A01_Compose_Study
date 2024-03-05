@@ -1,6 +1,7 @@
 package com.example.a01_compose_study.data.custom.sendMsg
 
 import com.example.a01_compose_study.data.Contact
+import com.example.a01_compose_study.data.custom.MWContext
 import com.example.a01_compose_study.domain.model.NoticeModel
 import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.model.SealedDomainType
@@ -9,6 +10,7 @@ data class ProcSendMsgData(
     val domainType: SealedDomainType = SealedDomainType.SendMessage,
     val screenType: ScreenType = ScreenType.None,
     val data: SendMsgDataType,
+    val mwContext: MWContext? = null,
 )
 
 sealed class SendMsgDataType {
@@ -28,8 +30,8 @@ sealed class SendMsgDataType {
     ) : SendMsgDataType()
 
     data class ErrorMsgData(
-        val notice : NoticeModel
-    ): SendMsgDataType()
+        val notice: NoticeModel
+    ) : SendMsgDataType()
 }
 
 //sealed class ProcSendMsgData {

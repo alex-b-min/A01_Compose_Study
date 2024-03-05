@@ -180,7 +180,17 @@ fun MainRoute(
             modifier = Modifier.fillMaxSize(0.13f),
             contentText = "PTT Open",
             onClick = {
-                pttViewModel.onPttEvent(PttEvent.StartVR(SelectVRResult.PttResult))
+                viewModel.onDomainEvent(
+                    event = MainEvent.OpenDomainWindowEvent(
+                        domainType = SealedDomainType.Ptt,
+                        screenType = ScreenType.PttListen,
+                        mwContext = null,
+                        data = announceString,
+                        isError = false,
+                        screenSizeType = ScreenSizeType.Small
+                    )
+                )
+                pttViewModel.onPttEvent(PttEvent.StartVR())
             }
         )
 
@@ -219,6 +229,7 @@ fun MainRoute(
                         event = MainEvent.OpenDomainWindowEvent(
                             domainType = SealedDomainType.Announce,
                             screenType = ScreenType.Prepare,
+                            mwContext = null,
                             data = "Help",
                             isError = false,
                             screenSizeType = ScreenSizeType.Small

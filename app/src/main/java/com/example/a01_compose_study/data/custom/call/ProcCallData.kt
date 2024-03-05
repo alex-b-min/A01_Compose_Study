@@ -1,6 +1,7 @@
 package com.example.a01_compose_study.data.custom.call
 
 import com.example.a01_compose_study.data.Contact
+import com.example.a01_compose_study.data.custom.MWContext
 import com.example.a01_compose_study.domain.model.NoticeModel
 import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.model.SealedDomainType
@@ -10,6 +11,7 @@ sealed class ProcCallData(
     val sealedDomainType: SealedDomainType = SealedDomainType.Call,
     val screenSizeType: ScreenSizeType = ScreenSizeType.Large,
     val screenType: ScreenType = ScreenType.None,
+    val mwContext: MWContext? = null,
 ) {
 
     object RejectRequest : ProcCallData(

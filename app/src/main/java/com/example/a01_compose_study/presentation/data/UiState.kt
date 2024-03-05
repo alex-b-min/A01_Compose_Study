@@ -1,7 +1,10 @@
 package com.example.a01_compose_study.presentation.data
 
 import android.util.Log
+import com.example.a01_compose_study.data.DialogueMode
+import com.example.a01_compose_study.data.custom.MWContext
 import com.example.a01_compose_study.data.custom.SealedParsedData
+import com.example.a01_compose_study.data.custom.VRResultListener
 import com.example.a01_compose_study.data.custom.sendMsg.ScreenData
 import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
@@ -24,7 +27,7 @@ object UiState {
     val _domainWindowVisible = MutableStateFlow<Boolean>(false)
     val domainWindowVisible: StateFlow<Boolean> = _domainWindowVisible
 
-    val _domainUiStateStack = mutableListOf<DomainUiState>()
+    val _domainUiStateStack = mutableListOf<Pair<DomainUiState,MWContext?>>()
 
     val _VRUiState = MutableStateFlow<VRUiState>(VRUiState.PttNone(active = false, isError = false))
     val vrUiState: StateFlow<VRUiState> = _VRUiState
@@ -32,11 +35,14 @@ object UiState {
     val _sendMsgUiData = MutableSharedFlow<Pair<ScreenType, Any>>()
     val sendMsgUiData: SharedFlow<Pair<ScreenType, Any>> = _sendMsgUiData
 
+    val _mwContext = MutableStateFlow<MWContext?>(null)
+    val mwContext: StateFlow<MWContext?> = _mwContext
+
     /**
      * 화면을 스택에 쌓음
      */
-    fun pushUiState(uiState: DomainUiState) {
-        _domainUiStateStack.add(uiState)
+    fun pushUiState(domainUiPair:Pair<DomainUiState,MWContext>) {
+        _domainUiStateStack.add(domainUiPair)
         _domainUiStateStack.forEachIndexed { index, domainUiState ->
             Log.d("@@ _domainUiStateStack", "index: $index / data: $domainUiState")
         }
@@ -45,16 +51,26 @@ object UiState {
     /**
      * 화면을 스택에 쌓지 않고 변화만 시킴
      */
-    fun changeUiState(uiState: DomainUiState) {
+    fun changeUiState(domainUiPair:Pair<DomainUiState,MWContext>) {
+        val uiState = domainUiPair.first
+        val mwContext = domainUiPair.second
         _domainUiState.update { domainUiState ->
             uiState.copyWithNewSizeType(domainUiState.screenSizeType)
         }
+        _mwContext.update { mwContext }
     }
 
     fun popUiState() {
         if (_domainUiStateStack.size > 1) {
-            _domainUiStateStack.removeAt(_domainUiStateStack.size - 1)
-            _domainUiState.value = _domainUiStateStack.last()
+//            _domainUiStateStack.removeAt(_domainUiStateStack.size - 1)
+//            _domainUiState.value = _domainUiStateStack.last()
+            val poppedPair = _domainUiStateStack.removeLast()
+            val domainUiState = poppedPair.first
+            val mwContext = poppedPair.second
+
+            _domainUiState.value = domainUiState
+            _mwContext.value = mwContext
+
         } else {
 //            _domainUiState.update {
 //                DomainUiState.PttWindow(
@@ -90,9 +106,9 @@ object UiState {
         return domainUiState
     }
 
-    fun handleScreenData(screenData: ScreenData, uiState: DomainUiState) {
+    fun handleScreenData(screenData: ScreenData, domainUiPair:Pair<DomainUiState,MWContext>) {
         when (screenData) {
-            ScreenData.PUSH -> pushUiState(uiState)
+            ScreenData.PUSH -> pushUiState(domainUiPair)
             ScreenData.POP -> popUiState()
             ScreenData.CHANGE -> popUiState()
             ScreenData.REJECT -> TODO()

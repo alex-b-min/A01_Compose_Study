@@ -8,6 +8,7 @@ import com.example.a01_compose_study.domain.util.ScreenSizeType
 data class ProcHelpData(
     val domainType: SealedDomainType,
     val screenType: ScreenType,
+    val mwContext: MWContext? = null,
     val screenSizeType: ScreenSizeType,
     val data: List<HelpItemData>,
 )
