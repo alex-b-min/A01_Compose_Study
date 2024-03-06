@@ -1,7 +1,6 @@
 package com.example.a01_compose_study.presentation.screen.sendMsg
 
 import androidx.lifecycle.ViewModel
-import com.example.a01_compose_study.data.custom.sendMsg.ScreenData
 import com.example.a01_compose_study.data.custom.sendMsg.SendMsgEvent
 import com.example.a01_compose_study.data.custom.sendMsg.SendMsgManager
 import com.example.a01_compose_study.domain.model.ScreenType
