@@ -68,7 +68,7 @@ object UiState {
             }
             onVREvent(
                 VREvent.ChangeVRUIEvent(
-                    VRUiState.PttLoading(
+                    VRUiState.PttListen(
                         active = true,
                         isError = false
                     )

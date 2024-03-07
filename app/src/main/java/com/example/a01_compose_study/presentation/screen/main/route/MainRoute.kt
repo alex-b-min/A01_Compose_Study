@@ -1,6 +1,8 @@
 package com.example.a01_compose_study.presentation.screen.main.route
 
 import android.util.Log
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,11 +12,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -42,6 +48,7 @@ import com.example.a01_compose_study.presentation.screen.sendMsg.SendMsgScreen
 import com.example.a01_compose_study.presentation.util.MultipleEventsCutter
 import com.example.a01_compose_study.presentation.util.get
 import com.example.a01_compose_study.ui.theme.Black2
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -58,6 +65,24 @@ fun MainRoute(
     val multipleEventsCutter = remember { MultipleEventsCutter.get() }
 
     val announceString by viewModel.announceString.collectAsStateWithLifecycle()
+
+    var isTouchDown by remember { mutableStateOf(false) }
+    var isTouchUp by remember { mutableStateOf(false) }
+    if (isTouchUp) {
+        scope.launch {
+            delay(2000)
+            onVREvent(
+                VREvent.ChangeVRUIEvent(
+                    VRUiState.PttLoading(
+                        active = true,
+                        isError = false
+                    )
+                )
+            )
+        }
+        isTouchUp = false
+    }
+    Log.d("@@isTouchUp", "${isTouchUp}")
 
     /**
      * 원래라고 하면은 Compose에서 뷰를 조작하는 변수(visible)는 remember 타입으로 선언해야 함..
@@ -77,79 +102,156 @@ fun MainRoute(
             viewModel.onDomainEvent(MainEvent.CloseDomainWindowEvent)
         }) {
         Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.BottomCenter
-        ) {
+            modifier = Modifier
+                .fillMaxSize()
+                /**
+                 * pointerInput를 이용하여 터치를 했을 시 VR의 Active 상태를 판별하여 애니메이션을 시작하는 코드
+                 * ==> 현재 개선해야할 부분은 VR의 Active 상태를 판별하여 VR 애니매이션을 실행하거나 종료하거나 하는데 이때 리컴포지션이 일어나 각 Domain별 Screen 화면도 재구성이 된다는 점이다.
+                 * ==>이러한 초기화 문제가 발생하면 현재 보고 있는 스크롤이 0번째 Index로 초기화되어, 화면이 최상단(0번째 인덱스)으로 스크롤되는 현상이 발생함
+                 */
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onLongPress = {
+                            // 긴 터치가 시작되었을 때 실행할 코드
+                            Log.d("@@ onLongPress", "Touch started at offset: $it")
+                        },
+                        onPress = { offset ->
+                            // 터치가 시작되었을 때 실행할 코드
+                            Log.d("@@ ACTION_DOWN", "Touch started at offset: $offset")
+                            onVREvent(
+                                VREvent.ChangeVRUIEvent(
+                                    VRUiState.PttLoading(
+                                        active = false,
+                                        isError = false
+                                    )
+                                )
+                            )
+                            isTouchUp = true
+                        },
+                        onTap = { offset ->
+                            // 빠른 터치일 때 실행할 코드
+                            Log.d("@@ TAP", "Quick tap at offset: $offset")
+                        }
+                    )
+                },
+            /**
+             * pointerInteropFilter를 이용하여 터치를 했을 시 VR의 Active 상태를 판별하여 애니메이션을 시작하는 코드
+             * ==> 작동이 잘되지 않아 위의 pointerInput을 사용하였음
+             */
+//                .pointerInteropFilter { event ->
+//                    when (event.actionMasked) {
+//                        MotionEvent.ACTION_DOWN -> {
+//                            Log.d("@@ ACTION_DOWN", "${event.actionMasked}")
+//                            isTouchDown = true
+//                        }
+//                        MotionEvent.AXIS_SCROLL -> {
+//                            Log.d("@@ AXIS_SCROLL", "${event.actionMasked}")
+//                            onVREvent(
+//                                VREvent.ChangeVRUIEvent(
+//                                    VRUiState.PttLoading(
+//                                        active = false,
+//                                        isError = false
+//                                    )
+//                                )
+//                            )
+//                        }
+//
+//                        MotionEvent.ACTION_UP -> {
+//                            Log.d("@@ ACTION_UP", "${event.actionMasked}")
+//                            if (isTouchDown) {
+//                                // 손을 뗐을 때, 터치 다운 이벤트가 있었으면 실행할 코드
+//                                onVREvent(
+//                                    VREvent.ChangeVRUIEvent(
+//                                        VRUiState.PttLoading(
+//                                            active = false,
+//                                            isError = false
+//                                        )
+//                                    )
+//                                )
+//                                isTouchUp = true
+//                            }
+//                            isTouchDown = false
+//                        }
+//                    }
+//                    true // 이벤트를 소비하지 않고 하위로 전달
+//                },
+            contentAlignment = Alignment.BottomCenter,
+
+            ) {
             VrUiAnimationHandler(vrUiState)
         }
 
-        Log.d("@@ domainUiState When문 위에서 시작", "${domainUiState}")
-        Log.d("@@ domainUiState When문 위에서 시작", "${domainWindowVisibleState}")
-        when (domainUiState) {
-            is DomainUiState.NoneWindow -> {
-            }
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(if (vrUiState.active) Color.Transparent else Color.Black)
+        ) {
+            Log.d("@@ domainUiState When문 위에서 시작", "${domainUiState}")
+            Log.d("@@ domainUiState When문 위에서 시작", "${domainWindowVisibleState}")
+            when (domainUiState) {
+                is DomainUiState.NoneWindow -> {
+                }
 
-            is DomainUiState.PttWindow -> {
-                Log.d("@@ PttWindow 진입", "몇번 실행?")
-                ComposePttScreen(
-                    domainUiState = domainUiState as DomainUiState.PttWindow,
-                    contentColor = Color.White,
-                    displayText = announceString
-                )
-            }
+                is DomainUiState.PttWindow -> {
+                    Log.d("@@ PttWindow 진입", "몇번 실행?")
+                    ComposePttScreen(
+                        domainUiState = domainUiState as DomainUiState.PttWindow,
+                        contentColor = Color.White,
+                        displayText = announceString
+                    )
+                }
 
-            is DomainUiState.HelpWindow -> {
-                Log.d("@@ HelpWindow 진입", "몇번 실행?")
-                Box(modifier = Modifier.fillMaxSize()) {
-                    ComposeHelpScreen(
-                        domainUiState = domainUiState as DomainUiState.HelpWindow,
-                        vrUiState = vrUiState,
-                        contentColor = Color.Gray,
-                        backgroundColor = Black2
+                is DomainUiState.HelpWindow -> {
+                    Log.d("@@ HelpWindow 진입", "몇번 실행?")
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        ComposeHelpScreen(
+                            domainUiState = domainUiState as DomainUiState.HelpWindow,
+                            vrUiState = vrUiState,
+                            contentColor = Color.Gray,
+                            backgroundColor = Black2
+                        )
+                    }
+                }
+
+                is DomainUiState.AnnounceWindow -> {
+                    Log.d("@@ AnnounceWindow 진입", "몇번 실행?")
+                    AnnounceScreen((domainUiState as DomainUiState.AnnounceWindow).text)
+                }
+
+                is DomainUiState.CallWindow -> {
+                    Log.d("@@ CallWindow 진입", "진입함 / index : ${domainUiState.scrollIndex}")
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        CallScreen(
+                            domainUiState = domainUiState as DomainUiState.CallWindow,
+                            vrUiState = vrUiState,
+                            vrDynamicBackground = if (vrUiState.active) Color.Transparent else Color.Black,
+                            fixedBackground = Black2
+                        )
+                    }
+                }
+
+                is DomainUiState.DomainMenuWindow -> {
+
+                }
+
+                is DomainUiState.NavigationWindow -> {
+
+                }
+
+                is DomainUiState.RadioWindow -> {
+
+                }
+
+                is DomainUiState.WeatherWindow -> {
+
+                }
+
+                is DomainUiState.SendMessageWindow -> {
+                    SendMsgScreen(
+                        domainUiState = domainUiState as DomainUiState.SendMessageWindow
                     )
                 }
             }
-
-            is DomainUiState.AnnounceWindow -> {
-                Log.d("@@ AnnounceWindow 진입", "몇번 실행?")
-                AnnounceScreen((domainUiState as DomainUiState.AnnounceWindow).text)
-            }
-
-            is DomainUiState.CallWindow -> {
-                Log.d("@@ CallWindow 진입", "몇번 실행?")
-                Box(modifier = Modifier.fillMaxSize()) {
-                    CallScreen(
-                        domainUiState = domainUiState as DomainUiState.CallWindow,
-                        vrUiState = vrUiState,
-                        vrDynamicBackground = if (vrUiState.active) Color.Transparent else Color.Black,
-                        fixedBackground = Black2
-                    )
-                }
-            }
-
-            is DomainUiState.DomainMenuWindow -> {
-
-            }
-
-            is DomainUiState.NavigationWindow -> {
-
-            }
-
-            is DomainUiState.RadioWindow -> {
-
-            }
-
-            is DomainUiState.WeatherWindow -> {
-
-            }
-
-            is DomainUiState.SendMessageWindow -> {
-                SendMsgScreen(
-                    domainUiState = domainUiState as DomainUiState.SendMessageWindow
-                )
-            }
-
-            else -> {}
         }
     }
 
