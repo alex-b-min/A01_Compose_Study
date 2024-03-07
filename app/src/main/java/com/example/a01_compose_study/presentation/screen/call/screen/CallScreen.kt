@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
@@ -45,6 +46,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -268,9 +270,11 @@ fun CallYesNoScreen(
             // 애니메이션이 성공적으로 완료되었을 때 실행할 로직
             onCalling()
         }
+
         AnimationEndReason.BoundReached -> {
             // 애니메이션이 취소되었을때 실행
         }
+
         else -> {
         }
     }
@@ -281,9 +285,11 @@ fun CallYesNoScreen(
             // 애니메이션이 성공적으로 완료되었을 때 실행할 로직
             onBackButton()
         }
+
         AnimationEndReason.BoundReached -> {
             // 애니메이션이 취소되었을때 실행
         }
+
         else -> {
         }
     }
@@ -325,7 +331,8 @@ fun CallYesNoScreen(
             TextView(
                 modifier = Modifier
                     .fillMaxWidth(0.8f)
-                    .wrapContentHeight(), text = domainUiState.detailData.name
+                    .wrapContentHeight(),
+                text = domainUiState.detailData.name
             )
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.navi_list_poi_name_margin_top)))
             Row(
@@ -349,101 +356,251 @@ fun CallYesNoScreen(
                 )
             }
             Spacer(modifier = Modifier.fillMaxHeight(0.25f))
-            Column(
-                modifier = Modifier.fillMaxWidth(0.85f),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(0.8f)
+                    .height(70.dp)
+                    .wrapContentWidth(Alignment.CenterHorizontally),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                OutlinedButton(
-                    onClick = {
-                        scope.launch {
-                            /**
-                             * 직접 Yes 버튼 클릭 제어
-                             */
-                            isYesSelected = true
-                            yesAnimationResult = yesAnimatableValue.animateTo(
-                                targetValue = 1f,
-                                animationSpec = tween(durationMillis = 700)
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                ) {
+                    OutlinedButton(
+                        onClick = {
+                            scope.launch {
+                                /**
+                                 * 직접 Yes 버튼 클릭 제어
+                                 */
+                                isYesSelected = true
+                                yesAnimationResult = yesAnimatableValue.animateTo(
+                                    targetValue = 1f,
+                                    animationSpec = tween(durationMillis = 700)
+                                )
+                            }
+                        },
+                        modifier = Modifier.fillMaxSize()
+                        , colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = Color.Black,
+                            backgroundColor = Black2,
+                        ),
+                        shape = MaterialTheme.shapes.medium,
+                        border = BorderStroke(0.5.dp, Color.Gray),
+                        contentPadding = PaddingValues(0.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            LinearProgressIndicator(
+                                progress = yesAnimatableValue.value,
+                                modifier = Modifier.fillMaxSize(),
+                                color = if (isYesSelected) Color.DarkGray else Color.Transparent,
+                                backgroundColor = Color.Transparent,
+                            )
+
+                            Text(
+                                text = "Yes",
+                                fontSize = 22.sp,
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.align(Alignment.Center)
                             )
                         }
-                    },
-                    modifier = Modifier
-                        .width(400.dp)
-                        .height(70.dp),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = Color.Black,
-                        backgroundColor = Black2,
-                    ),
-                    shape = MaterialTheme.shapes.medium,
-                    border = BorderStroke(0.5.dp, Color.Gray),
-                    contentPadding = PaddingValues(0.dp)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(0.dp)
-                    ) {
-                        LinearProgressIndicator(
-                            progress = yesAnimatableValue.value,
-                            modifier = Modifier.fillMaxSize(),
-                            color = if (isYesSelected) Color.DarkGray else Color.Transparent,
-                            backgroundColor = Color.Transparent,
-                        )
-
-                        Text(
-                            text = "Yes",
-                            fontSize = 22.sp,
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.align(Alignment.Center)
-                        )
                     }
                 }
-                OutlinedButton(
-                    onClick = {
-                        scope.launch {
-                            /**
-                             * 직접 No 버튼 클릭 제어
-                             */
-                            isNoSelected = true
-                            noAnimationResult = noAnimatableValue.animateTo(
-                                targetValue = 1f,
-                                animationSpec = tween(durationMillis = 700)
-                            )
-                        }
-                    },
+
+                Box(
                     modifier = Modifier
-                        .width(400.dp)
-                        .height(70.dp),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = Color.Black,
-                        backgroundColor = Black2,
-                    ),
-                    shape = MaterialTheme.shapes.medium,
-                    border = BorderStroke(0.5.dp, Color.Gray),
-                    contentPadding = PaddingValues(0.dp)
+                        .weight(1f)
                 ) {
-                    Box(
+                    OutlinedButton(
+                        onClick = {
+                            scope.launch {
+                                /**
+                                 * 직접 No 버튼 클릭 제어
+                                 */
+                                isNoSelected = true
+                                noAnimationResult = noAnimatableValue.animateTo(
+                                    targetValue = 1f,
+                                    animationSpec = tween(durationMillis = 700)
+                                )
+                            }
+                        },
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(0.dp)
+                        ,colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = Color.Black,
+                            backgroundColor = Black2,
+                        ),
+                        shape = MaterialTheme.shapes.medium,
+                        border = BorderStroke(0.5.dp, Color.Gray),
+                        contentPadding = PaddingValues(0.dp)
                     ) {
-                        LinearProgressIndicator(
-                            progress = noAnimatableValue.value,
-                            modifier = Modifier.fillMaxSize(),
-                            color = if (isNoSelected) Color.DarkGray else Color.Transparent,
-                            backgroundColor = Color.Transparent
-                        )
-                        Text(
-                            text = "No",
-                            fontSize = 22.sp,
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.align(Alignment.Center)
-                        )
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                        ) {
+                            LinearProgressIndicator(
+                                progress = noAnimatableValue.value,
+                                modifier = Modifier.fillMaxSize(),
+                                color = if (isNoSelected) Color.DarkGray else Color.Transparent,
+                                backgroundColor = Color.Transparent
+                            )
+                            Text(
+                                text = "No",
+                                fontSize = 22.sp,
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.align(Alignment.Center)
+                            )
+                        }
                     }
                 }
             }
+
+            Spacer(modifier = Modifier.height(15.dp))
+
+            OutlinedButton(
+                onClick = {
+                    scope.launch {
+                        /**
+                         * 직접 No 버튼 클릭 제어
+                         */
+                        isNoSelected = true
+                        noAnimationResult = noAnimatableValue.animateTo(
+                            targetValue = 1f,
+                            animationSpec = tween(durationMillis = 700)
+                        )
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth(0.8f)
+                    .height(70.dp)
+                ,colors = ButtonDefaults.outlinedButtonColors(
+                    contentColor = Color.Black,
+                    backgroundColor = Black2,
+                ),
+                shape = MaterialTheme.shapes.medium,
+                border = BorderStroke(0.5.dp, Color.Gray),
+                contentPadding = PaddingValues(0.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
+                    LinearProgressIndicator(
+                        progress = noAnimatableValue.value,
+                        modifier = Modifier.fillMaxSize(),
+                        color = if (isNoSelected) Color.DarkGray else Color.Transparent,
+                        backgroundColor = Color.Transparent
+                    )
+                    Text(
+                        text = "Other numbers",
+                        fontSize = 22.sp,
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
+            }
+
+//            Column(
+//                modifier = Modifier.fillMaxWidth(0.85f),
+//                verticalArrangement = Arrangement.spacedBy(12.dp),
+//                horizontalAlignment = Alignment.CenterHorizontally
+//            ) {
+//                OutlinedButton(
+//                    onClick = {
+//                        scope.launch {
+//                            /**
+//                             * 직접 Yes 버튼 클릭 제어
+//                             */
+//                            isYesSelected = true
+//                            yesAnimationResult = yesAnimatableValue.animateTo(
+//                                targetValue = 1f,
+//                                animationSpec = tween(durationMillis = 700)
+//                            )
+//                        }
+//                    },
+//                    modifier = Modifier
+//                        .width(400.dp)
+//                        .height(70.dp),
+//                    colors = ButtonDefaults.outlinedButtonColors(
+//                        contentColor = Color.Black,
+//                        backgroundColor = Black2,
+//                    ),
+//                    shape = MaterialTheme.shapes.medium,
+//                    border = BorderStroke(0.5.dp, Color.Gray),
+//                    contentPadding = PaddingValues(0.dp)
+//                ) {
+//                    Box(
+//                        modifier = Modifier
+//                            .fillMaxSize()
+//                            .padding(0.dp)
+//                    ) {
+//                        LinearProgressIndicator(
+//                            progress = yesAnimatableValue.value,
+//                            modifier = Modifier.fillMaxSize(),
+//                            color = if (isYesSelected) Color.DarkGray else Color.Transparent,
+//                            backgroundColor = Color.Transparent,
+//                        )
+//
+//                        Text(
+//                            text = "Yes",
+//                            fontSize = 22.sp,
+//                            color = Color.White,
+//                            fontWeight = FontWeight.Bold,
+//                            modifier = Modifier.align(Alignment.Center)
+//                        )
+//                    }
+//                }
+//                OutlinedButton(
+//                    onClick = {
+//                        scope.launch {
+//                            /**
+//                             * 직접 No 버튼 클릭 제어
+//                             */
+//                            isNoSelected = true
+//                            noAnimationResult = noAnimatableValue.animateTo(
+//                                targetValue = 1f,
+//                                animationSpec = tween(durationMillis = 700)
+//                            )
+//                        }
+//                    },
+//                    modifier = Modifier
+//                        .width(400.dp)
+//                        .height(70.dp),
+//                    colors = ButtonDefaults.outlinedButtonColors(
+//                        contentColor = Color.Black,
+//                        backgroundColor = Black2,
+//                    ),
+//                    shape = MaterialTheme.shapes.medium,
+//                    border = BorderStroke(0.5.dp, Color.Gray),
+//                    contentPadding = PaddingValues(0.dp)
+//                ) {
+//                    Box(
+//                        modifier = Modifier
+//                            .fillMaxSize()
+//                            .padding(0.dp)
+//                    ) {
+//                        LinearProgressIndicator(
+//                            progress = noAnimatableValue.value,
+//                            modifier = Modifier.fillMaxSize(),
+//                            color = if (isNoSelected) Color.DarkGray else Color.Transparent,
+//                            backgroundColor = Color.Transparent
+//                        )
+//                        Text(
+//                            text = "No",
+//                            fontSize = 22.sp,
+//                            color = Color.White,
+//                            fontWeight = FontWeight.Bold,
+//                            modifier = Modifier.align(Alignment.Center)
+//                        )
+//                    }
+//                }
+//            }
         }
     }
 }
@@ -487,7 +644,7 @@ fun CallIndexedListWindowPreview() {
     )
 }
 
-@Preview
+@Preview(Devices.TABLET)
 @Composable
 fun CallYesNoPreview() {
     CallYesNoScreen(
