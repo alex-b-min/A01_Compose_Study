@@ -87,6 +87,7 @@ fun CallIndexedList(
              */
             val isSelected = callItem.id == selectedContact?.id
             CallIndexedListItem(
+                index = index,
                 contactItem = callItem,
                 selectedContact = if (isSelected) selectedContact else null,
                 vrDynamicBackground = vrDynamicBackground,
@@ -99,6 +100,7 @@ fun CallIndexedList(
 
 @Composable
 fun CallIndexedListItem(
+    index: Int,
     contactItem: Contact,
     selectedContact: Contact? = null,
     vrDynamicBackground: Color,
@@ -195,7 +197,7 @@ fun CallIndexedListItem(
                                             .alignByBaseline()
                                     ) {
                                         Text(
-                                            text = "${contactItem.id}.",
+                                            text = "${index+1}.",
                                             color = Color.White,
                                             maxLines = 3,
                                             overflow = TextOverflow.Ellipsis,
@@ -289,6 +291,7 @@ fun CallIndexedListItemPreview() {
     val contact = Contact(id = "1", name = "문재민", number = "010-1111-2222")
 
     CallIndexedListItem(
+        index = 1,
         contactItem = contact,
         selectedContact = null,
         vrDynamicBackground = Color.Black,
