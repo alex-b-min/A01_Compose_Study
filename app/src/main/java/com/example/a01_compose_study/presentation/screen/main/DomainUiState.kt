@@ -52,6 +52,7 @@ sealed class DomainUiState(
         override val domainType: SealedDomainType,
         val data: List<Contact>,
         val detailData: Contact = Contact(),
+        val isContactNameUnique: Boolean = false,
         val isError: Boolean = false,
         override val scrollIndex: Int? = null,
         override val screenType: ScreenType,

@@ -303,6 +303,34 @@ class CallManager @Inject constructor(
     override fun onVRError(error: HVRError) {
         TODO("Not yet implemented")
     }
+
+    /**
+     * Set자료구조를 사용하여 전화번호부 목록에서 중복되는 이름을 가진 데이터 중에 처음 나오는 데이터만 남기는 함수
+     */
+    fun removeDuplicateNames(contacts: List<Contact>): List<Contact> {
+        val uniqueNames = HashSet<String>()
+        val filteredList = mutableListOf<Contact>()
+
+        for (contact in contacts) {
+            if (!uniqueNames.contains(contact.name)) {
+                uniqueNames.add(contact.name)
+                filteredList.add(contact)
+            }
+        }
+
+        return filteredList
+    }
+
+    /**
+     * 중복되는 이름이 2개 이상 존재하는지를 판별하는 함수
+     * ==> 만약 중복되는 이름이 2개 이상이라면 OtherName 존재해야함
+     */
+    fun isContactNameUnique(contact: Contact): Boolean {
+        val allContacts = fetchAllContacts()
+        val count = allContacts.count { it.name == contact.name }
+        Log.d("@@@@ isContactNameUnique", "count: ${count} / ${contact}")
+        return count <= 1
+    }
 }
 
 /**
@@ -321,118 +349,28 @@ fun fetchAllContacts(): List<Contact> {
     result.add(Contact(id = "1", name = "문재민", number = "010-1111-2222", type = types.indexOf(1)))
     result.add(Contact(id = "2", name = "문재민", number = "010-13-14", type = types.indexOf(2)))
 
-    result.add(Contact(id = "4", name = "이일구", number = "010-8765-4321", type = types.indexOf(1)))
-    result.add(Contact(id = "3", name = "이일구", number = "010-1234-5678", type = types.indexOf(3)))
+    result.add(Contact(id = "3", name = "이일구", number = "010-8765-4321", type = types.indexOf(1)))
+    result.add(Contact(id = "4", name = "이일구", number = "010-1234-5678", type = types.indexOf(3)))
 
+    result.add(Contact(id = "5", name = "엄마", number = "010-7777-8888", type = types.indexOf(1)))
+    result.add(Contact(id = "6", name = "엄마", number = "010-5555-6666", type = types.indexOf(2)))
+    result.add(Contact(id = "7", name = "엄마", number = "010-7777-8888", type = types.indexOf(3)))
 
-    result.add(Contact(id = "6", name = "엄마", number = "010-7777-8888", type = types.indexOf(1)))
-    result.add(Contact(id = "5", name = "엄마", number = "010-5555-6666", type = types.indexOf(2)))
-    result.add(Contact(id = "6", name = "엄마", number = "010-7777-8888", type = types.indexOf(3)))
-
-
-    result.add(
-        Contact(
-            id = "7",
-            name = "삐쓰까또레부르쥬미첼라햄페스츄리치즈나쵸스트링스파게티",
-            number = "010-2222-3333",
-            type = types.random()
-        )
-    )
-    result.add(
-        Contact(
-            id = "8",
-            name = "하늘별님구름햇님보다사랑스러우리",
-            number = "010-3333-4444",
-            type = types.random()
-        )
-    )
-    result.add(Contact(id = "9", name = "Alex", number = "010-4444-5555", type = types.random()))
-    result.add(
-        Contact(
-            id = "10",
-            name = "Alexander Sandor Signiel",
-            number = "010-4444-5555",
-            type = types.random()
-        )
-    )
-    result.add(
-        Contact(
-            id = "11",
-            name = "포티투닷 이순신",
-            number = "010-4444-5555",
-            type = types.random()
-        )
-    )
-    result.add(
-        Contact(
-            id = "12",
-            name = "포티투닷 홍길동 책임연구원 하하하하하",
-            number = "031-131",
-            type = types.random()
-        )
-    )
-    result.add(
-        Contact(
-            id = "13",
-            name = "김혜원 어머님",
-            number = "010-1111-5555",
-            type = types.random()
-        )
-    )
-    result.add(
-        Contact(
-            id = "14",
-            name = "홍길 동사무소",
-            number = "010-4444-5555",
-            type = types.random()
-        )
-    )
-    result.add(
-        Contact(
-            id = "15",
-            name = "홍길동 (HMC 유럽)",
-            number = "010-4444-5555",
-            type = types.random()
-        )
-    )
+    result.add(Contact(id = "8", name = "삐쓰까또레부르쥬미첼라햄페스츄리치즈나쵸스트링스파게티", number = "010-2222-3333", type = types.random()))
+    result.add(Contact(id = "9", name = "하늘별님구름햇님보다사랑스러우리", number = "010-3333-4444", type = types.random()))
+    result.add(Contact(id = "10", name = "Alex", number = "010-4444-5555", type = types.random()))
+    result.add(Contact(id = "11", name = "포티투닷 이순신", number = "010-4444-5555", type = types.random()))
+    result.add(Contact(id = "12", name = "포티투닷 홍길동 책임연구원 하하하하하", number = "031-131", type = types.random()))
+    result.add(Contact(id = "13", name = "김혜원 어머님", number = "010-1111-5555", type = types.random()))
+    result.add(Contact(id = "14", name = "홍길 동사무소", number = "010-4444-5555", type = types.random()))
+    result.add(Contact(id = "15", name = "홍길동 (HMC 유럽)", number = "010-4444-5555", type = types.random()))
     result.add(Contact(id = "16", name = "강신부", number = "010-4444-5555", type = types.random()))
     result.add(Contact(id = "17", name = "우리♥︎", number = "010-4444-5555", type = types.random()))
-    result.add(
-        Contact(
-            id = "18",
-            name = "ㅇ ㅏ ㅇ ㅣ ㄷ ㅣ",
-            number = "010-4444-5555",
-            type = types.random()
-        )
-    )
-    result.add(
-        Contact(
-            id = "19",
-            name = "1096119838",
-            number = "010-4444-5555",
-            type = types.random()
-        )
-    )
-    result.add(Contact(id = "20", name = "119 장난전화", number = "1509", type = types.random()))
+    result.add(Contact(id = "18", name = "ㅇ ㅏ ㅇ ㅣ ㄷ ㅣ", number = "010-4444-5555", type = types.random()))
+    result.add(Contact(id = "19", name = "119 장난전화", number = "1509", type = types.random()))
+    result.add(Contact(id = "20", name = "Alexander Sandor Signiel", number = "010-4444-5555", type = types.random()))
 
     return result.toList()
-}
-
-/**
- * Set자료구조를 사용하여 전화번호부 목록에서 중복되는 이름을 가진 데이터 중에 처음 나오는 데이터만 남기는 함수
- */
-fun removeDuplicateNames(contacts: List<Contact>): List<Contact> {
-    val uniqueNames = HashSet<String>()
-    val filteredList = mutableListOf<Contact>()
-
-    for (contact in contacts) {
-        if (!uniqueNames.contains(contact.name)) {
-            uniqueNames.add(contact.name)
-            filteredList.add(contact)
-        }
-    }
-
-    return filteredList
 }
 
 

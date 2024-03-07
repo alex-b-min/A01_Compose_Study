@@ -1,7 +1,9 @@
 package com.example.a01_compose_study.presentation.screen.call
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.example.a01_compose_study.data.custom.call.BtCall
+import com.example.a01_compose_study.data.custom.call.CallManager
 import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.presentation.data.UiState
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
@@ -11,6 +13,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CallViewModel @Inject constructor(
+    private val callManager: CallManager,
     private val btCall: BtCall,
 ) : ViewModel() {
 
@@ -23,10 +26,13 @@ class CallViewModel @Inject constructor(
             }
 
             is CallEvent.ContactListItemOnClick -> {
+                val isContactNameUnique = callManager.isContactNameUnique(event.selectedContactItem)
+                Log.d("@@@@ isContactNameUnique 결과값", "${isContactNameUnique}")
                 _domainUiState.update { domainUiState ->
                     val updatedState = (domainUiState as? DomainUiState.CallWindow)?.copy(
                         screenType = ScreenType.CallYesNo,
-                        detailData = event.selectedContactItem
+                        detailData = event.selectedContactItem,
+                        isContactNameUnique = isContactNameUnique
                     ) ?: domainUiState
                     UiState.pushUiStateMwContext(pairUiStateMwContext = Pair(first = updatedState, second = null))
                     updatedState

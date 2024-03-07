@@ -459,148 +459,53 @@ fun CallYesNoScreen(
                     }
                 }
             }
-
             Spacer(modifier = Modifier.height(15.dp))
 
-            OutlinedButton(
-                onClick = {
-                    scope.launch {
-                        /**
-                         * 직접 No 버튼 클릭 제어
-                         */
-                        isNoSelected = true
-                        noAnimationResult = noAnimatableValue.animateTo(
-                            targetValue = 1f,
-                            animationSpec = tween(durationMillis = 700)
+            if (domainUiState.isContactNameUnique.not()) { //유니크 하지 않을때(중복 이름이 존재할 때 == OtherNumber가 존재할 때)
+                OutlinedButton(
+                    onClick = {
+                        scope.launch {
+                            /**
+                             * 직접 No 버튼 클릭 제어
+                             */
+                            isNoSelected = true
+                            noAnimationResult = noAnimatableValue.animateTo(
+                                targetValue = 1f,
+                                animationSpec = tween(durationMillis = 700)
+                            )
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth(0.8f)
+                        .height(70.dp)
+                    ,colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = Color.Black,
+                        backgroundColor = Black2,
+                    ),
+                    shape = MaterialTheme.shapes.medium,
+                    border = BorderStroke(0.5.dp, Color.Gray),
+                    contentPadding = PaddingValues(0.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                    ) {
+                        LinearProgressIndicator(
+                            progress = noAnimatableValue.value,
+                            modifier = Modifier.fillMaxSize(),
+                            color = if (isNoSelected) Color.DarkGray else Color.Transparent,
+                            backgroundColor = Color.Transparent
+                        )
+                        Text(
+                            text = "Other numbers",
+                            fontSize = 22.sp,
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.align(Alignment.Center)
                         )
                     }
-                },
-                modifier = Modifier
-                    .fillMaxWidth(0.8f)
-                    .height(70.dp)
-                ,colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = Color.Black,
-                    backgroundColor = Black2,
-                ),
-                shape = MaterialTheme.shapes.medium,
-                border = BorderStroke(0.5.dp, Color.Gray),
-                contentPadding = PaddingValues(0.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                ) {
-                    LinearProgressIndicator(
-                        progress = noAnimatableValue.value,
-                        modifier = Modifier.fillMaxSize(),
-                        color = if (isNoSelected) Color.DarkGray else Color.Transparent,
-                        backgroundColor = Color.Transparent
-                    )
-                    Text(
-                        text = "Other numbers",
-                        fontSize = 22.sp,
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.align(Alignment.Center)
-                    )
                 }
             }
-
-//            Column(
-//                modifier = Modifier.fillMaxWidth(0.85f),
-//                verticalArrangement = Arrangement.spacedBy(12.dp),
-//                horizontalAlignment = Alignment.CenterHorizontally
-//            ) {
-//                OutlinedButton(
-//                    onClick = {
-//                        scope.launch {
-//                            /**
-//                             * 직접 Yes 버튼 클릭 제어
-//                             */
-//                            isYesSelected = true
-//                            yesAnimationResult = yesAnimatableValue.animateTo(
-//                                targetValue = 1f,
-//                                animationSpec = tween(durationMillis = 700)
-//                            )
-//                        }
-//                    },
-//                    modifier = Modifier
-//                        .width(400.dp)
-//                        .height(70.dp),
-//                    colors = ButtonDefaults.outlinedButtonColors(
-//                        contentColor = Color.Black,
-//                        backgroundColor = Black2,
-//                    ),
-//                    shape = MaterialTheme.shapes.medium,
-//                    border = BorderStroke(0.5.dp, Color.Gray),
-//                    contentPadding = PaddingValues(0.dp)
-//                ) {
-//                    Box(
-//                        modifier = Modifier
-//                            .fillMaxSize()
-//                            .padding(0.dp)
-//                    ) {
-//                        LinearProgressIndicator(
-//                            progress = yesAnimatableValue.value,
-//                            modifier = Modifier.fillMaxSize(),
-//                            color = if (isYesSelected) Color.DarkGray else Color.Transparent,
-//                            backgroundColor = Color.Transparent,
-//                        )
-//
-//                        Text(
-//                            text = "Yes",
-//                            fontSize = 22.sp,
-//                            color = Color.White,
-//                            fontWeight = FontWeight.Bold,
-//                            modifier = Modifier.align(Alignment.Center)
-//                        )
-//                    }
-//                }
-//                OutlinedButton(
-//                    onClick = {
-//                        scope.launch {
-//                            /**
-//                             * 직접 No 버튼 클릭 제어
-//                             */
-//                            isNoSelected = true
-//                            noAnimationResult = noAnimatableValue.animateTo(
-//                                targetValue = 1f,
-//                                animationSpec = tween(durationMillis = 700)
-//                            )
-//                        }
-//                    },
-//                    modifier = Modifier
-//                        .width(400.dp)
-//                        .height(70.dp),
-//                    colors = ButtonDefaults.outlinedButtonColors(
-//                        contentColor = Color.Black,
-//                        backgroundColor = Black2,
-//                    ),
-//                    shape = MaterialTheme.shapes.medium,
-//                    border = BorderStroke(0.5.dp, Color.Gray),
-//                    contentPadding = PaddingValues(0.dp)
-//                ) {
-//                    Box(
-//                        modifier = Modifier
-//                            .fillMaxSize()
-//                            .padding(0.dp)
-//                    ) {
-//                        LinearProgressIndicator(
-//                            progress = noAnimatableValue.value,
-//                            modifier = Modifier.fillMaxSize(),
-//                            color = if (isNoSelected) Color.DarkGray else Color.Transparent,
-//                            backgroundColor = Color.Transparent
-//                        )
-//                        Text(
-//                            text = "No",
-//                            fontSize = 22.sp,
-//                            color = Color.White,
-//                            fontWeight = FontWeight.Bold,
-//                            modifier = Modifier.align(Alignment.Center)
-//                        )
-//                    }
-//                }
-//            }
         }
     }
 }
