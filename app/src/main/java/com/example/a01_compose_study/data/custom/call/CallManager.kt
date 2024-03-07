@@ -156,11 +156,11 @@ class CallManager @Inject constructor(
                     // 인식된 이름으로 매칭되는 연락처가 여러개인 경우
                     if (recognizedList.size > 1) {
                         return ProcCallData.RecognizedContactListScreen(
-                            data =
+                            data = removeDuplicateNames(
                                 fetchRecognizedContacts(
                                     10
                                 )
-                            ,
+                            ),
                             mwContext = MWContext(DialogueMode.CALL, this@CallManager)
                         ) // 인덱스가 존재하는 전화번호부 목록 반환[DomainType.Call / ScreenType.List]
                         TODO("startVR(MWContext(DailogueMode.LIST) 실행")
@@ -168,7 +168,7 @@ class CallManager @Inject constructor(
                     } else if (recognizedList.isEmpty()) {
                         Log.d("@@ tempList Empty", "${fetchAllContacts()}")
                         return ProcCallData.AllContactListScreen(
-                            data = fetchAllContacts(),
+                            data = removeDuplicateNames(fetchAllContacts()),
                             mwContext = MWContext(DialogueMode.CALL, this@CallManager)
                         ) // 인덱스가 존재하지 않는 전체 전화번호부 목록 반환[DomainType.Call / ScreenType.List]
                         TODO("startVR(MWContext(DailogueMode.CALL) 실행")
@@ -417,6 +417,24 @@ fun fetchAllContacts(): List<Contact> {
 
     return result.toList()
 }
+
+/**
+ * Set자료구조를 사용하여 전화번호부 목록에서 중복되는 이름을 가진 데이터 중에 처음 나오는 데이터만 남기는 함수
+ */
+fun removeDuplicateNames(contacts: List<Contact>): List<Contact> {
+    val uniqueNames = HashSet<String>()
+    val filteredList = mutableListOf<Contact>()
+
+    for (contact in contacts) {
+        if (!uniqueNames.contains(contact.name)) {
+            uniqueNames.add(contact.name)
+            filteredList.add(contact)
+        }
+    }
+
+    return filteredList
+}
+
 
 /**
  * 인덱스를 가진 인식된 전체번호부 목록 더미 데이터
