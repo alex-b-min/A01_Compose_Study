@@ -71,6 +71,7 @@ sealed class DomainUiState(
         val domainType: SealedDomainType,
         override val  screenType: ScreenType,
         val msgData: MsgData? = null,
+        val contactList:List<Contact>? = mutableListOf(),
         val selectListItem: Contact? = null,
         val isError: Boolean = false,
         val screenData: ScreenData,

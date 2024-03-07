@@ -32,46 +32,37 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintSet
 import com.example.a01_compose_study.R
-import com.example.a01_compose_study.presentation.components.top_bar.TopAppBarContent
 
 @Composable
-fun MessageView(modifier: Modifier) {
+fun MessageView(
+    modifier: Modifier,
+    isSayMessage: Boolean,
+    name: String= "",
+    phoneNum: String = ""
+,    msgData: String = "",
+) {
     Box(
         modifier = modifier
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
-            TopAppBarContent(showNavigationIcon = false)
-            ContactInfoView()
+            ContactInfoView(name,phoneNum)
             Spacer(Modifier.height(dimensionResource(R.dimen.dp_21_3)))
             MsgTextField(
-                modifier = Modifier
-                    .height(dimensionResource(R.dimen.dp_130))
+                modifier = Modifier.height(dimensionResource(R.dimen.dp_130)),
+                isSayMessage = isSayMessage,
+                msgData = msgData,
             )
             Spacer(Modifier.height(dimensionResource(R.dimen.dp_33_3)))
-            Button(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 50.dp)
-                    .height(45.dp),
-                onClick = { /*TODO*/ },
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = colorResource(id = R.color.confirm_btn_bg_color)
-                )) {
-                Text(
-                    text = "YES",
-                    style = MaterialTheme.typography.button,
-                    textAlign = TextAlign.Center,
-                    color = Color.White
-                )
-            }
-
-
+            MessageButton(isSayMessage)
         }
     }
 }
 
 @Composable
-fun ContactInfoView() {
+fun ContactInfoView(
+    name: String,
+    phoneNum: String,
+) {
     val constraintSet = ConstraintSet {
         val name = createRefFor("name")
         val phoneNum = createRefFor("phoneNum")
@@ -96,7 +87,7 @@ fun ContactInfoView() {
         modifier = Modifier.fillMaxWidth()
     ) {
         Text(
-            text = "이름",
+            text = name,
             color = Color.White,
             style = MaterialTheme.typography.h6,
             maxLines = 1,
@@ -104,7 +95,7 @@ fun ContactInfoView() {
                 .layoutId("name")
         )
         Text(
-            text = "010-0000-0000",
+            text = phoneNum,
             color = colorResource(id = R.color.white_a50),
             style = MaterialTheme.typography.body2,
             modifier = Modifier
@@ -123,6 +114,8 @@ fun ContactInfoView() {
 @Composable
 fun MsgTextField(
     modifier: Modifier = Modifier,
+    msgData: String,
+    isSayMessage: Boolean,
     clickListener: (() -> Unit)? = null,
 ) {
     Box(modifier = modifier
@@ -141,18 +134,65 @@ fun MsgTextField(
 
         )
     ) {
-        Text(
-            text = "Say the Message",
-            modifier = Modifier.align(Alignment.Center),
-            maxLines = 3,
-            color = Color.White,
-            style = MaterialTheme.typography.body1
+        if (isSayMessage) {
+            Text(
+                text = "Say the Message",
+                modifier = Modifier.align(Alignment.Center),
+                maxLines = 3,
+                color = Color.White,
+                style = MaterialTheme.typography.body1
+            )
+        } else {
+            Text(
+                text = msgData,
+                modifier = Modifier.align(Alignment.Center),
+                maxLines = 3,
+                color = Color.White,
+                style = MaterialTheme.typography.body1
+            )
+        }
+    }
+}
+
+@Composable
+fun MessageButton(isSayMessage: Boolean) {
+    Button(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 50.dp)
+            .height(45.dp),
+        onClick = { /*TODO*/ },
+        colors = ButtonDefaults.buttonColors(
+            backgroundColor = colorResource(id = R.color.confirm_btn_bg_color)
         )
+    ) {
+        if (isSayMessage) {
+            Text(
+                text = "NO",
+                style = MaterialTheme.typography.button,
+                textAlign = TextAlign.Center,
+                color = Color.White
+            )
+        } else {
+            Text(
+                text = "YES",
+                style = MaterialTheme.typography.button,
+                textAlign = TextAlign.Center,
+                color = Color.White
+            )
+        }
     }
 }
 
 @Preview
 @Composable
 fun MessageViewPreview() {
-    MessageView(modifier = Modifier.fillMaxWidth())
+    MessageView(
+        modifier = Modifier.fillMaxWidth(),
+        isSayMessage = false,
+        name = "Name",
+        phoneNum = "010-0000-00000",
+        msgData = "Hi"
+    )
+
 }

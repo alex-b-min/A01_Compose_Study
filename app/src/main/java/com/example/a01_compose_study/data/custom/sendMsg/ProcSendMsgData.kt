@@ -15,6 +15,7 @@ data class ProcSendMsgData(
 
 sealed class SendMsgDataType {
     data class SendMsgData(
+        val contacts: List<Contact>? = null,
         val msgData: MsgData? = null,
         val screenData: ScreenData = ScreenData.PUSH
     ) : SendMsgDataType()
@@ -33,29 +34,6 @@ sealed class SendMsgDataType {
         val notice: NoticeModel
     ) : SendMsgDataType()
 }
-
-//sealed class ProcSendMsgData {
-//    data class SendMsgData(
-//        val domainType: SealedDomainType = SealedDomainType.SendMessage,
-//        val screenType: ScreenType = ScreenType.None,
-//        val msgData: MsgData?,
-//        val screenData: ScreenData = ScreenData.PUSH
-//    ) : ProcSendMsgData()
-//
-//    data class SendScreenData(
-//        val screenData: ScreenData
-//    ) : ProcSendMsgData()
-//
-//    //open domain event말고 다른 이벤트 고려
-//    data class SendListNum(
-//        val index: Int?
-//    ) : ProcSendMsgData()
-//
-//    data class ErrorMsgData(
-//        val notice : NoticeModel
-//    ): ProcSendMsgData()
-//}
-
 enum class ScreenData {
     PUSH,
     POP,
@@ -66,6 +44,6 @@ enum class ScreenData {
 
 data class MsgData(
     val name: String = "",
-    val contacts: List<Contact>? = null,
+    val phoneNum: String = "",
     val msg: String = "",
 )

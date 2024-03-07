@@ -25,24 +25,14 @@ import com.example.a01_compose_study.presentation.components.list.LazyColumnList
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
 
 @Composable
-fun SendMsgListView(
-    domainUiState: DomainUiState.HelpWindow,
-    contentColor: android.graphics.Color,
-    backgroundColor: android.graphics.Color,
-    onDismiss: () -> Unit,
-    onBackButton: () -> Unit,
-    onScreenSizeChange: (ScreenSizeType) -> Unit,
-    onItemClick: (HelpItemData) -> Unit,
-) {
-
-}
-
-@Composable
 fun MsgAllList(
     contactList: List<Contact>,
 ) {
-    LazyColumnList(list = contactList) {
-        MsgAllListItem()
+    LazyColumnList(list = contactList) {index, contact ->
+        MsgAllListItem(
+            name = contact.name,
+            phoneNum = contact.number,
+        )
     }
 }
 
@@ -50,8 +40,12 @@ fun MsgAllList(
 fun MsgNameList(
     contactList: List<Contact>,
 ) {
-    LazyColumnList(list = contactList) {
-        MsgNameListItem()
+    LazyColumnList(list = contactList) {index, contact ->
+        MsgNameListItem(
+            id = index+1,
+            name = contact.name,
+            phoneNum = contact.number,
+        )
     }
 }
 
@@ -60,14 +54,21 @@ fun MsgNameList(
 fun MsgCategoryList(
     contactList: List<Contact>,
 ) {
-    LazyColumnList(list = contactList) {
-        MsgCategoryListItem()
+    LazyColumnList(list = contactList) {index, contact ->
+        MsgCategoryListItem(
+            id = index+1,
+            name = contact.name,
+            phoneNum = contact.number,
+        )
     }
 }
 
 
 @Composable
-fun MsgAllListItem() {
+fun MsgAllListItem(
+    name: String,
+    phoneNum: String,
+) {
     val constraintSet = ConstraintSet {
         val name = createRefFor("name")
         val phoneNum = createRefFor("phoneNum")
@@ -92,7 +93,7 @@ fun MsgAllListItem() {
     Box(modifier = Modifier.padding(4.dp)) {
         ConstraintLayout(constraintSet, modifier = Modifier.fillMaxWidth()) {
             Text(
-                text = "이름",
+                text = name,
                 color = Color.White,
                 style = MaterialTheme.typography.h6,
                 maxLines = 1,
@@ -100,7 +101,7 @@ fun MsgAllListItem() {
                     .layoutId("name")
             )
             Text(
-                text = "010-0000-0000",
+                text = phoneNum,
                 color = colorResource(id = R.color.white_a50),
                 style = MaterialTheme.typography.body2,
                 modifier = Modifier
@@ -118,7 +119,11 @@ fun MsgAllListItem() {
 }
 
 @Composable
-fun MsgNameListItem() {
+fun MsgNameListItem(
+    id: Int,
+    name: String,
+    phoneNum: String,
+) {
     val constraintSet = ConstraintSet {
         val num = createRefFor("num")
         val name = createRefFor("name")
@@ -150,7 +155,7 @@ fun MsgNameListItem() {
         modifier = Modifier.fillMaxWidth()
     ) {
         Text(
-            text = "1",
+            text = id.toString(),
             color = Color.White,
             style = MaterialTheme.typography.h5,
             maxLines = 1,
@@ -158,7 +163,7 @@ fun MsgNameListItem() {
                 .layoutId("num")
         )
         Text(
-            text = "이름",
+            text = name,
             color = Color.White,
             style = MaterialTheme.typography.h6,
             maxLines = 1,
@@ -166,7 +171,7 @@ fun MsgNameListItem() {
                 .layoutId("name")
         )
         Text(
-            text = "010-0000-0000",
+            text = phoneNum,
             color = colorResource(id = R.color.white_a50),
             style = MaterialTheme.typography.body2,
             modifier = Modifier
@@ -184,7 +189,11 @@ fun MsgNameListItem() {
 }
 
 @Composable
-fun MsgCategoryListItem() {
+fun MsgCategoryListItem(
+    id: Int,
+    name: String,
+    phoneNum: String,
+) {
     val constraintSet = ConstraintSet {
         val num = createRefFor("num")
         val name = createRefFor("name")
@@ -210,7 +219,7 @@ fun MsgCategoryListItem() {
         modifier = Modifier.fillMaxWidth()
     ) {
         Text(
-            text = "1",
+            text = id.toString(),
             color = Color.White,
             style = MaterialTheme.typography.h5,
             maxLines = 1,
@@ -218,7 +227,7 @@ fun MsgCategoryListItem() {
                 .layoutId("num")
         )
         Text(
-            text = "이름",
+            text = name,
             color = Color.White,
             style = MaterialTheme.typography.h6,
             maxLines = 1,
@@ -226,7 +235,7 @@ fun MsgCategoryListItem() {
                 .layoutId("name")
         )
         Text(
-            text = "010-0000-0000",
+            text = phoneNum,
             color = colorResource(id = R.color.white_a50),
             style = MaterialTheme.typography.body2,
             modifier = Modifier

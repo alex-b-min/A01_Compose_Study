@@ -313,7 +313,9 @@ class MainViewModel @Inject constructor(
                                 screenType = event.screenType,
                                 isError = event.isError,
                                 msgData = eventData.msgData as MsgData,
+                                contactList = eventData.contacts,
                                 screenData = eventData.screenData,
+                                screenSizeType = ScreenSizeType.Large
                             )
                         }
 

@@ -156,7 +156,7 @@ class SendMsgManager @Inject constructor(
                                 DialogueMode.LIST, this@SendMsgManager
                             ),
                             data = SendMsgDataType.SendMsgData(
-                                msgData = MsgData(contacts = sendMsgContactList),
+                                contacts = sendMsgContactList,
                             )
                         )
                     }
@@ -331,7 +331,7 @@ class SendMsgManager @Inject constructor(
                 screenType = ScreenType.MessageSelectCategoryList, mwContext = MWContext(
                     DialogueMode.LIST, this@SendMsgManager
                 ), data = SendMsgDataType.SendMsgData(
-                    msgData = MsgData(contacts = sendMsgContactList),
+                    contacts = sendMsgContactList,
                 )
             )
         }
