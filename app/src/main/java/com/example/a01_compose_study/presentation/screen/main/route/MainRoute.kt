@@ -21,6 +21,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.a01_compose_study.R
 import com.example.a01_compose_study.data.HVRError
 import com.example.a01_compose_study.data.VRResult
+import com.example.a01_compose_study.data.custom.sendMsg.MsgData
+import com.example.a01_compose_study.data.custom.sendMsg.SendMsgDataType
 import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.util.ScreenSizeType
@@ -175,6 +177,44 @@ fun MainRoute(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalAlignment = Alignment.End
     ) {
+
+//        PttButton(
+//            modifier = Modifier.fillMaxSize(0.13f),
+//            contentText = "PTT Announce",
+//            onClick = {
+//                scope.launch {
+//                    viewModel.onDomainEvent(
+//                        event = MainEvent.OpenDomainWindowEvent(
+//                            domainType = SealedDomainType.Announce,
+//                            screenType = ScreenType.Prepare,
+//                            mwContext = null,
+//                            data = "Help",
+//                            isError = false,
+//                            screenSizeType = ScreenSizeType.Small
+//                        )
+//                    )
+//                }
+//            }
+//        )
+        PttButton(
+            modifier = Modifier.fillMaxSize(0.13f),
+            contentText = "SendMsg",
+            onClick = {
+                scope.launch {
+                    viewModel.onDomainEvent(
+                        event = MainEvent.OpenDomainWindowEvent(
+                            domainType = SealedDomainType.SendMessage,
+                            screenType = ScreenType.SendMessage,
+                            mwContext = null,
+                            data = SendMsgDataType.SendMsgData(msgData = MsgData()),
+                            isError = false,
+                            screenSizeType = ScreenSizeType.Large
+                        )
+                    )
+                }
+                pttViewModel.onPttEvent(PttEvent.StartVR(selectVRResult = SelectVRResult.SendMsgResult))
+            }
+        )
         PttButton(
             modifier = Modifier.fillMaxSize(0.13f),
             contentText = "PTT Open",

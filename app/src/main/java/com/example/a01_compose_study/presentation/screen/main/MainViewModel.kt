@@ -11,6 +11,7 @@ import com.example.a01_compose_study.data.custom.call.ProcCallData
 import com.example.a01_compose_study.data.custom.sendMsg.MsgData
 import com.example.a01_compose_study.data.custom.sendMsg.SendMsgDataType
 import com.example.a01_compose_study.domain.model.HelpItemData
+import com.example.a01_compose_study.domain.model.NoticeModel
 import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.util.ScreenSizeType
@@ -209,13 +210,18 @@ class MainViewModel @Inject constructor(
 
                             is SendMsgDataType.ErrorMsgData -> {
                                 onDomainEvent(
-                                    event = MainEvent.OpenDomainWindowEvent(
-                                        domainType = sealedParsedData.procSendMsgData.domainType,
+//                                    event = MainEvent.OpenDomainWindowEvent(
+//                                        domainType = sealedParsedData.procSendMsgData.domainType,
+//                                        screenType = sealedParsedData.procSendMsgData.screenType,
+//                                        mwContext = sealedParsedData.procSendMsgData.mwContext,
+//                                        data = sealedParsedData.procSendMsgData.data.notice,
+//                                        isError = false,
+//                                        screenSizeType = ScreenSizeType.Large
+//                                    )
+                                    event = MainEvent.SendDataEvent(
+                                        domainType = SealedDomainType.SendMessage,
                                         screenType = sealedParsedData.procSendMsgData.screenType,
-                                        mwContext = sealedParsedData.procSendMsgData.mwContext,
-                                        data = sealedParsedData.procSendMsgData.data.notice,
-                                        isError = false,
-                                        screenSizeType = ScreenSizeType.Large
+                                        data = sealedParsedData.procSendMsgData.data.notice
                                     )
                                 )
                             }
