@@ -37,15 +37,16 @@ import com.example.a01_compose_study.R
 fun MessageView(
     modifier: Modifier,
     isSayMessage: Boolean,
-    name: String= "",
-    phoneNum: String = ""
-,    msgData: String = "",
+    name: String = "",
+    phoneNum: String = "",
+    msgData: String = "",
+    onButtonClick: () -> Unit,
 ) {
     Box(
         modifier = modifier
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
-            ContactInfoView(name,phoneNum)
+            ContactInfoView(name, phoneNum)
             Spacer(Modifier.height(dimensionResource(R.dimen.dp_21_3)))
             MsgTextField(
                 modifier = Modifier.height(dimensionResource(R.dimen.dp_130)),
@@ -53,7 +54,10 @@ fun MessageView(
                 msgData = msgData,
             )
             Spacer(Modifier.height(dimensionResource(R.dimen.dp_33_3)))
-            MessageButton(isSayMessage)
+            MessageButton(
+                isSayMessage = isSayMessage,
+                onClick = onButtonClick
+            )
         }
     }
 }
@@ -155,13 +159,13 @@ fun MsgTextField(
 }
 
 @Composable
-fun MessageButton(isSayMessage: Boolean) {
+fun MessageButton(isSayMessage: Boolean, onClick: () -> Unit) {
     Button(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 50.dp)
             .height(45.dp),
-        onClick = { /*TODO*/ },
+        onClick = onClick,
         colors = ButtonDefaults.buttonColors(
             backgroundColor = colorResource(id = R.color.confirm_btn_bg_color)
         )
@@ -192,7 +196,8 @@ fun MessageViewPreview() {
         isSayMessage = false,
         name = "Name",
         phoneNum = "010-0000-00000",
-        msgData = "Hi"
+        msgData = "Hi",
+        onButtonClick = {}
     )
 
 }

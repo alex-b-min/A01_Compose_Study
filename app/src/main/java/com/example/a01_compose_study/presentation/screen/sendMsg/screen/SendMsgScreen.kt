@@ -1,5 +1,6 @@
 package com.example.a01_compose_study.presentation.screen.sendMsg.screen
 
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,14 +10,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.a01_compose_study.data.custom.sendMsg.SendMsgEvent
 import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.presentation.components.top_bar.TopAppBarContent
-import com.example.a01_compose_study.presentation.screen.help.HelpViewModel
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
+import com.example.a01_compose_study.presentation.screen.sendMsg.SendMsgViewModel
 
 @Composable
 fun SendMsgScreen(
-    viewModel: HelpViewModel = hiltViewModel(),
+    viewModel: SendMsgViewModel = hiltViewModel(),
     domainUiState: DomainUiState.SendMessageWindow,
 ) {
     Box(
@@ -25,17 +27,24 @@ fun SendMsgScreen(
             .clip(RoundedCornerShape(10.dp))
     ) {
         Column {
-            TopAppBarContent(showNavigationIcon = false)
+            Log.d("sendMsg","TopAppBarContent")
+            TopAppBarContent(
+                showNavigationIcon = false,
+                onActionIconClick = { viewModel.onSendMsgEvent(SendMsgEvent.OnBack) }
+            )
             if (domainUiState.screenType is ScreenType.SayMessage) {
                 domainUiState.msgData?.let {
+                    Log.d("sendMsg","SayMessage MessageView")
                     MessageView(
                         name = it.name,
                         phoneNum = domainUiState.msgData.phoneNum,
                         modifier = Modifier,
-                        isSayMessage = true
+                        isSayMessage = true,
+                        onButtonClick = { viewModel.onSendMsgEvent(SendMsgEvent.SayMessageNo) }
                     )
                 }
             } else if (domainUiState.screenType is ScreenType.SendMessage) {
+                Log.d("sendMsg","SendMessage MessageView")
                 domainUiState.msgData?.let {
                     MessageView(
                         name = it.name,
@@ -43,13 +52,17 @@ fun SendMsgScreen(
                         modifier = Modifier,
                         isSayMessage = false,
                         msgData = it.msg,
+                        onButtonClick = { viewModel.onSendMsgEvent(SendMsgEvent.SendMessageYes) }
                     )
                 }
             } else if (domainUiState.screenType is ScreenType.MessageAllList) {
+                Log.d("sendMsg","MessageAllList")
                 domainUiState.contactList?.let { MsgAllList(it) }
             } else if (domainUiState.screenType is ScreenType.MessageSelectNameList) {
+                Log.d("sendMsg","MessageSelectNameList")
                 domainUiState.contactList?.let { MsgNameList(it) }
             } else if (domainUiState.screenType is ScreenType.MessageSelectCategoryList) {
+                Log.d("sendMsg","MessageSelectCategoryList")
                 domainUiState.contactList?.let { MsgCategoryList(it) }
             }
         }

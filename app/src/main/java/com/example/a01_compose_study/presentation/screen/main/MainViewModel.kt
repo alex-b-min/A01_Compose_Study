@@ -176,6 +176,7 @@ class MainViewModel @Inject constructor(
                     is SealedParsedData.SendMsgData -> {
                         when (sealedParsedData.procSendMsgData.data) {
                             is SendMsgDataType.SendMsgData -> {
+                                Log.d("sendMsg", "ProcSendMsgData.SendMsgData - data: ${sealedParsedData.procSendMsgData.data}")
                                 onDomainEvent(
                                     event = MainEvent.OpenDomainWindowEvent(
                                         domainType = sealedParsedData.procSendMsgData.domainType,
@@ -189,6 +190,7 @@ class MainViewModel @Inject constructor(
                             }
 
                             is SendMsgDataType.SendScreenData -> {
+                                Log.d("sendMsg", "ProcSendMsgData.SendMsgData - data: ${sealedParsedData.procSendMsgData.data}")
                                 onDomainEvent(
                                     event = MainEvent.SendDataEvent(
                                         domainType = sealedParsedData.procSendMsgData.domainType,
@@ -199,6 +201,7 @@ class MainViewModel @Inject constructor(
                             }
 
                             is SendMsgDataType.SendListNum -> {
+                                Log.d("sendMsg", "ProcSendMsgData.SendMsgData - data: ${sealedParsedData.procSendMsgData.data}")
                                 onDomainEvent(
                                     event = MainEvent.SendDataEvent(
                                         domainType = SealedDomainType.SendMessage,
@@ -209,6 +212,7 @@ class MainViewModel @Inject constructor(
                             }
 
                             is SendMsgDataType.ErrorMsgData -> {
+                                Log.d("sendMsg", "ProcSendMsgData.SendMsgData - data: ${sealedParsedData.procSendMsgData.data}")
                                 onDomainEvent(
 //                                    event = MainEvent.OpenDomainWindowEvent(
 //                                        domainType = sealedParsedData.procSendMsgData.domainType,
@@ -308,11 +312,12 @@ class MainViewModel @Inject constructor(
 
                         SealedDomainType.SendMessage -> {
                             val eventData = event.data as SendMsgDataType.SendMsgData
+                            Log.d("sendMsg","contactList: {${eventData.contacts}}")
                             DomainUiState.SendMessageWindow(
                                 domainType = event.domainType,
                                 screenType = event.screenType,
                                 isError = event.isError,
-                                msgData = eventData.msgData as MsgData,
+                                msgData = eventData.msgData,
                                 contactList = eventData.contacts,
                                 screenData = eventData.screenData,
                                 screenSizeType = ScreenSizeType.Large

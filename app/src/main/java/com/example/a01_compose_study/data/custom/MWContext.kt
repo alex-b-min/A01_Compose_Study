@@ -1,6 +1,7 @@
 package com.example.a01_compose_study.data.custom
 
 import android.util.Log
+import com.example.a01_compose_study.data.Contact
 import com.example.a01_compose_study.data.DialogueMode
 import com.example.a01_compose_study.data.HTextToSpeechState
 import com.example.a01_compose_study.data.HVRError
@@ -8,6 +9,8 @@ import com.example.a01_compose_study.data.HVRState
 import com.example.a01_compose_study.data.VRResult
 import com.example.a01_compose_study.data.analyze.ParseDomainType
 import com.example.a01_compose_study.data.analyze.ParserFactory
+import com.example.a01_compose_study.data.pasing.BaseModel
+import com.example.a01_compose_study.data.pasing.SendMsgModel
 import com.example.a01_compose_study.domain.util.CustomLogger
 import com.example.a01_compose_study.presentation.data.UiState
 import com.example.a01_compose_study.presentation.screen.SelectVRResult
@@ -75,8 +78,6 @@ class MWContext(
 
     fun onVRResult(vrResult: VRResult, selectVRResult: SelectVRResult) {
         Log.d("@@ MWContext onVRResult", "${vrResult}")
-//        val bundle = ParserFactory().dataParsing(vrResult, dialogueMode = DialogueMode.HELP)
-//        bundle?.type = ParseDomainType.HELP
 
         val bundle = when (selectVRResult) {
             SelectVRResult.HelpResult -> {
@@ -107,6 +108,22 @@ class MWContext(
                     }
             }
 
+            SelectVRResult.SendMsgNameResult -> {
+                ParserFactory().dataParsing(vrResult, dialogueMode = dialogueMode)
+                    .also {
+                        it?.type = ParseDomainType.SEND_MESSAGE
+                        it?.dialogueMode = DialogueMode.SEND_MESSAGE_NAME
+                    }
+            }
+
+            SelectVRResult.SendMsgNameMsgResult -> {
+                ParserFactory().dataParsing(vrResult, dialogueMode = dialogueMode)
+                    .also {
+                        it?.type = ParseDomainType.SEND_MESSAGE
+                        it?.dialogueMode = DialogueMode.SEND_MESSAGE_NAME_CHANGE
+                    }
+            }
+
             SelectVRResult.ScrollIndexResult -> {
                 ParserFactory().dataParsing(vrResult, dialogueMode = dialogueMode)
                     .also {
@@ -127,37 +144,5 @@ class MWContext(
         } ?: run {
             resultListener.onBundleParsingErr()
         }
-
-//        when (bundle?.type) {
-//            ParseDomainType.HELP -> {
-//                /**
-//                 * 기존에는 적절한 각 DomainManager의 onReceiveBundle()에 해당 bundle의 값을 넣어주는 방식
-//                 * ==> 바뀐 방식은 아래와 같음
-//                 * 각 DoaminManager에서 bundle의 값을 넣으면 파싱하여 적절한 데이터을 리턴해주는 함수를 구현한다.
-//                 * 참고로 Help의 경우,
-//                 * domainType/screenType/screenSizeType/data 의 데이터를 가져야하므로 ProcHelpData라는 데이터 클래스를 한 개 생성함
-//                 */
-//                val procHelpData = dataProducer?.helpManager?.parsedData(bundle)
-//                job.launch {
-//                    procHelpData?.let { SealedParsedData.HelpData(it) }
-//                        ?.let { _sealedParsedData.emit(it) }
-//                }
-//            }
-//
-//            ParseDomainType.CALL -> {
-//                val procCallData = dataProducer?.callManager?.parsedData(bundle)
-//                Log.d("@@ procCallData", "${procCallData}")
-//                job.launch {
-//                    procCallData?.let { SealedParsedData.CallData(it) }
-//                        ?.let { _sealedParsedData.emit(it) }
-//                }
-//            }
-//
-//            else -> {
-//                /**
-//                 * 다른 도메인 타입들에 대한 값들이 들어간다.
-//                 */
-//            }
-//        }
     }
 }

@@ -1,5 +1,6 @@
 package com.example.a01_compose_study.presentation.screen.sendMsg.screen
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,6 +29,7 @@ import com.example.a01_compose_study.presentation.screen.main.DomainUiState
 fun MsgAllList(
     contactList: List<Contact>,
 ) {
+    Log.d("sendMsg"," 진짜 MsgAllList 안")
     LazyColumnList(list = contactList) {index, contact ->
         MsgAllListItem(
             name = contact.name,

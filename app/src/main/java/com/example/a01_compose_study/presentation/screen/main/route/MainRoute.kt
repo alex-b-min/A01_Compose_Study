@@ -179,89 +179,38 @@ fun MainRoute(
         horizontalAlignment = Alignment.End
     ) {
         PttButton(
-            modifier = Modifier.fillMaxSize(0.13f),
+            modifier = Modifier.fillMaxWidth(0.13f)
+            .fillMaxHeight(0.07f),
             contentText = "SendMsg",
             onClick = {
                 scope.launch {
-                    viewModel.onDomainEvent(
-                        event = MainEvent.OpenDomainWindowEvent(
-                            domainType = SealedDomainType.SendMessage,
-                            screenType = ScreenType.SendMessage,
-                            mwContext = null,
-                            data = SendMsgDataType.SendMsgData(
-                                msgData = MsgData(
-                                    name = "Riley",
-                                    phoneNum = "010-1112-1232",
-                                    msg = "success"
-                                )
-                            ),
-                            isError = false,
-                            screenSizeType = ScreenSizeType.Large
-                        )
-                    )
+//                    viewModel.vrmwManager.setVRResult(VRResult(), SelectVRResult.SendMsgResult)
+                    pttViewModel.onPttEvent(PttEvent.StartVR(selectVRResult = SelectVRResult.SendMsgResult))
                 }
-//                pttViewModel.onPttEvent(PttEvent.StartVR(selectVRResult = SelectVRResult.SendMsgResult))
             }
         )
 
         PttButton(
-            modifier = Modifier.fillMaxSize(0.13f),
-            contentText = "SayMsg",
+      
+                    modifier = Modifier.fillMaxWidth(0.13f)
+                .fillMaxHeight(0.07f),
+            contentText = "SendMsg Name",
             onClick = {
                 scope.launch {
-                    viewModel.onDomainEvent(
-                        event = MainEvent.OpenDomainWindowEvent(
-                            domainType = SealedDomainType.SendMessage,
-                            screenType = ScreenType.SayMessage,
-                            mwContext = null,
-                            data = SendMsgDataType.SendMsgData(
-                                msgData = MsgData(
-                                    name = "Riley",
-                                    phoneNum = "010-1112-1232"
-                                )
-                            ),
-                            isError = false,
-                            screenSizeType = ScreenSizeType.Large
-                        )
-                    )
+                    pttViewModel.onPttEvent(PttEvent.StartVR(selectVRResult = SelectVRResult.SendMsgNameResult))
                 }
-//                pttViewModel.onPttEvent(PttEvent.StartVR(selectVRResult = SelectVRResult.SendMsgResult))
             }
         )
 
         PttButton(
-            modifier = Modifier.fillMaxSize(0.13f),
-            contentText = "MsgAllList",
+            modifier = Modifier
+                .fillMaxSize(0.13f)
+                .fillMaxHeight(0.13f),
+            contentText = "SendMsg Name Msg",
             onClick = {
                 scope.launch {
-                    viewModel.onDomainEvent(
-                        event = MainEvent.OpenDomainWindowEvent(
-                            domainType = SealedDomainType.SendMessage,
-                            screenType = ScreenType.MessageAllList,
-                            mwContext = null,
-                            data = SendMsgDataType.SendMsgData(
-                                msgData = MsgData(),
-                                contacts = mutableListOf(
-                                    Contact(
-                                        name = "snsn",
-                                        number = "010-010-010"
-                                    ),
-                                    Contact(
-                                        name = "snn",
-                                        number = "010-010-010"
-                                    ),
-                                    Contact(
-                                        name = "sn",
-                                        number = "010-010-010"
-                                    )
-                                )
-                            ),
-                            isError = false,
-                            screenSizeType = ScreenSizeType.Large
-                        )
-                    )
+                    pttViewModel.onPttEvent(PttEvent.StartVR(selectVRResult = SelectVRResult.SendMsgNameMsgResult))
                 }
-//                pttViewModel.onPttEvent(PttEvent.StartVR(selectVRResult = SelectVRResult.SendMsgResult))
             }
         )
         PttButton(

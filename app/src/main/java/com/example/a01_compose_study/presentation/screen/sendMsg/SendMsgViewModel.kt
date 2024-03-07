@@ -6,8 +6,10 @@ import com.example.a01_compose_study.data.custom.sendMsg.SendMsgEvent
 import com.example.a01_compose_study.data.custom.sendMsg.SendMsgManager
 import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.presentation.data.UiState
+import com.example.a01_compose_study.presentation.data.UiState._domainUiState
 import com.example.a01_compose_study.presentation.data.UiState._mwContext
 import com.example.a01_compose_study.presentation.data.UiState.handleScreenData
+import com.example.a01_compose_study.presentation.data.UiState.popUiState
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -47,22 +49,24 @@ class SendMsgViewModel @Inject constructor(
             }
 
             is SendMsgEvent.OnBack -> {
-                UiState.popUiState()
+                popUiState()
             }
 
-            is SendMsgEvent.SayMessage -> {
-                // startVR & sendMessage 화면 전환
-                _domainUiState.update { domainUiState ->
-                    val updatedState = (domainUiState as? DomainUiState.SendMessageWindow)?.copy(
-                        screenType = ScreenType.SendMessage,
-                    ) ?: domainUiState
-
-                    updatedState
-                }
-            }
+//            is SendMsgEvent.SayMessage -> {
+//                // procMessageNameIntention에 Message 발화 intention 보냄
+//                _domainUiState.update { domainUiState ->
+//                    val updatedState = (domainUiState as? DomainUiState.SendMessageWindow)?.copy(
+//                        screenType = ScreenType.SendMessage,
+//                    ) ?: domainUiState
+//
+//                    updatedState
+//                }
+//            }
 
             is SendMsgEvent.SayMessageNo -> {
-                UiState.popUiState()
+                // 버튼 터치 이벤트
+                popUiState()
+                // clearMsg 작업
             }
 
             is SendMsgEvent.SendMessageYes -> {
@@ -70,44 +74,40 @@ class SendMsgViewModel @Inject constructor(
                 sendMsgManager.requestBtPhoneAppRun()
             }
 
-            is SendMsgEvent.SendMessageNo -> {
-                UiState.popUiState()
-            }
+//            is SendMsgEvent.SendMessageNo -> {
+//                UiState.popUiState()
+//            }
 
-            else -> {
-
-            }
         }
     }
+}
 
-    fun observeSendMsgData() {
-        CoroutineScope(Dispatchers.Main).launch {
-            UiState._sendMsgUiData.collect { data ->
-                handleSendMsgData(data)
-            }
+fun observeSendMsgData() {
+    CoroutineScope(Dispatchers.Main).launch {
+        UiState._sendMsgUiData.collect { data ->
+            handleSendMsgData(data)
         }
     }
+}
 
-    fun handleSendMsgData(sendMsgData: Pair<ScreenType, Any>) {
-        val screenType = sendMsgData.first
-        val data = sendMsgData.second
+fun handleSendMsgData(sendMsgData: Pair<ScreenType, Any>) {
+    val screenType = sendMsgData.first
+    val data = sendMsgData.second
 
-        when (screenType) {
-            is ScreenType.List -> {
-                // TODO procListIntention
-            }
+    when (screenType) {
+        is ScreenType.List -> {
+            // TODO procListIntention
+        }
 
-            is ScreenType.ScreenStack -> {
-                val screenData = data as? ScreenData
-                if (screenData != null) {
-                    handleScreenData(screenData, Pair(_domainUiState.value, _mwContext.value))
-                }
-            }
-
-            else -> {
-                // Reject
+        is ScreenType.ScreenStack -> {
+            val screenData = data as? ScreenData
+            if (screenData != null) {
+                handleScreenData(screenData, Pair(_domainUiState.value, _mwContext.value))
             }
         }
 
+        else -> {
+            // Reject
+        }
     }
 }

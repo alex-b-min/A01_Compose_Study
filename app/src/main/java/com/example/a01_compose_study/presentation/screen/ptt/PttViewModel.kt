@@ -148,7 +148,7 @@ class PttViewModel @Inject constructor(
                             onPttEvent(PttEvent.SetLoadingType)
                             delay(1500)
 
-//                            pttManager.pttEvent(selectVRResult = SelectVRResult.SendMsgResult)
+                            pttManager.pttEvent(selectVRResult = SelectVRResult.SendMsgResult)
                         }
                     }
                 }

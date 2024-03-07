@@ -1,6 +1,7 @@
 package com.example.a01_compose_study.data.custom.sendMsg
 
 
+import android.util.Log
 import com.example.a01_compose_study.data.Contact
 import com.example.a01_compose_study.data.DialogueMode
 import com.example.a01_compose_study.data.DomainType
@@ -14,6 +15,7 @@ import com.example.a01_compose_study.data.custom.VRResultListener
 import com.example.a01_compose_study.data.custom.call.BtCall
 import com.example.a01_compose_study.data.pasing.CommonModel
 import com.example.a01_compose_study.data.pasing.SendMsgModel
+import com.example.a01_compose_study.domain.model.NoticeModel
 import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.util.CustomLogger
@@ -97,11 +99,16 @@ class SendMsgManager @Inject constructor(
 
 
     private fun procSendMsgIntention(bundle: ParseBundle<out Any?>): ProcSendMsgData {
-        val sendMsgModel = bundle.model as? SendMsgModel
+
+        val bundle = SendMsgModel("")
+        Log.d("sendMsg","procSendMsgIntention 안")
+//        val sendMsgModel = bundle.model as? SendMsgModel
+        val sendMsgModel = bundle as? SendMsgModel
 
         initSendMsgValue()
 
-        val errorNotice = contactsManager.preConditionCheck(DomainType.SendMessage)
+//        val errorNotice = contactsManager.preConditionCheck(DomainType.SendMessage)
+        val errorNotice: NoticeModel? = null
 
         if (errorNotice != null) {
             return ProcSendMsgData(
@@ -116,20 +123,25 @@ class SendMsgManager @Inject constructor(
             )
         }
 
+        Log.d("sendMsg","procSendMsgIntention 직전")
         sendMsgModel?.let {
             checkMessageExistence(sendMsgModel)
+            Log.d("sendMsg","sendMsgModel? 안")
 
             if (sendMsgModel.items.isEmpty()) {
-                sendMsgContactList = contactsManager.makePhoneBookContactList()
+                Log.d("sendMsg","procSendMsgIntention , items isEmpty")
+//                sendMsgContactList = contactsManager.makePhoneBookContactList()
+                sendMsgContactList = fetchAllContacts()
                 return ProcSendMsgData(
                     screenType = ScreenType.MessageAllList,
                     mwContext = MWContext(
                         DialogueMode.SEND_MESSAGE, this@SendMsgManager
                     ),
-                    data = SendMsgDataType.SendMsgData(msgData = null)
+                    data = SendMsgDataType.SendMsgData(contacts = sendMsgContactList ,msgData = null)
                 )
             } else {
 
+                Log.d("sendMsg","sendMsgModel? else 안")
                 val nameCheckList =
                     contactsManager.makeContactList(sendMsgModel.getContactItems(), true)
 
@@ -164,6 +176,7 @@ class SendMsgManager @Inject constructor(
             }
         } ?: run {
             // TODO : reject()
+            Log.d("sendMsg","reject 안")
             return handlePopIntention()
         }
     }
@@ -431,5 +444,28 @@ class SendMsgManager @Inject constructor(
             CustomLogger.d("sendMessage: name:$name, phoneNumber: $phoneNumber, message: $message")
             btCall.sendMessage(name, phoneNumber, message)
         }
+    }
+
+    fun fetchAllContacts(): ArrayList<Contact> {
+        val result = arrayListOf<Contact>()
+        result.add(Contact(id = "1", name = "문재민", number = "010-1111-2222"))
+        result.add(Contact(id = "2", name = "삐쓰까또레부르쥬미첼라햄페스츄리치즈나쵸스트링스파게티", number = "010-2222-3333"))
+        result.add(Contact(id = "3", name = "하늘별님구름햇님보다사랑스러우리", number = "010-3333-4444"))
+        result.add(Contact(id = "4", name = "Alex", number = "010-4444-5555"))
+        result.add(Contact(id = "5", name = "Alexander Sandor Signiel ", number = "010-4444-5555"))
+        result.add(Contact(id = "6", name = "포티투닷 이순신", number = "010-4444-5555"))
+        result.add(Contact(id = "7", name = "포티투닷 홍길동 책임연구원 하하하하하", number = "031-131"))
+        result.add(Contact(id = "8", name = "엄마", number = "1509"))
+        result.add(Contact(id = "9", name = "김혜원 어머님", number = "010-1111-5555"))
+        result.add(Contact(id = "10", name = "홍길 동사무소", number = "010-4444-5555"))
+        result.add(Contact(id = "11", name = "홍길동 (HMC 유럽)", number = "010-4444-5555"))
+        result.add(Contact(id = "12", name = "강신부", number = "010-4444-5555"))
+        result.add(Contact(id = "13", name = "우리♥︎", number = "010-4444-5555"))
+        result.add(Contact(id = "14", name = "ㅇ ㅏ ㅇ ㅣ ㄷ ㅣ", number = "010-4444-5555"))
+        result.add(Contact(id = "15", name = "1096119838", number = "010-4444-5555"))
+        result.add(Contact(id = "16", name = "119 장난전화", number = "1509"))
+        result.add(Contact(id = "17", name = "이일구", number = "02-131"))
+
+        return result
     }
 }

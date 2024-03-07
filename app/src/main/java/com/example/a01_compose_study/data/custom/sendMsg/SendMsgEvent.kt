@@ -8,9 +8,8 @@ sealed class SendMsgEvent {
     ) : SendMsgEvent()
 
     object OnBack : SendMsgEvent()
-    object SayMessage : SendMsgEvent()
+//    object SayMessage : SendMsgEvent()
     object SayMessageNo : SendMsgEvent()
-    object SendMessage : SendMsgEvent()
     object SendMessageYes : SendMsgEvent()
-    object SendMessageNo : SendMsgEvent()
+//    object SendMessageNo : SendMsgEvent()
 }
