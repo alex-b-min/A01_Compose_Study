@@ -14,7 +14,7 @@ class BtCall @Inject constructor(
     private val TAG : String? = this.javaClass.simpleName
 
     fun outgoingCall(phoneNumber: String) {
-        Log.d("@@ 전화 겁니다", "Yes")
+        Log.d("@@ 전화걸었습니다." , phoneNumber)
     }
 
 //    fun outgoingCall(tel: String) {

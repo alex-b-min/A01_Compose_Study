@@ -108,7 +108,8 @@ fun CallScreen(
             fixedBackground = fixedBackground,
             onDismiss = { closeDomainWindow() },
             onBackButton = { popUiState() },
-            onCalling = { callViewModel.onCallBusinessEvent(CallBusinessEvent.Calling) }
+            onCalling = { phoneNumber ->
+                callViewModel.onCallBusinessEvent(CallBusinessEvent.Calling(phoneNumber = phoneNumber)) }
         )
     }
 }
@@ -235,7 +236,7 @@ fun CallYesNoScreen(
     fixedBackground: Color,
     onDismiss: () -> Unit,
     onBackButton: () -> Unit,
-    onCalling: () -> Unit,
+    onCalling: (String) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     var isYesSelected by remember { mutableStateOf(false) }
@@ -268,7 +269,7 @@ fun CallYesNoScreen(
     when (yesAnimationResult?.endReason) {
         AnimationEndReason.Finished -> {
             // 애니메이션이 성공적으로 완료되었을 때 실행할 로직
-            onCalling()
+            onCalling(domainUiState.detailData.number)
         }
 
         AnimationEndReason.BoundReached -> {

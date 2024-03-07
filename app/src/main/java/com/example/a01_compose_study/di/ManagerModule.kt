@@ -6,12 +6,10 @@ import com.example.a01_compose_study.data.custom.ContactsManager
 import com.example.a01_compose_study.data.custom.ContactsRepository
 import com.example.a01_compose_study.data.custom.DataProducer
 import com.example.a01_compose_study.data.custom.HelpManager
+import com.example.a01_compose_study.data.custom.call.BtCall
 import com.example.a01_compose_study.data.custom.call.CallManager
 import com.example.a01_compose_study.data.custom.ptt.PttManager
 import com.example.a01_compose_study.data.custom.sendMsg.SendMsgManager
-import com.example.a01_compose_study.data.repository.help.HelpRepositoryImpl
-import com.example.a01_compose_study.domain.repository.domain.HelpRepository
-import com.example.a01_compose_study.domain.usecase.HelpUseCase
 import com.example.a01_compose_study.presentation.screen.ptt.VrmwManager
 import dagger.Module
 import dagger.Provides
@@ -21,7 +19,6 @@ import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
@@ -65,7 +62,8 @@ object ManagerModule {
         return CallManager(
             context = context,
             contactsManager = contactsManager,
-            coroutineScope = coroutineScope
+            coroutineScope = coroutineScope,
+            btCall = BtCall(context)
         )
     }
 

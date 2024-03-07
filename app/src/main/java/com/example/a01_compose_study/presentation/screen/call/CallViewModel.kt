@@ -2,7 +2,6 @@ package com.example.a01_compose_study.presentation.screen.call
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.example.a01_compose_study.data.custom.call.BtCall
 import com.example.a01_compose_study.data.custom.call.CallManager
 import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.presentation.data.UiState
@@ -14,7 +13,6 @@ import javax.inject.Inject
 @HiltViewModel
 class CallViewModel @Inject constructor(
     private val callManager: CallManager,
-    private val btCall: BtCall,
 ) : ViewModel() {
 
     private val _domainUiState = UiState._domainUiState
@@ -44,7 +42,7 @@ class CallViewModel @Inject constructor(
     fun onCallBusinessEvent(event: CallBusinessEvent) {
         when(event) {
             is CallBusinessEvent.Calling -> {
-                btCall.outgoingCall("010-1234-5491")
+                callManager.makeCall(event.phoneNumber)
             }
         }
     }

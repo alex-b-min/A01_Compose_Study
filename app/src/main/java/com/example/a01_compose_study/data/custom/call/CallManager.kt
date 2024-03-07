@@ -32,6 +32,7 @@ class CallManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val contactsManager: ContactsManager,
     private val coroutineScope: CoroutineScope,
+    private val btCall: BtCall,
 ) : VRResultListener {
 
     private val _sealedParsedData = UiState._sealedParsedData
@@ -290,6 +291,10 @@ class CallManager @Inject constructor(
             Log.d("@@ procCallData", "${procCallData}")
             _sealedParsedData.emit(SealedParsedData.CallData(procCallData))
         }
+    }
+
+    fun makeCall(phoneNumber: String) {
+        btCall.outgoingCall(phoneNumber)
     }
 
     override fun onBundleParsingErr() {
