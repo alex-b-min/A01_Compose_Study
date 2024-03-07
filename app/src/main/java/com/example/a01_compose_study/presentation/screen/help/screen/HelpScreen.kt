@@ -1,9 +1,5 @@
 package com.example.a01_compose_study.presentation.screen.help.screen
 
-import android.content.Context
-import android.util.Log
-import android.view.MotionEvent
-import android.view.ViewConfiguration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,13 +9,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -29,16 +23,10 @@ import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.components.top_bar.TopAppBarContent
-import com.example.a01_compose_study.presentation.data.UiState
-import com.example.a01_compose_study.presentation.data.UiState.onVREvent
 import com.example.a01_compose_study.presentation.screen.help.HelpEvent
 import com.example.a01_compose_study.presentation.screen.help.HelpViewModel
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
-import com.example.a01_compose_study.presentation.screen.main.VREvent
 import com.example.a01_compose_study.presentation.screen.main.route.VRUiState
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlin.math.abs
 
 @Composable
 fun ComposeHelpScreen(
@@ -118,53 +106,6 @@ fun HelpListWindow(
             .fillMaxSize()
             .clip(RoundedCornerShape(15.dp))
             .background(if (vrUiState.active) Color.Transparent else backgroundColor)
-            .pointerInteropFilter {
-                when (it.action) {
-                    MotionEvent.ACTION_DOWN -> {
-                        // 터치 시작(VR 종료)
-                        startX = it.x
-                        startY = it.y
-                        Log.d("@@ 터치 시작 startX / startY / endX / endY", "${startX} , ${startY} , ${it.x}, ${it.y}")
-                        onVREvent(
-                            VREvent.ChangeVRUIEvent(
-                                VRUiState.PttLoading(
-                                    active = false,
-                                    isError = false
-                                )
-                            )
-                        )
-                        true // 이벤트를 소비함
-                    }
-                    MotionEvent.ACTION_MOVE -> {
-                        Log.d("@@ 드래그 startX / startY / endX / endY", "${startX} , ${startY} , ${it.x}, ${it.y}")
-                        // 이벤트를 소비하거나 하위 컴포넌트로 전달 여부를 결정할 수 있음
-                        true // 이벤트를 소비함
-                    }
-                    MotionEvent.ACTION_UP -> {
-                        // 터치 종료(기본값: VR 실행)
-                        Log.d("@@ 터치 종료 startX / startY / endX / endY", "${startX} , ${startY} , ${it.x}, ${it.y}")
-                        if (isClick(context = context, startX = startX, startY = startY, endX = it.x, endY = it.y)) {
-                            Log.d("@@ 같은 자리(일반 터치)" ,"${true}")
-                            // 일반 터치: 클릭 이벤트 실행
-                            // 여기에 클릭 이벤트를 처리하는 코드를 넣어주세요
-                            true
-                        } else {
-                            // 스크롤 터치: VR 실행
-                            Log.d("@@ 다른 자리(스크롤 터치)" ,"${false}")
-                            onVREvent(
-                                VREvent.ChangeVRUIEvent(
-                                    VRUiState.PttLoading(
-                                        active = true,
-                                        isError = false
-                                    )
-                                )
-                            )
-                            true // 이벤트를 소비함
-                        }
-                    }
-                    else -> true // 기타 모든 경우에 이벤트를 소비함
-                }
-            }
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -294,10 +235,4 @@ fun HelpListWindowPreview() {
         },
         onItemClick = {}
     )
-}
-
-// 두 점의 좌표가 같은지 확인하는 함수
-private fun isClick(context: Context, startX: Float, startY: Float, endX: Float, endY: Float): Boolean {
-    val touchSlop = ViewConfiguration.get(context).scaledTouchSlop.toFloat()
-    return abs(startX - endX) < touchSlop && abs(startY - endY) < touchSlop
 }
