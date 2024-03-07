@@ -1,6 +1,7 @@
 package com.example.a01_compose_study.data.custom.call
 
 import android.content.Context
+import android.provider.ContactsContract
 import android.util.Log
 import com.example.a01_compose_study.R
 import com.example.a01_compose_study.data.Contact
@@ -46,7 +47,8 @@ class CallManager @Inject constructor(
             DialogueMode.CALL -> {
                 Log.d("@@ dialogueMode : ", "${DialogueMode.CALL}")
 
-                val callModel = CallModel("Sample Intent") //bundle의 model 값을 이용하는게 아닌 임의로 직접 CallModel을 생성해서 테스트함
+                val callModel =
+                    CallModel("Sample Intent") //bundle의 model 값을 이용하는게 아닌 임의로 직접 CallModel을 생성해서 테스트함
                 callModel.items = fetchMutableRecognizedContacts(1)
                 Log.d("@@ CallModel", "${callModel}")
 
@@ -119,7 +121,8 @@ class CallManager @Inject constructor(
 //            val noticeModel: NoticeModel? = createNoticeModel(NoticeModelType.BLUETOOTH_PROCESSING, context)
 //            val noticeModel: NoticeModel? = createNoticeModel(NoticeModelType.BLUETOOTH_NOT_CONNECTED_NOT_PAIRING, context)
 //            val noticeModel: NoticeModel? = createNoticeModel(NoticeModelType.BLUETOOTH_NOT_CONNECTED_YES_PAIRING, context)
-            val noticeModel: NoticeModel? = createNoticeModel(NoticeModelType.DEFAULT, context) //Notice Model이 null일 때
+            val noticeModel: NoticeModel? =
+                createNoticeModel(NoticeModelType.DEFAULT, context) //Notice Model이 null일 때
 
             if (noticeModel != null) {
                 return ProcCallData.NoticeTTSRequest(
@@ -153,9 +156,11 @@ class CallManager @Inject constructor(
                     // 인식된 이름으로 매칭되는 연락처가 여러개인 경우
                     if (recognizedList.size > 1) {
                         return ProcCallData.RecognizedContactListScreen(
-                            data = fetchRecognizedContacts(
-                                10
-                            ),
+                            data =
+                                fetchRecognizedContacts(
+                                    10
+                                )
+                            ,
                             mwContext = MWContext(DialogueMode.CALL, this@CallManager)
                         ) // 인덱스가 존재하는 전화번호부 목록 반환[DomainType.Call / ScreenType.List]
                         TODO("startVR(MWContext(DailogueMode.LIST) 실행")
@@ -305,23 +310,110 @@ class CallManager @Inject constructor(
  */
 fun fetchAllContacts(): List<Contact> {
     val result: MutableList<Contact> = mutableListOf()
-    result.add(Contact(id = "1", name = "문재민", number = "010-1111-2222"))
-    result.add(Contact(id = "2", name = "삐쓰까또레부르쥬미첼라햄페스츄리치즈나쵸스트링스파게티", number = "010-2222-3333"))
-    result.add(Contact(id = "3", name = "하늘별님구름햇님보다사랑스러우리", number = "010-3333-4444"))
-    result.add(Contact(id = "4", name = "Alex", number = "010-4444-5555"))
-    result.add(Contact(id = "5", name = "Alexander Sandor Signiel ", number = "010-4444-5555"))
-    result.add(Contact(id = "6", name = "포티투닷 이순신", number = "010-4444-5555"))
-    result.add(Contact(id = "7", name = "포티투닷 홍길동 책임연구원 하하하하하", number = "031-131"))
-    result.add(Contact(id = "8", name = "엄마", number = "1509"))
-    result.add(Contact(id = "9", name = "김혜원 어머님", number = "010-1111-5555"))
-    result.add(Contact(id = "10", name = "홍길 동사무소", number = "010-4444-5555"))
-    result.add(Contact(id = "11", name = "홍길동 (HMC 유럽)", number = "010-4444-5555"))
-    result.add(Contact(id = "12", name = "강신부", number = "010-4444-5555"))
-    result.add(Contact(id = "13", name = "우리♥︎", number = "010-4444-5555"))
-    result.add(Contact(id = "14", name = "ㅇ ㅏ ㅇ ㅣ ㄷ ㅣ", number = "010-4444-5555"))
-    result.add(Contact(id = "15", name = "1096119838", number = "010-4444-5555"))
-    result.add(Contact(id = "16", name = "119 장난전화", number = "1509"))
-    result.add(Contact(id = "17", name = "이일구", number = "02-131"))
+
+    val types = listOf(
+        ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE,
+        ContactsContract.CommonDataKinds.Phone.TYPE_HOME,
+        ContactsContract.CommonDataKinds.Phone.TYPE_WORK,
+        ContactsContract.CommonDataKinds.Phone.TYPE_OTHER
+    )
+
+    result.add(Contact(id = "1", name = "문재민", number = "010-1111-2222", type = types.indexOf(1)))
+    result.add(Contact(id = "2", name = "문재민", number = "010-13-14", type = types.indexOf(2)))
+
+    result.add(Contact(id = "4", name = "이일구", number = "010-8765-4321", type = types.indexOf(1)))
+    result.add(Contact(id = "3", name = "이일구", number = "010-1234-5678", type = types.indexOf(3)))
+
+
+    result.add(Contact(id = "6", name = "엄마", number = "010-7777-8888", type = types.indexOf(1)))
+    result.add(Contact(id = "5", name = "엄마", number = "010-5555-6666", type = types.indexOf(2)))
+    result.add(Contact(id = "6", name = "엄마", number = "010-7777-8888", type = types.indexOf(3)))
+
+
+    result.add(
+        Contact(
+            id = "7",
+            name = "삐쓰까또레부르쥬미첼라햄페스츄리치즈나쵸스트링스파게티",
+            number = "010-2222-3333",
+            type = types.random()
+        )
+    )
+    result.add(
+        Contact(
+            id = "8",
+            name = "하늘별님구름햇님보다사랑스러우리",
+            number = "010-3333-4444",
+            type = types.random()
+        )
+    )
+    result.add(Contact(id = "9", name = "Alex", number = "010-4444-5555", type = types.random()))
+    result.add(
+        Contact(
+            id = "10",
+            name = "Alexander Sandor Signiel",
+            number = "010-4444-5555",
+            type = types.random()
+        )
+    )
+    result.add(
+        Contact(
+            id = "11",
+            name = "포티투닷 이순신",
+            number = "010-4444-5555",
+            type = types.random()
+        )
+    )
+    result.add(
+        Contact(
+            id = "12",
+            name = "포티투닷 홍길동 책임연구원 하하하하하",
+            number = "031-131",
+            type = types.random()
+        )
+    )
+    result.add(
+        Contact(
+            id = "13",
+            name = "김혜원 어머님",
+            number = "010-1111-5555",
+            type = types.random()
+        )
+    )
+    result.add(
+        Contact(
+            id = "14",
+            name = "홍길 동사무소",
+            number = "010-4444-5555",
+            type = types.random()
+        )
+    )
+    result.add(
+        Contact(
+            id = "15",
+            name = "홍길동 (HMC 유럽)",
+            number = "010-4444-5555",
+            type = types.random()
+        )
+    )
+    result.add(Contact(id = "16", name = "강신부", number = "010-4444-5555", type = types.random()))
+    result.add(Contact(id = "17", name = "우리♥︎", number = "010-4444-5555", type = types.random()))
+    result.add(
+        Contact(
+            id = "18",
+            name = "ㅇ ㅏ ㅇ ㅣ ㄷ ㅣ",
+            number = "010-4444-5555",
+            type = types.random()
+        )
+    )
+    result.add(
+        Contact(
+            id = "19",
+            name = "1096119838",
+            number = "010-4444-5555",
+            type = types.random()
+        )
+    )
+    result.add(Contact(id = "20", name = "119 장난전화", number = "1509", type = types.random()))
 
     return result.toList()
 }

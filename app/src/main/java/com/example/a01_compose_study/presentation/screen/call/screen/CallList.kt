@@ -1,5 +1,6 @@
 package com.example.a01_compose_study.presentation.screen.call.screen
 
+import android.provider.ContactsContract
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -180,8 +181,26 @@ fun CallListItem(
                                                 textAlign = TextAlign.Start,
                                                 modifier = Modifier.alignByBaseline()
                                             )
+
+                                            val categoryIcon = when(contactItem.type) {
+                                                ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE -> {
+                                                    painterResource(id = R.drawable.ic_comm_mobile)
+                                                }
+                                                ContactsContract.CommonDataKinds.Phone.TYPE_HOME -> {
+                                                    painterResource(id = R.drawable.ic_comm_home)
+                                                }
+                                                ContactsContract.CommonDataKinds.Phone.TYPE_WORK -> {
+                                                    painterResource(id = R.drawable.ic_comm_office)
+                                                }
+                                                ContactsContract.CommonDataKinds.Phone.TYPE_OTHER -> {
+                                                    painterResource(id = R.drawable.ic_comm_others)
+                                                }
+                                                else -> {
+                                                    painterResource(id = R.drawable.ic_comm_others)
+                                                }
+                                            }
                                             Image(
-                                                painter = painterResource(id = R.drawable.ic_comm_office),
+                                                painter = categoryIcon,
                                                 contentDescription = "OtherNumber_Office",
                                                 modifier = Modifier
                                                     .width(dimensionResource(R.dimen.dp_16))
