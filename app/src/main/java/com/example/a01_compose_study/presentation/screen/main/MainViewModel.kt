@@ -15,6 +15,7 @@ import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.data.UiState
+import com.example.a01_compose_study.presentation.data.UiState.onVREvent
 import com.example.a01_compose_study.presentation.screen.SelectVRResult
 import com.example.a01_compose_study.presentation.screen.main.route.VRUiState
 import com.example.a01_compose_study.presentation.screen.ptt.PttEvent
@@ -393,7 +394,7 @@ class MainViewModel @Inject constructor(
 
     /**
      * Ptt 이벤트(VR시작, Listen/Speak/Loading 상태를 받았을 때 실행되는 로직 구현)
-     * ==> 현재 겹쳐져서 실행되는 VR 화면과 PttWindow로 구현된 VR 화면이 각각 관리되고 각각 보여주고 있는데 추후에 하나의 VR 화면으로  통합할 필요가 있어 보임
+     * ==> 현재 겹쳐져서 실행되는 VR 화면과 PttWindow(DomainUiState를 VR 화면으로 바꾸어 보여주 Screen는)로 구현된 VR 화면이 각각 관리되고 각각 보여주고 있는데 추후에 하나의 VR 화면으로  통합할 필요가 있어 보임
      */
     fun onPttEvent(event: PttEvent) {
         when (event) {
@@ -421,12 +422,6 @@ class MainViewModel @Inject constructor(
                         isError = false,
                         screenType = ScreenType.PttLoading
                     ) ?: domainUiState
-                }
-            }
-
-            is PttEvent.SetNone -> {
-                _domainUiState.update { domainUiState ->
-                    DomainUiState.NoneWindow().copyWithNewSizeType(domainUiState.screenSizeType)
                 }
             }
 
@@ -499,7 +494,9 @@ class MainViewModel @Inject constructor(
                                     screenSizeType = ScreenSizeType.Small
                                 )
                             )
-
+                            /**
+                             * onPttEvent()을 통해 각 상황에 맞는 로직을 실행하여 각 화면 상태를 나타내주는 역할
+                             */
                             onPttEvent(PttEvent.SetLoadingType)
                             delay(1500)
                             onPttEvent(PttEvent.PreparePtt)
@@ -508,6 +505,13 @@ class MainViewModel @Inject constructor(
                             delay(1500)
                             onPttEvent(PttEvent.SetLoadingType)
                             delay(1500)
+                            /**
+                             * 아래의 코드를 보면 알겠지만, onVREvent() 호출을 하는데 이는 겹쳐져서 실행되는 VR 화면을 조작하는 이벤트이다.
+                             * ==> PttWindow(DomainUiState를 VR 화면으로 바꾸어 보여주 Screen는)를 조작하는 곳에서 겹쳐지는 VR를 조작을 하기에 2번 일을 하게 되는 셈이다.
+                             * ==> 하나의 이벤트로 관리해야 할 필요가 있다고 느낌(내 생각엔 겹쳐져서 실행되는 VR 화면이 적합해보임)
+                             */
+                            onDomainEvent(MainEvent.NoneDomainWindowEvent())
+                            onVREvent(VREvent.ChangeVRUIEvent(vrUiState = VRUiState.PttNone(active = false, isError = false)))
                             pttManager.pttEvent(selectVRResult = event.selectVRResult)
                         }
                     }
