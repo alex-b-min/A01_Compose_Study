@@ -87,7 +87,7 @@ class MWContext(
                 ParserFactory().dataParsing(vrResult, dialogueMode = dialogueMode)
                     .also {
                         it?.type = ParseDomainType.HELP
-                        it?.dialogueMode = DialogueMode.CALL
+                        it?.dialogueMode = DialogueMode.HELP
                     }
             }
 
