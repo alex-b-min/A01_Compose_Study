@@ -336,6 +336,15 @@ class CallManager @Inject constructor(
         Log.d("@@@@ isContactNameUnique", "count: ${count} / ${contact}")
         return count <= 1
     }
+
+    /**
+     * 인자로 받은 Contact의 이름과 일치하는 연락처 리스트를 반환하는 함수
+     */
+    fun findContactsByName(contact: Contact): List<Contact> {
+        val allContacts = fetchAllContacts()
+        val matchingContacts = allContacts.filter { it.name == contact.name }
+        return matchingContacts
+    }
 }
 
 /**

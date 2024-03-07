@@ -9,4 +9,12 @@ sealed class CallEvent {
     data class ContactListItemOnClick(
         val selectedContactItem: Contact
     ) : CallEvent()
+
+    data class OnYesButtonClick(
+        val phoneNumber: String
+    ) : CallEvent()
+
+    data class OnOtherNameButtonClick(
+        val currentContact: Contact
+    ) : CallEvent()
 }

@@ -36,10 +36,48 @@ class CallViewModel @Inject constructor(
                     updatedState
                 }
             }
+
+            is CallEvent.OnYesButtonClick -> {
+                onCallBusinessEvent(CallBusinessEvent.Calling(phoneNumber = event.phoneNumber))
+            }
+
+            is CallEvent.OnOtherNameButtonClick -> {
+                val currentContact = event.currentContact
+                val matchingContacts = callManager.findContactsByName(currentContact)
+
+                Log.d("@@@@ OnOtherNameButtonClick", "${matchingContacts}")
+                if (matchingContacts.size == 2) {
+                    val differentContact = matchingContacts.find { it.number != currentContact.number }
+                    Log.d("@@@@ differentContact", "${differentContact}")
+
+                    /**
+                     * 현재 화면 데이터를 사용하여 일부 속성만을 업데이트하는 하여 UI를 변경하는 상황인데 무한 재구성이 발생하는 이슈가 생김..
+                     */
+                    _domainUiState.update { domainUiState ->
+                        val updatedState = differentContact?.let {
+                            (domainUiState as? DomainUiState.CallWindow)?.copy(
+                                detailData = it,
+                            )
+                        } ?: domainUiState
+                        UiState.pushUiStateMwContext(pairUiStateMwContext = Pair(first = updatedState, second = null))
+                        updatedState
+                    }
+                } else {
+                    _domainUiState.update { domainUiState ->
+                        val updatedState = (domainUiState as? DomainUiState.CallWindow)?.copy(
+                            data = matchingContacts,
+                            screenType = ScreenType.CallIndexedList,
+                            detailData = event.currentContact,
+                        ) ?: domainUiState
+                        UiState.pushUiStateMwContext(pairUiStateMwContext = Pair(first = updatedState, second = null))
+                        updatedState
+                    }
+                }
+            }
         }
     }
 
-    fun onCallBusinessEvent(event: CallBusinessEvent) {
+    private fun onCallBusinessEvent(event: CallBusinessEvent) {
         when(event) {
             is CallBusinessEvent.Calling -> {
                 callManager.makeCall(event.phoneNumber)

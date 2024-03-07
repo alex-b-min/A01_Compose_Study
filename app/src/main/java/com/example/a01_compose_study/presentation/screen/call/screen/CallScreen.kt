@@ -60,7 +60,6 @@ import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.components.text.TextView
 import com.example.a01_compose_study.presentation.data.UiState.closeDomainWindow
 import com.example.a01_compose_study.presentation.data.UiState.popUiState
-import com.example.a01_compose_study.presentation.screen.call.CallBusinessEvent
 import com.example.a01_compose_study.presentation.screen.call.CallEvent
 import com.example.a01_compose_study.presentation.screen.call.CallViewModel
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
@@ -108,8 +107,11 @@ fun CallScreen(
             fixedBackground = fixedBackground,
             onDismiss = { closeDomainWindow() },
             onBackButton = { popUiState() },
-            onCalling = { phoneNumber ->
-                callViewModel.onCallBusinessEvent(CallBusinessEvent.Calling(phoneNumber = phoneNumber)) }
+            onYesButton = { phoneNumber ->
+                callViewModel.onCallEvent(CallEvent.OnYesButtonClick(phoneNumber = phoneNumber)) },
+            onOtherNameButtonClick = { currentContact ->
+                callViewModel.onCallEvent(CallEvent.OnOtherNameButtonClick(currentContact = currentContact))
+            }
         )
     }
 }
@@ -236,11 +238,14 @@ fun CallYesNoScreen(
     fixedBackground: Color,
     onDismiss: () -> Unit,
     onBackButton: () -> Unit,
-    onCalling: (String) -> Unit,
+    onYesButton: (String) -> Unit,
+    onOtherNameButtonClick: (Contact) -> Unit
 ) {
     val scope = rememberCoroutineScope()
+
     var isYesSelected by remember { mutableStateOf(false) }
     var isNoSelected by remember { mutableStateOf(false) }
+    var isOtherNumberSelected by remember { mutableStateOf(false) }
 
     val yesAnimatableValue = remember { Animatable(0f) }
     var yesAnimationResult by remember {
@@ -251,6 +256,13 @@ fun CallYesNoScreen(
 
     val noAnimatableValue = remember { Animatable(0f) }
     var noAnimationResult by remember {
+        mutableStateOf<AnimationResult<Float, AnimationVector1D>?>(
+            null
+        )
+    }
+
+    val otherNameAnimatableValue = remember { Animatable(0f) }
+    var otherNameAnimationResult by remember {
         mutableStateOf<AnimationResult<Float, AnimationVector1D>?>(
             null
         )
@@ -269,7 +281,7 @@ fun CallYesNoScreen(
     when (yesAnimationResult?.endReason) {
         AnimationEndReason.Finished -> {
             // 애니메이션이 성공적으로 완료되었을 때 실행할 로직
-            onCalling(domainUiState.detailData.number)
+            onYesButton(domainUiState.detailData.number)
         }
 
         AnimationEndReason.BoundReached -> {
@@ -285,6 +297,21 @@ fun CallYesNoScreen(
         AnimationEndReason.Finished -> {
             // 애니메이션이 성공적으로 완료되었을 때 실행할 로직
             onBackButton()
+        }
+
+        AnimationEndReason.BoundReached -> {
+            // 애니메이션이 취소되었을때 실행
+        }
+
+        else -> {
+        }
+    }
+
+    // otherNumber 애니메이션 결과값에 대한 처리
+    when (otherNameAnimationResult?.endReason) {
+        AnimationEndReason.Finished -> {
+            // 애니메이션이 성공적으로 완료되었을 때 실행할 로직
+            onOtherNameButtonClick(domainUiState.detailData)
         }
 
         AnimationEndReason.BoundReached -> {
@@ -467,13 +494,14 @@ fun CallYesNoScreen(
                     onClick = {
                         scope.launch {
                             /**
-                             * 직접 No 버튼 클릭 제어
+                             * 직접 OtherNumber 버튼 클릭 제어
                              */
-                            isNoSelected = true
-                            noAnimationResult = noAnimatableValue.animateTo(
+                            isOtherNumberSelected = true
+                            otherNameAnimationResult = otherNameAnimatableValue.animateTo(
                                 targetValue = 1f,
                                 animationSpec = tween(durationMillis = 700)
                             )
+
                         }
                     },
                     modifier = Modifier
@@ -492,9 +520,9 @@ fun CallYesNoScreen(
                             .fillMaxSize()
                     ) {
                         LinearProgressIndicator(
-                            progress = noAnimatableValue.value,
+                            progress = otherNameAnimatableValue.value,
                             modifier = Modifier.fillMaxSize(),
-                            color = if (isNoSelected) Color.DarkGray else Color.Transparent,
+                            color = if (isOtherNumberSelected) Color.DarkGray else Color.Transparent,
                             backgroundColor = Color.Transparent
                         )
                         Text(
@@ -566,6 +594,7 @@ fun CallYesNoPreview() {
         fixedBackground = Color.Black,
         onDismiss = {},
         onBackButton = {},
-        onCalling = {}
+        onYesButton = {},
+        onOtherNameButtonClick = {}
     )
 }
