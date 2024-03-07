@@ -144,6 +144,16 @@ class MainViewModel @Inject constructor(
                                 Log.d("@@ ProcCallData", "ContactListScreen - Contact List: ${sealedParsedData.procCallData.data}")
                                 onDomainEvent(
                                     event = MainEvent.OpenDomainWindowEvent(
+                                        domainType = SealedDomainType.Announce,
+                                        screenType = ScreenType.Notice,
+                                        data = sealedParsedData.procCallData.sealedDomainType.text,
+                                        isError = false,
+                                        screenSizeType = sealedParsedData.procCallData.screenSizeType
+                                    )
+                                )
+                                delay(1000)
+                                onDomainEvent(
+                                    event = MainEvent.OpenDomainWindowEvent(
                                         mwContext = sealedParsedData.procCallData.mwContext,
                                         domainType = sealedParsedData.procCallData.sealedDomainType,
                                         screenType = sealedParsedData.procCallData.screenType,
@@ -383,6 +393,7 @@ class MainViewModel @Inject constructor(
 
     /**
      * Ptt 이벤트(VR시작, Listen/Speak/Loading 상태를 받았을 때 실행되는 로직 구현)
+     * ==> 현재 겹쳐져서 실행되는 VR 화면과 PttWindow로 구현된 VR 화면이 각각 관리되고 각각 보여주고 있는데 추후에 하나의 VR 화면으로  통합할 필요가 있어 보임
      */
     fun onPttEvent(event: PttEvent) {
         when (event) {
@@ -410,6 +421,12 @@ class MainViewModel @Inject constructor(
                         isError = false,
                         screenType = ScreenType.PttLoading
                     ) ?: domainUiState
+                }
+            }
+
+            is PttEvent.SetNone -> {
+                _domainUiState.update { domainUiState ->
+                    DomainUiState.NoneWindow().copyWithNewSizeType(domainUiState.screenSizeType)
                 }
             }
 
@@ -482,9 +499,7 @@ class MainViewModel @Inject constructor(
                                     screenSizeType = ScreenSizeType.Small
                                 )
                             )
-                            /**
-                             * onPttEvent()을 통해 각 상황에 맞는 로직을 실행하여 각 화면 상태를 나타내주는 역할
-                             */
+
                             onPttEvent(PttEvent.SetLoadingType)
                             delay(1500)
                             onPttEvent(PttEvent.PreparePtt)
@@ -493,7 +508,6 @@ class MainViewModel @Inject constructor(
                             delay(1500)
                             onPttEvent(PttEvent.SetLoadingType)
                             delay(1500)
-
                             pttManager.pttEvent(selectVRResult = event.selectVRResult)
                         }
                     }
