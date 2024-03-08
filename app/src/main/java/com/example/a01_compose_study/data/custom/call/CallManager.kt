@@ -248,6 +248,7 @@ class CallManager @Inject constructor(
         val dummyIntention = when(selectVRResult) {
             SelectVRResult.CallOtherNameResult -> { "OtherNumber" }
             SelectVRResult.CallYesResult -> { "Yes" }
+            SelectVRResult.CallNoResult -> { "No" }
             else -> {""}
         }
 
@@ -257,35 +258,11 @@ class CallManager @Inject constructor(
             }
 
             Intentions.No.value -> {
-                ProcCallData.ProcYesNoOtherNumberResult(
-                    callYesNoOtherNumberResult = CallYesNoOtherNumberResult.No,
-                    mwContext = MWContext(DialogueMode.CALLNAME, this@CallManager)
-                )
+                ProcCallData.ProcNoResult(mwContext = MWContext(DialogueMode.CALLNAME, this@CallManager))
             }
 
             Intentions.OtherNumber.value -> {
                 ProcCallData.ProcOtherNumberResult(mwContext = MWContext(DialogueMode.CALLNAME, this@CallManager))
-
-//                if (fetchAllContacts().size > 2) { // otherNumber 3개 이상일 경우, Category LIST 화면 전환
-//                    ProcCallData.ProcYesNoOtherNumberResult(
-//                        callYesNoOtherNumberResult = CallYesNoOtherNumberResult.OtherNumberList(
-//                            fetchAllContacts()
-//                        ),
-//                        mwContext = MWContext(DialogueMode.LIST, this@CallManager)
-//                    )
-//                } else if (fetchAllContacts().size > 1) { // otherNumber가 2개 밖에 없을 시, 현재 번호 말고 다른 번호로 바로 표시
-//                    ProcCallData.ProcYesNoOtherNumberResult(
-//                        callYesNoOtherNumberResult = CallYesNoOtherNumberResult.OtherNumber(
-//                            matchContact()
-//                        ),
-//                        mwContext = MWContext(DialogueMode.LIST, this@CallManager)
-//                    )
-//                } else { // otherNumber가 1개인 경우, 현재의 번호밖에 없는 상태니까 reject() 표시
-//                    ProcCallData.ProcYesNoOtherNumberResult(
-//                        callYesNoOtherNumberResult = CallYesNoOtherNumberResult.Reject,
-//                        mwContext = MWContext(DialogueMode.LIST, this@CallManager)
-//                    )
-//                }
             }
 
             else -> {
@@ -296,10 +273,7 @@ class CallManager @Inject constructor(
 
     override fun onReceiveBundle(bundle: ParseBundle<out Any>, selectVRResult: SelectVRResult) {
         coroutineScope.launch {
-            Log.d("@@ Call onReceiveBundle", "${bundle}")
-
             val procCallData = parsedData(bundle, selectVRResult)
-            Log.d("@@ procCallData", "${procCallData}")
             _sealedParsedData.emit(SealedParsedData.CallData(procCallData))
         }
     }

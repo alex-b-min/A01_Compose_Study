@@ -573,6 +573,22 @@ fun MainRoute(
             ) {
                 PttButton(
                     modifier = Modifier.fillMaxSize(),
+                    contentText = "VR Result: No",
+                    onClick = {
+                        viewModel.vrmwManager.setVRResult(
+                            VRResult(),
+                            SelectVRResult.CallNoResult
+                        )
+                    }
+                )
+            }
+
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+            ) {
+                PttButton(
+                    modifier = Modifier.fillMaxSize(),
                     contentText = "VR Result: OtherName",
                     onClick = {
                         viewModel.vrmwManager.setVRResult(

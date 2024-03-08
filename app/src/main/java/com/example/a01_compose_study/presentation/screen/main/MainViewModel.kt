@@ -204,6 +204,7 @@ class MainViewModel @Inject constructor(
 
                             is ProcCallData.ProcOtherNumberResult -> {}
                             is ProcCallData.ProcYesResult -> {}
+                            is ProcCallData.ProcNoResult -> {}
                         }
                     }
 
