@@ -82,7 +82,7 @@ fun CallIndexedList(
         itemsIndexed(contactList) { index, callItem ->
             /**
              * selectedContact(선택한 아이템)의 id와 수신객체인 callItem의 id가 일치하는지의 Boolean값
-             * 일치한다면, YesNo 화면으로 게이지 채워지고 자동으로 넘어가고
+             * 일치한다면, 게이지 채워진 후 YesNo 화면으로 넘어가고
              * 일치하지 않는다면, 아무일도 벌어지지 않는다.
              */
             val isSelected = callItem.id == selectedContact?.id
