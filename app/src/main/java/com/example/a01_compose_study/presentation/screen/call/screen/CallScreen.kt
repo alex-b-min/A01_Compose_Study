@@ -261,8 +261,8 @@ fun CallYesNoScreen(
         )
     }
 
-    val otherNameAnimatableValue = remember { Animatable(0f) }
-    var otherNameAnimationResult by remember {
+    val otherNumberAnimatableValue = remember { Animatable(0f) }
+    var otherNumberAnimationResult by remember {
         mutableStateOf<AnimationResult<Float, AnimationVector1D>?>(
             null
         )
@@ -308,17 +308,37 @@ fun CallYesNoScreen(
     }
 
     // otherNumber 애니메이션 결과값에 대한 처리
-    when (otherNameAnimationResult?.endReason) {
-        AnimationEndReason.Finished -> {
-            // 애니메이션이 성공적으로 완료되었을 때 실행할 로직
-            onOtherNameButtonClick(domainUiState.detailData)
-        }
+    // otherNumberAnimationResult를 처리할때 LaunchedEffect를 사용한 이유는 원인 모를 무한 리컴포지션이 발생하여 otherNumberAnimationResult이 변경될 때만 실행하기 위함
+    LaunchedEffect(otherNumberAnimationResult) {
+        when (otherNumberAnimationResult?.endReason) {
+            AnimationEndReason.Finished -> {
+                onOtherNameButtonClick(domainUiState.detailData) // domainUiState.detailData를 이용하여 onOtherNameButtonClick()를 발생시킨다.(이 로직은 CallViewModel로부터 가지고 와서 사용함)
+                /**
+                 * 위의 onOtherNameButtonClick()을 통해 카테고리를 여러개 가진 번호가,
+                 * 아니라면 다른 화면으로 이동하여 아래의 로직을 실행하지 않는다.
+                 * 맞다면 다른 화면으로 이동하지 않아 아래의 로직을 실행한다.
+                 */
+                otherNumberAnimatableValue.animateTo( //현재 꽉찬 OtherNumber 게이지를 0으로 초기화
+                    targetValue = 0f,
+                    animationSpec = tween(durationMillis = 0)
+                )
+                scope.launch {
 
-        AnimationEndReason.BoundReached -> {
-            // 애니메이션이 취소되었을때 실행
-        }
-
-        else -> {
+                    yesAnimatableValue.animateTo( //현재 진행중인 Yes 게이지를 0으로 초기화
+                        targetValue = 0f,
+                        animationSpec = tween(durationMillis = 0)
+                    )
+                    yesAnimatableValue.animateTo( // Yes 게이지를 0으로 초기화 후 다시 게이지를 채워주는 애니메이션
+                        targetValue = 1f,
+                        animationSpec = tween(durationMillis = 5000)
+                    )
+                }
+            }
+            AnimationEndReason.BoundReached -> {
+                // 애니메이션이 취소되었을 때 실행
+            }
+            else -> {
+            }
         }
     }
 
@@ -497,7 +517,7 @@ fun CallYesNoScreen(
                              * 직접 OtherNumber 버튼 클릭 제어
                              */
                             isOtherNumberSelected = true
-                            otherNameAnimationResult = otherNameAnimatableValue.animateTo(
+                            otherNumberAnimationResult = otherNumberAnimatableValue.animateTo(
                                 targetValue = 1f,
                                 animationSpec = tween(durationMillis = 700)
                             )
@@ -520,7 +540,7 @@ fun CallYesNoScreen(
                             .fillMaxSize()
                     ) {
                         LinearProgressIndicator(
-                            progress = otherNameAnimatableValue.value,
+                            progress = otherNumberAnimatableValue.value,
                             modifier = Modifier.fillMaxSize(),
                             color = if (isOtherNumberSelected) Color.DarkGray else Color.Transparent,
                             backgroundColor = Color.Transparent
