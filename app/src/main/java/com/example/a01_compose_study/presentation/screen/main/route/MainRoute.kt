@@ -561,7 +561,7 @@ fun MainRoute(
                     onClick = {
                         viewModel.vrmwManager.setVRResult(
                             VRResult(),
-                            SelectVRResult.CallOtherNameResult
+                            SelectVRResult.CallYesResult
                         )
                     }
                 )

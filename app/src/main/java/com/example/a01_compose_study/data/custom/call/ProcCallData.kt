@@ -53,4 +53,8 @@ sealed class ProcCallData(
     data class ProcOtherNumberResult(
         override val mwContext: MWContext
     ) : ProcCallData(screenType = ScreenType.CallYesNo, mwContext = mwContext)
+
+    data class ProcYesResult(
+        override val mwContext: MWContext
+    ) : ProcCallData(screenType = ScreenType.CallYesNo, mwContext = mwContext)
 }

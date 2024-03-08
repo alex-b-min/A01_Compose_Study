@@ -12,4 +12,5 @@ sealed class SelectVRResult {
     object ScrollIndexResult : SelectVRResult()
     object CallRecognizedContact : SelectVRResult()
     object CallOtherNameResult : SelectVRResult()
+    object CallYesResult : SelectVRResult()
 }

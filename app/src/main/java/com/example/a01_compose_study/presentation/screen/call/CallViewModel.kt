@@ -39,6 +39,10 @@ class CallViewModel @Inject constructor(
                             Log.d("@@ ProcCallNameScreen 호출", "${sealedParsedData.procCallData}")
                         }
 
+                        is ProcCallData.ProcYesResult -> {
+                            _vrProcessingResultState.emit(VRProcessingResult.Yes)
+                        }
+
                         is ProcCallData.ProcOtherNumberResult -> {
                             _vrProcessingResultState.emit(VRProcessingResult.OtherNumber)
                         }

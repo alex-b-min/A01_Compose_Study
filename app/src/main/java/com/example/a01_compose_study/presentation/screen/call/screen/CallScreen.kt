@@ -288,6 +288,19 @@ fun CallYesNoScreen(
                 )
             }
 
+            VRProcessingResult.Yes -> {
+                scope.launch {
+                    /**
+                     * 직접 Yes 버튼 클릭 제어
+                     */
+                    isYesSelected = true
+                    yesAnimationResult = yesAnimatableValue.animateTo(
+                        targetValue = 1f,
+                        animationSpec = tween(durationMillis = 700)
+                    )
+                }
+            }
+
             VRProcessingResult.None -> {
             }
         }

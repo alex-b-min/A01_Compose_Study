@@ -6,4 +6,6 @@ package com.example.a01_compose_study.presentation.screen.call
 sealed class VRProcessingResult {
     object None : VRProcessingResult()
     object OtherNumber : VRProcessingResult()
+
+    object Yes : VRProcessingResult()
 }

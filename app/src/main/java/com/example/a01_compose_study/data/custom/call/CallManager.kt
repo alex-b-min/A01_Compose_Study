@@ -247,15 +247,13 @@ class CallManager @Inject constructor(
          */
         val dummyIntention = when(selectVRResult) {
             SelectVRResult.CallOtherNameResult -> { "OtherNumber" }
+            SelectVRResult.CallYesResult -> { "Yes" }
             else -> {""}
         }
 
         return when (dummyIntention) {
             Intentions.Yes.value -> {
-                ProcCallData.ProcYesNoOtherNumberResult(
-                    callYesNoOtherNumberResult = CallYesNoOtherNumberResult.Yes,
-                    mwContext = MWContext(DialogueMode.CALLNAME, this@CallManager)
-                )
+                ProcCallData.ProcYesResult(mwContext = MWContext(DialogueMode.CALLNAME, this@CallManager))
             }
 
             Intentions.No.value -> {
