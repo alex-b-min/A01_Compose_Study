@@ -396,7 +396,7 @@ fun MainRoute(
     ) {
         PttButton(
             modifier = Modifier
-                .fillMaxWidth(0.12f)
+                .fillMaxWidth(0.13f)
                 .fillMaxHeight(0.13f),
             contentText = "VR Call List Result",
             onClick = {
@@ -406,7 +406,7 @@ fun MainRoute(
 
         PttButton(
             modifier = Modifier
-                .fillMaxWidth(0.12f)
+                .fillMaxWidth(0.13f)
                 .fillMaxHeight(0.13f),
             contentText = "VR Call Index List Result",
             onClick = {
@@ -416,7 +416,7 @@ fun MainRoute(
 
         PttButton(
             modifier = Modifier
-                .fillMaxWidth(0.12f)
+                .fillMaxWidth(0.13f)
                 .fillMaxHeight(0.13f),
             contentText = "VR Line Number Result",
             onClick = {
@@ -428,7 +428,7 @@ fun MainRoute(
 
         PttButton(
             modifier = Modifier
-                .fillMaxWidth(0.12f)
+                .fillMaxWidth(0.13f)
                 .fillMaxHeight(0.13f),
             contentText = "Change ScrollIndex 5",
             onClick = {
@@ -443,13 +443,22 @@ fun MainRoute(
         )
         PttButton(
             modifier = Modifier
-                .fillMaxWidth(0.12f)
+                .fillMaxWidth(0.13f)
                 .fillMaxHeight(0.13f),
             contentText = "Change ScrollIndex 8",
             onClick = {
                 viewModel.onDomainEvent(
                     MainEvent.ChangeScrollIndexEvent(selectedScrollIndex = 8 - 1)
                 )
+            }
+        )
+        PttButton(
+            modifier = Modifier
+                .fillMaxWidth(0.13f)
+                .fillMaxHeight(0.13f),
+            contentText = "VR Result: OtherName",
+            onClick = {
+                viewModel.vrmwManager.setVRResult(VRResult(), SelectVRResult.CallOtherNameResult)
             }
         )
     }

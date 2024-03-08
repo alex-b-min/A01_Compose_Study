@@ -50,6 +50,7 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.a01_compose_study.R
 import com.example.a01_compose_study.data.Contact
@@ -61,6 +62,7 @@ import com.example.a01_compose_study.presentation.components.text.TextView
 import com.example.a01_compose_study.presentation.data.UiState.closeDomainWindow
 import com.example.a01_compose_study.presentation.data.UiState.popUiState
 import com.example.a01_compose_study.presentation.screen.call.CallEvent
+import com.example.a01_compose_study.presentation.screen.call.VRProcessingResult
 import com.example.a01_compose_study.presentation.screen.call.CallViewModel
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
 import com.example.a01_compose_study.presentation.screen.main.route.VRUiState
@@ -75,6 +77,8 @@ fun CallScreen(
     vrDynamicBackground: Color,
     fixedBackground: Color,
 ) {
+    val vrProcessingResult by callViewModel.vrProcessingResultState.collectAsStateWithLifecycle(initialValue = VRProcessingResult.None)
+
     if (domainUiState.screenType is ScreenType.CallList) {
         CallListWindow(
             domainUiState = domainUiState,
@@ -102,6 +106,7 @@ fun CallScreen(
     } else if (domainUiState.screenType is ScreenType.CallYesNo) {
         CallYesNoScreen(
             domainUiState = domainUiState,
+            vrProcessingResult = vrProcessingResult,
             vrUiState = vrUiState,
             vrDynamicBackground = vrDynamicBackground,
             fixedBackground = fixedBackground,
@@ -109,8 +114,8 @@ fun CallScreen(
             onBackButton = { popUiState() },
             onYesButton = { phoneNumber ->
                 callViewModel.onCallEvent(CallEvent.OnYesButtonClick(phoneNumber = phoneNumber)) },
-            onOtherNameButtonClick = { currentContact ->
-                callViewModel.onCallEvent(CallEvent.OnOtherNameButtonClick(currentContact = currentContact))
+            onOtherNumberButtonClick = {
+                callViewModel.onCallEvent(CallEvent.OnOtherNumberButtonClick)
             }
         )
     }
@@ -233,13 +238,14 @@ fun CallIndexedListWindow(
 @Composable
 fun CallYesNoScreen(
     domainUiState: DomainUiState.CallWindow,
+    vrProcessingResult: VRProcessingResult,
     vrUiState: VRUiState,
     vrDynamicBackground: Color,
     fixedBackground: Color,
     onDismiss: () -> Unit,
     onBackButton: () -> Unit,
     onYesButton: (String) -> Unit,
-    onOtherNameButtonClick: (Contact) -> Unit
+    onOtherNumberButtonClick: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
 
@@ -266,6 +272,25 @@ fun CallYesNoScreen(
         mutableStateOf<AnimationResult<Float, AnimationVector1D>?>(
             null
         )
+    }
+
+    /**
+     * 음성인식 결과값(rProcessingResult의 값)에 따라 수행될 로직을 수행함
+     * ( 이해하기 쉽게 이 로직과 반대의 개념은 직접 클릭하여 로직 수행 )
+     */
+    LaunchedEffect(vrProcessingResult) {
+        when(vrProcessingResult) {
+            VRProcessingResult.OtherNumber -> {
+                isOtherNumberSelected = true
+                otherNumberAnimationResult = otherNumberAnimatableValue.animateTo(
+                    targetValue = 1f,
+                    animationSpec = tween(durationMillis = 700)
+                )
+            }
+
+            VRProcessingResult.None -> {
+            }
+        }
     }
 
     // 화면에 처음 들어왔을 때 자동으로 yes 애니메이션 게이지가 차오르게 하는 코드
@@ -312,7 +337,7 @@ fun CallYesNoScreen(
     LaunchedEffect(otherNumberAnimationResult) {
         when (otherNumberAnimationResult?.endReason) {
             AnimationEndReason.Finished -> {
-                onOtherNameButtonClick(domainUiState.detailData) // domainUiState.detailData를 이용하여 onOtherNameButtonClick()를 발생시킨다.(이 로직은 CallViewModel로부터 가지고 와서 사용함)
+                onOtherNumberButtonClick() // domainUiState.detailData를 이용하여 onOtherNameButtonClick()를 발생시킨다.(이 로직은 CallViewModel로부터 가지고 와서 사용함)
                 /**
                  * 위의 onOtherNameButtonClick()을 통해 카테고리를 여러개 가진 번호가,
                  * 아니라면 다른 화면으로 이동하여 아래의 로직을 실행하지 않는다.
@@ -323,7 +348,6 @@ fun CallYesNoScreen(
                     animationSpec = tween(durationMillis = 0)
                 )
                 scope.launch {
-
                     yesAnimatableValue.animateTo( //현재 진행중인 Yes 게이지를 0으로 초기화
                         targetValue = 0f,
                         animationSpec = tween(durationMillis = 0)
@@ -521,7 +545,6 @@ fun CallYesNoScreen(
                                 targetValue = 1f,
                                 animationSpec = tween(durationMillis = 700)
                             )
-
                         }
                     },
                     modifier = Modifier
@@ -609,12 +632,13 @@ fun CallYesNoPreview() {
             screenType = ScreenType.CallIndexedList,
             screenSizeType = ScreenSizeType.Middle
         ),
+        vrProcessingResult = VRProcessingResult.None,
         vrUiState = VRUiState.PttSpeak(active = true, isError = false),
         vrDynamicBackground = Color.Black,
         fixedBackground = Color.Black,
         onDismiss = {},
         onBackButton = {},
         onYesButton = {},
-        onOtherNameButtonClick = {}
+        onOtherNumberButtonClick = {}
     )
 }

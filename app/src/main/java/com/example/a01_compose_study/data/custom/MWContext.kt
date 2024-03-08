@@ -126,6 +126,14 @@ class MWContext(
                         it?.dialogueMode = DialogueMode.LIST
                     }
             }
+
+            SelectVRResult.CallOtherNameResult -> {
+                ParserFactory().dataParsing(vrResult, dialogueMode = dialogueMode)
+                    .also {
+                        it?.type = ParseDomainType.CALL
+                        it?.dialogueMode = DialogueMode.CALLNAME
+                    }
+            }
         }
 
         bundle?.let {

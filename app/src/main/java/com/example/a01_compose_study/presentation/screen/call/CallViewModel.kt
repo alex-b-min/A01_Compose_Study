@@ -2,12 +2,20 @@ package com.example.a01_compose_study.presentation.screen.call
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.a01_compose_study.data.custom.SealedParsedData
 import com.example.a01_compose_study.data.custom.call.CallManager
+import com.example.a01_compose_study.data.custom.call.ProcCallData
 import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.presentation.data.UiState
+import com.example.a01_compose_study.presentation.data.UiState.sealedParsedData
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -16,8 +24,38 @@ class CallViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _domainUiState = UiState._domainUiState
-    private val _domainWindowVisible = UiState._domainWindowVisible
+    val domainUiState: StateFlow<DomainUiState> = UiState._domainUiState
 
+    private val _vrProcessingResultState = MutableSharedFlow<VRProcessingResult>()
+    val vrProcessingResultState: SharedFlow<VRProcessingResult> = _vrProcessingResultState
+
+    init {
+        viewModelScope.launch {
+            sealedParsedData.collect { sealedParsedData ->
+                Log.d("@@@@ CallModel 생성 후 콜렉", "${sealedParsedData}")
+                if (sealedParsedData is SealedParsedData.CallData) {
+                    when(sealedParsedData.procCallData) {
+                        is ProcCallData.ProcCallNameScreen -> {
+                            Log.d("@@ ProcCallNameScreen 호출", "${sealedParsedData.procCallData}")
+                        }
+
+                        is ProcCallData.ProcOtherNumberResult -> {
+                            _vrProcessingResultState.emit(VRProcessingResult.OtherNumber)
+                        }
+
+                        else -> {
+                            Log.d("@@ else 호출", "${sealedParsedData.procCallData}")
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * 실제로 UI와 인터렉션이 발생했을때 사용하는 이벤트
+     * ( 아래의 onCallBusinessEvent()를 사용하여 로직을 구성 )
+     */
     fun onCallEvent(event: CallEvent) {
         when(event) {
             is  CallEvent.OnCallBack -> {
@@ -41,18 +79,12 @@ class CallViewModel @Inject constructor(
                 onCallBusinessEvent(CallBusinessEvent.Calling(phoneNumber = event.phoneNumber))
             }
 
-            is CallEvent.OnOtherNameButtonClick -> {
-                val currentContact = event.currentContact
+            is CallEvent.OnOtherNumberButtonClick -> {
+                val currentContact = (domainUiState.value as DomainUiState.CallWindow).detailData
                 val matchingContacts = callManager.findContactsByContactId(currentContact)
 
-                Log.d("@@@@ OnOtherNameButtonClick", "${matchingContacts}")
                 if (matchingContacts.size == 2) {
                     val differentContact = matchingContacts.find { it.number != currentContact.number }
-                    Log.d("@@@@ differentContact", "${differentContact}")
-
-                    /**
-                     * 현재 화면 데이터를 사용하여 일부 속성만을 업데이트하는 하여 UI를 변경하는 상황인데 무한 재구성이 발생하는 이슈가 생김..
-                     */
                     _domainUiState.update { domainUiState ->
                         val updatedState = differentContact?.let {
                             (domainUiState as? DomainUiState.CallWindow)?.copy(
@@ -67,7 +99,7 @@ class CallViewModel @Inject constructor(
                         val updatedState = (domainUiState as? DomainUiState.CallWindow)?.copy(
                             data = matchingContacts,
                             screenType = ScreenType.CallIndexedList,
-                            detailData = event.currentContact,
+                            detailData = domainUiState.detailData,
                         ) ?: domainUiState
                         UiState.pushUiStateMwContext(pairUiStateMwContext = Pair(first = updatedState, second = null))
                         updatedState
@@ -77,6 +109,9 @@ class CallViewModel @Inject constructor(
         }
     }
 
+    /**
+     * 구체적인 Call 비즈니스 로직을 발생시키는 이벤트
+     */
     private fun onCallBusinessEvent(event: CallBusinessEvent) {
         when(event) {
             is CallBusinessEvent.Calling -> {

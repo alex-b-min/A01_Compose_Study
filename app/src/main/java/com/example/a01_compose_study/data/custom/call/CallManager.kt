@@ -81,7 +81,10 @@ class CallManager @Inject constructor(
                 val commonModel =
                     CommonModel("Yes") //bundle의 model 값을 이용하는게 아닌 임의로 직접 CommonModel을 생성해서 테스트함
                 commonModel.let {
-                    procYesNoIntention(it)
+                    procYesNoIntention(
+                        data = it,
+                        selectVRResult = selectVRResult
+                    )
                 } ?: run {
                     return ProcCallData.RejectRequest
                 }
@@ -236,10 +239,18 @@ class CallManager @Inject constructor(
     /**
      * DialogueMode가 CallName 인 경우에 실행!![ 실제 경우 : YesNo 화면에서 발화를 한 결과에 대한 처리 ]
      */
-    private fun procYesNoIntention(data: CommonModel): ProcCallData {
+    private fun procYesNoIntention(data: CommonModel, selectVRResult: SelectVRResult): ProcCallData {
         val intention = data.intention.replace(" ", "")
 
-        return when (intention) {
+        /**
+         * 음성 인식 결과를 바탕으로 임의로 생성한 Intention
+         */
+        val dummyIntention = when(selectVRResult) {
+            SelectVRResult.CallOtherNameResult -> { "OtherNumber" }
+            else -> {""}
+        }
+
+        return when (dummyIntention) {
             Intentions.Yes.value -> {
                 ProcCallData.ProcYesNoOtherNumberResult(
                     callYesNoOtherNumberResult = CallYesNoOtherNumberResult.Yes,
@@ -255,26 +266,28 @@ class CallManager @Inject constructor(
             }
 
             Intentions.OtherNumber.value -> {
-                if (fetchAllContacts().size > 2) { // otherNumber 3개 이상일 경우, Category LIST 화면 전환
-                    ProcCallData.ProcYesNoOtherNumberResult(
-                        callYesNoOtherNumberResult = CallYesNoOtherNumberResult.OtherNumberList(
-                            fetchAllContacts()
-                        ),
-                        mwContext = MWContext(DialogueMode.LIST, this@CallManager)
-                    )
-                } else if (fetchAllContacts().size > 1) { // otherNumber가 2개 밖에 없을 시, 현재 번호 말고 다른 번호로 바로 표시
-                    ProcCallData.ProcYesNoOtherNumberResult(
-                        callYesNoOtherNumberResult = CallYesNoOtherNumberResult.OtherNumber(
-                            matchContact()
-                        ),
-                        mwContext = MWContext(DialogueMode.LIST, this@CallManager)
-                    )
-                } else { // otherNumber가 1개인 경우, 현재의 번호밖에 없는 상태니까 reject() 표시
-                    ProcCallData.ProcYesNoOtherNumberResult(
-                        callYesNoOtherNumberResult = CallYesNoOtherNumberResult.Reject,
-                        mwContext = MWContext(DialogueMode.LIST, this@CallManager)
-                    )
-                }
+                ProcCallData.ProcOtherNumberResult(mwContext = MWContext(DialogueMode.CALLNAME, this@CallManager))
+
+//                if (fetchAllContacts().size > 2) { // otherNumber 3개 이상일 경우, Category LIST 화면 전환
+//                    ProcCallData.ProcYesNoOtherNumberResult(
+//                        callYesNoOtherNumberResult = CallYesNoOtherNumberResult.OtherNumberList(
+//                            fetchAllContacts()
+//                        ),
+//                        mwContext = MWContext(DialogueMode.LIST, this@CallManager)
+//                    )
+//                } else if (fetchAllContacts().size > 1) { // otherNumber가 2개 밖에 없을 시, 현재 번호 말고 다른 번호로 바로 표시
+//                    ProcCallData.ProcYesNoOtherNumberResult(
+//                        callYesNoOtherNumberResult = CallYesNoOtherNumberResult.OtherNumber(
+//                            matchContact()
+//                        ),
+//                        mwContext = MWContext(DialogueMode.LIST, this@CallManager)
+//                    )
+//                } else { // otherNumber가 1개인 경우, 현재의 번호밖에 없는 상태니까 reject() 표시
+//                    ProcCallData.ProcYesNoOtherNumberResult(
+//                        callYesNoOtherNumberResult = CallYesNoOtherNumberResult.Reject,
+//                        mwContext = MWContext(DialogueMode.LIST, this@CallManager)
+//                    )
+//                }
             }
 
             else -> {

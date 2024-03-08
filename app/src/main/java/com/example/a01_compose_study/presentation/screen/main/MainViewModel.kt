@@ -201,6 +201,8 @@ class MainViewModel @Inject constructor(
                             is ProcCallData.ProcYesNoOtherNumberResult -> {
                                 Log.d("@@ ProcCallData", "YesNoOtherNumberResultProc - Result: ${sealedParsedData.procCallData.callYesNoOtherNumberResult}")
                             }
+
+                            is ProcCallData.ProcOtherNumberResult -> {}
                         }
                     }
 

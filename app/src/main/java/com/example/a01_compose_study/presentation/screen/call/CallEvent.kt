@@ -14,7 +14,5 @@ sealed class CallEvent {
         val phoneNumber: String
     ) : CallEvent()
 
-    data class OnOtherNameButtonClick(
-        val currentContact: Contact
-    ) : CallEvent()
+    object OnOtherNumberButtonClick : CallEvent()
 }
