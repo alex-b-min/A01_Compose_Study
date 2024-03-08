@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.a01_compose_study.data.custom.SealedParsedData
 import com.example.a01_compose_study.data.custom.call.CallManager
 import com.example.a01_compose_study.data.custom.call.ProcCallData
+import com.example.a01_compose_study.data.custom.ptt.PttManager
 import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.presentation.data.UiState
 import com.example.a01_compose_study.presentation.data.UiState.sealedParsedData
@@ -20,6 +21,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CallViewModel @Inject constructor(
     private val callManager: CallManager,
+    val pttManager: PttManager,
 ) : ViewModel() {
 
     private val _domainUiState = UiState._domainUiState
@@ -34,6 +36,23 @@ class CallViewModel @Inject constructor(
                 Log.d("@@@@ CallModel 생성 후 콜렉", "${sealedParsedData}")
                 if (sealedParsedData is SealedParsedData.CallData) {
                     when(sealedParsedData.procCallData) {
+                        is ProcCallData.ScrollIndex -> {
+                            val voiceRecognitionIndex = sealedParsedData.procCallData.index // 음성인식으로 받아온 index
+                            val currentCallWindowContactListLastIndex = (domainUiState.value as? DomainUiState.CallWindow)?.data?.lastIndex // 현재 UI에 보여지는 ContactList의 마지막 index의 값
+
+                            if (voiceRecognitionIndex != null && currentCallWindowContactListLastIndex != null) {
+                                if (voiceRecognitionIndex < currentCallWindowContactListLastIndex) {
+                                    UiState._domainUiState.update { domainUiState ->
+                                        domainUiState.copyWithNewScrollIndex(sealedParsedData.procCallData.index)
+                                    }
+                                } else {
+                                    pttManager.vrmwManager.requestTTs(
+                                        promptId = listOf("PID_CMN_COMM_02_31"),
+                                        runnable = { pttManager.vrmwManager.resumeVR() }
+                                    )
+                                }
+                            }
+                        }
 
                         is ProcCallData.ProcYesResult -> {
                             _vrProcessingResultState.update { currResult ->

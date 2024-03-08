@@ -70,7 +70,10 @@ class CallManager @Inject constructor(
                 commonModel?.index = 5 //임의로 발화 결과인 라인 넘버의 값을 할당함
 
                 commonModel?.let {
-                    procListIntention(it)
+                    procListIntention(
+                        data = it,
+                        selectVRResult = selectVRResult
+                    )
                 } ?: run {
                     return ProcCallData.RejectRequest
                 }
@@ -198,7 +201,7 @@ class CallManager @Inject constructor(
     /**
      * DialogueMode가 LIST 인 경우에 실행!![ 실제 경우 : 인식된 이름으로 매칭되는 인덱스가 존재하는 전화번호부 목록 화면에서 VR 실행을 실행한 결과 ]
      */
-    private fun procListIntention(data: CommonModel): ProcCallData {
+    private fun procListIntention(data: CommonModel, selectVRResult: SelectVRResult): ProcCallData {
         /**
          * 가정 : DialogueMode가 LIST가 되었다고 가정을 하는 상황이라면, 인식된 이름으로 매칭되는 인덱스가 존재하는 전화번호부 목록을 보여주고 있는 상태일 것이다.
          * 1. 서버로부터 받은 index의 크기가 현재 스크린을 구성하고 있는 모델의 인덱스보다 큰 경우(이동 불가 경우)
@@ -207,6 +210,7 @@ class CallManager @Inject constructor(
          * ==> 서버로부터의 내려온 index의 위치로 이동
          */
         val index = data.index
+        val customIndex = (selectVRResult as? SelectVRResult.ScrollIndexResult)?.inputIndex
         index?.let { serverIndex -> // server의 index가 null 아닐때
             getCurrDomainUiState().value.let { currDomainUiState -> // 현재 화면을 구성하는 데이터가 null이 아닐때
                 val currCallModel = currDomainUiState as? DomainUiState.CallWindow
@@ -223,7 +227,7 @@ class CallManager @Inject constructor(
                         )
                     } else {
                         ProcCallData.ScrollIndex(
-                            index = 5,
+                            index = customIndex,
                             mwContext = MWContext(DialogueMode.LIST, this@CallManager)
                         )
                     }

@@ -119,14 +119,6 @@ class MWContext(
                     }
             }
 
-            SelectVRResult.ScrollIndexResult -> {
-                ParserFactory().dataParsing(vrResult, dialogueMode = dialogueMode)
-                    .also {
-                        it?.type = ParseDomainType.CALL
-                        it?.dialogueMode = DialogueMode.LIST
-                    }
-            }
-
             SelectVRResult.CallOtherNameResult -> {
                 ParserFactory().dataParsing(vrResult, dialogueMode = dialogueMode)
                     .also {
@@ -148,6 +140,14 @@ class MWContext(
                     .also {
                         it?.type = ParseDomainType.CALL
                         it?.dialogueMode = DialogueMode.CALLNAME
+                    }
+            }
+
+            is SelectVRResult.ScrollIndexResult -> {
+                ParserFactory().dataParsing(vrResult, dialogueMode = dialogueMode)
+                    .also {
+                        it?.type = ParseDomainType.CALL
+                        it?.dialogueMode = DialogueMode.LIST
                     }
             }
         }

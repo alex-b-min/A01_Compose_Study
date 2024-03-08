@@ -9,9 +9,9 @@ sealed class SelectVRResult {
     object PttResult : SelectVRResult()
     object CallListResult : SelectVRResult()
     object CallIndexListResult : SelectVRResult()
-    object ScrollIndexResult : SelectVRResult()
     object CallRecognizedContact : SelectVRResult()
     object CallOtherNameResult : SelectVRResult()
     object CallYesResult : SelectVRResult()
     object CallNoResult : SelectVRResult()
+    data class ScrollIndexResult(val inputIndex: Int) : SelectVRResult()
 }

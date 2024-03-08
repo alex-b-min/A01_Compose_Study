@@ -510,7 +510,7 @@ fun MainRoute(
                         scope.launch {
                             viewModel.vrmwManager.setVRResult(
                                 VRResult(),
-                                SelectVRResult.ScrollIndexResult
+                                SelectVRResult.ScrollIndexResult(5)
                             )
                         }
                     }
