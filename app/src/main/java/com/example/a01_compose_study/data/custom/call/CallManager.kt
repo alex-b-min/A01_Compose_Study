@@ -157,7 +157,7 @@ class CallManager @Inject constructor(
                     // 인식된 이름으로 매칭되는 연락처가 여러개인 경우
                     if (recognizedList.size > 1) {
                         return ProcCallData.RecognizedContactListScreen(
-                            data = removeDuplicateNames(
+                            data = removeDuplicateContactIds(
                                 fetchRecognizedContacts(
                                     10
                                 )
@@ -169,7 +169,7 @@ class CallManager @Inject constructor(
                     } else if (recognizedList.isEmpty()) {
                         Log.d("@@ tempList Empty", "${fetchAllContacts()}")
                         return ProcCallData.AllContactListScreen(
-                            data = removeDuplicateNames(fetchAllContacts()),
+                            data = removeDuplicateContactIds(fetchAllContacts()),
                             mwContext = MWContext(DialogueMode.CALL, this@CallManager)
                         ) // 인덱스가 존재하지 않는 전체 전화번호부 목록 반환[DomainType.Call / ScreenType.List]
                         TODO("startVR(MWContext(DailogueMode.CALL) 실행")
@@ -310,15 +310,15 @@ class CallManager @Inject constructor(
     }
 
     /**
-     * Set자료구조를 사용하여 전화번호부 목록에서 중복되는 이름을 가진 데이터 중에 처음 나오는 데이터만 남기는 함수
+     * Set자료구조를 사용하여 전화번호부 목록에서 중복되는 contact_id를 가진 데이터 중에 처음 나오는 데이터만 남기는 함수
      */
-    fun removeDuplicateNames(contacts: List<Contact>): List<Contact> {
-        val uniqueNames = HashSet<String>()
+    fun removeDuplicateContactIds(contacts: List<Contact>): List<Contact> {
+        val uniqueIds = HashSet<String>()
         val filteredList = mutableListOf<Contact>()
 
         for (contact in contacts) {
-            if (!uniqueNames.contains(contact.name)) {
-                uniqueNames.add(contact.name)
+            if (!uniqueIds.contains(contact.contact_id)) {
+                uniqueIds.add(contact.contact_id)
                 filteredList.add(contact)
             }
         }
@@ -327,23 +327,22 @@ class CallManager @Inject constructor(
     }
 
     /**
-     * 중복되는 이름이 2개 이상 존재하는지를 판별하는 함수
-     * ==> 만약 중복되는 이름이 2개 이상이라면 OtherName 존재해야함
+     * 중복되는 contatct_id 값이 2개 이상 존재하는지를 판별하는 함수
+     * ==> 만약 중복되는 contatct_id가 2개 이상이라면 OtherNumber 존재해야함
      */
-    fun isContactNameUnique(contact: Contact): Boolean {
+    fun isContactIdUnique(contact: Contact): Boolean {
         val allContacts = fetchAllContacts()
-        val count = allContacts.count { it.name == contact.name }
-        Log.d("@@@@ isContactNameUnique", "count: ${count} / ${contact}")
+        val count = allContacts.count { it.contact_id == contact.contact_id }
+        Log.d("@@@@ isContactIdUnique", "count: $count / $contact")
         return count <= 1
     }
 
     /**
-     * 인자로 받은 Contact의 이름과 일치하는 연락처 리스트를 반환하는 함수
+     * 인자로 받은 Contact의 contacit_id와 일치하는 연락처 리스트를 반환하는 함수
      */
-    fun findContactsByName(contact: Contact): List<Contact> {
+    fun findContactsByContactId(contact: Contact): List<Contact> {
         val allContacts = fetchAllContacts()
-        val matchingContacts = allContacts.filter { it.name == contact.name }
-        return matchingContacts
+        return allContacts.filter { it.contact_id == contact.contact_id }
     }
 }
 
@@ -360,29 +359,29 @@ fun fetchAllContacts(): List<Contact> {
         ContactsContract.CommonDataKinds.Phone.TYPE_OTHER
     )
 
-    result.add(Contact(id = "1", name = "문재민", number = "010-1111-2222", type = types.indexOf(1)))
-    result.add(Contact(id = "2", name = "문재민", number = "010-1312-1443", type = types.indexOf(2)))
+    result.add(Contact(id = "1", contact_id = "1", name = "문재민", number = "010-1111-2222", type = types.indexOf(1)))
+    result.add(Contact(id = "2", contact_id = "1", name = "문재민", number = "010-1312-1443", type = types.indexOf(2)))
 
-    result.add(Contact(id = "3", name = "이일구", number = "010-8765-4321", type = types.indexOf(1)))
-    result.add(Contact(id = "4", name = "이일구", number = "010-1234-5678", type = types.indexOf(3)))
+    result.add(Contact(id = "3", contact_id = "2", name = "이일구", number = "010-8765-4321", type = types.indexOf(1)))
+    result.add(Contact(id = "4", contact_id = "2", name = "이일구", number = "010-1234-5678", type = types.indexOf(3)))
 
-    result.add(Contact(id = "5", name = "엄마", number = "010-5555-5555", type = types.indexOf(1)))
-    result.add(Contact(id = "6", name = "엄마", number = "010-6666-6666", type = types.indexOf(2)))
-    result.add(Contact(id = "7", name = "엄마", number = "010-7777-7777", type = types.indexOf(3)))
+    result.add(Contact(id = "5", contact_id = "3", name = "엄마", number = "010-5555-5555", type = types.indexOf(1)))
+    result.add(Contact(id = "6", contact_id = "3", name = "엄마", number = "010-6666-6666", type = types.indexOf(2)))
+    result.add(Contact(id = "7", contact_id = "3", name = "엄마", number = "010-7777-7777", type = types.indexOf(3)))
 
-    result.add(Contact(id = "8", name = "삐쓰까또레부르쥬미첼라햄페스츄리치즈나쵸스트링스파게티", number = "010-2222-3333", type = types.random()))
-    result.add(Contact(id = "9", name = "하늘별님구름햇님보다사랑스러우리", number = "010-3333-4444", type = types.random()))
-    result.add(Contact(id = "10", name = "Alex", number = "010-4444-5555", type = types.random()))
-    result.add(Contact(id = "11", name = "포티투닷 이순신", number = "010-4444-5555", type = types.random()))
-    result.add(Contact(id = "12", name = "포티투닷 홍길동 책임연구원 하하하하하", number = "031-131", type = types.random()))
-    result.add(Contact(id = "13", name = "김혜원 어머님", number = "010-1111-5555", type = types.random()))
-    result.add(Contact(id = "14", name = "홍길 동사무소", number = "010-4444-5555", type = types.random()))
-    result.add(Contact(id = "15", name = "홍길동 (HMC 유럽)", number = "010-4444-5555", type = types.random()))
-    result.add(Contact(id = "16", name = "강신부", number = "010-4444-5555", type = types.random()))
-    result.add(Contact(id = "17", name = "우리♥︎", number = "010-4444-5555", type = types.random()))
-    result.add(Contact(id = "18", name = "ㅇ ㅏ ㅇ ㅣ ㄷ ㅣ", number = "010-4444-5555", type = types.random()))
-    result.add(Contact(id = "19", name = "119 장난전화", number = "1509", type = types.random()))
-    result.add(Contact(id = "20", name = "Alexander Sandor Signiel", number = "010-4444-5555", type = types.random()))
+    result.add(Contact(id = "8", contact_id = "4", name = "삐쓰까또레부르쥬미첼라햄페스츄리치즈나쵸스트링스파게티", number = "010-2222-3333", type = types.random()))
+    result.add(Contact(id = "9", contact_id = "5", name = "하늘별님구름햇님보다사랑스러우리", number = "010-3333-4444", type = types.random()))
+    result.add(Contact(id = "10", contact_id = "6", name = "Alex", number = "010-4444-5555", type = types.random()))
+    result.add(Contact(id = "11", contact_id = "7", name = "포티투닷 이순신", number = "010-4444-5555", type = types.random()))
+    result.add(Contact(id = "12", contact_id = "8", name = "포티투닷 홍길동 책임연구원 하하하하하", number = "031-131", type = types.random()))
+    result.add(Contact(id = "13", contact_id = "9", name = "김혜원 어머님", number = "010-1111-5555", type = types.random()))
+    result.add(Contact(id = "14", contact_id = "10", name = "홍길 동사무소", number = "010-4444-5555", type = types.random()))
+    result.add(Contact(id = "15", contact_id = "11", name = "홍길동 (HMC 유럽)", number = "010-4444-5555", type = types.random()))
+    result.add(Contact(id = "16", contact_id = "12", name = "강신부", number = "010-4444-5555", type = types.random()))
+    result.add(Contact(id = "17", contact_id = "13", name = "우리♥︎", number = "010-4444-5555", type = types.random()))
+    result.add(Contact(id = "18", contact_id = "14", name = "ㅇ ㅏ ㅇ ㅣ ㄷ ㅣ", number = "010-4444-5555", type = types.random()))
+    result.add(Contact(id = "19", contact_id = "15", name = "119 장난전화", number = "1509", type = types.random()))
+    result.add(Contact(id = "20", contact_id = "16", name = "Alexander Sandor Signiel", number = "010-4444-5555", type = types.random()))
 
     return result.toList()
 }

@@ -24,7 +24,7 @@ class CallViewModel @Inject constructor(
             }
 
             is CallEvent.ContactListItemOnClick -> {
-                val isContactNameUnique = callManager.isContactNameUnique(event.selectedContactItem)
+                val isContactNameUnique = callManager.isContactIdUnique(event.selectedContactItem)
                 Log.d("@@@@ isContactNameUnique 결과값", "${isContactNameUnique}")
                 _domainUiState.update { domainUiState ->
                     val updatedState = (domainUiState as? DomainUiState.CallWindow)?.copy(
@@ -43,7 +43,7 @@ class CallViewModel @Inject constructor(
 
             is CallEvent.OnOtherNameButtonClick -> {
                 val currentContact = event.currentContact
-                val matchingContacts = callManager.findContactsByName(currentContact)
+                val matchingContacts = callManager.findContactsByContactId(currentContact)
 
                 Log.d("@@@@ OnOtherNameButtonClick", "${matchingContacts}")
                 if (matchingContacts.size == 2) {

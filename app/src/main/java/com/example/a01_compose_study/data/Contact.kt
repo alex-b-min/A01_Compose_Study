@@ -3,8 +3,8 @@ package com.example.a01_compose_study.data
 //phoneType: ContactsContract.CommonDataKinds.Phone.TYPE_HOME etc..
 //https://developer.android.com/reference/android/provider/ContactsContract.CommonDataKinds.Phone#TYPE_MOBILE
 data class Contact(
-    var id: String = "",
-    var contact_id: String = "",
+    var id: String = "", // 각 번호의 고유 값
+    var contact_id: String = "", // 한 사람의 고유
     var first_name: String = "",
     var middle_name: String = "",
     var last_name: String = "",
