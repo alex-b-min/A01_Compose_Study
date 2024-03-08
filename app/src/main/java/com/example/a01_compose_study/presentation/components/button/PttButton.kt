@@ -47,7 +47,8 @@ fun PttButton(
         ) {
             Text(
                 text = contentText,
-                fontSize = 20.sp
+                fontSize = 25.sp,
+                lineHeight = 25.sp
             )
         }
     }

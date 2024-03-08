@@ -1,16 +1,15 @@
 package com.example.a01_compose_study.presentation.screen.main.route
 
 import android.util.Log
-import android.view.MotionEvent
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -19,11 +18,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -51,7 +47,6 @@ import com.example.a01_compose_study.presentation.screen.sendMsg.SendMsgScreen
 import com.example.a01_compose_study.presentation.util.MultipleEventsCutter
 import com.example.a01_compose_study.presentation.util.get
 import com.example.a01_compose_study.ui.theme.Black2
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -164,88 +159,132 @@ fun MainRoute(
         }
     }
 
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalAlignment = Alignment.End
+    Box(
+        modifier = Modifier
+            .fillMaxSize(),
+        contentAlignment = Alignment.TopEnd
     ) {
-        PttButton(
-            modifier = Modifier.fillMaxSize(0.13f),
-            contentText = "PTT Open",
-            onClick = {
-                viewModel.onPttEvent(PttEvent.StartVR(SelectVRResult.PttResult))
-            }
-        )
-
-        PttButton(
-            modifier = Modifier.fillMaxSize(0.13f),
-            contentText = "PTT Prepare",
-            onClick = {
-                viewModel.onPttEvent(PttEvent.PreparePtt)
-            }
-        )
-
-        PttButton(
-            modifier = Modifier.fillMaxSize(0.13f),
-            contentText = "PTT Speak",
-            onClick = {
-                viewModel.onPttEvent(PttEvent.SetSpeakType)
-            }
-        )
-
-        PttButton(
-            modifier = Modifier.fillMaxSize(0.13f),
-            contentText = "PTT Loading",
-            onClick = {
-                scope.launch {
-                    viewModel.onPttEvent(PttEvent.SetLoadingType)
-                }
-            }
-        )
-
-        PttButton(
-            modifier = Modifier.fillMaxSize(0.13f),
-            contentText = "PTT Announce",
-            onClick = {
-                scope.launch {
-                    viewModel.onDomainEvent(
-                        event = MainEvent.OpenDomainWindowEvent(
-                            domainType = SealedDomainType.Announce,
-                            screenType = ScreenType.Prepare,
-                            data = "Help",
-                            isError = false,
-                            screenSizeType = ScreenSizeType.Small
-                        )
-                    )
-                }
-            }
-        )
-
-        PttButton(
-            modifier = Modifier.fillMaxSize(0.13f),
-            contentText = "PTT Close",
-            onClick = {
-                scope.launch {
-                    viewModel.onDomainEvent(MainEvent.CloseDomainWindowEvent)
-                }
-            }
-        )
-
-        PttButton(
-            modifier = Modifier.fillMaxSize(0.13f),
-            contentText = "PTT Help",
-            onClick = {
-                viewModel.onPttEvent(PttEvent.StartVR(SelectVRResult.HelpResult))
-            }
-        )
-
-        PttButton(
+        Column(
             modifier = Modifier
-                .fillMaxWidth(0.13f)
-                .fillMaxHeight(0.2f),
-            contentText = "ERROR_HMI",
-            onClick = {
-                multipleEventsCutter.processEvent {
+                .fillMaxHeight(0.9f)
+                .fillMaxWidth(0.11f)
+            ,
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.End
+        ) {
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+            ) {
+                PttButton(
+                    modifier = Modifier.fillMaxSize(),
+                    contentText = "PTT Open",
+                    onClick = {
+                        viewModel.onPttEvent(PttEvent.StartVR(SelectVRResult.PttResult))
+                    }
+                )
+            }
+
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+            ) {
+                PttButton(
+                    modifier = Modifier.fillMaxSize(),
+                    contentText = "PTT Prepare",
+                    onClick = {
+                        viewModel.onPttEvent(PttEvent.PreparePtt)
+                    }
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+            ) {
+                PttButton(
+                    modifier = Modifier.fillMaxSize(),
+                    contentText = "PTT Speak",
+                    onClick = {
+                        viewModel.onPttEvent(PttEvent.SetSpeakType)
+                    }
+                )
+            }
+
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+            ) {
+                PttButton(
+                    modifier = Modifier.fillMaxSize(),
+                    contentText = "PTT Loading",
+                    onClick = {
+                        scope.launch {
+                            viewModel.onPttEvent(PttEvent.SetLoadingType)
+                        }
+                    }
+                )
+            }
+
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+            ) {
+                PttButton(
+                    modifier = Modifier.fillMaxSize(),
+                    contentText = "PTT Announce",
+                    onClick = {
+                        scope.launch {
+                            viewModel.onDomainEvent(
+                                event = MainEvent.OpenDomainWindowEvent(
+                                    domainType = SealedDomainType.Announce,
+                                    screenType = ScreenType.Prepare,
+                                    data = "Help",
+                                    isError = false,
+                                    screenSizeType = ScreenSizeType.Small
+                                )
+                            )
+                        }
+                    }
+                )
+            }
+
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+            ) {
+                PttButton(
+                    modifier = Modifier.fillMaxSize(),
+                    contentText = "PTT Close",
+                    onClick = {
+                        scope.launch {
+                            viewModel.onDomainEvent(MainEvent.CloseDomainWindowEvent)
+                        }
+                    }
+                )
+            }
+
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+            ) {
+                PttButton(
+                    modifier = Modifier.fillMaxSize(),
+                    contentText = "PTT Help",
+                    onClick = {
+                        viewModel.onPttEvent(PttEvent.StartVR(SelectVRResult.HelpResult))
+                    }
+                )
+            }
+
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+            ) {
+                PttButton(
+                    modifier = Modifier.fillMaxSize(),
+                    contentText = "ERROR_HMI",
+                    onClick = {
+                        multipleEventsCutter.processEvent {
 //                        viewModel.onDomainEvent(
 //                            event = MainEvent.OpenDomainWindowEvent(
 //                                domainType = SealedDomainType.Ptt,
@@ -255,212 +294,301 @@ fun MainRoute(
 //                                screenSizeType = ScreenSizeType.Small
 //                            )
 //                        )
-                    viewModel.vrmwManager.setVRError(HVRError.ERROR_HMI)
-                }
-            }
-        )
-
-        PttButton(
-            modifier = Modifier
-                .fillMaxWidth(0.13f)
-                .fillMaxHeight(0.25f),
-            contentText = "Size Up",
-            onClick = {
-                val resultScreenSizeType = when (domainUiState.screenSizeType) {
-                    is ScreenSizeType.Zero -> ScreenSizeType.Zero
-                    is ScreenSizeType.Small -> ScreenSizeType.Middle
-                    is ScreenSizeType.Middle -> ScreenSizeType.Large
-                    is ScreenSizeType.Large -> ScreenSizeType.Full
-                    is ScreenSizeType.Full -> ScreenSizeType.Full
-                }
-                viewModel.onDomainEvent(
-                    MainEvent.ChangeDomainWindowSizeEvent(
-                        resultScreenSizeType
-                    )
+                            viewModel.vrmwManager.setVRError(HVRError.ERROR_HMI)
+                        }
+                    }
                 )
             }
-        )
 
-        PttButton(
-            modifier = Modifier
-                .fillMaxWidth(0.13f)
-                .fillMaxHeight(0.25f),
-            contentText = "Size Down",
-            onClick = {
-                val resultScreenSizeType = when (domainUiState.screenSizeType) {
-                    is ScreenSizeType.Zero -> ScreenSizeType.Zero
-                    is ScreenSizeType.Small -> ScreenSizeType.Small
-                    is ScreenSizeType.Middle -> ScreenSizeType.Small
-                    is ScreenSizeType.Large -> ScreenSizeType.Middle
-                    is ScreenSizeType.Full -> ScreenSizeType.Large
-                }
-                viewModel.onDomainEvent(
-                    MainEvent.ChangeDomainWindowSizeEvent(
-                        resultScreenSizeType
-                    )
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+            ) {
+                PttButton(
+                    modifier = Modifier.fillMaxSize(),
+                    contentText = "Size Up",
+                    onClick = {
+                        val resultScreenSizeType = when (domainUiState.screenSizeType) {
+                            is ScreenSizeType.Zero -> ScreenSizeType.Zero
+                            is ScreenSizeType.Small -> ScreenSizeType.Middle
+                            is ScreenSizeType.Middle -> ScreenSizeType.Large
+                            is ScreenSizeType.Large -> ScreenSizeType.Full
+                            is ScreenSizeType.Full -> ScreenSizeType.Full
+                        }
+                        viewModel.onDomainEvent(
+                            MainEvent.ChangeDomainWindowSizeEvent(
+                                resultScreenSizeType
+                            )
+                        )
+                    }
                 )
             }
-        )
+
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+            ) {
+                PttButton(
+                    modifier = Modifier.fillMaxSize(),
+                    contentText = "Size Down",
+                    onClick = {
+                        val resultScreenSizeType = when (domainUiState.screenSizeType) {
+                            is ScreenSizeType.Zero -> ScreenSizeType.Zero
+                            is ScreenSizeType.Small -> ScreenSizeType.Small
+                            is ScreenSizeType.Middle -> ScreenSizeType.Small
+                            is ScreenSizeType.Large -> ScreenSizeType.Middle
+                            is ScreenSizeType.Full -> ScreenSizeType.Large
+                        }
+                        viewModel.onDomainEvent(
+                            MainEvent.ChangeDomainWindowSizeEvent(
+                                resultScreenSizeType
+                            )
+                        )
+                    }
+                )
+            }
+        }
     }
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(end = 250.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalAlignment = Alignment.End
+            .offset(x = -220.dp),
+        contentAlignment = Alignment.TopEnd
     ) {
-        PttButton(
-            modifier = Modifier.fillMaxSize(0.13f),
-            contentText = "VR Loading",
-            onClick = {
-                onVREvent(
-                    VREvent.ChangeVRUIEvent(
-                        VRUiState.PttLoading(
-                            active = true,
-                            isError = false
-                        )
-                    )
-                )
-            }
-        )
-
-        PttButton(
-            modifier = Modifier.fillMaxSize(0.13f),
-            contentText = "VR Speak",
-            onClick = {
-                onVREvent(
-                    VREvent.ChangeVRUIEvent(
-                        VRUiState.PttSpeak(
-                            active = true,
-                            isError = false
-                        )
-                    )
-                )
-            }
-        )
-
-        PttButton(
-            modifier = Modifier.fillMaxSize(0.13f),
-            contentText = "VR Listen",
-            onClick = {
-                onVREvent(
-                    VREvent.ChangeVRUIEvent(
-                        VRUiState.PttListen(
-                            active = true,
-                            isError = false
-                        )
-                    )
-                )
-            }
-        )
-
-        PttButton(
-            modifier = Modifier.fillMaxSize(0.13f),
-            contentText = "VR Not",
-            onClick = {
-                onVREvent(
-                    VREvent.ChangeVRUIEvent(
-                        VRUiState.PttNone(
-                            false,
-                            isError = false
-                        )
-                    )
-                )
-            }
-        )
-
-        PttButton(
+        Column(
             modifier = Modifier
-                .fillMaxWidth(0.13f)
-                .fillMaxHeight(0.3f),
-            contentText = "VR isError",
-            onClick = {
-                onVREvent(
-                    VREvent.ChangeVRUIEvent(
-                        VRUiState.PttNone(
-                            true,
-                            isError = true
+                .fillMaxHeight(0.5f)
+                .fillMaxWidth(0.1f)
+            ,
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.End
+        ) {
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+            ) {
+                PttButton(
+                    modifier = Modifier.fillMaxSize(),
+                    contentText = "VR Loading",
+                    onClick = {
+                        onVREvent(
+                            VREvent.ChangeVRUIEvent(
+                                VRUiState.PttLoading(
+                                    active = true,
+                                    isError = false
+                                )
+                            )
                         )
-                    )
+                    }
                 )
             }
-        )
+
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+            ) {
+                PttButton(
+                    modifier = Modifier.fillMaxSize(),
+                    contentText = "VR Speak",
+                    onClick = {
+                        onVREvent(
+                            VREvent.ChangeVRUIEvent(
+                                VRUiState.PttSpeak(
+                                    active = true,
+                                    isError = false
+                                )
+                            )
+                        )
+                    }
+                )
+            }
+
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+            ) {
+                PttButton(
+                    modifier = Modifier.fillMaxSize(),
+                    contentText = "VR Listen",
+                    onClick = {
+                        onVREvent(
+                            VREvent.ChangeVRUIEvent(
+                                VRUiState.PttListen(
+                                    active = true,
+                                    isError = false
+                                )
+                            )
+                        )
+                    }
+                )
+            }
+
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+            ) {
+                PttButton(
+                    modifier = Modifier.fillMaxSize(),
+                    contentText = "VR Not",
+                    onClick = {
+                        onVREvent(
+                            VREvent.ChangeVRUIEvent(
+                                VRUiState.PttNone(
+                                    false,
+                                    isError = false
+                                )
+                            )
+                        )
+                    }
+                )
+            }
+
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+            ) {
+                PttButton(
+                    modifier = Modifier.fillMaxSize(),
+                    contentText = "VR isError",
+                    onClick = {
+                        onVREvent(
+                            VREvent.ChangeVRUIEvent(
+                                VRUiState.PttNone(
+                                    true,
+                                    isError = true
+                                )
+                            )
+                        )
+                    }
+                )
+            }
+        }
     }
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(end = 470.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalAlignment = Alignment.End
+            .offset(x = -420.dp),
+        contentAlignment = Alignment.TopEnd
     ) {
-        PttButton(
+        Column(
             modifier = Modifier
-                .fillMaxWidth(0.13f)
-                .fillMaxHeight(0.13f),
-            contentText = "VR Call List Result",
-            onClick = {
-                viewModel.onPttEvent(PttEvent.StartVR(SelectVRResult.CallListResult))
-            }
-        )
-
-        PttButton(
-            modifier = Modifier
-                .fillMaxWidth(0.13f)
-                .fillMaxHeight(0.13f),
-            contentText = "VR Call Index List Result",
-            onClick = {
-                viewModel.onPttEvent(PttEvent.StartVR(SelectVRResult.CallIndexListResult))
-            }
-        )
-
-        PttButton(
-            modifier = Modifier
-                .fillMaxWidth(0.13f)
-                .fillMaxHeight(0.13f),
-            contentText = "VR Line Number Result",
-            onClick = {
-                scope.launch {
-                    viewModel.vrmwManager.setVRResult(VRResult(), SelectVRResult.ScrollIndexResult)
-                }
-            }
-        )
-
-        PttButton(
-            modifier = Modifier
-                .fillMaxWidth(0.13f)
-                .fillMaxHeight(0.13f),
-            contentText = "Change ScrollIndex 5",
-            onClick = {
-                /**
-                 * 발화로 스크롤이 변경되는 환경이라면 CallViewModel의 Event에 있어야 하지만,
-                 * 현재 버튼 클릭으로 index 값을 직접 주입해야 하는 환경이 MainEvent에 임의로 정의해서 사용하고 있는 상황
-                 */
-                viewModel.onDomainEvent(
-                    MainEvent.ChangeScrollIndexEvent(selectedScrollIndex = 5 - 1)
+                .fillMaxHeight(0.8f)
+                .fillMaxWidth(0.1f)
+                .wrapContentWidth(Alignment.End),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+            ) {
+                PttButton(
+                    modifier = Modifier.fillMaxSize(),
+                    contentText = "VR Call List Result",
+                    onClick = {
+                        viewModel.onPttEvent(PttEvent.StartVR(SelectVRResult.CallListResult))
+                    }
                 )
             }
-        )
-        PttButton(
-            modifier = Modifier
-                .fillMaxWidth(0.13f)
-                .fillMaxHeight(0.13f),
-            contentText = "Change ScrollIndex 8",
-            onClick = {
-                viewModel.onDomainEvent(
-                    MainEvent.ChangeScrollIndexEvent(selectedScrollIndex = 8 - 1)
+
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+            ) {
+                PttButton(
+                    modifier = Modifier.fillMaxSize(),
+                    contentText = "VR Call Index List Result",
+                    onClick = {
+                        viewModel.onPttEvent(PttEvent.StartVR(SelectVRResult.CallIndexListResult))
+                    }
+                )
+
+            }
+
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+            ) {
+                PttButton(
+                    modifier = Modifier.fillMaxSize(),
+                    contentText = "VR Line Number Result",
+                    onClick = {
+                        scope.launch {
+                            viewModel.vrmwManager.setVRResult(
+                                VRResult(),
+                                SelectVRResult.ScrollIndexResult
+                            )
+                        }
+                    }
                 )
             }
-        )
-        PttButton(
-            modifier = Modifier
-                .fillMaxWidth(0.13f)
-                .fillMaxHeight(0.13f),
-            contentText = "VR Result: OtherName",
-            onClick = {
-                viewModel.vrmwManager.setVRResult(VRResult(), SelectVRResult.CallOtherNameResult)
+
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+            ) {
+                PttButton(
+                    modifier = Modifier.fillMaxSize(),
+                    contentText = "Change ScrollIndex 5",
+                    onClick = {
+                        /**
+                         * 발화로 스크롤이 변경되는 환경이라면 CallViewModel의 Event에 있어야 하지만,
+                         * 현재 버튼 클릭으로 index 값을 직접 주입해야 하는 환경이 MainEvent에 임의로 정의해서 사용하고 있는 상황
+                         */
+                        viewModel.onDomainEvent(
+                            MainEvent.ChangeScrollIndexEvent(selectedScrollIndex = 5 - 1)
+                        )
+                    }
+                )
             }
-        )
+
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+            ) {
+                PttButton(
+                    modifier = Modifier.fillMaxSize(),
+                    contentText = "Change ScrollIndex 8",
+                    onClick = {
+                        viewModel.onDomainEvent(
+                            MainEvent.ChangeScrollIndexEvent(selectedScrollIndex = 8 - 1)
+                        )
+                    }
+                )
+            }
+
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+            ) {
+                PttButton(
+                    modifier = Modifier.fillMaxSize(),
+                    contentText = "VR Result: Yes",
+                    onClick = {
+                        viewModel.vrmwManager.setVRResult(
+                            VRResult(),
+                            SelectVRResult.CallOtherNameResult
+                        )
+                    }
+                )
+            }
+
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+            ) {
+                PttButton(
+                    modifier = Modifier.fillMaxSize(),
+                    contentText = "VR Result: OtherName",
+                    onClick = {
+                        viewModel.vrmwManager.setVRResult(
+                            VRResult(),
+                            SelectVRResult.CallOtherNameResult
+                        )
+                    }
+                )
+            }
+        }
     }
 }
 
@@ -504,7 +632,10 @@ fun VrUiAnimationHandler(vrUiState: VRUiState) {
             }
 
             vrUiState.active -> {
-                Log.d("@@ vrUiState.active??", "active: ${vrUiState.active}/ isError: ${vrUiState.isError}")
+                Log.d(
+                    "@@ vrUiState.active??",
+                    "active: ${vrUiState.active}/ isError: ${vrUiState.isError}"
+                )
                 LottieAssetAnimationHandler(
                     modifier = Modifier.fillMaxSize(),
                     lottieJsonAssetPath = "bg_glow/09_tsd_frame_glow_l_lt.json",
@@ -513,7 +644,10 @@ fun VrUiAnimationHandler(vrUiState: VRUiState) {
                 )
                 if (rawResId != 0) {
                     Log.d("@@ rawResId", "rawResId : ${rawResId}")
-                    Log.d("@@ rawResId(PttListen)", "rawResId : ${R.raw.tsd_listening_passive_loop_lt_01_2}")
+                    Log.d(
+                        "@@ rawResId(PttListen)",
+                        "rawResId : ${R.raw.tsd_listening_passive_loop_lt_01_2}"
+                    )
                     LottieRawAnimationHandler(
                         modifier = Modifier.fillMaxSize(),
                         rawResId = rawResId,
@@ -527,5 +661,3 @@ fun VrUiAnimationHandler(vrUiState: VRUiState) {
         }
     }
 }
-
-
