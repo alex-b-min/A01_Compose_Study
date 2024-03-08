@@ -1,6 +1,7 @@
 package com.example.a01_compose_study.presentation.screen.main.route
 
 import android.util.Log
+import android.view.MotionEvent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -21,6 +23,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -80,10 +83,11 @@ fun MainRoute(
     WindowFrame(
         domainUiState = domainUiState,
         domainWindowVisible = domainWindowVisibleState,
+        vrUiState = vrUiState,
         onCloseDomainWindow = {
             viewModel.onDomainEvent(MainEvent.CloseDomainWindowEvent)
         }) {
-        VrUiAnimationHandler(vrUiState)
+//        VrUiAnimationHandler(vrUiState)
 
         Box(
             modifier = Modifier
@@ -452,105 +456,32 @@ fun MainRoute(
 }
 
 /**
- * 계속해서 리컴포지션이 발생되는 오류가 있음 추후 수정해야함..
+ * VR의 상태가 바껴 애니메이션이 바뀌면 겹쳐진 도메인 스크린들도 같이 리컴포지션이 되는 이슈가 있음.. 추후 수정해야함..
  */
 @Composable
 fun VrUiAnimationHandler(vrUiState: VRUiState) {
-    val scope = rememberCoroutineScope()
+    var rawResId by remember { mutableStateOf(0) }
 
-    var isTouchDown by remember { mutableStateOf(false) }
-    var isTouchUp by remember { mutableStateOf(false) }
-    if (isTouchUp) {
-        scope.launch {
-            delay(2000)
-            onVREvent(
-                VREvent.ChangeVRUIEvent(
-                    VRUiState.PttLoading(
-                        active = true,
-                        isError = false
-                    )
-                )
-            )
+    LaunchedEffect(vrUiState) {
+        Log.d("@@ VrUiAnimationHandler", "${vrUiState}")
+        when {
+            vrUiState.active && vrUiState.isError -> {
+                rawResId = 0 // 초기화
+            }
+
+            vrUiState.active -> {
+                rawResId = when (vrUiState) {
+                    is VRUiState.PttLoading -> R.raw.tsd_thinking_loop_fix_lt_03_2
+                    is VRUiState.PttListen -> R.raw.tsd_listening_passive_loop_lt_01_2
+                    is VRUiState.PttSpeak -> R.raw.loop
+                    else -> 0 // 다른 상태에 대한 처리
+                }
+            }
         }
-        isTouchUp = false
     }
-    Log.d("@@isTouchUp", "${isTouchUp}")
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            /**
-             * [pointerInput를 이용하여 터치를 했을 시 VR의 Active 상태를 판별하여 애니메이션을 시작하는 코드]
-             * ==> 현재 개선해야할 부분은 VR의 Active 상태를 판별하여 VR 애니매이션을 실행하거나 종료하거나 하는데 이때 리컴포지션이 일어나 각 Domain별 Screen 화면도 재구성이 된다는 점이다.
-             * ==> 이러한 초기화 문제가 발생하여 현재 보고 있는 스크롤이 0번째 Index로 초기화되어, 화면이 최상단(0번째 인덱스)으로 스크롤되는 현상이 발생함
-             * ==> 다른것부터 하고 난 후 이것을 해결해봐야겠음..(시간이 많이 걸릴 이슈..)
-             */
-            .pointerInput(Unit) {
-                detectTapGestures(
-                    onLongPress = {
-                        // 긴 터치가 시작되었을 때 실행할 코드
-                        Log.d("@@ onLongPress", "Touch started at offset: $it")
-                    },
-                    onPress = { offset ->
-                        // 터치가 시작되었을 때 실행할 코드
-                        Log.d("@@ ACTION_DOWN", "Touch started at offset: $offset")
-                        onVREvent(
-                            VREvent.ChangeVRUIEvent(
-                                VRUiState.PttLoading(
-                                    active = false,
-                                    isError = false
-                                )
-                            )
-                        )
-                        isTouchUp = true
-                    },
-                    onTap = { offset ->
-                        // 빠른 터치일 때 실행할 코드
-                        Log.d("@@ TAP", "Quick tap at offset: $offset")
-                    }
-                )
-            },
-                /**
-                 * [pointerInteropFilter를 이용하여 터치를 했을 시 VR의 Active 상태를 판별하여 애니메이션을 시작하는 코드]
-                 * ==> 작동이 잘되지 않아 위의 pointerInput을 사용하였음
-                 */
-//                .pointerInteropFilter { event ->
-//                    when (event.actionMasked) {
-//                        MotionEvent.ACTION_DOWN -> {
-//                            Log.d("@@ ACTION_DOWN", "${event.actionMasked}")
-//                            isTouchDown = true
-//                        }
-//                        MotionEvent.AXIS_SCROLL -> {
-//                            Log.d("@@ AXIS_SCROLL", "${event.actionMasked}")
-//                            onVREvent(
-//                                VREvent.ChangeVRUIEvent(
-//                                    VRUiState.PttLoading(
-//                                        active = false,
-//                                        isError = false
-//                                    )
-//                                )
-//                            )
-//                        }
-//
-//                        MotionEvent.ACTION_UP -> {
-//                            Log.d("@@ ACTION_UP", "${event.actionMasked}")
-//                            if (isTouchDown) {
-//                                // 손을 뗐을 때, 터치 다운 이벤트가 있었으면 실행할 코드
-//                                onVREvent(
-//                                    VREvent.ChangeVRUIEvent(
-//                                        VRUiState.PttLoading(
-//                                            active = false,
-//                                            isError = false
-//                                        )
-//                                    )
-//                                )
-//                                isTouchUp = true
-//                            }
-//                            isTouchDown = false
-//                        }
-//                    }
-//                    true // 이벤트를 소비하지 않고 하위로 전달
-//                },
+        modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.BottomCenter,
     ) {
         when {
@@ -564,50 +495,24 @@ fun VrUiAnimationHandler(vrUiState: VRUiState) {
             }
 
             vrUiState.active -> {
+                Log.d("@@ vrUiState.active??", "active: ${vrUiState.active}/ isError: ${vrUiState.isError}")
                 LottieAssetAnimationHandler(
                     modifier = Modifier.fillMaxSize(),
                     lottieJsonAssetPath = "bg_glow/09_tsd_frame_glow_l_lt.json",
                     lottieImageAssetFolder = "bg_glow/images/default",
                     infiniteLoop = true
                 )
-                when (vrUiState) {
-                    is VRUiState.PttLoading -> {
-                        LottieRawAnimationHandler(
-                            modifier = Modifier.fillMaxSize(),
-                            rawResId = R.raw.tsd_thinking_loop_fix_lt_03_2,
-                            infiniteLoop = true,
-                            onFrameChanged = { currentFrame ->
-                                // 필요한 경우 처리
-                            }
-                        )
-                    }
-
-                    is VRUiState.PttListen -> {
-                        LottieRawAnimationHandler(
-                            modifier = Modifier
-                                .fillMaxSize(),
-                            rawResId = R.raw.tsd_listening_passive_loop_lt_01_2,
-                            infiniteLoop = true,
-                            onFrameChanged = { currentFrame ->
-                                // 필요한 경우 처리
-                            }
-                        )
-                    }
-
-                    is VRUiState.PttSpeak -> {
-                        LottieRawAnimationHandler(
-                            modifier = Modifier.fillMaxSize(),
-                            rawResId = R.raw.loop,
-                            infiniteLoop = true,
-                            onFrameChanged = { currentFrame ->
-                                // 필요한 경우 처리
-                            }
-                        )
-                    }
-
-                    else -> {
-                        // 다른 상태에 대한 처리
-                    }
+                if (rawResId != 0) {
+                    Log.d("@@ rawResId", "rawResId : ${rawResId}")
+                    Log.d("@@ rawResId(PttListen)", "rawResId : ${R.raw.tsd_listening_passive_loop_lt_01_2}")
+                    LottieRawAnimationHandler(
+                        modifier = Modifier.fillMaxSize(),
+                        rawResId = rawResId,
+                        infiniteLoop = true,
+                        onFrameChanged = { currentFrame ->
+                            // 필요한 경우 처리
+                        }
+                    )
                 }
             }
         }
