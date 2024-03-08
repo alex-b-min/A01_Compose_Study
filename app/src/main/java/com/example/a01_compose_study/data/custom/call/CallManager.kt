@@ -361,14 +361,14 @@ fun fetchAllContacts(): List<Contact> {
     )
 
     result.add(Contact(id = "1", name = "문재민", number = "010-1111-2222", type = types.indexOf(1)))
-    result.add(Contact(id = "2", name = "문재민", number = "010-13-14", type = types.indexOf(2)))
+    result.add(Contact(id = "2", name = "문재민", number = "010-1312-1443", type = types.indexOf(2)))
 
     result.add(Contact(id = "3", name = "이일구", number = "010-8765-4321", type = types.indexOf(1)))
     result.add(Contact(id = "4", name = "이일구", number = "010-1234-5678", type = types.indexOf(3)))
 
-    result.add(Contact(id = "5", name = "엄마", number = "010-7777-8888", type = types.indexOf(1)))
-    result.add(Contact(id = "6", name = "엄마", number = "010-5555-6666", type = types.indexOf(2)))
-    result.add(Contact(id = "7", name = "엄마", number = "010-7777-8888", type = types.indexOf(3)))
+    result.add(Contact(id = "5", name = "엄마", number = "010-5555-5555", type = types.indexOf(1)))
+    result.add(Contact(id = "6", name = "엄마", number = "010-6666-6666", type = types.indexOf(2)))
+    result.add(Contact(id = "7", name = "엄마", number = "010-7777-7777", type = types.indexOf(3)))
 
     result.add(Contact(id = "8", name = "삐쓰까또레부르쥬미첼라햄페스츄리치즈나쵸스트링스파게티", number = "010-2222-3333", type = types.random()))
     result.add(Contact(id = "9", name = "하늘별님구름햇님보다사랑스러우리", number = "010-3333-4444", type = types.random()))
