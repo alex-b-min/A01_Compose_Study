@@ -11,5 +11,7 @@ sealed class SelectVRResult {
     object SendMsgResult: SelectVRResult()
     object SendMsgNameResult: SelectVRResult()
     object SendMsgNameMsgResult: SelectVRResult()
+    object NoResult: SelectVRResult()
+    object MessageReult: SelectVRResult()
     object ScrollIndexResult : SelectVRResult()
 }

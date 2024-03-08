@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
@@ -14,27 +16,32 @@ import com.example.a01_compose_study.data.custom.sendMsg.SendMsgEvent
 import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.presentation.components.top_bar.TopAppBarContent
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
+import com.example.a01_compose_study.presentation.screen.main.route.VRUiState
 import com.example.a01_compose_study.presentation.screen.sendMsg.SendMsgViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 
 @Composable
 fun SendMsgScreen(
+//    viewModel: SendMsgViewModel = viewModel(),
     viewModel: SendMsgViewModel = hiltViewModel(),
     domainUiState: DomainUiState.SendMessageWindow,
+    vrUiState: VRUiState,
 ) {
+    val lineIndex by viewModel.lineIndex.collectAsState()
     Box(
         modifier = Modifier
             .fillMaxSize()
             .clip(RoundedCornerShape(10.dp))
     ) {
         Column {
-            Log.d("sendMsg","TopAppBarContent")
+            Log.d("sendMsg", "TopAppBarContent")
             TopAppBarContent(
                 showNavigationIcon = false,
                 onActionIconClick = { viewModel.onSendMsgEvent(SendMsgEvent.OnBack) }
             )
             if (domainUiState.screenType is ScreenType.SayMessage) {
                 domainUiState.msgData?.let {
-                    Log.d("sendMsg","SayMessage MessageView")
+                    Log.d("sendMsg", "SayMessage MessageView")
                     MessageView(
                         name = it.name,
                         phoneNum = domainUiState.msgData.phoneNum,
@@ -44,7 +51,7 @@ fun SendMsgScreen(
                     )
                 }
             } else if (domainUiState.screenType is ScreenType.SendMessage) {
-                Log.d("sendMsg","SendMessage MessageView")
+                Log.d("sendMsg", "SendMessage MessageView")
                 domainUiState.msgData?.let {
                     MessageView(
                         name = it.name,
@@ -56,14 +63,45 @@ fun SendMsgScreen(
                     )
                 }
             } else if (domainUiState.screenType is ScreenType.MessageAllList) {
-                Log.d("sendMsg","MessageAllList")
-                domainUiState.contactList?.let { MsgAllList(it) }
+                Log.d("sendMsg", "MessageAllList")
+                domainUiState.contactList?.let {
+                    Log.e("sendMsg", "Screen contactList? 안")
+                    Log.e("sendMsg","AllList:${viewModel.lineIndex}")
+
+                    MsgAllList(
+                        contactList = it,
+                        lineIndex = lineIndex,
+                        onItemClick = { contact ->
+                            viewModel.onSendMsgEvent(SendMsgEvent.MsgAllListItemOnClick(contact))
+                            Log.e("sendMsg", "Screen click 실행")
+                        })
+                }
             } else if (domainUiState.screenType is ScreenType.MessageSelectNameList) {
-                Log.d("sendMsg","MessageSelectNameList")
-                domainUiState.contactList?.let { MsgNameList(it) }
+                Log.d("sendMsg", "MessageSelectNameList")
+                domainUiState.contactList?.let {
+                    MsgNameList(
+                        contactList = it,
+                        lineIndex = lineIndex,
+                        onItemClick = { contact ->
+                            viewModel.onSendMsgEvent(SendMsgEvent.SelectNameListItemOnClick(contact))
+                            Log.e("sendMsg", "Screen click 실행")
+                        })
+                }
             } else if (domainUiState.screenType is ScreenType.MessageSelectCategoryList) {
-                Log.d("sendMsg","MessageSelectCategoryList")
-                domainUiState.contactList?.let { MsgCategoryList(it) }
+                Log.d("sendMsg", "MessageSelectCategoryList")
+                domainUiState.contactList?.let {
+                    MsgCategoryList(
+                        contactList = it,
+                        lineIndex = lineIndex,
+                        onItemClick = { contact ->
+                            viewModel.onSendMsgEvent(
+                                SendMsgEvent.SelectCategoryListItemOnClick(
+                                    contact
+                                )
+                            )
+                            Log.e("sendMsg", "Screen click 실행")
+                        })
+                }
             }
         }
     }

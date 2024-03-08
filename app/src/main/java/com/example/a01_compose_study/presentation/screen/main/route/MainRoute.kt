@@ -165,11 +165,10 @@ fun MainRoute(
 
             is DomainUiState.SendMessageWindow -> {
                 SendMsgScreen(
+                    vrUiState = vrUiState,
                     domainUiState = domainUiState as DomainUiState.SendMessageWindow
                 )
             }
-
-            else -> {}
         }
     }
 
@@ -179,9 +178,10 @@ fun MainRoute(
         horizontalAlignment = Alignment.End
     ) {
         PttButton(
-            modifier = Modifier.fillMaxWidth(0.13f)
-            .fillMaxHeight(0.07f),
-            contentText = "SendMsg",
+            modifier = Modifier
+                .fillMaxWidth(0.13f)
+                .fillMaxHeight(0.07f),
+            contentText = "speak: SendMsg",
             onClick = {
                 scope.launch {
 //                    viewModel.vrmwManager.setVRResult(VRResult(), SelectVRResult.SendMsgResult)
@@ -189,14 +189,14 @@ fun MainRoute(
                 }
             }
         )
-
         PttButton(
-      
-                    modifier = Modifier.fillMaxWidth(0.13f)
+            modifier = Modifier
+                .fillMaxWidth(0.13f)
                 .fillMaxHeight(0.07f),
-            contentText = "SendMsg Name",
+            contentText = "speak: SendMsg Name",
             onClick = {
                 scope.launch {
+//                    viewModel.vrmwManager.setVRResult(VRResult(), SelectVRResult.SendMsgResult)
                     pttViewModel.onPttEvent(PttEvent.StartVR(selectVRResult = SelectVRResult.SendMsgNameResult))
                 }
             }
@@ -204,13 +204,38 @@ fun MainRoute(
 
         PttButton(
             modifier = Modifier
-                .fillMaxSize(0.13f)
-                .fillMaxHeight(0.13f),
-            contentText = "SendMsg Name Msg",
+                .fillMaxWidth(0.13f)
+                .fillMaxHeight(0.07f),
+            contentText = "Line 1",
             onClick = {
                 scope.launch {
-                    pttViewModel.onPttEvent(PttEvent.StartVR(selectVRResult = SelectVRResult.SendMsgNameMsgResult))
+                    viewModel.vrmwManager.setVRResult(VRResult(), SelectVRResult.ScrollIndexResult)
                 }
+            }
+        )
+
+        PttButton(
+            modifier = Modifier
+                .fillMaxWidth(0.13f)
+                .fillMaxHeight(0.07f),
+            contentText = "No",
+            onClick = {
+                scope.launch {
+//                    pttViewModel.onPttEvent(PttEvent.StartVR(selectVRResult = SelectVRResult.NoResult))
+                    viewModel.vrmwManager.setVRResult( vrResult = VRResult(), selectVRResult = SelectVRResult.NoResult)
+                }
+            }
+        )
+
+        PttButton(
+            modifier = Modifier
+                .fillMaxWidth(0.13f)
+                .fillMaxHeight(0.07f),
+            contentText = "say message",
+            onClick = {
+                scope.launch {
+//                    viewModel.vrmwManager.setVRResult(VRResult(), SelectVRResult.ScrollIndexResult)
+                    viewModel.vrmwManager.setVRResult( vrResult = VRResult(), selectVRResult = SelectVRResult.MessageReult)                }
             }
         )
         PttButton(

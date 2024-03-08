@@ -13,6 +13,8 @@ import com.example.a01_compose_study.presentation.screen.main.DomainUiState
 import com.example.a01_compose_study.presentation.screen.main.MainEvent
 import com.example.a01_compose_study.presentation.screen.SelectVRResult
 import com.example.a01_compose_study.presentation.screen.main.MainViewModel
+import com.example.a01_compose_study.presentation.screen.main.VREvent
+import com.example.a01_compose_study.presentation.screen.main.route.VRUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -140,15 +142,15 @@ class PttViewModel @Inject constructor(
                              * onPttEvent()을 통해 각 상황에 맞는 로직을 실행하여 각 화면 상태를 나타내주는 역할
                              */
                             onPttEvent(PttEvent.SetLoadingType)
-                            delay(1500)
+                            delay(150)
                             onPttEvent(PttEvent.PreparePtt)
-                            delay(1500)
+                            delay(150)
                             onPttEvent(PttEvent.SetSpeakType)
-                            delay(1500)
+                            delay(150)
                             onPttEvent(PttEvent.SetLoadingType)
-                            delay(1500)
+                            delay(150)
 
-                            pttManager.pttEvent(selectVRResult = SelectVRResult.SendMsgResult)
+                            pttManager.pttEvent(selectVRResult = SelectVRResult.SendMsgNameResult)
                         }
                     }
                 }

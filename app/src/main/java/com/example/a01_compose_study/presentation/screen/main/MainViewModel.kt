@@ -1,26 +1,29 @@
 package com.example.a01_compose_study.presentation.screen.main
 
+import android.app.Application
 import android.util.Log
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.a01_compose_study.data.Contact
 import com.example.a01_compose_study.data.HVRError
 import com.example.a01_compose_study.data.custom.MWContext
 import com.example.a01_compose_study.data.custom.SealedParsedData
 import com.example.a01_compose_study.data.custom.call.ProcCallData
-import com.example.a01_compose_study.data.custom.sendMsg.MsgData
 import com.example.a01_compose_study.data.custom.sendMsg.SendMsgDataType
+import com.example.a01_compose_study.data.custom.sendMsg.SendMsgEvent
 import com.example.a01_compose_study.domain.model.HelpItemData
-import com.example.a01_compose_study.domain.model.NoticeModel
 import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.data.UiState
+import com.example.a01_compose_study.presentation.data.UiState._sendMsgUiData
 import com.example.a01_compose_study.presentation.screen.main.route.VRUiState
 import com.example.a01_compose_study.presentation.screen.ptt.VrmwManager
+import com.example.a01_compose_study.presentation.screen.sendMsg.SendMsgViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -31,6 +34,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
+    val application: Application,
     val vrmwManager: VrmwManager, // MainViewModel에서 필요한 이유는, 음성인식 결과를 직접적으로 생성하기 위해
 ) : ViewModel() {
 
@@ -130,19 +134,31 @@ class MainViewModel @Inject constructor(
                             }
 
                             is ProcCallData.ListTTSRequest -> {
-                                Log.d("@@ ProcCallData", "ListTTSRequest - Prompt ID: ${sealedParsedData.procCallData.promptId}")
+                                Log.d(
+                                    "@@ ProcCallData",
+                                    "ListTTSRequest - Prompt ID: ${sealedParsedData.procCallData.promptId}"
+                                )
                             }
 
                             is ProcCallData.NoticeTTSRequest -> {
-                                Log.d("@@ ProcCallData", "NoticeTTSRequest - Notice Model: ${sealedParsedData.procCallData.noticeModel}")
+                                Log.d(
+                                    "@@ ProcCallData",
+                                    "NoticeTTSRequest - Notice Model: ${sealedParsedData.procCallData.noticeModel}"
+                                )
                             }
 
                             is ProcCallData.ProcCallNameScreen -> {
-                                Log.d("@@ ProcCallData", "ProcCallNameScreen - Contact: ${sealedParsedData.procCallData.data}")
+                                Log.d(
+                                    "@@ ProcCallData",
+                                    "ProcCallNameScreen - Contact: ${sealedParsedData.procCallData.data}"
+                                )
                             }
 
                             is ProcCallData.RecognizedContactListScreen -> {
-                                Log.d("@@ ProcCallData", "ContactListScreen - Contact List: ${sealedParsedData.procCallData.data}")
+                                Log.d(
+                                    "@@ ProcCallData",
+                                    "ContactListScreen - Contact List: ${sealedParsedData.procCallData.data}"
+                                )
                                 onDomainEvent(
                                     event = MainEvent.OpenDomainWindowEvent(
                                         domainType = sealedParsedData.procCallData.sealedDomainType,
@@ -157,18 +173,26 @@ class MainViewModel @Inject constructor(
 
                             is ProcCallData.AllContactListScreen -> {
                                 Log.d(
-                                    "@@ ProcCallData", "FullContactListScreen - Full Contact List: ${sealedParsedData.procCallData.data}")
+                                    "@@ ProcCallData",
+                                    "FullContactListScreen - Full Contact List: ${sealedParsedData.procCallData.data}"
+                                )
                             }
 
                             is ProcCallData.ScrollIndex -> {
                                 if (sealedParsedData.procCallData.index != null) {
                                     onDomainEvent(MainEvent.ChangeScrollIndexEvent(sealedParsedData.procCallData.index))
                                 }
-                                Log.d("@@ ProcCallData", "ScrollIndex - Index: ${sealedParsedData.procCallData.index}")
+                                Log.d(
+                                    "@@ ProcCallData",
+                                    "ScrollIndex - Index: ${sealedParsedData.procCallData.index}"
+                                )
                             }
 
                             is ProcCallData.ProcYesNoOtherNumberResult -> {
-                                Log.d("@@ ProcCallData", "YesNoOtherNumberResultProc - Result: ${sealedParsedData.procCallData.callYesNoOtherNumberResult}")
+                                Log.d(
+                                    "@@ ProcCallData",
+                                    "YesNoOtherNumberResultProc - Result: ${sealedParsedData.procCallData.callYesNoOtherNumberResult}"
+                                )
                             }
                         }
                     }
@@ -176,7 +200,18 @@ class MainViewModel @Inject constructor(
                     is SealedParsedData.SendMsgData -> {
                         when (sealedParsedData.procSendMsgData.data) {
                             is SendMsgDataType.SendMsgData -> {
-                                Log.d("sendMsg", "ProcSendMsgData.SendMsgData - data: ${sealedParsedData.procSendMsgData.data}")
+                                Log.d(
+                                    "sendMsg",
+                                    "ProcSendMsgData.SendMsgData - data: ${sealedParsedData.procSendMsgData.data}"
+                                )
+                                UiState.onVREvent(
+                                    VREvent.ChangeVRUIEvent(
+                                        VRUiState.PttLoading(
+                                            active = true,
+                                            isError = false
+                                        )
+                                    )
+                                )
                                 onDomainEvent(
                                     event = MainEvent.OpenDomainWindowEvent(
                                         domainType = sealedParsedData.procSendMsgData.domainType,
@@ -190,7 +225,10 @@ class MainViewModel @Inject constructor(
                             }
 
                             is SendMsgDataType.SendScreenData -> {
-                                Log.d("sendMsg", "ProcSendMsgData.SendMsgData - data: ${sealedParsedData.procSendMsgData.data}")
+                                Log.d(
+                                    "sendMsg",
+                                    "ProcSendMsgData.SendMsgData - data: ${sealedParsedData.procSendMsgData.data}"
+                                )
                                 onDomainEvent(
                                     event = MainEvent.SendDataEvent(
                                         domainType = sealedParsedData.procSendMsgData.domainType,
@@ -201,7 +239,10 @@ class MainViewModel @Inject constructor(
                             }
 
                             is SendMsgDataType.SendListNum -> {
-                                Log.d("sendMsg", "ProcSendMsgData.SendMsgData - data: ${sealedParsedData.procSendMsgData.data}")
+                                Log.e(
+                                    "sendMsg",
+                                    "ProcSendMsgData.SendMsgData - data: ${sealedParsedData.procSendMsgData.data}"
+                                )
                                 onDomainEvent(
                                     event = MainEvent.SendDataEvent(
                                         domainType = SealedDomainType.SendMessage,
@@ -212,7 +253,10 @@ class MainViewModel @Inject constructor(
                             }
 
                             is SendMsgDataType.ErrorMsgData -> {
-                                Log.d("sendMsg", "ProcSendMsgData.SendMsgData - data: ${sealedParsedData.procSendMsgData.data}")
+                                Log.d(
+                                    "sendMsg",
+                                    "ProcSendMsgData.SendMsgData - data: ${sealedParsedData.procSendMsgData.data}"
+                                )
                                 onDomainEvent(
 //                                    event = MainEvent.OpenDomainWindowEvent(
 //                                        domainType = sealedParsedData.procSendMsgData.domainType,
@@ -312,7 +356,7 @@ class MainViewModel @Inject constructor(
 
                         SealedDomainType.SendMessage -> {
                             val eventData = event.data as SendMsgDataType.SendMsgData
-                            Log.d("sendMsg","contactList: {${eventData.contacts}}")
+                            Log.d("sendMsg", "contactList: {${eventData.contacts}}")
                             DomainUiState.SendMessageWindow(
                                 domainType = event.domainType,
                                 screenType = event.screenType,
@@ -350,7 +394,7 @@ class MainViewModel @Inject constructor(
                     }
                     domainUiState
                 }
-                UiState.pushUiState(Pair(domainUiState.value,mwContext.value))
+                UiState.pushUiState(Pair(domainUiState.value, mwContext.value))
             }
 
             is MainEvent.ChangeScrollIndexEvent -> {
@@ -361,13 +405,26 @@ class MainViewModel @Inject constructor(
             }
 
             is MainEvent.SendDataEvent -> {
+//                val sendMsgViewModel: SendMsgViewModel by lazy {
+//                    ViewModelProvider.AndroidViewModelFactory.getInstance(application)
+//                        .create(SendMsgViewModel::class.java)
+//                }
+
                 when (event.domainType) {
                     is SealedDomainType.SendMessage -> {
-                        CoroutineScope(Dispatchers.Default).launch {
-                            _sendMsgData.emit(event.screenType to event.data)
+                        val sendMsgViewModel: SendMsgViewModel
+                        Log.d("sendMsg", "수행 /${event.screenType} ,${event.data}")
+                        Log.d("sendMsg", "_sendMsgData: ${_sendMsgData}")
+                        viewModelScope.launch {
+                            _sendMsgUiData.emit(event.screenType to event.data)
+                            Log.d("sendMsg", "emit 함")
                         }
+//                        CoroutineScope(Dispatchers.Default).launch {
+////                            _sendMsgData.collect(event.screenType to event.data)
+//                            _sendMsgData.collect { event.screenType to event.data }
+//                            Log.d("sendMsg","_sendMsgData: ${_sendMsgData}")
+//                        }
                     }
-
                     else -> {
 
                     }

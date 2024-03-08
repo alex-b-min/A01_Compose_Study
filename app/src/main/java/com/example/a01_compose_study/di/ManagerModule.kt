@@ -1,5 +1,6 @@
 package com.example.a01_compose_study.di
 
+import android.app.Application
 import android.content.Context
 import com.example.a01_compose_study.data.custom.ContactsDummyProvider
 import com.example.a01_compose_study.data.custom.ContactsManager
@@ -12,6 +13,7 @@ import com.example.a01_compose_study.data.custom.ptt.PttManager
 import com.example.a01_compose_study.data.custom.sendMsg.SendMsgManager
 import com.example.a01_compose_study.presentation.screen.main.MainViewModel
 import com.example.a01_compose_study.presentation.screen.ptt.VrmwManager
+import com.example.a01_compose_study.presentation.screen.sendMsg.SendMsgViewModel
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -91,9 +93,11 @@ object ManagerModule {
     @Provides
     @Singleton
     fun provideMainViewModel(
+        application: Application,
         vrmwManager: VrmwManager,
     ):MainViewModel{
         return MainViewModel(
+            application = application,
             vrmwManager = vrmwManager,
         )
     }
@@ -148,6 +152,18 @@ object ManagerModule {
             contactsManager = contactsManager,
             job = ioCoroutineScope,
             btCall = btCall
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun provideSendMsgViewModel(
+        @IOCoroutineScope ioCoroutineScope: CoroutineScope,
+        sendMsgManager: SendMsgManager,
+    ): SendMsgViewModel{
+        return SendMsgViewModel(
+            job = ioCoroutineScope,
+            sendMsgManager = sendMsgManager,
         )
     }
 }

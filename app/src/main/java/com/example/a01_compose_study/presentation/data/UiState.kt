@@ -25,7 +25,7 @@ object UiState {
     val _domainWindowVisible = MutableStateFlow<Boolean>(false)
     val domainWindowVisible: StateFlow<Boolean> = _domainWindowVisible
 
-    val _domainUiStateStack = mutableListOf<Pair<DomainUiState,MWContext?>>()
+    val _domainUiStateStack = mutableListOf<Pair<DomainUiState, MWContext?>>()
 
     val _VRUiState = MutableStateFlow<VRUiState>(VRUiState.PttNone(active = false, isError = false))
     val vrUiState: StateFlow<VRUiState> = _VRUiState
@@ -46,7 +46,7 @@ object UiState {
 //            Log.d("@@ _domainUiStateStack", "index: $index / data: $domainUiState")
 //        }
 //    }
-        fun pushUiState(domainUiPair:Pair<DomainUiState,MWContext?>) {
+    fun pushUiState(domainUiPair: Pair<DomainUiState, MWContext?>) {
 //        val domainUiPair:Pair<DomainUiState,MWContext?> = Pair(domainUiState,mwContext)
         _domainUiStateStack.add(domainUiPair)
     }
@@ -54,7 +54,7 @@ object UiState {
     /**
      * 화면을 스택에 쌓지 않고 변화만 시킴
      */
-    fun changeUiState(domainUiPair:Pair<DomainUiState,MWContext?>) {
+    fun changeUiState(domainUiPair: Pair<DomainUiState, MWContext?>) {
         val uiState = domainUiPair.first
         val mwContext = domainUiPair.second
         _domainUiState.update { domainUiState ->
@@ -64,27 +64,16 @@ object UiState {
     }
 
     fun popUiState() {
+        Log.d("sendMsg", "popUiState, _domainUiStateStack.size:${_domainUiStateStack.size}")
         if (_domainUiStateStack.size > 1) {
-//            _domainUiStateStack.removeAt(_domainUiStateStack.size - 1)
-//            _domainUiState.value = _domainUiStateStack.last()
-            val poppedPair = _domainUiStateStack.removeLast()
-            val domainUiState = poppedPair.first
-            val mwContext = poppedPair.second
 
-            _domainUiState.value = domainUiState
-            _mwContext.value = mwContext
+            _domainUiStateStack.removeLast()
+            _domainUiState.value = _domainUiStateStack.last().first
+            _mwContext.value = _domainUiStateStack.last().second
 
+            Log.d("sendMsg", "popUiState, _domainUiStateStack.size:${_domainUiStateStack.size}")
         } else {
-//            _domainUiState.update {
-//                DomainUiState.PttWindow(
-//                    domainType = SealedDomainType.Ptt,
-//                    screenType = ScreenType.PttListen,
-//                    guideText = "",
-//                    isError = false,
-//                    screenSizeType = ScreenSizeType.Small
-//                )
-//            }
-//        }
+            Log.d("sendMsg", "popUiState : else")
         }
     }
 
@@ -109,10 +98,15 @@ object UiState {
         return domainUiState
     }
 
-    fun handleScreenData(screenData: ScreenData, domainUiPair:Pair<DomainUiState,MWContext?>) {
+    fun handleScreenData(screenData: ScreenData, domainUiPair: Pair<DomainUiState, MWContext?>) {
+        Log.d("sendMsg", "handleScreenData : ${screenData}")
         when (screenData) {
             ScreenData.PUSH -> pushUiState(domainUiPair)
-            ScreenData.POP -> popUiState()
+            ScreenData.POP -> {
+                Log.d("sendMsg", "popUiState 실행함")
+                popUiState()
+            }
+
             ScreenData.CHANGE -> popUiState()
             ScreenData.REJECT -> TODO()
             ScreenData.BtPhoneAppRun -> TODO()

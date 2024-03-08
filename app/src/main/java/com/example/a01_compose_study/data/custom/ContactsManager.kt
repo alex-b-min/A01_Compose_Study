@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothProfile
 import android.content.Context
+import android.util.Log
 import com.example.a01_compose_study.R
 import com.example.a01_compose_study.data.ACLDevice
 import com.example.a01_compose_study.data.Contact
@@ -13,7 +14,6 @@ import com.example.a01_compose_study.data.HVRConfigEvent
 import com.example.a01_compose_study.data.HVRG2PMode
 import com.example.a01_compose_study.data.HfpDevice
 import com.example.a01_compose_study.data.PhonebookDownloadState
-import com.example.a01_compose_study.data.Tags
 import com.example.a01_compose_study.data.custom.NormalizeUtils.convertTextNormalize
 import com.example.a01_compose_study.di.ApplicationScope
 import com.example.a01_compose_study.di.IoDispatcher
@@ -31,7 +31,6 @@ import com.example.a01_compose_study.presentation.data.ServiceState.settingState
 import com.example.a01_compose_study.presentation.data.ServiceState.systemState
 import com.example.a01_compose_study.presentation.data.ServiceState.vrConfig
 import com.example.a01_compose_study.presentation.data.UiState.changeUiState
-import com.example.a01_compose_study.presentation.data.UiState.domainUiState
 import com.example.a01_compose_study.presentation.data.UiState.mwContext
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
 import com.example.a01_compose_study.presentation.screen.ptt.VrmwManager
@@ -1188,202 +1187,246 @@ class ContactsManager @Inject constructor(
 
     fun makeContactList(
         items: List<Contact>,
-        filter: Boolean,
-        category: Int = 0,
-        isOtherNumber: Boolean = false
-    ): ArrayList<Contact> {
-        return makeContactList(
-            items,
-            contactsList.value,
-            filter = filter,
-            category = category,
-            isOtherNumber = isOtherNumber
-        )
-    }
-
-    fun makeContactList(
-        items: List<Contact>,
         contactsList: List<Contact>,
-        filter: Boolean,
-        category: Int = 0,
-        isOtherNumber: Boolean = false
-    ): ArrayList<Contact> {
-        CustomLogger.e("makeContactList find target size : ${items.size}, filter:${filter} category:${category}")
-        items.forEach {
-            CustomLogger.e("find target: ${it}")
-        }
-        val findList = mutableListOf<Contact>()
-        for (item in items) {
+        contactId: String = "",
+    ): MutableList<Contact> {
+        var result = mutableListOf<Contact>()
 
-            // Other Number인 경우, contact_id가 이미 있는 경우에 해당
-            if (item.contact_id.isNotEmpty()) {
-                CustomLogger.e("find with contact_id: ${item.contact_id}")
-                for (contact in contactsList) {
-                    if (item.contact_id.equals(contact.contact_id, ignoreCase = true)) {
-                        findList.add(contact.copy(slotType = item.slotType))
-                    }
-                }
-            } else if (!Tags.FULL_FIRST.isEqual(item.slotType)) {
-                item.nameRmSpecial.let { name ->
-//                        println(
-//                            "find :[${name}] slotType:${
-//                                Tags.values().find { tag -> tag.value == item.slotType }
-//                            }"
-//                        )
-                    for (contact in contactsList) {
-                        if (name.equals(contact.nameRmSpecial, ignoreCase = true)) {
-//                                println(
-//                                    "found:[${name}]: id:${contact.id} contact_id:${contact.contact_id} nameRmSpecial: ${contact.nameRmSpecial} number:${contact.number} contactType:${contact.type} itemType:${item.type}"
-//                                )
-                            findList.add(contact.copy(slotType = item.slotType))
-                        }
-                    }
-
-                    if (findList.isEmpty()) {
-//                            println(
-//                                "not found name using equals"
-//                            )
-                        for (contact in contactsList) {
-                            if (contact.nameRmSpecial.isNotEmpty()) {
-                                if (name.contains(contact.nameRmSpecial, ignoreCase = true) ||
-                                    contact.nameRmSpecial.contains(name, ignoreCase = true)
-                                ) {
-//                                        println(
-//                                            "found:[${name}]: id:${contact.id} contact_id:${contact.contact_id} nameRmSpecial: ${contact.nameRmSpecial} number:${contact.number} contactType:${contact.type} itemType:${item.type}"
-//                                        )
-                                    // Call <Name>인 경우는 바로 전화
-                                    // Call <Name, Category>인 경우는 없다고 한 후 다른 Category 번호로 전화해야 함.
-                                    findList.add(contact.copy(slotType = item.slotType))
-                                }
-                            }
-                        }
-                    }
-                }
-            } else {
-//                    println(
-//                        "full_first find f:[${item.trimFirstName()}] l:[${item.trimLastName()}]"
-//                    )
-                for (contact in contactsList) {
-                    if (item.trimFirstName().equals(contact.trimFirstName(), ignoreCase = true)
-                        && item.trimLastName().equals(contact.trimLastName(), ignoreCase = true)
-                    ) {
-                        if (item.trimFirstName().isEmpty() && item.trimLastName().isEmpty()) {
-                            continue
-                        }
-                        if (contact.trimFirstName().isEmpty() && contact.trimLastName().isEmpty()) {
-                            continue
-                        }
-//                            println(
-//                                "full_first found:[${item.trimFirstName()} ${item.trimLastName()}]: id:${contact.id} contact_id:${contact.contact_id} nameRmSpecial: ${contact.nameRmSpecial} number:${contact.number} contactType:${contact.type} itemType:${item.type}"
-//                            )
-                        findList.add(contact.copy(slotType = item.slotType))
-                    }
-                }
-                if (findList.isEmpty()) {
-//                        println(
-//                            "full_first not found name using equals"
-//                        )
-                    for (contact in contactsList) {
-                        if (contact.nameRmSpecial.isNotEmpty()) {
-                            if ((item.trimFirstName()
-                                    .contains(contact.trimFirstName(), true) ||
-                                        contact.nameRmSpecial
-                                            .contains(item.trimFirstName(), true))
-                                &&
-                                (item.trimLastName()
-                                    .contains(contact.trimLastName(), true) ||
-                                        contact.nameRmSpecial
-                                            .contains(item.trimLastName(), true))
-                            ) {
-
-                                if (item.trimFirstName().isEmpty() && item.trimLastName()
-                                        .isEmpty()
-                                ) {
-                                    continue
-                                }
-                                if (contact.trimFirstName().isEmpty() && contact.trimLastName()
-                                        .isEmpty()
-                                ) {
-                                    continue
-                                }
-
-//                                    println(
-//                                        "full_first found:[${item.trimFirstName()}_${item.trimLastName()}]: id:${contact.id} contact_id:${contact.contact_id} nameRmSpecial: ${contact.nameRmSpecial} number:${contact.number} contactType:${contact.type} itemType:${item.type}"
-//                                    )
-                                // Call <Name>인 경우는 바로 전화
-                                // Call <Name, Category>인 경우는 없다고 한 후 다른 Category 번호로 전화해야 함.
-                                findList.add(contact.copy(slotType = item.slotType))
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        CustomLogger.e("findList Size : ${findList.size}")
-
-        var filterList = findList.filter {
-            it.name.isNotEmpty() && it.number.isNotEmpty()
-        }
-
-
-        // 카테고리 기준 필터링 시작
-        if (category != 0) {
-
-            // 이름 갯수 구하기
-            // 아더넘버 발화인 경우는 contact_id 가 입력된 하나의 연락처만 입력되기 때문에
-            // 검색조건에서 여러사람이 나올 수 없음
-            val nameCount = filterList.distinctBy {
+        if (contactId == "") {
+            // 같은 이름 list
+            Log.d("sendMsg", "같은 이름 list")
+            val filterList = items.distinctBy {
                 it.contact_id
-            }.size
-            // 맞는 카테고리 갯수 구하기
-            val rowCount = filterList.filter {
-                it.type == category
-            }.size
-
-            // 타입 맞는게 1개 이상이면 카테고리 필터 적용
-            // 여러이름이더라도 카테고리까지 맞는것 우선 리턴
-            // 맞는 카테고리가 없으면 목록 보여줌
-            if (rowCount > 0) {
-                filterList = filterList.filter {
-                    it.type == category
-                }
             }
-
-            // 여러사람이 있는 경우
-            if (nameCount > 1) {
-                // 여러사람이 카테고리 까지 맞거나, 일치하는 카테고리가 여러개 일때 사람기준으로 압축
-                filterList = filterList.distinctBy {
-                    it.contact_id
-                }
-            } else {
-                // 아더넘버 발화인 경우 사람기준 압축하지 않음
-                if (!isOtherNumber) {
-                    filterList = filterList.distinctBy {
-                        it.contact_id
+            Log.d("sendMsg", "filterList: ${filterList}")
+            for (item in filterList) {
+                for (contact in contactsList) {
+                    if (item.contact_id == contact.contact_id) {
+                        Log.d("sub", "${contact}")
+                        result.add(contact)
+                        break
                     }
                 }
             }
         } else {
-            // 카테고리 검색이 아닌 경우
-            // filter : contact_id 기준으로 중복 제거
-            if (filter) {
-                filterList = filterList.distinctBy {
-                    it.contact_id
-                }
-            } else {
-                filterList = filterList.distinctBy {
-                    it.id
+            Log.d("sendMsg", "같은 카테고리 리스트")
+            Log.d("sendMsg", "item : ${items} ")
+            val filterList = mutableListOf<Contact>()
+            // 같은 카테고리 리스트
+
+            for (item in items) {
+                if (item.contact_id == contactId) {
+                    filterList.add(item)
                 }
             }
+            // contactsList 중 filterList가 있는 것만 List로
+            Log.d("sendMsg", "filterList : ${filterList} ")
+            result = items.filter { it in contactsList }.toMutableList()
+            Log.d("sendMsg", "result : ${result} ")
         }
 
-
-        CustomLogger.e("filterList Size : ${filterList.size}")
-        val slicedSubList = filterList.subList(0, minOf(20, filterList.size))
-        CustomLogger.e("slicedSubList Size : ${slicedSubList.size}")
-
-        return ArrayList<Contact>(slicedSubList)
+        return result
     }
+
+
+//    fun makeContactList(
+//        items: List<Contact>,
+//        filter: Boolean,
+//        category: Int = 0,
+//        isOtherNumber: Boolean = false
+//    ): ArrayList<Contact> {
+//        return makeContactList(
+//            items,
+//            contactsList.value,
+//            filter = filter,
+//            category = category,
+//            isOtherNumber = isOtherNumber
+//        )
+//    }
+//
+//    fun makeContactList(
+//        items: List<Contact>,
+//        contactsList: List<Contact>,
+//        filter: Boolean,
+//        category: Int = 0,
+//        isOtherNumber: Boolean = false
+//    ): ArrayList<Contact> {
+//        CustomLogger.e("makeContactList find target size : ${items.size}, filter:${filter} category:${category}")
+//        items.forEach {
+//            CustomLogger.e("find target: ${it}")
+//        }
+//        val findList = mutableListOf<Contact>()
+//        for (item in items) {
+//
+//            // Other Number인 경우, contact_id가 이미 있는 경우에 해당
+//            if (item.contact_id.isNotEmpty()) {
+//                CustomLogger.e("find with contact_id: ${item.contact_id}")
+//                for (contact in contactsList) {
+//                    if (item.contact_id.equals(contact.contact_id, ignoreCase = true)) {
+//                        findList.add(contact.copy(slotType = item.slotType))
+//                    }
+//                }
+//            } else if (!Tags.FULL_FIRST.isEqual(item.slotType)) {
+//                item.nameRmSpecial.let { name ->
+////                        println(
+////                            "find :[${name}] slotType:${
+////                                Tags.values().find { tag -> tag.value == item.slotType }
+////                            }"
+////                        )
+//                    for (contact in contactsList) {
+//                        if (name.equals(contact.nameRmSpecial, ignoreCase = true)) {
+////                                println(
+////                                    "found:[${name}]: id:${contact.id} contact_id:${contact.contact_id} nameRmSpecial: ${contact.nameRmSpecial} number:${contact.number} contactType:${contact.type} itemType:${item.type}"
+////                                )
+//                            findList.add(contact.copy(slotType = item.slotType))
+//                        }
+//                    }
+//
+//                    if (findList.isEmpty()) {
+////                            println(
+////                                "not found name using equals"
+////                            )
+//                        for (contact in contactsList) {
+//                            if (contact.nameRmSpecial.isNotEmpty()) {
+//                                if (name.contains(contact.nameRmSpecial, ignoreCase = true) ||
+//                                    contact.nameRmSpecial.contains(name, ignoreCase = true)
+//                                ) {
+////                                        println(
+////                                            "found:[${name}]: id:${contact.id} contact_id:${contact.contact_id} nameRmSpecial: ${contact.nameRmSpecial} number:${contact.number} contactType:${contact.type} itemType:${item.type}"
+////                                        )
+//                                    // Call <Name>인 경우는 바로 전화
+//                                    // Call <Name, Category>인 경우는 없다고 한 후 다른 Category 번호로 전화해야 함.
+//                                    findList.add(contact.copy(slotType = item.slotType))
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            } else {
+////                    println(
+////                        "full_first find f:[${item.trimFirstName()}] l:[${item.trimLastName()}]"
+////                    )
+//                for (contact in contactsList) {
+//                    if (item.trimFirstName().equals(contact.trimFirstName(), ignoreCase = true)
+//                        && item.trimLastName().equals(contact.trimLastName(), ignoreCase = true)
+//                    ) {
+//                        if (item.trimFirstName().isEmpty() && item.trimLastName().isEmpty()) {
+//                            continue
+//                        }
+//                        if (contact.trimFirstName().isEmpty() && contact.trimLastName().isEmpty()) {
+//                            continue
+//                        }
+////                            println(
+////                                "full_first found:[${item.trimFirstName()} ${item.trimLastName()}]: id:${contact.id} contact_id:${contact.contact_id} nameRmSpecial: ${contact.nameRmSpecial} number:${contact.number} contactType:${contact.type} itemType:${item.type}"
+////                            )
+//                        findList.add(contact.copy(slotType = item.slotType))
+//                    }
+//                }
+//                if (findList.isEmpty()) {
+////                        println(
+////                            "full_first not found name using equals"
+////                        )
+//                    for (contact in contactsList) {
+//                        if (contact.nameRmSpecial.isNotEmpty()) {
+//                            if ((item.trimFirstName()
+//                                    .contains(contact.trimFirstName(), true) ||
+//                                        contact.nameRmSpecial
+//                                            .contains(item.trimFirstName(), true))
+//                                &&
+//                                (item.trimLastName()
+//                                    .contains(contact.trimLastName(), true) ||
+//                                        contact.nameRmSpecial
+//                                            .contains(item.trimLastName(), true))
+//                            ) {
+//
+//                                if (item.trimFirstName().isEmpty() && item.trimLastName()
+//                                        .isEmpty()
+//                                ) {
+//                                    continue
+//                                }
+//                                if (contact.trimFirstName().isEmpty() && contact.trimLastName()
+//                                        .isEmpty()
+//                                ) {
+//                                    continue
+//                                }
+//
+////                                    println(
+////                                        "full_first found:[${item.trimFirstName()}_${item.trimLastName()}]: id:${contact.id} contact_id:${contact.contact_id} nameRmSpecial: ${contact.nameRmSpecial} number:${contact.number} contactType:${contact.type} itemType:${item.type}"
+////                                    )
+//                                // Call <Name>인 경우는 바로 전화
+//                                // Call <Name, Category>인 경우는 없다고 한 후 다른 Category 번호로 전화해야 함.
+//                                findList.add(contact.copy(slotType = item.slotType))
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//        CustomLogger.e("findList Size : ${findList.size}")
+//
+//        var filterList = findList.filter {
+//            it.name.isNotEmpty() && it.number.isNotEmpty()
+//        }
+//
+//
+//        // 카테고리 기준 필터링 시작
+//        if (category != 0) {
+//
+//            // 이름 갯수 구하기
+//            // 아더넘버 발화인 경우는 contact_id 가 입력된 하나의 연락처만 입력되기 때문에
+//            // 검색조건에서 여러사람이 나올 수 없음
+//            val nameCount = filterList.distinctBy {
+//                it.contact_id
+//            }.size
+//            // 맞는 카테고리 갯수 구하기
+//            val rowCount = filterList.filter {
+//                it.type == category
+//            }.size
+//
+//            // 타입 맞는게 1개 이상이면 카테고리 필터 적용
+//            // 여러이름이더라도 카테고리까지 맞는것 우선 리턴
+//            // 맞는 카테고리가 없으면 목록 보여줌
+//            if (rowCount > 0) {
+//                filterList = filterList.filter {
+//                    it.type == category
+//                }
+//            }
+//
+//            // 여러사람이 있는 경우
+//            if (nameCount > 1) {
+//                // 여러사람이 카테고리 까지 맞거나, 일치하는 카테고리가 여러개 일때 사람기준으로 압축
+//                filterList = filterList.distinctBy {
+//                    it.contact_id
+//                }
+//            } else {
+//                // 아더넘버 발화인 경우 사람기준 압축하지 않음
+//                if (!isOtherNumber) {
+//                    filterList = filterList.distinctBy {
+//                        it.contact_id
+//                    }
+//                }
+//            }
+//        } else {
+//            // 카테고리 검색이 아닌 경우
+//            // filter : contact_id 기준으로 중복 제거
+//            if (filter) {
+//                filterList = filterList.distinctBy {
+//                    it.contact_id
+//                }
+//            } else {
+//                filterList = filterList.distinctBy {
+//                    it.id
+//                }
+//            }
+//        }
+//
+//
+//        CustomLogger.e("filterList Size : ${filterList.size}")
+//        val slicedSubList = filterList.subList(0, minOf(20, filterList.size))
+//        CustomLogger.e("slicedSubList Size : ${slicedSubList.size}")
+//
+//        return ArrayList<Contact>(slicedSubList)
+//    }
 
     fun getMwState(): MWState {
         return mwState

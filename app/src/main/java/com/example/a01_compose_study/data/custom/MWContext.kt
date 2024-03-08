@@ -1,7 +1,6 @@
 package com.example.a01_compose_study.data.custom
 
 import android.util.Log
-import com.example.a01_compose_study.data.Contact
 import com.example.a01_compose_study.data.DialogueMode
 import com.example.a01_compose_study.data.HTextToSpeechState
 import com.example.a01_compose_study.data.HVRError
@@ -9,8 +8,6 @@ import com.example.a01_compose_study.data.HVRState
 import com.example.a01_compose_study.data.VRResult
 import com.example.a01_compose_study.data.analyze.ParseDomainType
 import com.example.a01_compose_study.data.analyze.ParserFactory
-import com.example.a01_compose_study.data.pasing.BaseModel
-import com.example.a01_compose_study.data.pasing.SendMsgModel
 import com.example.a01_compose_study.domain.util.CustomLogger
 import com.example.a01_compose_study.presentation.data.UiState
 import com.example.a01_compose_study.presentation.screen.SelectVRResult
@@ -112,7 +109,7 @@ class MWContext(
                 ParserFactory().dataParsing(vrResult, dialogueMode = dialogueMode)
                     .also {
                         it?.type = ParseDomainType.SEND_MESSAGE
-                        it?.dialogueMode = DialogueMode.SEND_MESSAGE_NAME
+                        it?.dialogueMode = DialogueMode.SEND_MESSAGE
                     }
             }
 
@@ -124,10 +121,31 @@ class MWContext(
                     }
             }
 
-            SelectVRResult.ScrollIndexResult -> {
+            SelectVRResult.NoResult -> {
                 ParserFactory().dataParsing(vrResult, dialogueMode = dialogueMode)
                     .also {
-                        it?.type = ParseDomainType.CALL
+                        it?.type = ParseDomainType.SEND_MESSAGE
+                        it?.dialogueMode = DialogueMode.SEND_MESSAGE_NAME
+                    }
+            }
+            SelectVRResult.MessageReult -> {
+                ParserFactory().dataParsing(vrResult, dialogueMode = dialogueMode)
+                    .also {
+                        it?.type = ParseDomainType.SEND_MESSAGE
+                        it?.dialogueMode = DialogueMode.SEND_MESSAGE_NAME
+                    }
+            }
+
+            SelectVRResult.ScrollIndexResult -> {
+//                ParserFactory().dataParsing(vrResult, dialogueMode = dialogueMode)
+//                    .also {
+//                        it?.type = ParseDomainType.CALL
+//                        it?.dialogueMode = DialogueMode.LIST
+//                    }
+                Log.e("sendMsg","MWContext안 ScrollIndexResult")
+                ParserFactory().dataParsing(vrResult, dialogueMode = dialogueMode)
+                    .also {
+                        it?.type = ParseDomainType.SEND_MESSAGE
                         it?.dialogueMode = DialogueMode.LIST
                     }
             }

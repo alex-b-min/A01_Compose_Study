@@ -1,7 +1,7 @@
 package com.example.a01_compose_study.presentation.screen.sendMsg.screen
 
-import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -9,6 +9,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.layoutId
@@ -20,57 +25,77 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintSet
 import com.example.a01_compose_study.R
 import com.example.a01_compose_study.data.Contact
-import com.example.a01_compose_study.domain.model.HelpItemData
-import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.components.list.LazyColumnList
-import com.example.a01_compose_study.presentation.screen.main.DomainUiState
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun MsgAllList(
+    lineIndex: Int,
     contactList: List<Contact>,
+    onItemClick: (Contact) -> Unit,
 ) {
-    Log.d("sendMsg"," 진짜 MsgAllList 안")
-    LazyColumnList(list = contactList) {index, contact ->
-        MsgAllListItem(
-            name = contact.name,
-            phoneNum = contact.number,
-        )
-    }
+    LazyColumnList(
+        list = contactList,
+        index = lineIndex,
+        listContent = { index, contact ->
+            MsgAllListItem(
+                contact = contact,
+                onItemClick = onItemClick
+
+            )
+        })
 }
 
 @Composable
 fun MsgNameList(
+    lineIndex: Int,
     contactList: List<Contact>,
+    onItemClick: (Contact) -> Unit,
 ) {
-    LazyColumnList(list = contactList) {index, contact ->
-        MsgNameListItem(
-            id = index+1,
-            name = contact.name,
-            phoneNum = contact.number,
-        )
-    }
+//    val scrollState = rememberLazyListState()
+    LazyColumnList(
+        list = contactList,
+        index = lineIndex,
+        listContent = { index, contact ->
+            MsgNameListItem(
+                id = index + 1,
+                contact = contact,
+                onItemClick = onItemClick
+            )
+        })
+
+
 }
 
 
 @Composable
 fun MsgCategoryList(
+    lineIndex: Int,
     contactList: List<Contact>,
+    onItemClick: (Contact) -> Unit,
 ) {
-    LazyColumnList(list = contactList) {index, contact ->
-        MsgCategoryListItem(
-            id = index+1,
-            name = contact.name,
-            phoneNum = contact.number,
-        )
-    }
+    LazyColumnList(
+        list = contactList,
+        index = lineIndex,
+        listContent = { index, contact ->
+            MsgCategoryListItem(
+                id = index + 1,
+                contact = contact,
+                onItemClick = onItemClick
+            )
+        })
 }
 
 
 @Composable
 fun MsgAllListItem(
-    name: String,
-    phoneNum: String,
+    contact: Contact,
+    onItemClick: (Contact) -> Unit,
 ) {
+    val scope = rememberCoroutineScope()
+    var isSelected by remember { mutableStateOf(false) }
+
     val constraintSet = ConstraintSet {
         val name = createRefFor("name")
         val phoneNum = createRefFor("phoneNum")
@@ -92,10 +117,18 @@ fun MsgAllListItem(
         }
     }
 
-    Box(modifier = Modifier.padding(4.dp)) {
+    Box(modifier = Modifier
+        .padding(4.dp)
+          .clickable {
+              scope.launch {
+                  isSelected = true
+                  delay(850)
+                  onItemClick(contact)
+              }
+          }) {
         ConstraintLayout(constraintSet, modifier = Modifier.fillMaxWidth()) {
             Text(
-                text = name,
+                text = contact.name,
                 color = Color.White,
                 style = MaterialTheme.typography.h6,
                 maxLines = 1,
@@ -103,7 +136,7 @@ fun MsgAllListItem(
                     .layoutId("name")
             )
             Text(
-                text = phoneNum,
+                text = contact.number,
                 color = colorResource(id = R.color.white_a50),
                 style = MaterialTheme.typography.body2,
                 modifier = Modifier
@@ -123,9 +156,12 @@ fun MsgAllListItem(
 @Composable
 fun MsgNameListItem(
     id: Int,
-    name: String,
-    phoneNum: String,
+    contact: Contact,
+    onItemClick: (Contact) -> Unit,
 ) {
+    val scope = rememberCoroutineScope()
+    var isSelected by remember { mutableStateOf(false) }
+
     val constraintSet = ConstraintSet {
         val num = createRefFor("num")
         val name = createRefFor("name")
@@ -155,6 +191,12 @@ fun MsgNameListItem(
     ConstraintLayout(
         constraintSet,
         modifier = Modifier.fillMaxWidth()
+            . clickable {
+            scope.launch {
+                isSelected = true
+                delay(850)
+                onItemClick(contact)
+            }}
     ) {
         Text(
             text = id.toString(),
@@ -165,7 +207,7 @@ fun MsgNameListItem(
                 .layoutId("num")
         )
         Text(
-            text = name,
+            text =  contact.name,
             color = Color.White,
             style = MaterialTheme.typography.h6,
             maxLines = 1,
@@ -173,7 +215,7 @@ fun MsgNameListItem(
                 .layoutId("name")
         )
         Text(
-            text = phoneNum,
+            text = contact.number,
             color = colorResource(id = R.color.white_a50),
             style = MaterialTheme.typography.body2,
             modifier = Modifier
@@ -193,9 +235,12 @@ fun MsgNameListItem(
 @Composable
 fun MsgCategoryListItem(
     id: Int,
-    name: String,
-    phoneNum: String,
+    contact: Contact,
+    onItemClick: (Contact) -> Unit,
 ) {
+    val scope = rememberCoroutineScope()
+    var isSelected by remember { mutableStateOf(false) }
+
     val constraintSet = ConstraintSet {
         val num = createRefFor("num")
         val name = createRefFor("name")
@@ -219,6 +264,12 @@ fun MsgCategoryListItem(
     ConstraintLayout(
         constraintSet,
         modifier = Modifier.fillMaxWidth()
+            .clickable {
+            scope.launch {
+                isSelected = true
+                delay(850)
+                onItemClick(contact)
+            }}
     ) {
         Text(
             text = id.toString(),
@@ -229,7 +280,7 @@ fun MsgCategoryListItem(
                 .layoutId("num")
         )
         Text(
-            text = name,
+            text = contact.name,
             color = Color.White,
             style = MaterialTheme.typography.h6,
             maxLines = 1,
@@ -237,7 +288,7 @@ fun MsgCategoryListItem(
                 .layoutId("name")
         )
         Text(
-            text = phoneNum,
+            text = contact.number,
             color = colorResource(id = R.color.white_a50),
             style = MaterialTheme.typography.body2,
             modifier = Modifier
@@ -251,25 +302,34 @@ fun MsgCategoryListItem(
 @Composable
 fun MsgAllListItemPreview() {
     val list = mutableListOf<Contact>()
-    list.add(Contact(id = "1", name = "김", number = "010-0000"))
-    list.add(Contact(id = "2", name = "수", number = "010-0000"))
-    MsgAllList(list)
+    list.add(Contact(id = "1", name = "riley", number = "010-0000"))
+    list.add(Contact(id = "2", name = "kim", number = "010-0000"))
+    MsgAllList(
+        lineIndex = 0,
+         contactList = list,
+        onItemClick = {})
 }
 
 @Preview
 @Composable
 fun MsgNameListItemPreview() {
     val list = mutableListOf<Contact>()
-    list.add(Contact(id = "1", name = "김", number = "010-0000"))
-    list.add(Contact(id = "2", name = "수", number = "010-0000"))
-    MsgNameList(list)
+    list.add(Contact(id = "1", name = "riley", number = "010-0000"))
+    list.add(Contact(id = "2", name = "kim", number = "010-0000"))
+    MsgNameList(
+        lineIndex = 0,
+        contactList = list,
+        onItemClick = {})
 }
 
 @Preview
 @Composable
 fun MsgCategoryListItemPreview() {
     val list = mutableListOf<Contact>()
-    list.add(Contact(id = "1", name = "김", number = "010-0000"))
-    list.add(Contact(id = "2", name = "수", number = "010-0000"))
-    MsgCategoryList(list)
+    list.add(Contact(id = "1", name = "riley", number = "010-0000"))
+    list.add(Contact(id = "2", name = "kim", number = "010-0000"))
+    MsgCategoryList(
+        lineIndex = 0,
+        contactList = list,
+        onItemClick = {})
 }

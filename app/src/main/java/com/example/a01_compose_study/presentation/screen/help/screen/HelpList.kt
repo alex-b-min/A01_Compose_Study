@@ -3,7 +3,6 @@ package com.example.a01_compose_study.presentation.screen.help.screen
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -73,11 +72,12 @@ fun HelpList(
 
 @Composable
 fun HelpDetailList(helpItemData: HelpItemData) {
-    LazyColumnList(list = helpItemData.commandsDetail) { index, commandDeatail ->
+    LazyColumnList(list = helpItemData.commandsDetail,
+        listContent = { index, commandDeatail ->
         HelpDetailListItem(
             commandDetail = commandDeatail
         )
-    }
+    })
 }
 
 

@@ -4,7 +4,6 @@ package com.example.a01_compose_study.data.custom.sendMsg
 import android.util.Log
 import com.example.a01_compose_study.data.Contact
 import com.example.a01_compose_study.data.DialogueMode
-import com.example.a01_compose_study.data.DomainType
 import com.example.a01_compose_study.data.HVRError
 import com.example.a01_compose_study.data.Intentions
 import com.example.a01_compose_study.data.analyze.ParseBundle
@@ -65,26 +64,31 @@ class SendMsgManager @Inject constructor(
         /**
          * ParseBundle<out Any>? 타입의 bundle을 SendMsgData로 파싱하는 로직이 담겨야함
          */
+        Log.d("sendMsg", "parsedData dialogueMode: ${bundle.dialogueMode}")
         when (bundle.dialogueMode) {
             DialogueMode.SEND_MESSAGE -> {
+                Log.d("sendMsg", "@@ procSendMsgIntention")
                 return procSendMsgIntention(bundle)
             }
 
             DialogueMode.SEND_MESSAGE_NAME -> {
+                Log.d("sendMsg", "@@ procMessageNameIntention")
                 return procMessageNameIntention(bundle)
             }
 
             DialogueMode.SEND_MESSAGE_NAME_CHANGE -> {
+                Log.d("sendMsg", "@@ procMessageChangeIntention")
                 return procMessageChangeIntention(bundle)
             }
 
             DialogueMode.LIST -> {
-                val commonModel = bundle.model as? CommonModel
-                commonModel?.let {
-                    procListIntention(it)
-                } ?: run {
-                    // TODO : reject()
-                    return handleRejectIntention()
+                Log.d("sendMsg", "@@ procListIntention")
+
+//                val commonModel = bundle.model as? CommonModel
+                val commonModel = CommonModel("")
+                commonModel.index = 1
+                commonModel.let {
+                    return procListIntention(it)
                 }
                 // TODO : reject()
                 return handleRejectIntention()
@@ -100,8 +104,57 @@ class SendMsgManager @Inject constructor(
 
     private fun procSendMsgIntention(bundle: ParseBundle<out Any?>): ProcSendMsgData {
 
+        // SendMessage 발화 번들
         val bundle = SendMsgModel("")
-        Log.d("sendMsg","procSendMsgIntention 안")
+        Log.d("sendMsg", "procSendMsgIntention 안")
+
+//         SendMessge Name 번들
+//        val bundle = SendMsgModel("sample intent").apply {
+//            enableIndex = true
+//            prompt = "Prompt message"
+////            messageValue = "Hello"
+//
+//            items.add(
+//                Contact(
+//                    id = "1",
+//                    name = "문재민",
+//                    number = "010-1111-2222",
+//                    contact_id = "200",
+//                    type = 1
+//                )
+//            )
+//            items.add(
+//                Contact(
+//                    id = "2",
+//                    name = "문재민",
+//                    number = "010-1111-2223",
+//                    contact_id = "200",
+//                    type = 2
+//                )
+//            )
+//            items.add(
+//                Contact(
+//                    id = "3",
+//                    name = "문재민",
+//                    number = "010-1111-2224",
+//                    contact_id = "200",
+//                    type = 3
+//                )
+//            )
+//            items.add(
+//                Contact(
+//                    id = "5",
+//                    name = "바보",
+//                    number = "010-1111-2225",
+//                    contact_id = "300",
+//                    type = 4
+//                )
+//            )
+////            items.add(Contact(id = "3", name = "문재민", number = "456-789-0123", contact_id = "20"))
+//        }
+
+
+        // 기존 코드
 //        val sendMsgModel = bundle.model as? SendMsgModel
         val sendMsgModel = bundle as? SendMsgModel
 
@@ -123,13 +176,17 @@ class SendMsgManager @Inject constructor(
             )
         }
 
-        Log.d("sendMsg","procSendMsgIntention 직전")
         sendMsgModel?.let {
-            checkMessageExistence(sendMsgModel)
-            Log.d("sendMsg","sendMsgModel? 안")
+//            checkMessageExistence(sendMsgModel)
+            if (sendMsgModel.messageValue != "") {
+                Log.d("sendMsg", "messageValue = ${sendMsgModel.messageValue}")
+                messageValue.value = sendMsgModel.messageValue
+                // 시나리오가 <Name, Msg>인지 판단 용도
+                firstRecogMessage.value = true
+            }
 
             if (sendMsgModel.items.isEmpty()) {
-                Log.d("sendMsg","procSendMsgIntention , items isEmpty")
+
 //                sendMsgContactList = contactsManager.makePhoneBookContactList()
                 sendMsgContactList = fetchAllContacts()
                 return ProcSendMsgData(
@@ -137,28 +194,40 @@ class SendMsgManager @Inject constructor(
                     mwContext = MWContext(
                         DialogueMode.SEND_MESSAGE, this@SendMsgManager
                     ),
-                    data = SendMsgDataType.SendMsgData(contacts = sendMsgContactList ,msgData = null)
+                    data = SendMsgDataType.SendMsgData(
+                        contacts = sendMsgContactList,
+                        msgData = null
+                    )
                 )
             } else {
 
-                Log.d("sendMsg","sendMsgModel? else 안")
                 val nameCheckList =
-                    contactsManager.makeContactList(sendMsgModel.getContactItems(), true)
+                    contactsManager.makeContactList(
+                        sendMsgModel.getContactItems(),
+                        fetchAllContacts()
+                    )
+
+                Log.d("sendMsg", "nameCheckList : ${nameCheckList}")
 
                 when (nameCheckList.size) {
                     0 -> {
-                        sendMsgContactList = nameCheckList.toMutableList()
+//                        sendMsgContactList = nameCheckList.toMutableList()
+                        sendMsgContactList = fetchAllContacts()
                         return ProcSendMsgData(
                             screenType = ScreenType.MessageAllList,
                             mwContext = MWContext(
                                 DialogueMode.SEND_MESSAGE, this@SendMsgManager
                             ),
-                            data = SendMsgDataType.SendMsgData(msgData = null)
+                            data = SendMsgDataType.SendMsgData(
+                                msgData = null,
+                                contacts = sendMsgContactList
+                            )
                         )
                     }
 
                     1 -> {
-                        return handleCategory(sendMsgModel)
+                        val contactId = nameCheckList[0].contact_id
+                        return handleCategory(sendMsgModel, contactId)
                     }
                     // 검색된 이름 여러개
                     else -> {
@@ -168,7 +237,7 @@ class SendMsgManager @Inject constructor(
                                 DialogueMode.LIST, this@SendMsgManager
                             ),
                             data = SendMsgDataType.SendMsgData(
-                                contacts = sendMsgContactList,
+                                contacts = nameCheckList,
                             )
                         )
                     }
@@ -176,17 +245,31 @@ class SendMsgManager @Inject constructor(
             }
         } ?: run {
             // TODO : reject()
-            Log.d("sendMsg","reject 안")
             return handlePopIntention()
         }
     }
 
 
     private fun procMessageNameIntention(bundle: ParseBundle<out Any?>): ProcSendMsgData {
-        val commonModel = bundle.model as? CommonModel
-        val sendMsgModel = bundle.model as? SendMsgModel
+        // No 발화 시나리오 번들
+//        val bundle = CommonModel("")
+//        bundle.intention = "No"
 
-        commonModel?.let {
+//         Msg 발화 시나리오 번들
+        val bundle = SendMsgModel("")
+//        bundle.intention = "No"
+        bundle.intention = "MessageContent"
+        bundle.messageValue = "I am Msg"
+
+
+//        val commonModel = bundle.model as? CommonModel
+//        val sendMsgModel = bundle.model as? SendMsgModel
+        val commonModel = bundle as? CommonModel
+        val sendMsgModel = bundle as? SendMsgModel
+
+
+            commonModel?.let {
+            Log.d("sendMsg", "procMessageNameIntention commonModel? 안")
             val intention = it.intention.replace(" ", "")
             printSttString(it.prompt)
 
@@ -201,9 +284,13 @@ class SendMsgManager @Inject constructor(
         sendMsgModel?.let { it ->
             val intention = it.intention.replace(" ", "")
 
+
+            Log.d("sendMsg", "procMessageNameIntention sendMsgModel? 안 :${intention}")
+
             printSttString(it.prompt)
 
             if (Intentions.No.isEqual(intention)) {
+                Log.d("sendMsg", "procMessageNameIntention sendMsgModel? 안 No")
                 // 즉 cm이 있거나 send가 없으면 데이터 없음
                 // 반대로 하면 cm이 없으면서 send가 있면 데이터 있음 -> checkScreenStack(send)
                 // name 시나리오 : say - send - no - say - no  - list -> 데이터 유지
@@ -216,10 +303,18 @@ class SendMsgManager @Inject constructor(
 
             // Message 발화 시 넘어 오는 intention
             if (Intentions.MessageContent.isEqual(intention)) {
+                Log.d(
+                    "sendMsg",
+                    "procMessageNameIntention sendMsgModel? 안 Message: ${it.messageValue}"
+                )
                 messageValue.value = it.messageValue
+                // TODO selectedPhonebookItem null 임
+                selectedPhonebookItem = Contact(name = "an", number = "010-22-333",)
                 // Send Message <Name, Msg> 시나리오에서 Change Message 후 Message 발화하여 다시 MessageChange 화면
                 // "No" 발화 시 MessageName이 아닌 상황별 List나 PTT를 띄워야 함
                 if (firstRecogMessage.value) {
+                    Log.d("sendMsg", " firstRecogMessage.value: ${firstRecogMessage.value}")
+
                     selectedPhonebookItem?.let {
                         // changeMessageChange(it.name, sendMsgModel.messageValue)
                         // add 하지 않고 change / data -> Name, Message 넘겨줌
@@ -237,6 +332,7 @@ class SendMsgManager @Inject constructor(
                         )
                     }
                 } else {
+                    Log.d("sendMsg", " firstRecogMessage.value 없음")
                     // 1. Send Message 후 연락처 선택 후 Message 발화
                     // 2. Send Message <Name>
                     // 3. Change Message 발화 -> Say the Message 화면에서 발화
@@ -259,6 +355,7 @@ class SendMsgManager @Inject constructor(
             }
         }
         // TODO reject()
+        Log.e("sendMsg", "reject")
         return handlePopIntention()
     }
 
@@ -326,19 +423,33 @@ class SendMsgManager @Inject constructor(
     }
 
     private fun procListIntention(data: CommonModel): ProcSendMsgData {
+        Log.d("sendMsg", "procListIntention 안에 들어옴")
         // data만 넘겨주고 초점 맞추는 로직은 viewModel에서 구현
         return ProcSendMsgData(
-            screenType = ScreenType.List, data = SendMsgDataType.SendListNum(
+            screenType = ScreenType.List,
+            data = SendMsgDataType.SendListNum(
                 index = data.index
             )
         )
     }
 
 
-    private fun handleCategory(sendMsgModel: SendMsgModel): ProcSendMsgData {
-        sendMsgContactList = contactsManager.makeContactList(sendMsgModel.getContactItems(), false)
+    fun handleCategory(
+        sendMsgModel: SendMsgModel,
+        contactId: String,
+//        nameCheckList: MutableList<Contact>
+    ): ProcSendMsgData {
+        Log.d("sendMsg", "handleCategory 안")
+
+        Log.d("sendMsg", "contactId: ${contactId}")
+        sendMsgContactList = contactsManager.makeContactList(
+            items = sendMsgModel.getContactItems(),
+            contactsList = fetchAllContacts(),
+            contactId = contactId
+        )
+        Log.d("sendMsg", "sendMsgContactList: ${sendMsgContactList}")
         if (sendMsgContactList.size > 1) {
-            //getCategoryListRunnable().run()
+            Log.d("sendMsg", "카테고리 여러개")
             isCategoryListScreen.value = true
             return ProcSendMsgData(
                 screenType = ScreenType.MessageSelectCategoryList, mwContext = MWContext(
@@ -350,28 +461,32 @@ class SendMsgManager @Inject constructor(
         }
         // 1명의 전화번호부에 Category가 1개
         else {
-            selectedPhonebookItem = sendMsgContactList[0]
-            if (messageValue.value != "") {
-                // getMessageNameRunnable().run()
-                return ProcSendMsgData(
-                    screenType = ScreenType.SayMessage, mwContext = MWContext(
-                        DialogueMode.SEND_MESSAGE_NAME, this@SendMsgManager
-                    ), data = SendMsgDataType.SendMsgData(
-                        msgData = MsgData(name = sendMsgModel.getContactItems()[0].name),
+            sendMsgContactList?.let {
+                Log.d("sendMsg", "카테고리 1개")
+                selectedPhonebookItem = sendMsgContactList[0]
+                if (messageValue.value != "") {
+                    Log.d("sendMsg", "messageValue.value 존재: ${messageValue.value}")
+                    return ProcSendMsgData(
+                        screenType = ScreenType.SendMessage, mwContext = MWContext(
+                            DialogueMode.SEND_MESSAGE_NAME_CHANGE, this@SendMsgManager
+                        ), data = SendMsgDataType.SendMsgData(
+                            msgData = MsgData(
+                                name = sendMsgModel.getContactItems()[0].name,
+                                msg = sendMsgModel.messageValue
+                            ),
+                        )
                     )
-                )
-            } else {
-                // getMessageChangeRunnable(sendMsgModel).run()
-                return ProcSendMsgData(
-                    screenType = ScreenType.SendMessage, mwContext = MWContext(
-                        DialogueMode.SEND_MESSAGE_NAME_CHANGE, this@SendMsgManager
-                    ), data = SendMsgDataType.SendMsgData(
-                        msgData = MsgData(
-                            name = sendMsgModel.getContactItems()[0].name,
-                            msg = sendMsgModel.messageValue
-                        ),
+                } else {
+                    Log.d("sendMsg", "messageValue.value 없음")
+                    return ProcSendMsgData(
+                        screenType = ScreenType.SayMessage, mwContext = MWContext(
+                            DialogueMode.SEND_MESSAGE_NAME, this@SendMsgManager
+                        ), data = SendMsgDataType.SendMsgData(
+                            msgData = MsgData(name = sendMsgModel.getContactItems()[0].name),
+                        )
                     )
-                )
+                }
+
             }
         }
     }
@@ -411,14 +526,6 @@ class SendMsgManager @Inject constructor(
         return checkResult
     }
 
-    private fun checkMessageExistence(sendMsgModel: SendMsgModel) {
-        if (sendMsgModel.messageValue != "") {
-            messageValue.value = sendMsgModel.messageValue
-            // 시나리오가 <Name, Msg>인지 판단 용도
-            firstRecogMessage.value = true
-        }
-    }
-
     private fun initSendMsgValue() {
         CustomLogger.i("initSendMsgValue")
         selectedPhonebookItem = null
@@ -448,15 +555,84 @@ class SendMsgManager @Inject constructor(
 
     fun fetchAllContacts(): ArrayList<Contact> {
         val result = arrayListOf<Contact>()
-        result.add(Contact(id = "1", name = "문재민", number = "010-1111-2222"))
-        result.add(Contact(id = "2", name = "삐쓰까또레부르쥬미첼라햄페스츄리치즈나쵸스트링스파게티", number = "010-2222-3333"))
-        result.add(Contact(id = "3", name = "하늘별님구름햇님보다사랑스러우리", number = "010-3333-4444"))
-        result.add(Contact(id = "4", name = "Alex", number = "010-4444-5555"))
-        result.add(Contact(id = "5", name = "Alexander Sandor Signiel ", number = "010-4444-5555"))
-        result.add(Contact(id = "6", name = "포티투닷 이순신", number = "010-4444-5555"))
-        result.add(Contact(id = "7", name = "포티투닷 홍길동 책임연구원 하하하하하", number = "031-131"))
-        result.add(Contact(id = "8", name = "엄마", number = "1509"))
-        result.add(Contact(id = "9", name = "김혜원 어머님", number = "010-1111-5555"))
+        result.add(
+            Contact(
+                id = "1",
+                name = "문재민",
+                number = "010-1111-2222",
+                contact_id = "200",
+                type = 1
+            )
+        )
+        result.add(
+            Contact(
+                id = "2",
+                name = "문재민",
+                number = "010-1111-2223",
+                contact_id = "200",
+                type = 2
+            )
+        )
+        result.add(
+            Contact(
+                id = "3",
+                name = "문재민",
+                number = "010-1111-2224",
+                contact_id = "200",
+                type = 3
+            )
+        )
+
+        result.add(
+            Contact(
+                id = "2",
+                name = "삐쓰까또레부르쥬미첼라햄페스츄리치즈나쵸스트링스파게티",
+                number = "010-2222-3333",
+                contact_id = "600"
+            )
+        )
+        result.add(
+            Contact(
+                id = "3",
+                name = "하늘별님구름햇님보다사랑스러우리",
+                number = "010-3333-4444",
+                contact_id = "600"
+            )
+        )
+        result.add(Contact(id = "4", name = "Alex", number = "010-4444-5555", contact_id = "600"))
+        result.add(
+            Contact(
+                id = "5",
+                name = "Alexander Sandor Signiel ",
+                number = "010-4444-5555",
+                contact_id = "600"
+            )
+        )
+        result.add(
+            Contact(
+                id = "6",
+                name = "포티투닷 이순신",
+                number = "010-4444-5555",
+                contact_id = "600"
+            )
+        )
+        result.add(
+            Contact(
+                id = "7",
+                name = "포티투닷 홍길동 책임연구원 하하하하하",
+                number = "031-131",
+                contact_id = "600"
+            )
+        )
+        result.add(Contact(id = "8", name = "엄마", number = "1509", contact_id = "600"))
+        result.add(
+            Contact(
+                id = "9",
+                name = "김혜원 어머님",
+                number = "010-1111-5555",
+                contact_id = "600"
+            )
+        )
         result.add(Contact(id = "10", name = "홍길 동사무소", number = "010-4444-5555"))
         result.add(Contact(id = "11", name = "홍길동 (HMC 유럽)", number = "010-4444-5555"))
         result.add(Contact(id = "12", name = "강신부", number = "010-4444-5555"))
