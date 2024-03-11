@@ -206,6 +206,19 @@ fun MainRoute(
             modifier = Modifier
                 .fillMaxWidth(0.13f)
                 .fillMaxHeight(0.07f),
+            contentText = "speak: SendMsg Name Msg",
+            onClick = {
+                scope.launch {
+//                    viewModel.vrmwManager.setVRResult(VRResult(), SelectVRResult.SendMsgResult)
+                    pttViewModel.onPttEvent(PttEvent.StartVR(selectVRResult = SelectVRResult.SendMsgNameMsgResult))
+                }
+            }
+        )
+
+        PttButton(
+            modifier = Modifier
+                .fillMaxWidth(0.13f)
+                .fillMaxHeight(0.07f),
             contentText = "Line 1",
             onClick = {
                 scope.launch {
@@ -218,245 +231,202 @@ fun MainRoute(
             modifier = Modifier
                 .fillMaxWidth(0.13f)
                 .fillMaxHeight(0.07f),
-            contentText = "No",
+            contentText = "sayMsg : No",
             onClick = {
                 scope.launch {
 //                    pttViewModel.onPttEvent(PttEvent.StartVR(selectVRResult = SelectVRResult.NoResult))
-                    viewModel.vrmwManager.setVRResult( vrResult = VRResult(), selectVRResult = SelectVRResult.NoResult)
+                    viewModel.vrmwManager.setVRResult( vrResult = VRResult(), selectVRResult = SelectVRResult.NoResult(isSayMessage = true))
                 }
             }
         )
-
         PttButton(
             modifier = Modifier
                 .fillMaxWidth(0.13f)
                 .fillMaxHeight(0.07f),
+            contentText = "sendMsg : No",
+            onClick = {
+                scope.launch {
+//                    pttViewModel.onPttEvent(PttEvent.StartVR(selectVRResult = SelectVRResult.NoResult))
+                    viewModel.vrmwManager.setVRResult( vrResult = VRResult(), selectVRResult = SelectVRResult.NoResult(isSayMessage = false))
+                }
+            }
+        )
+        PttButton(
+            modifier = Modifier
+                .fillMaxWidth(0.13f)
+                .fillMaxHeight(0.07f),
+            contentText = "Yes",
+            onClick = {
+                scope.launch {
+                    viewModel.vrmwManager.setVRResult( vrResult = VRResult(), selectVRResult = SelectVRResult.YesResult)
+                }
+            }
+        )
+
+        PttButton(
+            modifier = Modifier
+                .fillMaxWidth(0.13f)
+                .fillMaxHeight(0.08f),
             contentText = "say message",
             onClick = {
                 scope.launch {
-//                    viewModel.vrmwManager.setVRResult(VRResult(), SelectVRResult.ScrollIndexResult)
                     viewModel.vrmwManager.setVRResult( vrResult = VRResult(), selectVRResult = SelectVRResult.MessageReult)                }
             }
         )
         PttButton(
-            modifier = Modifier.fillMaxSize(0.13f),
-            contentText = "MsgNameList",
-            onClick = {
-                scope.launch {
-                    viewModel.onDomainEvent(
-                        event = MainEvent.OpenDomainWindowEvent(
-                            domainType = SealedDomainType.SendMessage,
-                            screenType = ScreenType.MessageSelectNameList,
-                            mwContext = null,
-                            data = SendMsgDataType.SendMsgData(
-                                msgData = MsgData(),
-                                contacts = mutableListOf(
-                                    Contact(
-                                        id = "1",
-                                        name = "snsn",
-                                        number = "010-010-010"
-                                    ),
-                                    Contact(
-                                        id = "2",
-                                        name = "snn",
-                                        number = "010-010-010"
-                                    ),
-                                    Contact(
-                                        id = "3",
-                                        name = "sn",
-                                        number = "010-010-010"
-                                    )
-                                )
-                            ),
-                            isError = false,
-                            screenSizeType = ScreenSizeType.Large
-                        )
-                    )
-                }
-//                pttViewModel.onPttEvent(PttEvent.StartVR(selectVRResult = SelectVRResult.SendMsgResult))
-            }
-        )
-        PttButton(
-            modifier = Modifier.fillMaxSize(0.13f),
-            contentText = "MsgCategoryList",
-            onClick = {
-                scope.launch {
-                    viewModel.onDomainEvent(
-                        event = MainEvent.OpenDomainWindowEvent(
-                            domainType = SealedDomainType.SendMessage,
-                            screenType = ScreenType.MessageSelectCategoryList,
-                            mwContext = null,
-                            data = SendMsgDataType.SendMsgData(
-                                msgData = MsgData(),
-                                contacts = mutableListOf(
-                                    Contact(
-                                        id = "1",
-                                        name = "snsn",
-                                        number = "010-010-010"
-                                    ),
-                                    Contact(
-                                        id = "2",
-                                        name = "snn",
-                                        number = "010-010-010"
-                                    ),
-                                    Contact(
-                                        id = "3",
-                                        name = "sn",
-                                        number = "010-010-010"
-                                    )
-                                )
-                            ),
-                            isError = false,
-                            screenSizeType = ScreenSizeType.Large
-                        )
-                    )
-                }
-//                pttViewModel.onPttEvent(PttEvent.StartVR(selectVRResult = SelectVRResult.SendMsgResult))
-            }
-        )
-        PttButton(
-            modifier = Modifier.fillMaxSize(0.13f),
-            contentText = "PTT Open",
-            onClick = {
-                viewModel.onDomainEvent(
-                    event = MainEvent.OpenDomainWindowEvent(
-                        domainType = SealedDomainType.Ptt,
-                        screenType = ScreenType.PttListen,
-                        mwContext = null,
-                        data = announceString,
-                        isError = false,
-                        screenSizeType = ScreenSizeType.Small
-                    )
-                )
-//                pttViewModel.onPttEvent(PttEvent.StartVR(selectVRResult = SelectVRResult.SendMsgResult))
-            }
-        )
-
-        PttButton(
-            modifier = Modifier.fillMaxSize(0.13f),
-            contentText = "PTT Prepare",
-            onClick = {
-                pttViewModel.onPttEvent(PttEvent.PreparePtt)
-            }
-        )
-
-        PttButton(
-            modifier = Modifier.fillMaxSize(0.13f),
-            contentText = "PTT Speak",
-            onClick = {
-                pttViewModel.onPttEvent(PttEvent.SetSpeakType)
-            }
-        )
-
-        PttButton(
-            modifier = Modifier.fillMaxSize(0.13f),
-            contentText = "PTT Loading",
-            onClick = {
-                scope.launch {
-                    pttViewModel.onPttEvent(PttEvent.SetLoadingType)
-                }
-            }
-        )
-
-        PttButton(
-            modifier = Modifier.fillMaxSize(0.13f),
-            contentText = "PTT Announce",
-            onClick = {
-                scope.launch {
-                    viewModel.onDomainEvent(
-                        event = MainEvent.OpenDomainWindowEvent(
-                            domainType = SealedDomainType.Announce,
-                            screenType = ScreenType.Prepare,
-                            mwContext = null,
-                            data = "Help",
-                            isError = false,
-                            screenSizeType = ScreenSizeType.Small
-                        )
-                    )
-                }
-            }
-        )
-
-        PttButton(
-            modifier = Modifier.fillMaxSize(0.13f),
-            contentText = "PTT Close",
-            onClick = {
-                scope.launch {
-                    viewModel.onDomainEvent(MainEvent.CloseDomainWindowEvent)
-                }
-            }
-        )
-
-        PttButton(
-            modifier = Modifier.fillMaxSize(0.13f),
-            contentText = "PTT Help",
-            onClick = {
-                pttViewModel.onPttEvent(PttEvent.StartVR(SelectVRResult.HelpResult))
-            }
-        )
-
-        PttButton(
             modifier = Modifier
                 .fillMaxWidth(0.13f)
-                .fillMaxHeight(0.2f),
-            contentText = "ERROR_HMI",
+                .fillMaxHeight(0.09f),
+            contentText = "change message",
             onClick = {
-                multipleEventsCutter.processEvent {
-//                        viewModel.onDomainEvent(
-//                            event = MainEvent.OpenDomainWindowEvent(
-//                                domainType = SealedDomainType.Ptt,
-//                                screenType = ScreenType.PttListen,
-//                                data = "에러",
-//                                isError = true,
-//                                screenSizeType = ScreenSizeType.Small
-//                            )
+                scope.launch {
+//                    viewModel.vrmwManager.setVRResult(VRResult(), SelectVRResult.ScrollIndexResult)
+                    viewModel.vrmwManager.setVRResult( vrResult = VRResult(), selectVRResult = SelectVRResult.ChangeMessage)                }
+            }
+        )
+//        PttButton(
+//            modifier = Modifier.fillMaxSize(0.13f),
+//            contentText = "PTT Open",
+//            onClick = {
+//                viewModel.onDomainEvent(
+//                    event = MainEvent.OpenDomainWindowEvent(
+//                        domainType = SealedDomainType.Ptt,
+//                        screenType = ScreenType.PttListen,
+//                        mwContext = null,
+//                        data = announceString,
+//                        isError = false,
+//                        screenSizeType = ScreenSizeType.Small
+//                    )
+//                )
+////                pttViewModel.onPttEvent(PttEvent.StartVR(selectVRResult = SelectVRResult.SendMsgResult))
+//            }
+//        )
+//
+//        PttButton(
+//            modifier = Modifier.fillMaxSize(0.13f),
+//            contentText = "PTT Prepare",
+//            onClick = {
+//                pttViewModel.onPttEvent(PttEvent.PreparePtt)
+//            }
+//        )
+//
+//        PttButton(
+//            modifier = Modifier.fillMaxSize(0.13f),
+//            contentText = "PTT Speak",
+//            onClick = {
+//                pttViewModel.onPttEvent(PttEvent.SetSpeakType)
+//            }
+//        )
+//
+//        PttButton(
+//            modifier = Modifier.fillMaxSize(0.13f),
+//            contentText = "PTT Loading",
+//            onClick = {
+//                scope.launch {
+//                    pttViewModel.onPttEvent(PttEvent.SetLoadingType)
+//                }
+//            }
+//        )
+//
+//        PttButton(
+//            modifier = Modifier.fillMaxSize(0.13f),
+//            contentText = "PTT Announce",
+//            onClick = {
+//                scope.launch {
+//                    viewModel.onDomainEvent(
+//                        event = MainEvent.OpenDomainWindowEvent(
+//                            domainType = SealedDomainType.Announce,
+//                            screenType = ScreenType.Prepare,
+//                            mwContext = null,
+//                            data = "Help",
+//                            isError = false,
+//                            screenSizeType = ScreenSizeType.Small
 //                        )
-                    viewModel.vrmwManager.setVRError(HVRError.ERROR_HMI)
-                }
-            }
-        )
-
-        PttButton(
-            modifier = Modifier
-                .fillMaxWidth(0.13f)
-                .fillMaxHeight(0.25f),
-            contentText = "Size Up",
-            onClick = {
-                val resultScreenSizeType = when (domainUiState.screenSizeType) {
-                    is ScreenSizeType.Zero -> ScreenSizeType.Zero
-                    is ScreenSizeType.Small -> ScreenSizeType.Middle
-                    is ScreenSizeType.Middle -> ScreenSizeType.Large
-                    is ScreenSizeType.Large -> ScreenSizeType.Full
-                    is ScreenSizeType.Full -> ScreenSizeType.Full
-                }
-                viewModel.onDomainEvent(
-                    MainEvent.ChangeDomainWindowSizeEvent(
-                        resultScreenSizeType
-                    )
-                )
-            }
-        )
-
-        PttButton(
-            modifier = Modifier
-                .fillMaxWidth(0.13f)
-                .fillMaxHeight(0.25f),
-            contentText = "Size Down",
-            onClick = {
-                val resultScreenSizeType = when (domainUiState.screenSizeType) {
-                    is ScreenSizeType.Zero -> ScreenSizeType.Zero
-                    is ScreenSizeType.Small -> ScreenSizeType.Small
-                    is ScreenSizeType.Middle -> ScreenSizeType.Small
-                    is ScreenSizeType.Large -> ScreenSizeType.Middle
-                    is ScreenSizeType.Full -> ScreenSizeType.Large
-                }
-                viewModel.onDomainEvent(
-                    MainEvent.ChangeDomainWindowSizeEvent(
-                        resultScreenSizeType
-                    )
-                )
-            }
-        )
+//                    )
+//                }
+//            }
+//        )
+//
+//        PttButton(
+//            modifier = Modifier.fillMaxSize(0.13f),
+//            contentText = "PTT Close",
+//            onClick = {
+//                scope.launch {
+//                    viewModel.onDomainEvent(MainEvent.CloseDomainWindowEvent)
+//                }
+//            }
+//        )
+//
+//        PttButton(
+//            modifier = Modifier.fillMaxSize(0.13f),
+//            contentText = "PTT Help",
+//            onClick = {
+//                pttViewModel.onPttEvent(PttEvent.StartVR(SelectVRResult.HelpResult))
+//            }
+//        )
+//
+//        PttButton(
+//            modifier = Modifier
+//                .fillMaxWidth(0.13f)
+//                .fillMaxHeight(0.2f),
+//            contentText = "ERROR_HMI",
+//            onClick = {
+//                multipleEventsCutter.processEvent {
+////                        viewModel.onDomainEvent(
+////                            event = MainEvent.OpenDomainWindowEvent(
+////                                domainType = SealedDomainType.Ptt,
+////                                screenType = ScreenType.PttListen,
+////                                data = "에러",
+////                                isError = true,
+////                                screenSizeType = ScreenSizeType.Small
+////                            )
+////                        )
+//                    viewModel.vrmwManager.setVRError(HVRError.ERROR_HMI)
+//                }
+//            }
+//        )
+//
+//        PttButton(
+//            modifier = Modifier
+//                .fillMaxWidth(0.13f)
+//                .fillMaxHeight(0.25f),
+//            contentText = "Size Up",
+//            onClick = {
+//                val resultScreenSizeType = when (domainUiState.screenSizeType) {
+//                    is ScreenSizeType.Zero -> ScreenSizeType.Zero
+//                    is ScreenSizeType.Small -> ScreenSizeType.Middle
+//                    is ScreenSizeType.Middle -> ScreenSizeType.Large
+//                    is ScreenSizeType.Large -> ScreenSizeType.Full
+//                    is ScreenSizeType.Full -> ScreenSizeType.Full
+//                }
+//                viewModel.onDomainEvent(
+//                    MainEvent.ChangeDomainWindowSizeEvent(
+//                        resultScreenSizeType
+//                    )
+//                )
+//            }
+//        )
+//
+//        PttButton(
+//            modifier = Modifier
+//                .fillMaxWidth(0.13f)
+//                .fillMaxHeight(0.25f),
+//            contentText = "Size Down",
+//            onClick = {
+//                val resultScreenSizeType = when (domainUiState.screenSizeType) {
+//                    is ScreenSizeType.Zero -> ScreenSizeType.Zero
+//                    is ScreenSizeType.Small -> ScreenSizeType.Small
+//                    is ScreenSizeType.Middle -> ScreenSizeType.Small
+//                    is ScreenSizeType.Large -> ScreenSizeType.Middle
+//                    is ScreenSizeType.Full -> ScreenSizeType.Large
+//                }
+//                viewModel.onDomainEvent(
+//                    MainEvent.ChangeDomainWindowSizeEvent(
+//                        resultScreenSizeType
+//                    )
+//                )
+//            }
+//        )
     }
     Column(
         modifier = Modifier

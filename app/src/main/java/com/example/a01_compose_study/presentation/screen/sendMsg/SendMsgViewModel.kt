@@ -51,6 +51,7 @@ class SendMsgViewModel @Inject constructor(
         when (event) {
             // 카테고리 여러개인지 확인 로직
             is SendMsgEvent.MsgAllListItemOnClick -> {
+                // TODO sendMsgModel 받아오는 로직
                 Log.e("sendMsg","onSendMsgEvent MsgAllListItemOnClick 안")
                 val sendMsgModel = SendMsgModel("")
                 sendMsgModel.getContactItems().add(event.selectedSendMsgItem)
@@ -63,9 +64,12 @@ class SendMsgViewModel @Inject constructor(
                 }
             }
             is SendMsgEvent.SelectNameListItemOnClick -> {
+                // TODO sendMsgModel 받아오는 로직
                 //카테고리 여러개인지 매니저 로직 (위와 동일)
+                Log.e("sendMsg", "아이템 clickEvent 실행}")
                 val sendMsgModel = SendMsgModel("")
                 sendMsgModel.getContactItems().add(event.selectedSendMsgItem)
+                sendMsgModel.messageValue = "hello"
                 val bundle = sendMsgManager.handleCategory(
                     sendMsgModel = sendMsgModel,
                     contactId = event.selectedSendMsgItem.contact_id
@@ -76,20 +80,16 @@ class SendMsgViewModel @Inject constructor(
             }
 
             is SendMsgEvent.SelectCategoryListItemOnClick -> {
-                // say Message
-                _domainUiState.update { domainUiState ->
-                    val updatedState = (domainUiState as? DomainUiState.SendMessageWindow)?.copy(
-                        screenType = ScreenType.SayMessage,
-                        selectListItem = event.selectedSendMsgItem,
-                        msgData = MsgData(
-                            name = event.selectedSendMsgItem.name,
-                            phoneNum = event.selectedSendMsgItem.number,
-                        )
-                    ) ?: domainUiState
-                    UiState.pushUiState(Pair(updatedState,null))
-                    updatedState
-                }
+                // TODO sendMsgModel 받아오는 로직
+                // 메세지 유무에 따라 화면 전환
+                val sendMsgModel = SendMsgModel("")
+                sendMsgModel.getContactItems().add(event.selectedSendMsgItem)
+                sendMsgModel.messageValue = "hello"
+                val bundle = sendMsgManager.handleMsgExistence(sendMsgModel)
 
+                job.launch {
+                    UiState._sealedParsedData.emit(SealedParsedData.SendMsgData(bundle))
+                }
             }
             is SendMsgEvent.OnBack -> {
                 popUiState()

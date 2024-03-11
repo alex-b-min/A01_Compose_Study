@@ -11,7 +11,9 @@ sealed class SelectVRResult {
     object SendMsgResult: SelectVRResult()
     object SendMsgNameResult: SelectVRResult()
     object SendMsgNameMsgResult: SelectVRResult()
-    object NoResult: SelectVRResult()
+    data class NoResult(val isSayMessage:Boolean): SelectVRResult()
+    object YesResult: SelectVRResult()
     object MessageReult: SelectVRResult()
+    object ChangeMessage: SelectVRResult()
     object ScrollIndexResult : SelectVRResult()
 }

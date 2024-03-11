@@ -117,15 +117,32 @@ class MWContext(
                 ParserFactory().dataParsing(vrResult, dialogueMode = dialogueMode)
                     .also {
                         it?.type = ParseDomainType.SEND_MESSAGE
-                        it?.dialogueMode = DialogueMode.SEND_MESSAGE_NAME_CHANGE
+                        it?.dialogueMode = DialogueMode.SEND_MESSAGE
+//                        it?.dialogueMode = DialogueMode.SEND_MESSAGE_NAME_CHANGE
                     }
             }
 
-            SelectVRResult.NoResult -> {
+            SelectVRResult.NoResult(isSayMessage = true) -> {
                 ParserFactory().dataParsing(vrResult, dialogueMode = dialogueMode)
                     .also {
                         it?.type = ParseDomainType.SEND_MESSAGE
                         it?.dialogueMode = DialogueMode.SEND_MESSAGE_NAME
+                    }
+            }
+
+            SelectVRResult.NoResult(isSayMessage = false) -> {
+                ParserFactory().dataParsing(vrResult, dialogueMode = dialogueMode)
+                    .also {
+                        it?.type = ParseDomainType.SEND_MESSAGE
+                        it?.dialogueMode = DialogueMode.SEND_MESSAGE_NAME_CHANGE
+                    }
+            }
+
+            SelectVRResult.YesResult -> {
+                ParserFactory().dataParsing(vrResult, dialogueMode = dialogueMode)
+                    .also {
+                        it?.type = ParseDomainType.SEND_MESSAGE
+                        it?.dialogueMode = DialogueMode.SEND_MESSAGE_NAME_CHANGE
                     }
             }
             SelectVRResult.MessageReult -> {
@@ -133,6 +150,13 @@ class MWContext(
                     .also {
                         it?.type = ParseDomainType.SEND_MESSAGE
                         it?.dialogueMode = DialogueMode.SEND_MESSAGE_NAME
+                    }
+            }
+            SelectVRResult.ChangeMessage -> {
+                ParserFactory().dataParsing(vrResult, dialogueMode = dialogueMode)
+                    .also {
+                        it?.type = ParseDomainType.SEND_MESSAGE
+                        it?.dialogueMode = DialogueMode.SEND_MESSAGE_NAME_CHANGE
                     }
             }
 
@@ -147,6 +171,14 @@ class MWContext(
                     .also {
                         it?.type = ParseDomainType.SEND_MESSAGE
                         it?.dialogueMode = DialogueMode.LIST
+                    }
+            }
+
+            else -> {
+                ParserFactory().dataParsing(vrResult, dialogueMode = dialogueMode)
+                    .also {
+                        it?.type = ParseDomainType.SEND_MESSAGE
+                        it?.dialogueMode = DialogueMode.NONE
                     }
             }
         }

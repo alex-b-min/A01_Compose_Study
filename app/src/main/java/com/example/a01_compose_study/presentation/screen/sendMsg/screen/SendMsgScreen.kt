@@ -44,7 +44,7 @@ fun SendMsgScreen(
                     Log.d("sendMsg", "SayMessage MessageView")
                     MessageView(
                         name = it.name,
-                        phoneNum = domainUiState.msgData.phoneNum,
+                        phoneNum = it.phoneNum,
                         modifier = Modifier,
                         isSayMessage = true,
                         onButtonClick = { viewModel.onSendMsgEvent(SendMsgEvent.SayMessageNo) }
@@ -55,7 +55,7 @@ fun SendMsgScreen(
                 domainUiState.msgData?.let {
                     MessageView(
                         name = it.name,
-                        phoneNum = domainUiState.msgData.phoneNum,
+                        phoneNum = it.phoneNum,
                         modifier = Modifier,
                         isSayMessage = false,
                         msgData = it.msg,
