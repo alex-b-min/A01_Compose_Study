@@ -11,9 +11,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -58,6 +61,9 @@ fun MainRoute(
 
     val announceString by viewModel.announceString.collectAsStateWithLifecycle()
 
+    var screenToDisplayState by remember {
+        mutableStateOf<ScreenToDisplay?>(null)
+    }
     /**
      * 원래라고 하면은 Compose에서 뷰를 조작하는 변수(visible)는 remember 타입으로 선언해야 함..
      * 그러나 이 방법은 각 뷰의 가시성을 개별적으로 관리해야 한다는 점임..
@@ -86,70 +92,31 @@ fun MainRoute(
             Log.d("@@ domainUiState When문 위에서 시작", "${domainUiState}")
             Log.d("@@ domainUiState When문 위에서 시작", "${domainWindowVisibleState}")
 
-            when (domainUiState) {
-                is DomainUiState.NoneWindow -> {
+            /**
+             * 각 도메인별 화면과 겹쳐진 VR 애니메이션 실행 및 종료 시, 리컴포지션이 일어나는데 이때 각 도메인별 화면도 리컴포지션이 발생하게 됩니다.(같은 화면 배치라서 그런듯..)
+             * ==> 이때 리컴포지션이 발생하면 domainUiState 함수도 재호출 되기 때문 각 도메인별 화면도 재구성이 됩니다.(화면이 재구성되어 ScrollIndex가 0번째 Index로 초기화하는 문제가 있었음)
+             * ==> 불필요한 화면 변경을 방지하고자 `domainUiState`의 값이 변경될 때만 화면을 변경해야 하는 목적이 생기게 됩니다.
+             * 이를 위해 `ScreenToDisplay`라는 sealed class를 정의하였고, 최종적으로 `ScreenToDisplay`의 값에 따라 도메인 화면이 구성됩니다.
+             * ( 즉, 쉽게 말해보자면 domainUiState의 값이 변경이 될 때만, ScreenToDisplay라는 값을 변경시킨다.
+             * 기존의 domainUiState의 값을 통해 각 도메인 별 화면을 구성하였다면, 변경된 구조는 ScreenToDisplay의 값을 통해 각 도메인 별 화면을 구성한다.)
+             */
+            LaunchedEffect(domainUiState) {
+                val screenToDisplay = when (val uiState = domainUiState) {
+                    is DomainUiState.NoneWindow -> null
+                    is DomainUiState.PttWindow -> ScreenToDisplay.PttScreen(uiState, announceString)
+                    is DomainUiState.HelpWindow -> ScreenToDisplay.HelpScreen(uiState, vrUiState)
+                    is DomainUiState.AnnounceWindow -> ScreenToDisplay.AnnounceScreen(uiState.text)
+                    is DomainUiState.CallWindow -> ScreenToDisplay.CallScreen(uiState, vrUiState)
+                    is DomainUiState.DomainMenuWindow -> ScreenToDisplay.DomainMenuScreen(uiState)
+                    is DomainUiState.NavigationWindow -> ScreenToDisplay.NavigationScreen(uiState)
+                    is DomainUiState.RadioWindow -> ScreenToDisplay.RadioScreen(uiState)
+                    is DomainUiState.WeatherWindow -> ScreenToDisplay.WeatherScreen(uiState)
+                    is DomainUiState.SendMessageWindow -> ScreenToDisplay.SendMessageScreen(uiState)
                 }
 
-                is DomainUiState.PttWindow -> {
-                    Log.d("@@ PttWindow 진입", "몇번 실행?")
-                    ComposePttScreen(
-                        domainUiState = domainUiState as DomainUiState.PttWindow,
-                        contentColor = Color.White,
-                        displayText = announceString
-                    )
-                }
-
-                is DomainUiState.HelpWindow -> {
-                    Log.d("@@ HelpWindow 진입", "몇번 실행?")
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        ComposeHelpScreen(
-                            domainUiState = domainUiState as DomainUiState.HelpWindow,
-                            vrUiState = vrUiState,
-                            contentColor = Color.Gray,
-                            backgroundColor = Black2
-                        )
-                    }
-                }
-
-                is DomainUiState.AnnounceWindow -> {
-                    Log.d("@@ AnnounceWindow 진입", "몇번 실행?")
-                    AnnounceScreen((domainUiState as DomainUiState.AnnounceWindow).text)
-                }
-
-                is DomainUiState.CallWindow -> {
-                    Log.d("@@ CallWindow 진입", "진입함 / index : ${domainUiState.scrollIndex}")
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        CallScreen(
-                            domainUiState = domainUiState as DomainUiState.CallWindow,
-                            vrUiState = vrUiState,
-                            vrDynamicBackground = if (vrUiState.active) Color.Transparent else Color.Black,
-                            fixedBackground = Black2
-                        )
-                    }
-                }
-
-                is DomainUiState.DomainMenuWindow -> {
-
-                }
-
-                is DomainUiState.NavigationWindow -> {
-
-                }
-
-                is DomainUiState.RadioWindow -> {
-
-                }
-
-                is DomainUiState.WeatherWindow -> {
-
-                }
-
-                is DomainUiState.SendMessageWindow -> {
-                    SendMsgScreen(
-                        domainUiState = domainUiState as DomainUiState.SendMessageWindow
-                    )
-                }
+                screenToDisplayState = screenToDisplay //screenToDisplayState의 값 변경
             }
+            updateScreenToDisplay(screen = screenToDisplayState)
         }
     }
 
@@ -627,6 +594,59 @@ fun MainRoute(
                     }
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun updateScreenToDisplay(screen: ScreenToDisplay?) {
+    Log.d("@@@@ screen", "${screen}")
+    when (screen) {
+        null -> { }
+        is ScreenToDisplay.PttScreen -> {
+            ComposePttScreen(
+                domainUiState = screen.uiState,
+                contentColor = Color.White,
+                displayText = screen.announceString
+            )
+        }
+        is ScreenToDisplay.HelpScreen -> {
+            Box(modifier = Modifier.fillMaxSize()) {
+                ComposeHelpScreen(
+                    domainUiState = screen.uiState,
+                    vrUiState = screen.vrUiState,
+                    contentColor = Color.Gray,
+                    backgroundColor = Black2
+                )
+            }
+        }
+        is ScreenToDisplay.AnnounceScreen -> {
+            AnnounceScreen(screen.text)
+        }
+        is ScreenToDisplay.CallScreen -> {
+            Box(modifier = Modifier.fillMaxSize()) {
+                CallScreen(
+                    domainUiState = screen.uiState,
+                    vrUiState = screen.vrUiState,
+                    vrDynamicBackground = if (screen.vrUiState.active) Color.Transparent else Color.Black,
+                    fixedBackground = Black2
+                )
+            }
+        }
+        is ScreenToDisplay.DomainMenuScreen -> {
+            // Handle DomainMenuScreen
+        }
+        is ScreenToDisplay.NavigationScreen -> {
+            // Handle NavigationScreen
+        }
+        is ScreenToDisplay.RadioScreen -> {
+            // Handle RadioScreen
+        }
+        is ScreenToDisplay.WeatherScreen -> {
+            // Handle WeatherScreen
+        }
+        is ScreenToDisplay.SendMessageScreen -> {
+            SendMsgScreen(domainUiState = screen.uiState)
         }
     }
 }
