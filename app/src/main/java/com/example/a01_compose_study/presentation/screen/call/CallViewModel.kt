@@ -52,8 +52,13 @@ class CallViewModel @Inject constructor(
                                     } else { // 스크롤 음성인식 결과가 현재 UI에 존재하는 스크롤 인덱스 번호보다 작다면 현재 UI의 ScrollIndex 프로퍼티에 음성인식 인덱스를 할당
                                         UiState._domainUiState.update { domainUiState ->
                                             val updatedState = domainUiState.copyWithNewScrollIndex(newScrollIndex = sealedParsedData.procCallData.index - 1, isClicked = true) // 클릭 후 상태 변경
-//                                            UiState.replaceTopUiStateMwContext(newUiStateMwContext = Pair(first = updatedState, second = sealedParsedData.procCallData.mwContext)) // 현재 스택에 저장되어 있는 데이터를 현재의 DomainUiState, MWContext로 대체한다.
-                                            UiState.pushUiStateMwContext(Pair(first = updatedState, second = sealedParsedData.procCallData.mwContext))
+                                            /**
+                                             * domainUiState의 scrollIndex의 값이 null인 경우에만 스택에 추가
+                                             * null이 아닌 경우에는 기존에 쌓여있던
+                                             */
+                                            if (domainUiState.scrollIndex == null) {
+                                                UiState.pushUiStateMwContext(Pair(first = updatedState, second = sealedParsedData.procCallData.mwContext))
+                                            }
                                             updatedState
                                         }
                                     }
@@ -63,18 +68,21 @@ class CallViewModel @Inject constructor(
 
                         is ProcCallData.ProcYesResult -> {
                             _vrProcessingResultState.update { currResult ->
+                                UiState.replaceTopUiStateMwContext(newUiStateMwContext = Pair(first = domainUiState.value, second = sealedParsedData.procCallData.mwContext))
                                 VRProcessingResult.Yes
                             }
                         }
 
                         is ProcCallData.ProcNoResult -> {
                             _vrProcessingResultState.update { currResult ->
+                                UiState.replaceTopUiStateMwContext(newUiStateMwContext = Pair(first = domainUiState.value, second = sealedParsedData.procCallData.mwContext))
                                 VRProcessingResult.No
                             }
                         }
 
                         is ProcCallData.ProcOtherNumberResult -> {
                             _vrProcessingResultState.update { currResult ->
+                                UiState.replaceTopUiStateMwContext(newUiStateMwContext = Pair(first = domainUiState.value, second = sealedParsedData.procCallData.mwContext))
                                 VRProcessingResult.OtherNumber
                             }
                         }
@@ -129,9 +137,6 @@ class CallViewModel @Inject constructor(
 
             is CallEvent.OnYesButtonClick -> {
                 onCallBusinessEvent(CallBusinessEvent.Calling(phoneNumber = event.phoneNumber))
-                _vrProcessingResultState.update { currResult ->
-                    VRProcessingResult.None
-                }
             }
 
             is CallEvent.OnOtherNumberButtonClick -> {
