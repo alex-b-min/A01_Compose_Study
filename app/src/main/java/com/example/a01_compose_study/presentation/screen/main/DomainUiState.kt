@@ -8,6 +8,10 @@ import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 
+/**
+ * `DomainUiState`는 각 도메인 화면의 상태를 표현하는 sealed class입니다.
+ * 각 서브 클래스는 특정 도메인의 화면 상태를 나타내기 위한 필수 요소인, 화면 크기, 유형, 스크롤 인덱스 등을 포함합니다.
+ */
 sealed class DomainUiState(
     open val screenSizeType: ScreenSizeType = ScreenSizeType.Zero,
     open val screenType: ScreenType = ScreenType.None,
