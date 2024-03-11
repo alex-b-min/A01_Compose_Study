@@ -467,7 +467,7 @@ fun MainRoute(
     ) {
         Column(
             modifier = Modifier
-                .fillMaxHeight(0.8f)
+                .fillMaxHeight(0.35f)
                 .fillMaxWidth(0.1f)
                 .wrapContentWidth(Alignment.End),
             verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -513,7 +513,22 @@ fun MainRoute(
                     }
                 )
             }
+        }
+    }
 
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .offset(x = -620.dp),
+        contentAlignment = Alignment.TopEnd
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxHeight(0.25f)
+                .fillMaxWidth(0.1f)
+                .wrapContentWidth(Alignment.End),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
             Box(
                 modifier = Modifier
                     .weight(1f)
@@ -549,8 +564,22 @@ fun MainRoute(
                     }
                 )
             }
+        }
+    }
 
-
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .offset(x = -820.dp),
+        contentAlignment = Alignment.TopEnd
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxHeight(0.35f)
+                .fillMaxWidth(0.1f)
+                .wrapContentWidth(Alignment.End),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
             Box(
                 modifier = Modifier
                     .weight(1f)
