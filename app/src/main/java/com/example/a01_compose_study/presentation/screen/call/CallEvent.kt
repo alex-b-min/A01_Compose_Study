@@ -7,7 +7,8 @@ sealed class CallEvent {
     object OnCallBack : CallEvent()
 
     data class ContactListItemOnClick(
-        val selectedContactItem: Contact
+        val selectedContactItem: Contact,
+        val itemIndex: Int
     ) : CallEvent()
 
     data class OnYesButtonClick(

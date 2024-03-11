@@ -395,13 +395,6 @@ class MainViewModel @Inject constructor(
 
             }
 
-            is MainEvent.ChangeScrollIndexEvent -> {
-                Log.d("@@  MainEvent.ChangeScrollIndexEvent", "수행 / ${event.selectedScrollIndex}")
-                UiState._domainUiState.update { domainUiState ->
-                    domainUiState.copyWithNewScrollIndex(event.selectedScrollIndex)
-                }
-            }
-
             is MainEvent.SendDataEvent -> {
                 CoroutineScope(Dispatchers.Default).launch {
                     UiState._sendUiData.emit(event.data)

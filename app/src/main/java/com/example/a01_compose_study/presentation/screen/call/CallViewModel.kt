@@ -3,6 +3,7 @@ package com.example.a01_compose_study.presentation.screen.call
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.a01_compose_study.data.Contact
 import com.example.a01_compose_study.data.custom.SealedParsedData
 import com.example.a01_compose_study.data.custom.call.CallManager
 import com.example.a01_compose_study.data.custom.call.ProcCallData
@@ -27,8 +28,7 @@ class CallViewModel @Inject constructor(
     private val _domainUiState = UiState._domainUiState
     val domainUiState: StateFlow<DomainUiState> = UiState._domainUiState
 
-    private val _vrProcessingResultState =
-        MutableStateFlow<VRProcessingResult>(VRProcessingResult.None)
+    private val _vrProcessingResultState = MutableStateFlow<VRProcessingResult>(VRProcessingResult.None)
     val vrProcessingResultState: StateFlow<VRProcessingResult> = _vrProcessingResultState
 
     init {
@@ -51,7 +51,10 @@ class CallViewModel @Inject constructor(
                                         )
                                     } else { // 스크롤 음성인식 결과가 현재 UI에 존재하는 스크롤 인덱스 번호보다 작다면 현재 UI의 ScrollIndex 프로퍼티에 음성인식 인덱스를 할당
                                         UiState._domainUiState.update { domainUiState ->
-                                            domainUiState.copyWithNewScrollIndex(sealedParsedData.procCallData.index-1)
+                                            val updatedState = domainUiState.copyWithNewScrollIndex(newScrollIndex = sealedParsedData.procCallData.index - 1, isClicked = true) // 클릭 후 상태 변경
+//                                            UiState.replaceTopUiStateMwContext(newUiStateMwContext = Pair(first = updatedState, second = sealedParsedData.procCallData.mwContext)) // 현재 스택에 저장되어 있는 데이터를 현재의 DomainUiState, MWContext로 대체한다.
+                                            UiState.pushUiStateMwContext(Pair(first = updatedState, second = sealedParsedData.procCallData.mwContext))
+                                            updatedState
                                         }
                                     }
                                 }
@@ -95,14 +98,25 @@ class CallViewModel @Inject constructor(
             }
 
             is CallEvent.ContactListItemOnClick -> {
-                val isContactNameUnique = callManager.isContactIdUnique(event.selectedContactItem)
-                Log.d("@@@@ isContactNameUnique 결과값", "${isContactNameUnique}")
+                val isContactIdUnique = callManager.isContactIdUnique(event.selectedContactItem)
+                Log.d("@@@@ isContactNameUnique 결과값", "${isContactIdUnique}")
+                Log.d("@@@@ ContactListItemOnClick ", "${event.itemIndex}")
                 _domainUiState.update { domainUiState ->
                     val updatedState = (domainUiState as? DomainUiState.CallWindow)?.copy(
                         screenType = ScreenType.CallYesNo,
                         detailData = event.selectedContactItem,
-                        isContactNameUnique = isContactNameUnique
+                        isContactIdUnique = isContactIdUnique
                     ) ?: domainUiState
+
+                    val isClickResetState = domainUiState.copyWithNewScrollIndex(newScrollIndex = event.itemIndex, isClicked = false)// 클릭 전 상태(뒤로가기를 하여 이전 화면으로 돌아갈때는 클릭 전 상태로 돌아가야 한다.)
+                    /**
+                     * 다음 화면으로 전환하기 전에 현재 마지막으로 쌓인 스택에는 scrollIndex 값이 할당되어 있지 않습니다.
+                     * 따라서 이벤트로 받아온 인덱스 데이터를 사용하여 마지막 스택에 있는 데이터의 scrollIndex 값을 업데이트 해줍니다.
+                     */
+                    UiState.replaceTopUiStateMwContext(newUiStateMwContext = Pair(first = isClickResetState, second = null))
+                    /**
+                     * 다음 화면으로 전환하기
+                     */
                     UiState.pushUiStateMwContext(
                         pairUiStateMwContext = Pair(
                             first = updatedState,

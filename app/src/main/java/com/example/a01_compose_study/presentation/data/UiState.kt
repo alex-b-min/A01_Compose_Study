@@ -78,6 +78,48 @@ object UiState {
     }
 
     /**
+     * 마지막에 쌓인 스택 데이터와 인자로 들어온 데이터를 교체할 때 사용
+     * [실제 사용 예시] - 리스트 화면에서 아이템을 클릭하여 다른 화면으로 이동한 후 다시 돌아왔을 때,
+     * 현재 화면의 ScrollIndex 값에 따라 스크롤 위치가 이동한 후에 게이지 클릭 이벤트가 발생해선 안됩니다.
+     * 따라서, 스크롤 이동 후 즉시 클릭 이벤트가 실행되지 않고,
+     * 클릭 여부 프로퍼티를 통해 스크롤 이동 후 클릭 이벤트가 수행되어야 하는지 결정해야 합니다.
+     * 즉,
+     * 화면 이동 시 UIState를 업데이트할 때는 클릭 여부 프로퍼티를 true로 설정하지만 이때 스택에는 저장하지 않습니다.
+     * 그러나 현재 화면으로 돌아올 때는 게이지 클릭 이벤트가 발생하지 않도록 클릭 여부 프로퍼티를 false로 설정한 UIState를 스택에 저장합니다.
+     */
+    fun replaceTopUiStateMwContext(newUiStateMwContext: Pair<DomainUiState, MWContext?>) {
+        if (newUiStateMwContext.second == null) {
+            // MWContext가 null인 경우, 스택의 마지막 데이터의 DomainUiState만 변경
+            if (domainUiStateMwContextStack.isNotEmpty()) {
+                val lastMwContext = domainUiStateMwContextStack.last().second
+                domainUiStateMwContextStack.removeAt(domainUiStateMwContextStack.size - 1)
+                domainUiStateMwContextStack.add(Pair(newUiStateMwContext.first, lastMwContext))
+            } else {
+                domainUiStateMwContextStack.add(newUiStateMwContext)
+            }
+        } else {
+            // MWContext가 null이 아닌 경우, 스택의 마지막 데이터를 삭제하고 새로운 데이터 추가
+            if (domainUiStateMwContextStack.isNotEmpty()) {
+                domainUiStateMwContextStack.removeAt(domainUiStateMwContextStack.size - 1)
+            }
+            domainUiStateMwContextStack.add(newUiStateMwContext)
+        }
+
+        domainUiStateMwContextStack.forEachIndexed { index, domainUiStateMwContext ->
+            _mwContextState.value = domainUiStateMwContext.second
+            Log.d("@@// UiStateMwContext replace", "index: $index / mwContext: ${domainUiStateMwContext.second} / domainUiState: ${domainUiStateMwContext.first}")
+        }
+        onVREvent(
+            VREvent.ChangeVRUIEvent(
+                VRUiState.PttListen(
+                    active = true,
+                    isError = false
+                )
+            )
+        )
+    }
+
+    /**
      * 화면을 스택에 쌓지 않고 스크린 사이즈만 변화 시킴
      */
     fun changeUiState(uiState: DomainUiState) {

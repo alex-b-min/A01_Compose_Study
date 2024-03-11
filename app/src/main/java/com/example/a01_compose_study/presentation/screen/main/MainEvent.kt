@@ -28,11 +28,6 @@ sealed class MainEvent() {
         val screenSizeType: ScreenSizeType,
     ) : MainEvent()
 
-    data class ChangeScrollIndexEvent(
-        val mwContext: MWContext? = null,
-        val selectedScrollIndex: Int,
-    ) : MainEvent()
-
     data class SendDataEvent(
         val data: Any,
     ): MainEvent()

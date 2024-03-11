@@ -1,6 +1,5 @@
 package com.example.a01_compose_study.presentation.screen.call.screen
 
-import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.animation.core.AnimationResult
@@ -88,8 +87,8 @@ fun CallScreen(
             fixedBackground = fixedBackground,
             onDismiss = { closeDomainWindow() },
             onBackButton = { popUiState() },
-            onItemClick = { contact ->
-                callViewModel.onCallEvent(CallEvent.ContactListItemOnClick(selectedContactItem = contact))
+            onItemClick = { contact, itemIndex ->
+                callViewModel.onCallEvent(CallEvent.ContactListItemOnClick(selectedContactItem = contact, itemIndex =itemIndex))
             }
         )
     } else if (domainUiState.screenType is ScreenType.CallIndexedList) {
@@ -100,8 +99,8 @@ fun CallScreen(
             fixedBackground = fixedBackground,
             onDismiss = { closeDomainWindow() },
             onBackButton = { popUiState() },
-            onItemClick = { contact ->
-                callViewModel.onCallEvent(CallEvent.ContactListItemOnClick(selectedContactItem = contact))
+            onItemClick = { contact, itemIndex ->
+                callViewModel.onCallEvent(CallEvent.ContactListItemOnClick(selectedContactItem = contact, itemIndex = itemIndex))
             }
         )
     } else if (domainUiState.screenType is ScreenType.CallYesNo) {
@@ -130,9 +129,10 @@ fun CallListWindow(
     fixedBackground: Color,
     onDismiss: () -> Unit,
     onBackButton: () -> Unit,
-    onItemClick: (Contact) -> Unit,
+    onItemClick: (Contact, Int) -> Unit,
 ) {
     val contactList = domainUiState.data
+    val currentIndex = domainUiState.scrollIndex
 
     Box(
         modifier = Modifier
@@ -170,10 +170,11 @@ fun CallListWindow(
             if (contactList != null) {
                 CallList(
                     contactList = contactList,
+                    currentIndex = currentIndex,
                     vrDynamicBackground = vrDynamicBackground,
                     fixedBackground = fixedBackground,
-                    onItemClick = { contact ->
-                        onItemClick(contact)
+                    onItemClick = { contact, itemIndex ->
+                        onItemClick(contact, itemIndex)
                     })
             }
         }
@@ -188,10 +189,11 @@ fun CallIndexedListWindow(
     fixedBackground: Color,
     onDismiss: () -> Unit,
     onBackButton: () -> Unit,
-    onItemClick: (Contact) -> Unit,
+    onItemClick: (Contact, Int) -> Unit,
 ) {
     val contactList = domainUiState.data
-    val selectedIndex = domainUiState.scrollIndex
+    val currentIndex = domainUiState.scrollIndex
+    val isClicked = domainUiState.isClicked
 
     Box(
         modifier = Modifier
@@ -230,10 +232,11 @@ fun CallIndexedListWindow(
                 CallIndexedList(
                     contactList = contactList,
                     vrDynamicBackground = vrDynamicBackground,
-                    selectedIndex = selectedIndex,
+                    currentIndex = currentIndex,
+                    isClicked = isClicked,
                     fixedBackground = fixedBackground,
-                    onItemClick = { contact ->
-                        onItemClick(contact)
+                    onItemClick = { contact, itemIndex ->
+                        onItemClick(contact, itemIndex)
                     })
             }
         }
@@ -565,7 +568,7 @@ fun CallYesNoScreen(
             }
             Spacer(modifier = Modifier.height(15.dp))
 
-            if (domainUiState.isContactNameUnique.not()) { //유니크 하지 않을때(중복 이름이 존재할 때 == OtherNumber가 존재할 때)
+            if (domainUiState.isContactIdUnique.not()) { //유니크 하지 않을때(중복 이름이 존재할 때 == OtherNumber가 존재할 때)
                 OutlinedButton(
                     onClick = {
                         scope.launch {
@@ -630,7 +633,7 @@ fun CallListWindowPreview() {
         fixedBackground = Color.Black,
         onDismiss = {},
         onBackButton = {},
-        onItemClick = {}
+        onItemClick = {contact: Contact, i: Int ->  }
     )
 }
 
@@ -649,7 +652,7 @@ fun CallIndexedListWindowPreview() {
         fixedBackground = Color.Black,
         onDismiss = {},
         onBackButton = {},
-        onItemClick = {}
+        onItemClick = {contact: Contact, i: Int ->  }
     )
 }
 

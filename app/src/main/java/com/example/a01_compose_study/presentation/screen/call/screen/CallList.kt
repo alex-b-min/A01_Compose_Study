@@ -19,10 +19,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,16 +49,25 @@ import kotlinx.coroutines.launch
 @Composable
 fun CallList(
     contactList: List<Contact>,
+    currentIndex: Int? = null,
     vrDynamicBackground: Color,
     fixedBackground: Color,
-    onItemClick: (Contact) -> Unit,
+    onItemClick: (Contact, Int) -> Unit,
 ) {
-    LazyColumn() {
+    val scrollState = rememberLazyListState()
+
+    LaunchedEffect(currentIndex) {
+        val scrollIndex = currentIndex ?: 0
+        scrollState.animateScrollToItem(scrollIndex)
+    }
+
+    LazyColumn(state = scrollState) {
         itemsIndexed(contactList) { index, callItem ->
             CallListItem(
                 contactItem = callItem,
                 vrDynamicBackground = vrDynamicBackground,
                 fixedBackground = fixedBackground,
+                itemIndex = index,
                 onItemClick = onItemClick,
             )
         }
@@ -66,9 +77,10 @@ fun CallList(
 @Composable
 fun CallListItem(
     contactItem: Contact,
+    itemIndex: Int,
     vrDynamicBackground: Color,
     fixedBackground: Color,
-    onItemClick: (Contact) -> Unit,
+    onItemClick: (Contact, Int) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
 
@@ -106,7 +118,7 @@ fun CallListItem(
                     scope.launch {
                         isSelected = true
                         delay(850)
-                        onItemClick(contactItem)
+                        onItemClick(contactItem, itemIndex)
                     }
                 },
             verticalAlignment = Alignment.CenterVertically
@@ -226,6 +238,7 @@ fun CallListItemPreview() {
     CallListItem(contactItem = contact,
         vrDynamicBackground = Color.Black,
         fixedBackground = Color.Black,
-        onItemClick = {
-        })
+        itemIndex = 1,
+        onItemClick = { contact: Contact, i: Int ->  }
+    )
 }
