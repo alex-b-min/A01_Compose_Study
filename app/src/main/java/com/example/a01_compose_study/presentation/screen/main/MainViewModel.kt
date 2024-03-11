@@ -139,6 +139,26 @@ class MainViewModel @Inject constructor(
 
                             is ProcCallData.ProcCallNameScreen -> {
                                 Log.d("@@ ProcCallData", "ProcCallNameScreen - Contact: ${sealedParsedData.procCallData.data}")
+                                onDomainEvent(
+                                    event = MainEvent.OpenDomainWindowEvent(
+                                        domainType = SealedDomainType.Announce,
+                                        screenType = ScreenType.Notice,
+                                        data = sealedParsedData.procCallData.sealedDomainType.text,
+                                        isError = false,
+                                        screenSizeType = sealedParsedData.procCallData.screenSizeType
+                                    )
+                                )
+                                delay(1000)
+                                onDomainEvent(
+                                    event = MainEvent.OpenDomainWindowEvent(
+                                        mwContext = sealedParsedData.procCallData.mwContext,
+                                        domainType = sealedParsedData.procCallData.sealedDomainType,
+                                        screenType = sealedParsedData.procCallData.screenType,
+                                        data = sealedParsedData.procCallData.data,
+                                        isError = false,
+                                        screenSizeType = sealedParsedData.procCallData.screenSizeType,
+                                    )
+                                )
                             }
 
                             is ProcCallData.RecognizedContactListScreen -> {
@@ -311,15 +331,26 @@ class MainViewModel @Inject constructor(
                         }
 
                         SealedDomainType.Call -> {
+                            val contactDetail = event.data as? Contact
                             val contactList = event.data as? List<Contact> ?: emptyList()
+                            val domainUiState = if (contactDetail != null) {
+                                DomainUiState.CallWindow(
+                                    domainType = event.domainType,
+                                    screenType = event.screenType,
+                                    screenSizeType = event.screenSizeType,
+                                    detailData = contactDetail
+                                )
+                            } else {
+                                DomainUiState.CallWindow(
+                                    domainType = event.domainType,
+                                    screenType = event.screenType,
+                                    screenSizeType = event.screenSizeType,
+                                    data = contactList
+                                )
+                            }
                             Log.d("@@ contactList", "${contactList}")
                             Log.d("@@ event", "${event}")
-                            DomainUiState.CallWindow(
-                                domainType = event.domainType,
-                                screenType = event.screenType,
-                                screenSizeType = event.screenSizeType,
-                                data = contactList,
-                            )
+                            domainUiState
                         }
 
                         SealedDomainType.SendMessage -> {

@@ -505,13 +505,10 @@ fun MainRoute(
             ) {
                 PttButton(
                     modifier = Modifier.fillMaxSize(),
-                    contentText = "VR Line Number Result",
+                    contentText = "인식된 이름 1개 경우",
                     onClick = {
                         scope.launch {
-                            viewModel.vrmwManager.setVRResult(
-                                VRResult(),
-                                SelectVRResult.ScrollIndexResult(5)
-                            )
+                            viewModel.onPttEvent(PttEvent.StartVR(SelectVRResult.CallRecognizedContact))
                         }
                     }
                 )
@@ -523,30 +520,14 @@ fun MainRoute(
             ) {
                 PttButton(
                     modifier = Modifier.fillMaxSize(),
-                    contentText = "Change ScrollIndex 5",
+                    contentText = "VR Line Number Result(5)",
                     onClick = {
-                        /**
-                         * 발화로 스크롤이 변경되는 환경이라면 CallViewModel의 Event에 있어야 하지만,
-                         * 현재 버튼 클릭으로 index 값을 직접 주입해야 하는 환경이 MainEvent에 임의로 정의해서 사용하고 있는 상황
-                         */
-                        viewModel.onDomainEvent(
-                            MainEvent.ChangeScrollIndexEvent(selectedScrollIndex = 5 - 1)
-                        )
-                    }
-                )
-            }
-
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-            ) {
-                PttButton(
-                    modifier = Modifier.fillMaxSize(),
-                    contentText = "Change ScrollIndex 8",
-                    onClick = {
-                        viewModel.onDomainEvent(
-                            MainEvent.ChangeScrollIndexEvent(selectedScrollIndex = 8 - 1)
-                        )
+                        scope.launch {
+                            viewModel.vrmwManager.setVRResult(
+                                VRResult(),
+                                SelectVRResult.ScrollIndexResult(5)
+                            )
+                        }
                     }
                 )
             }

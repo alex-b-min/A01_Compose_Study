@@ -167,13 +167,15 @@ fun CallListWindow(
                         }
                 )
             }
-            CallList(
-                contactList = contactList,
-                vrDynamicBackground = vrDynamicBackground,
-                fixedBackground = fixedBackground,
-                onItemClick = { contact ->
-                    onItemClick(contact)
-                })
+            if (contactList != null) {
+                CallList(
+                    contactList = contactList,
+                    vrDynamicBackground = vrDynamicBackground,
+                    fixedBackground = fixedBackground,
+                    onItemClick = { contact ->
+                        onItemClick(contact)
+                    })
+            }
         }
     }
 }
@@ -224,14 +226,16 @@ fun CallIndexedListWindow(
                         }
                 )
             }
-            CallIndexedList(
-                contactList = contactList,
-                vrDynamicBackground = vrDynamicBackground,
-                selectedIndex = selectedIndex,
-                fixedBackground = fixedBackground,
-                onItemClick = { contact ->
-                    onItemClick(contact)
-                })
+            if (contactList != null) {
+                CallIndexedList(
+                    contactList = contactList,
+                    vrDynamicBackground = vrDynamicBackground,
+                    selectedIndex = selectedIndex,
+                    fixedBackground = fixedBackground,
+                    onItemClick = { contact ->
+                        onItemClick(contact)
+                    })
+            }
         }
     }
 }

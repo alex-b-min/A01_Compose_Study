@@ -50,7 +50,7 @@ sealed class DomainUiState(
 
     data class CallWindow(
         override val domainType: SealedDomainType,
-        val data: List<Contact>,
+        val data: List<Contact>? = emptyList(),
         val detailData: Contact = Contact(),
         val isContactNameUnique: Boolean = false,
         val isError: Boolean = false,

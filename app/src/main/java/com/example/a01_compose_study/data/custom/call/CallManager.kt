@@ -220,7 +220,7 @@ class CallManager @Inject constructor(
                      * - 크다면 TTS 요청
                      * - 작다면 해당 ScrollIndex를 반환(추후 ScrollIndex의 값은 스크롤을 움직이는 값으로 사용됨)
                      */
-                    return if (callModel.data.size < serverIndex) {
+                    return if ((callModel.data?.size ?: 0) < serverIndex) {
                         ProcCallData.ListTTSRequest(
                             promptId = "PID_CMN_COMM_02_31",
                             mwContext = MWContext(DialogueMode.LIST, this@CallManager)
