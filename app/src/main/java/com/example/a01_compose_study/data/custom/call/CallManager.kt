@@ -209,35 +209,20 @@ class CallManager @Inject constructor(
          * 2. 서버로부터 받은 index의 크기가 현재 스크린을 구성하고 있는 모델의 인덱스보다 작은 경우(이동 가능 경우)
          * ==> 서버로부터의 내려온 index의 위치로 이동
          */
-        val index = data.index
-        val customIndex = (selectVRResult as? SelectVRResult.ScrollIndexResult)?.inputIndex
-        index?.let { serverIndex -> // server의 index가 null 아닐때
-            getCurrDomainUiState().value.let { currDomainUiState -> // 현재 화면을 구성하는 데이터가 null이 아닐때
-                val currCallModel = currDomainUiState as? DomainUiState.CallWindow
-                currCallModel?.let { callModel -> // 현재 화면을 구성하고 있는 CallModel의 데이터가 null이 아닐때
-                    /**
-                     * 서버의 index 보다 해당 callModel의 index 값을 비교
-                     * - 크다면 TTS 요청
-                     * - 작다면 해당 ScrollIndex를 반환(추후 ScrollIndex의 값은 스크롤을 움직이는 값으로 사용됨)
-                     */
-                    return if ((callModel.data?.size ?: 0) < serverIndex) {
-                        ProcCallData.ListTTSRequest(
-                            promptId = "PID_CMN_COMM_02_31",
-                            mwContext = MWContext(DialogueMode.LIST, this@CallManager)
-                        )
-                    } else {
-                        ProcCallData.ScrollIndex(
-                            index = customIndex,
-                            mwContext = MWContext(DialogueMode.LIST, this@CallManager)
-                        )
-                    }
-                }
-            }
+        val index = data.index //실제 음성인식 결과 데이터
+        val customIndex = (selectVRResult as? SelectVRResult.ScrollIndexResult)?.inputIndex // 직접 주입시킨 인덱스값(음성인식 결과)라고 가정함
+
+        return if (customIndex != null) {
+            ProcCallData.ScrollIndex(
+                index = customIndex,
+                mwContext = MWContext(DialogueMode.LIST, this@CallManager)
+            )
+        } else {
+            ProcCallData.ListTTSRequest(
+                promptId = "PID_CMN_COMM_02_31",
+                mwContext = MWContext(DialogueMode.LIST, this@CallManager)
+            )
         }
-        return ProcCallData.ListTTSRequest(
-            promptId = "PID_CMN_COMM_02_31",
-            mwContext = MWContext(DialogueMode.LIST, this@CallManager)
-        )
     }
 
     /**

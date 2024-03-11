@@ -13,5 +13,5 @@ sealed class SelectVRResult {
     object CallOtherNameResult : SelectVRResult()
     object CallYesResult : SelectVRResult()
     object CallNoResult : SelectVRResult()
-    data class ScrollIndexResult(val inputIndex: Int) : SelectVRResult()
+    data class ScrollIndexResult(val inputIndex: Int?) : SelectVRResult()
 }

@@ -478,7 +478,7 @@ fun MainRoute(
             ) {
                 PttButton(
                     modifier = Modifier.fillMaxSize(),
-                    contentText = "VR Call List Result",
+                    contentText = "인식된 이름 없는 경우",
                     onClick = {
                         viewModel.onPttEvent(PttEvent.StartVR(SelectVRResult.CallListResult))
                     }
@@ -491,7 +491,7 @@ fun MainRoute(
             ) {
                 PttButton(
                     modifier = Modifier.fillMaxSize(),
-                    contentText = "VR Call Index List Result",
+                    contentText = "인식된 이름 2개 이상인 경우",
                     onClick = {
                         viewModel.onPttEvent(PttEvent.StartVR(SelectVRResult.CallIndexListResult))
                     }
@@ -525,12 +525,31 @@ fun MainRoute(
                         scope.launch {
                             viewModel.vrmwManager.setVRResult(
                                 VRResult(),
-                                SelectVRResult.ScrollIndexResult(5)
+                                SelectVRResult.ScrollIndexResult(inputIndex = 5)
                             )
                         }
                     }
                 )
             }
+
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+            ) {
+                PttButton(
+                    modifier = Modifier.fillMaxSize(),
+                    contentText = "VR Line Number Result(Null)",
+                    onClick = {
+                        scope.launch {
+                            viewModel.vrmwManager.setVRResult(
+                                VRResult(),
+                                SelectVRResult.ScrollIndexResult(inputIndex = null)
+                            )
+                        }
+                    }
+                )
+            }
+
 
             Box(
                 modifier = Modifier

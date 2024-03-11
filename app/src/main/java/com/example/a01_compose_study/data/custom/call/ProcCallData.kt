@@ -41,7 +41,7 @@ sealed class ProcCallData(
     ) : ProcCallData(screenType = ScreenType.CallList, mwContext = mwContext)
 
     data class ScrollIndex(
-        val index: Int?,
+        val index: Int,
         override val mwContext: MWContext
     ) : ProcCallData(screenType = ScreenType.CallIndexedList, mwContext = mwContext)
 

@@ -27,7 +27,8 @@ class CallViewModel @Inject constructor(
     private val _domainUiState = UiState._domainUiState
     val domainUiState: StateFlow<DomainUiState> = UiState._domainUiState
 
-    private val _vrProcessingResultState = MutableStateFlow<VRProcessingResult>(VRProcessingResult.None)
+    private val _vrProcessingResultState =
+        MutableStateFlow<VRProcessingResult>(VRProcessingResult.None)
     val vrProcessingResultState: StateFlow<VRProcessingResult> = _vrProcessingResultState
 
     init {
@@ -35,21 +36,24 @@ class CallViewModel @Inject constructor(
             sealedParsedData.collect { sealedParsedData ->
                 Log.d("@@@@ CallModel 생성 후 콜렉", "${sealedParsedData}")
                 if (sealedParsedData is SealedParsedData.CallData) {
-                    when(sealedParsedData.procCallData) {
+                    when (sealedParsedData.procCallData) {
                         is ProcCallData.ScrollIndex -> {
+                            Log.d("@@ ScrollIndex", "${sealedParsedData.procCallData}")
                             val voiceRecognitionIndex = sealedParsedData.procCallData.index // 음성인식으로 받아온 index
-                            val currentCallWindowContactListLastIndex = (domainUiState.value as? DomainUiState.CallWindow)?.data?.lastIndex // 현재 UI에 보여지는 ContactList의 마지막 index의 값
-
-                            if (voiceRecognitionIndex != null && currentCallWindowContactListLastIndex != null) {
-                                if (voiceRecognitionIndex < currentCallWindowContactListLastIndex) {
-                                    UiState._domainUiState.update { domainUiState ->
-                                        domainUiState.copyWithNewScrollIndex(sealedParsedData.procCallData.index)
+                            domainUiState.value.let { currDomainUiState -> // 현재 UI를 구성하는 DomainUiState
+                                val currCallModel = currDomainUiState as? DomainUiState.CallWindow
+                                currCallModel?.let { callModel ->
+                                    val currentCallWindowContactListLastIndex = callModel.data?.lastIndex ?: 0 // 현재 Index가 존재하는 ContactList의 마지막 인덱스 번호
+                                    if (currentCallWindowContactListLastIndex < voiceRecognitionIndex) { // 스크롤 음성인식 결과가 현재 UI에 존재하는 스크롤 인덱스 번호보다 크다면, TTS 요청
+                                        pttManager.vrmwManager.requestTTs(
+                                            promptId = listOf("PID_CMN_COMM_02_31"),
+                                            runnable = { pttManager.vrmwManager.resumeVR() }
+                                        )
+                                    } else { // 스크롤 음성인식 결과가 현재 UI에 존재하는 스크롤 인덱스 번호보다 작다면 현재 UI의 ScrollIndex 프로퍼티에 음성인식 인덱스를 할당
+                                        UiState._domainUiState.update { domainUiState ->
+                                            domainUiState.copyWithNewScrollIndex(sealedParsedData.procCallData.index-1)
+                                        }
                                     }
-                                } else {
-                                    pttManager.vrmwManager.requestTTs(
-                                        promptId = listOf("PID_CMN_COMM_02_31"),
-                                        runnable = { pttManager.vrmwManager.resumeVR() }
-                                    )
                                 }
                             }
                         }
@@ -86,8 +90,8 @@ class CallViewModel @Inject constructor(
      * ( 아래의 onCallBusinessEvent()를 사용하여 로직을 구성 )
      */
     fun onCallEvent(event: CallEvent) {
-        when(event) {
-            is  CallEvent.OnCallBack -> {
+        when (event) {
+            is CallEvent.OnCallBack -> {
             }
 
             is CallEvent.ContactListItemOnClick -> {
@@ -99,7 +103,12 @@ class CallViewModel @Inject constructor(
                         detailData = event.selectedContactItem,
                         isContactNameUnique = isContactNameUnique
                     ) ?: domainUiState
-                    UiState.pushUiStateMwContext(pairUiStateMwContext = Pair(first = updatedState, second = null))
+                    UiState.pushUiStateMwContext(
+                        pairUiStateMwContext = Pair(
+                            first = updatedState,
+                            second = null
+                        )
+                    )
                     updatedState
                 }
             }
@@ -119,14 +128,20 @@ class CallViewModel @Inject constructor(
                  * 일치하는 cotact_id가 2개라면 다른 번호로 교체
                  */
                 if (matchingContacts.size == 2) {
-                    val differentContact = matchingContacts.find { it.number != currentContact.number }
+                    val differentContact =
+                        matchingContacts.find { it.number != currentContact.number }
                     _domainUiState.update { domainUiState ->
                         val updatedState = differentContact?.let {
                             (domainUiState as? DomainUiState.CallWindow)?.copy(
                                 detailData = it,
                             )
                         } ?: domainUiState
-                        UiState.pushUiStateMwContext(pairUiStateMwContext = Pair(first = updatedState, second = null))
+                        UiState.pushUiStateMwContext(
+                            pairUiStateMwContext = Pair(
+                                first = updatedState,
+                                second = null
+                            )
+                        )
                         updatedState
                     }
                 } else {
@@ -139,7 +154,12 @@ class CallViewModel @Inject constructor(
                             screenType = ScreenType.CallIndexedList,
                             detailData = domainUiState.detailData,
                         ) ?: domainUiState
-                        UiState.pushUiStateMwContext(pairUiStateMwContext = Pair(first = updatedState, second = null))
+                        UiState.pushUiStateMwContext(
+                            pairUiStateMwContext = Pair(
+                                first = updatedState,
+                                second = null
+                            )
+                        )
                         updatedState
                     }
                 }
@@ -147,7 +167,7 @@ class CallViewModel @Inject constructor(
         }
         /**
          * 음성인식 이벤트를 발생시키는 State 초기화
-          */
+         */
         clearVRProcessingResultState()
     }
 
@@ -155,7 +175,7 @@ class CallViewModel @Inject constructor(
      * 구체적인 Call 비즈니스 로직을 발생시키는 이벤트
      */
     private fun onCallBusinessEvent(event: CallBusinessEvent) {
-        when(event) {
+        when (event) {
             is CallBusinessEvent.Calling -> {
                 callManager.makeCall(event.phoneNumber)
             }
