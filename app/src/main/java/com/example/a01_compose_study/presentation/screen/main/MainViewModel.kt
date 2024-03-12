@@ -122,7 +122,11 @@ class MainViewModel @Inject constructor(
                             )
                         )
                     }
-
+                    /**
+                     * MainViewModel이 collect 하는 정보는 reject,tts요청, CallScreen를 처음 띄우기 위한 값만을 collect한다.
+                     * CallViewModel은 CallScreen이 띄워진 후 구체적인 로직을 위한 값들을 collect 한다.
+                     * *참고: CallViewModel은 CallScreen이 띄워진 상태에서만 생성된다.
+                     */
                     is SealedParsedData.CallData -> {
                         when (sealedParsedData.procCallData) {
                             is ProcCallData.RejectRequest -> {
@@ -198,16 +202,7 @@ class MainViewModel @Inject constructor(
                                     )
                                 )
                             }
-
-                            is ProcCallData.ScrollIndex -> {}
-
-                            is ProcCallData.ProcYesNoOtherNumberResult -> {
-                                Log.d("@@ ProcCallData", "YesNoOtherNumberResultProc - Result: ${sealedParsedData.procCallData.callYesNoOtherNumberResult}")
-                            }
-
-                            is ProcCallData.ProcOtherNumberResult -> {}
-                            is ProcCallData.ProcYesResult -> {}
-                            is ProcCallData.ProcNoResult -> {}
+                            else -> {}
                         }
                     }
 

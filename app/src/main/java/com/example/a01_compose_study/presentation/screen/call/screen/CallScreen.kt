@@ -86,8 +86,8 @@ fun CallScreen(
             vrUiState = vrUiState,
             vrDynamicBackground = vrDynamicBackground,
             fixedBackground = fixedBackground,
-            onDismiss = { closeDomainWindow() },
-            onBackButton = { popUiState() },
+            onDismiss = { callViewModel.onCallEvent(CallEvent.CloseButtonClick) },
+            onBackButton = { callViewModel.onCallEvent(CallEvent.BackButtonClick) },
             onItemClick = { contact, itemIndex ->
                 callViewModel.onCallEvent(CallEvent.ContactListItemOnClick(selectedContactItem = contact, itemIndex =itemIndex))
             }
@@ -98,8 +98,8 @@ fun CallScreen(
             vrUiState = vrUiState,
             vrDynamicBackground = vrDynamicBackground,
             fixedBackground = fixedBackground,
-            onDismiss = { closeDomainWindow() },
-            onBackButton = { popUiState() },
+            onDismiss = { callViewModel.onCallEvent(CallEvent.CloseButtonClick) },
+            onBackButton = { callViewModel.onCallEvent(CallEvent.BackButtonClick) },
             onItemClick = { contact, itemIndex ->
                 callViewModel.onCallEvent(CallEvent.ContactListItemOnClick(selectedContactItem = contact, itemIndex = itemIndex))
             }
@@ -111,8 +111,8 @@ fun CallScreen(
             vrUiState = vrUiState,
             vrDynamicBackground = vrDynamicBackground,
             fixedBackground = fixedBackground,
-            onDismiss = { closeDomainWindow() },
-            onBackButton = { popUiState() },
+            onDismiss = { callViewModel.onCallEvent(CallEvent.CloseButtonClick) },
+            onBackButton = { callViewModel.onCallEvent(CallEvent.BackButtonClick) },
             onYesButton = { phoneNumber ->
                 callViewModel.onCallEvent(CallEvent.OnYesButtonClick(phoneNumber = phoneNumber)) },
             onOtherNumberButtonClick = {

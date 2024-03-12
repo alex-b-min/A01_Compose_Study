@@ -165,10 +165,6 @@ object UiState {
         }
     }
 
-    fun getCurrDomainUiState(): StateFlow<DomainUiState> {
-        return domainUiState
-    }
-
     fun openDomainWindow() {
         _domainWindowVisible.value = true
     }
@@ -180,5 +176,13 @@ object UiState {
 
     fun clearUiState() {
         domainUiStateMwContextStack.clear()
+    }
+
+    fun replaceTopUiStateMwContext(newUiState: DomainUiState, mwContext: MWContext?) {
+        replaceTopUiStateMwContext(Pair(newUiState, mwContext))
+    }
+
+    fun pushUiStateMwContext(uiState: DomainUiState, mwContext: MWContext?) {
+        pushUiStateMwContext(Pair(uiState, mwContext))
     }
 }

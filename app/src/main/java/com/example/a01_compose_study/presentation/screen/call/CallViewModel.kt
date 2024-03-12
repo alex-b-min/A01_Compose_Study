@@ -1,6 +1,5 @@
 package com.example.a01_compose_study.presentation.screen.call
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.a01_compose_study.data.Contact
@@ -10,6 +9,8 @@ import com.example.a01_compose_study.data.custom.call.ProcCallData
 import com.example.a01_compose_study.data.custom.ptt.PttManager
 import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.presentation.data.UiState
+import com.example.a01_compose_study.presentation.data.UiState.pushUiStateMwContext
+import com.example.a01_compose_study.presentation.data.UiState.replaceTopUiStateMwContext
 import com.example.a01_compose_study.presentation.data.UiState.sealedParsedData
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,187 +29,200 @@ class CallViewModel @Inject constructor(
     private val _domainUiState = UiState._domainUiState
     val domainUiState: StateFlow<DomainUiState> = UiState._domainUiState
 
+    // VR 처리 결과를 관리하여 클릭 이벤트를 발생시키는 MutableStateFlow
     private val _vrProcessingResultState = MutableStateFlow<VRProcessingResult>(VRProcessingResult.None)
     val vrProcessingResultState: StateFlow<VRProcessingResult> = _vrProcessingResultState
 
     init {
         viewModelScope.launch {
-            sealedParsedData.collect { sealedParsedData ->
-                Log.d("@@@@ CallModel 생성 후 콜렉", "${sealedParsedData}")
+            sealedParsedData.collect { sealedParsedData -> // Call 데이터 수집
                 if (sealedParsedData is SealedParsedData.CallData) {
-                    when (sealedParsedData.procCallData) {
-                        is ProcCallData.ScrollIndex -> {
-                            Log.d("@@ ScrollIndex", "${sealedParsedData.procCallData}")
-                            val voiceRecognitionIndex = sealedParsedData.procCallData.index // 음성인식으로 받아온 index
-                            domainUiState.value.let { currDomainUiState -> // 현재 UI를 구성하는 DomainUiState
-                                val currCallModel = currDomainUiState as? DomainUiState.CallWindow
-                                currCallModel?.let { callModel ->
-                                    val currentCallWindowContactListLastIndex = callModel.data?.lastIndex ?: 0 // 현재 Index가 존재하는 ContactList의 마지막 인덱스 번호
-                                    if (currentCallWindowContactListLastIndex < voiceRecognitionIndex) { // 스크롤 음성인식 결과가 현재 UI에 존재하는 스크롤 인덱스 번호보다 크다면, TTS 요청
-                                        pttManager.vrmwManager.requestTTs(
-                                            promptId = listOf("PID_CMN_COMM_02_31"),
-                                            runnable = { pttManager.vrmwManager.resumeVR() }
-                                        )
-                                    } else { // 스크롤 음성인식 결과가 현재 UI에 존재하는 스크롤 인덱스 번호보다 작다면 현재 UI의 ScrollIndex 프로퍼티에 음성인식 인덱스를 할당
-                                        UiState._domainUiState.update { domainUiState ->
-                                            val updatedState = domainUiState.copyWithNewScrollIndex(newScrollIndex = sealedParsedData.procCallData.index - 1, isClicked = true) // 클릭 후 상태 변경
-                                            /**
-                                             * domainUiState의 scrollIndex의 값이 null인 경우에만 스택에 추가
-                                             * null이 아닌 경우에는 기존에 쌓여있던 데이터를 쌓는게 아니라 데이터 교체를 해야하기 때문이다.
-                                             * [참고: 데이터 교체는 CallEvent.ContactListItemOnClick 에서 한다.]
-                                             */
-                                            if (domainUiState.scrollIndex == null) {
-                                                UiState.pushUiStateMwContext(Pair(first = updatedState, second = sealedParsedData.procCallData.mwContext))
-                                            }
-                                            updatedState
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        is ProcCallData.ProcYesResult -> {
-                            _vrProcessingResultState.update { currResult ->
-                                UiState.replaceTopUiStateMwContext(newUiStateMwContext = Pair(first = domainUiState.value, second = sealedParsedData.procCallData.mwContext))
-                                VRProcessingResult.Yes
-                            }
-                        }
-
-                        is ProcCallData.ProcNoResult -> {
-                            _vrProcessingResultState.update { currResult ->
-                                UiState.replaceTopUiStateMwContext(newUiStateMwContext = Pair(first = domainUiState.value, second = sealedParsedData.procCallData.mwContext))
-                                VRProcessingResult.No
-                            }
-                        }
-
-                        is ProcCallData.ProcOtherNumberResult -> {
-                            _vrProcessingResultState.update { currResult ->
-                                UiState.replaceTopUiStateMwContext(newUiStateMwContext = Pair(first = domainUiState.value, second = sealedParsedData.procCallData.mwContext))
-                                VRProcessingResult.OtherNumber
-                            }
-                        }
-
-                        else -> {
-                            Log.d("@@ else 호출", "${sealedParsedData.procCallData}")
-                        }
-                    }
+                    handleCallData(sealedParsedData.procCallData) //Call 데이터 처리
                 }
             }
         }
     }
 
-    /**
-     * 실제로 UI와 인터렉션이 발생했을때 사용하는 이벤트
-     * ( 아래의 onCallBusinessEvent()를 사용하여 로직을 구성 )
-     */
+    // 사용자 이벤트에 대한 처리를 담당하는 함수
     fun onCallEvent(event: CallEvent) {
         when (event) {
-            is CallEvent.OnCallBack -> {
-            }
+            is CallEvent.CloseButtonClick -> UiState.closeDomainWindow()
+            is CallEvent.BackButtonClick ->  UiState.popUiState()
+            is CallEvent.ContactListItemOnClick -> handleContactListItemClick(event)
+            is CallEvent.OnYesButtonClick -> onCallBusinessEvent(CallBusinessEvent.Calling(event.phoneNumber))
+            is CallEvent.OnOtherNumberButtonClick -> handleOtherNumberButtonClick()
+        }
+        clearVRProcessingResultState() // VR 처리 결과 초기화
+    }
 
-            is CallEvent.ContactListItemOnClick -> {
-                val isContactIdUnique = callManager.isContactIdUnique(event.selectedContactItem)
-                Log.d("@@@@ isContactNameUnique 결과값", "${isContactIdUnique}")
-                Log.d("@@@@ ContactListItemOnClick ", "${event.itemIndex}")
-                _domainUiState.update { domainUiState ->
-                    val updatedState = (domainUiState as? DomainUiState.CallWindow)?.copy(
-                        screenType = ScreenType.CallYesNo,
-                        detailData = event.selectedContactItem,
-                        isContactIdUnique = isContactIdUnique
-                    ) ?: domainUiState
+    // Call 데이터를 처리하는 함수
+    private fun handleCallData(procCallData: ProcCallData) {
+        when (procCallData) {
+            is ProcCallData.ScrollIndex -> handleScrollIndex(procCallData)
+            is ProcCallData.ProcYesResult -> handleProcResult(procCallData, VRProcessingResult.Yes)
+            is ProcCallData.ProcNoResult -> handleProcResult(procCallData, VRProcessingResult.No)
+            is ProcCallData.ProcOtherNumberResult -> handleProcResult(procCallData, VRProcessingResult.OtherNumber)
 
-                    /**
-                     * LineNumber 음성 인식 결과를 collect할 때 바로 index를 업데이트할 수 있지만,
-                     * 직접 클릭할 때는 컴포저블 함수 내부에서 index 값을 외부로 전달을 해야만 index가 업데이트 가능하다.
-                     * ==> 따라서 음성 인식 발화를 통해 클릭 이벤트를 발생을 시키든, 실제로 클릭하든, 어떤 방법을 사용하든지 간에 클릭 시에는 index 데이터를 발행하도록 통일하였음
-                     */
-                    val isClickResetState = domainUiState.copyWithNewScrollIndex(newScrollIndex = event.itemIndex, isClicked = false)// 클릭 전 상태(뒤로가기를 하여 이전 화면으로 돌아갈때는 클릭 전 상태로 돌아가야 한다.)
-                    /**
-                     * [마지막 스택에 저장되어 있는 데이터 교체하기]
-                     * 이유: 다음 화면으로 전환하기 전에 현재 마지막으로 쌓인 스택에는 scrollIndex 값이 할당되어 있지 않음
-                     * ==> 그렇기에 뒤로가기를 했을 시에는 전에 위치하던 ScrollIndex 위치에 존재하지 않고 Index가 0인 곳에 위치한다.
-                     * 따라서 이벤트로 받아온 인덱스 데이터를 사용하여 마지막 스택에 있는 데이터의 scrollIndex 값을 업데이트 해준다.
-                     * ==> 최종적으로 뒤로가기를 했을 시에도 전에 위치하던 ScrollIndex 위치에 존재하게 한다.
-                     * [중요한 것은 화면을 나타내기 위한 데이터인 DomainUiState만 교체를 하고 마지막 스택의 MWContext의 값은 그대로 유지 시킨다.]
-                     */
-                    UiState.replaceTopUiStateMwContext(newUiStateMwContext = Pair(first = isClickResetState, second = null))
-                    /**
-                     * [다음 화면으로 전환하기 및 스택에 쌓기]
-                     */
-                    UiState.pushUiStateMwContext(pairUiStateMwContext = Pair(first = updatedState, second = null)
-                    )
-                    updatedState
-                }
-            }
+            else -> {}
+        }
+    }
 
-            is CallEvent.OnYesButtonClick -> {
-                onCallBusinessEvent(CallBusinessEvent.Calling(phoneNumber = event.phoneNumber))
-            }
-
-            is CallEvent.OnOtherNumberButtonClick -> {
-                val currentContact = (domainUiState.value as DomainUiState.CallWindow).detailData
-                val matchingContacts = callManager.findContactsByContactId(currentContact)
-
-                /**
-                 * 일치하는 cotact_id가 2개라면 다른 번호로 교체
-                 */
-                if (matchingContacts.size == 2) {
-                    val differentContact =
-                        matchingContacts.find { it.number != currentContact.number }
-                    _domainUiState.update { domainUiState ->
-                        val updatedState = differentContact?.let {
-                            (domainUiState as? DomainUiState.CallWindow)?.copy(
-                                detailData = it,
-                            )
-                        } ?: domainUiState
-                        UiState.replaceTopUiStateMwContext(newUiStateMwContext = Pair(first = updatedState, second = null))
-                        updatedState
+    // 스크롤 인덱스 처리 함수
+    private fun handleScrollIndex(procCallData: ProcCallData.ScrollIndex) {
+        val voiceRecognitionIndex = procCallData.index
+        domainUiState.value.let { currDomainUiState ->
+            val currCallModel = currDomainUiState as? DomainUiState.CallWindow
+            currCallModel?.let { callModel ->
+                val currentCallWindowContactListLastIndex = callModel.data?.lastIndex ?: 0
+                // 음성 인식 인덱스가 현재 UI에 표시된 마지막 인덱스보다 크면 TTS 요청
+                if (currentCallWindowContactListLastIndex < voiceRecognitionIndex) {
+                    requestTTs(promptId = "PID_CMN_COMM_02_31") {
+                        pttManager.vrmwManager.resumeVR()
                     }
                 } else {
-                    /**
-                     * 일치하는 cotact_id가 2개가 아니라면(3개 이상) 동일한 contact_id를 가진 연락처 목록을 띄워줌
-                     */
-                    _domainUiState.update { domainUiState ->
-                        val updatedState = (domainUiState as? DomainUiState.CallWindow)?.copy(
-                            data = matchingContacts,
-                            screenType = ScreenType.CallIndexedList,
-                            detailData = domainUiState.detailData,
-                        ) ?: domainUiState
-                        UiState.pushUiStateMwContext(
-                            pairUiStateMwContext = Pair(
-                                first = updatedState,
-                                second = null
-                            )
-                        )
-                        updatedState
-                    }
+                    // 스크롤 인덱스 업데이트
+                    updateUiStateWithScrollIndex(procCallData)
                 }
             }
         }
-        /**
-         * 음성인식 이벤트를 발생시키는 State 초기화
-         */
-        clearVRProcessingResultState()
     }
 
-    /**
-     * 구체적인 Call 비즈니스 로직을 발생시키는 이벤트
-     */
-    private fun onCallBusinessEvent(event: CallBusinessEvent) {
-        when (event) {
-            is CallBusinessEvent.Calling -> {
-                callManager.makeCall(event.phoneNumber)
+    // VR 처리 결과를 핸들링하는 함수, vrProcessingResult 값에 따라 클릭 이벤트(Yes, No, OtherNumber)가 발생됨.
+    private fun handleProcResult(
+        procCallData: ProcCallData,
+        vrProcessingResult: VRProcessingResult,
+    ) {
+        _vrProcessingResultState.update {
+            replaceTopUiStateMwContext(domainUiState.value, procCallData.mwContext)
+            vrProcessingResult
+        }
+    }
+
+    // 연락처 아이템 클릭 이벤트 처리 함수
+    private fun handleContactListItemClick(event: CallEvent.ContactListItemOnClick) {
+        val isContactIdUnique = callManager.isContactIdUnique(event.selectedContactItem)
+        _domainUiState.update { currentUiState ->
+            val updatedState = (currentUiState as? DomainUiState.CallWindow)?.copy(
+                screenType = ScreenType.CallYesNo,
+                detailData = event.selectedContactItem,
+                isContactIdUnique = isContactIdUnique
+            ) ?: currentUiState
+            // 연락처 아이템 클릭 시 UI 상태 업데이트
+            updateUiStateForContactListItemClick(itemIndex = event.itemIndex, currentUiState = currentUiState, updatedState = updatedState)
+            updatedState
+        }
+    }
+
+    // OtherNumber 버튼 클릭 처리 함수
+    private fun handleOtherNumberButtonClick() {
+        val currentContact = (domainUiState.value as? DomainUiState.CallWindow)?.detailData
+        val matchingContacts = currentContact?.let { callManager.findContactsByContactId(it) }
+
+        if (matchingContacts?.size == 2) { // 일치하는 cotact_id가 2개라면 다른 번호로 교체
+            val differentContact = matchingContacts.find { it.number != currentContact.number }
+            differentContact?.let { contact ->
+                updateUiStateForDifferentContact(contact)
+            }
+        } else { // 일치하는 cotact_id가 2개가 아니라면(3개 이상) 동일한 contact_id를 가진 연락처 목록을 띄워줌
+            matchingContacts?.let { contacts ->
+                updateUiStateForMatchingContacts(contacts)
             }
         }
     }
 
-    /**
-     * 음성인식에 대한 이벤트를 발생시켰다면 해당 이벤트를 초기화를 해줘야함
-     * ==> 왜냐하면 초기화를 시키지 않으면 계속 값을 들고 있기 때문에 해당 이벤트를 계속 발생시킴
-     */
-    private fun clearVRProcessingResultState() {
-        _vrProcessingResultState.update { currResult ->
-            VRProcessingResult.None
+    // 스크롤 인덱스를 새로운 상태로 업데이트하는 함수
+    private fun updateUiStateWithScrollIndex(procCallData: ProcCallData.ScrollIndex) {
+        UiState._domainUiState.update { domainUiState ->
+            val updatedState = domainUiState.copyWithNewScrollIndex(newScrollIndex = procCallData.index - 1, isClicked = true) // 클릭 후 상태 변경
+            /**
+             * domainUiState의 scrollIndex의 값이 null인 경우에만 스택에 추가
+             * null이 아닌 경우에는 기존에 쌓여있던 데이터를 쌓는게 아니라 데이터 교체를 해야하기 때문이다.
+             * [참고: 데이터 교체는 CallEvent.ContactListItemOnClick 에서 한다.]
+             */
+            if (domainUiState.scrollIndex == null) {
+                pushUiStateMwContext(
+                    Pair(
+                        first = updatedState,
+                        second = procCallData.mwContext
+                    )
+                )
+            }
+            updatedState
         }
+    }
+
+    // 연락처 아이템 클릭 이벤트에 대한 UI 상태 업데이트 함수
+    private fun updateUiStateForContactListItemClick(itemIndex: Int, currentUiState: DomainUiState, updatedState: DomainUiState) {
+        /**
+         * LineNumber 음성 인식 결과를 collect할 때 바로 index를 업데이트할 수 있지만,
+         * 직접 클릭할 때는 컴포저블 함수 내부에서 index 값을 외부로 전달을 해야만 index가 업데이트 가능하다.
+         * ==> 따라서 음성 인식 발화를 통해 클릭 이벤트를 발생을 시키든, 실제로 클릭하든, 어떤 방법을 사용하든지 간에 클릭 시에는 index 데이터를 발행하도록 통일하였음
+         */
+        val isClickResetState = currentUiState.copyWithNewScrollIndex(itemIndex, isClicked = false)
+        /**
+         * [마지막 스택에 저장되어 있는 데이터 교체하기]
+         * 이유: 다음 화면으로 전환하기 전에 현재 마지막으로 쌓인 스택에는 scrollIndex 값이 할당되어 있지 않음
+         * ==> 그렇기에 뒤로가기를 했을 시에는 전에 위치하던 ScrollIndex 위치에 존재하지 않고 Index가 0인 곳에 위치한다.
+         * 따라서 이벤트로 받아온 인덱스 데이터를 사용하여 마지막 스택에 있는 데이터의 scrollIndex 값을 업데이트 해준다.
+         * ==> 최종적으로 뒤로가기를 했을 시에도 전에 위치하던 ScrollIndex 위치에 존재하게 한다.
+         * [중요한 것은 화면을 나타내기 위한 데이터인 DomainUiState만 교체를 하고 마지막 스택의 MWContext의 값은 그대로 유지 시킨다.]
+         */
+        replaceTopUiStateMwContext(isClickResetState, null)
+        /**
+         * [다음 화면으로 전환하기 및 스택에 쌓기]
+         */
+        pushUiStateMwContext(updatedState, null)
+    }
+
+    // 다른 연락처 정보로 UI 상태 업데이트 함수
+    private fun updateUiStateForDifferentContact(differentContact: Contact) {
+        _domainUiState.update { domainUiState ->
+            val updatedState = (domainUiState as? DomainUiState.CallWindow)?.copy(
+                detailData = differentContact
+            ) ?: domainUiState
+            // 스택에 추가하지 않고 마지막 index에 존재하는 데이터와 교체
+            replaceTopUiStateMwContext(newUiStateMwContext = Pair(first = updatedState, second = null))
+            updatedState
+        }
+    }
+
+    // 동일한 연락처 목록으로 UI 상태 업데이트 함수
+    private fun updateUiStateForMatchingContacts(matchingContacts: List<Contact>) {
+        _domainUiState.update { domainUiState ->
+            val updatedState = (domainUiState as? DomainUiState.CallWindow)?.copy(
+                data = matchingContacts,
+                screenType = ScreenType.CallIndexedList,
+                detailData = domainUiState.detailData,
+            ) ?: domainUiState
+            // 다음 화면으로 전환하기 및 스택에 쌓기
+            pushUiStateMwContext(
+                pairUiStateMwContext = Pair(
+                    first = updatedState,
+                    second = null
+                )
+            )
+            updatedState
+        }
+    }
+
+    // 전화 비즈니스 이벤트 처리 함수
+    private fun onCallBusinessEvent(event: CallBusinessEvent) {
+        when (event) {
+            is CallBusinessEvent.Calling -> callManager.makeCall(event.phoneNumber)
+        }
+    }
+
+    // VR 처리 결과 초기화 함수
+    // 만약 초기화를 하지 않는다면 어떠한 값으로 계속해서 값을 유지하기에 이벤트를 발생시켰다면 초기화를 해줘야함
+    private fun clearVRProcessingResultState() {
+        _vrProcessingResultState.update { VRProcessingResult.None }
+    }
+
+    // TTS 요청 함수
+    private fun requestTTs(promptId: String, onCompleted: () -> Unit) {
+        pttManager.vrmwManager.requestTTs(
+            promptId = listOf(promptId),
+            runnable = onCompleted
+        )
     }
 }

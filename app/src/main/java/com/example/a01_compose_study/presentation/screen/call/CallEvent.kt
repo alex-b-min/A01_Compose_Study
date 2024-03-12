@@ -4,7 +4,9 @@ import com.example.a01_compose_study.data.Contact
 
 sealed class CallEvent {
 
-    object OnCallBack : CallEvent()
+    object CloseButtonClick : CallEvent()
+
+    object BackButtonClick : CallEvent()
 
     data class ContactListItemOnClick(
         val selectedContactItem: Contact,
