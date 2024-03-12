@@ -50,6 +50,7 @@ fun MessageView(
     name: String = "",
     phoneNum: String = "",
     msgData: String = "",
+    isVrInput: Boolean = false,
     onButtonClick: () -> Unit,
 ) {
     Box(
@@ -66,7 +67,8 @@ fun MessageView(
             Spacer(Modifier.height(dimensionResource(R.dimen.dp_33_3)))
             MessageButton(
                 isSayMessage = isSayMessage,
-                onClick = onButtonClick
+                onClick = onButtonClick,
+                isVrInput = isVrInput
             )
         }
     }
@@ -170,12 +172,21 @@ fun MsgTextField(
 
 
 @Composable
-fun MessageButton(isSayMessage: Boolean, onClick: () -> Unit) {
+fun MessageButton(
+    isSayMessage: Boolean,
+    onClick: () -> Unit,
+    isVrInput: Boolean = false
+) {
     var clicked by remember { mutableStateOf(false) }
     val progress by animateFloatAsState(
         if (clicked) 1f else 0f,
         animationSpec = tween(durationMillis = 3000)
     )
+
+    if (isVrInput) {
+        clicked = true
+        onClick()
+    }
 
     Button(
         onClick = {

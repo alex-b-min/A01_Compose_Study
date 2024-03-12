@@ -102,6 +102,8 @@ class MWContext(
                     .also {
                         it?.type = ParseDomainType.SEND_MESSAGE
                         it?.dialogueMode = DialogueMode.SEND_MESSAGE
+                        it?.selectVRResult = SelectVRResult.SendMsgResult
+                        Log.d("sub","${it?.selectVRResult}")
                     }
             }
 
@@ -110,6 +112,8 @@ class MWContext(
                     .also {
                         it?.type = ParseDomainType.SEND_MESSAGE
                         it?.dialogueMode = DialogueMode.SEND_MESSAGE
+                        it?.selectVRResult = SelectVRResult.SendMsgNameResult
+                        Log.d("sub","${it?.selectVRResult}")
                     }
             }
 
@@ -118,7 +122,8 @@ class MWContext(
                     .also {
                         it?.type = ParseDomainType.SEND_MESSAGE
                         it?.dialogueMode = DialogueMode.SEND_MESSAGE
-//                        it?.dialogueMode = DialogueMode.SEND_MESSAGE_NAME_CHANGE
+                        it?.selectVRResult = SelectVRResult.SendMsgNameMsgResult
+                        Log.d("sub","${it?.selectVRResult}")
                     }
             }
 
@@ -127,6 +132,7 @@ class MWContext(
                     .also {
                         it?.type = ParseDomainType.SEND_MESSAGE
                         it?.dialogueMode = DialogueMode.SEND_MESSAGE_NAME
+                        it?.selectVRResult = SelectVRResult.NoResult(isSayMessage = true)
                     }
             }
 
@@ -135,6 +141,7 @@ class MWContext(
                     .also {
                         it?.type = ParseDomainType.SEND_MESSAGE
                         it?.dialogueMode = DialogueMode.SEND_MESSAGE_NAME_CHANGE
+                        it?.selectVRResult = SelectVRResult.NoResult(isSayMessage = false)
                     }
             }
 
@@ -143,6 +150,7 @@ class MWContext(
                     .also {
                         it?.type = ParseDomainType.SEND_MESSAGE
                         it?.dialogueMode = DialogueMode.SEND_MESSAGE_NAME_CHANGE
+                        it?.selectVRResult = SelectVRResult.YesResult
                     }
             }
             SelectVRResult.MessageReult -> {
@@ -150,6 +158,7 @@ class MWContext(
                     .also {
                         it?.type = ParseDomainType.SEND_MESSAGE
                         it?.dialogueMode = DialogueMode.SEND_MESSAGE_NAME
+                        it?.selectVRResult = SelectVRResult.MessageReult
                     }
             }
             SelectVRResult.ChangeMessage -> {
@@ -157,6 +166,7 @@ class MWContext(
                     .also {
                         it?.type = ParseDomainType.SEND_MESSAGE
                         it?.dialogueMode = DialogueMode.SEND_MESSAGE_NAME_CHANGE
+                        it?.selectVRResult = SelectVRResult.ChangeMessage
                     }
             }
 
@@ -166,6 +176,7 @@ class MWContext(
                     .also {
                         it?.type = ParseDomainType.SEND_MESSAGE
                         it?.dialogueMode = DialogueMode.LIST
+                        it?.selectVRResult = SelectVRResult.ScrollIndexResult
                     }
             }
 
@@ -185,6 +196,7 @@ class MWContext(
                 resultListener.onVRError(HVRError.ERROR_HMI)
             } else {
                 resultListener.onReceiveBundle(it)
+                Log.d("sub","${it?.selectVRResult}")
             }
         } ?: run {
             resultListener.onBundleParsingErr()

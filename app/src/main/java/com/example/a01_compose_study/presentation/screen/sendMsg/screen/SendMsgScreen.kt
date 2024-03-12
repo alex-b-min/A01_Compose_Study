@@ -27,7 +27,7 @@ fun SendMsgScreen(
     ) {
     val lineIndex by viewModel.lineIndex.collectAsState()
     val isVrActive by UiState.isVrActive.collectAsState()
-    val isVrLineIndex by UiState.isVrInput.collectAsState()
+    val isVrInput by UiState.isVrInput.collectAsState()
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -48,6 +48,7 @@ fun SendMsgScreen(
                         phoneNum = it.phoneNum,
                         modifier = Modifier,
                         isSayMessage = true,
+                        isVrInput = isVrInput,
                         onButtonClick = { viewModel.onSendMsgEvent(SendMsgEvent.SayMessageNo) }
                     )
                 }
@@ -59,6 +60,7 @@ fun SendMsgScreen(
                         phoneNum = it.phoneNum,
                         modifier = Modifier,
                         isSayMessage = false,
+                        isVrInput = isVrInput,
                         msgData = it.msg,
                         onButtonClick = { viewModel.onSendMsgEvent(SendMsgEvent.SendMessageYes) }
                     )
@@ -79,7 +81,7 @@ fun SendMsgScreen(
                     MsgNameList(
                         contactList = it,
                         lineIndex = lineIndex,
-                        isVrLineIndex = isVrLineIndex,
+                        isVrInput = isVrInput,
                         onItemClick = { contact ->
                             viewModel.onSendMsgEvent(SendMsgEvent.SelectNameListItemOnClick(contact))
                         },
@@ -91,7 +93,7 @@ fun SendMsgScreen(
                     MsgCategoryList(
                         contactList = it,
                         lineIndex = lineIndex,
-                        isVrLineIndex = isVrLineIndex,
+                        isVrInput = isVrInput,
                         onItemClick = { contact ->
                             viewModel.onSendMsgEvent(
                                 SendMsgEvent.SelectCategoryListItemOnClick(contact)

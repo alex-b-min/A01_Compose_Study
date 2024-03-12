@@ -159,11 +159,11 @@ fun MainRoute(
             contentText = "speak: SendMsg",
             onClick = {
                 scope.launch {
-//                    viewModel.vrmwManager.setVRResult(VRResult(), SelectVRResult.SendMsgResult)
                     pttViewModel.onPttEvent(PttEvent.StartVR(selectVRResult = SelectVRResult.SendMsgResult))
                 }
             }
         )
+
         PttButton(
             modifier = Modifier
                 .fillMaxWidth(0.13f)
@@ -171,7 +171,6 @@ fun MainRoute(
             contentText = "speak: SendMsg Name",
             onClick = {
                 scope.launch {
-//                    viewModel.vrmwManager.setVRResult(VRResult(), SelectVRResult.SendMsgResult)
                     pttViewModel.onPttEvent(PttEvent.StartVR(selectVRResult = SelectVRResult.SendMsgNameResult))
                 }
             }
@@ -184,7 +183,6 @@ fun MainRoute(
             contentText = "speak: SendMsg Name Msg",
             onClick = {
                 scope.launch {
-//                    viewModel.vrmwManager.setVRResult(VRResult(), SelectVRResult.SendMsgResult)
                     pttViewModel.onPttEvent(PttEvent.StartVR(selectVRResult = SelectVRResult.SendMsgNameMsgResult))
                 }
             }
@@ -209,7 +207,6 @@ fun MainRoute(
             contentText = "sayMsg : No",
             onClick = {
                 scope.launch {
-//                    pttViewModel.onPttEvent(PttEvent.StartVR(selectVRResult = SelectVRResult.NoResult))
                     viewModel.vrmwManager.setVRResult(
                         vrResult = VRResult(),
                         selectVRResult = SelectVRResult.NoResult(isSayMessage = true)
@@ -224,7 +221,6 @@ fun MainRoute(
             contentText = "sendMsg : No",
             onClick = {
                 scope.launch {
-//                    pttViewModel.onPttEvent(PttEvent.StartVR(selectVRResult = SelectVRResult.NoResult))
                     viewModel.vrmwManager.setVRResult(
                         vrResult = VRResult(),
                         selectVRResult = SelectVRResult.NoResult(isSayMessage = false)
@@ -236,7 +232,7 @@ fun MainRoute(
             modifier = Modifier
                 .fillMaxWidth(0.13f)
                 .fillMaxHeight(0.07f),
-            contentText = "Yes",
+            contentText = "sendMsg : Yes",
             onClick = {
                 scope.launch {
                     viewModel.vrmwManager.setVRResult(
@@ -268,7 +264,6 @@ fun MainRoute(
             contentText = "change message",
             onClick = {
                 scope.launch {
-//                    viewModel.vrmwManager.setVRResult(VRResult(), SelectVRResult.ScrollIndexResult)
                     viewModel.vrmwManager.setVRResult(
                         vrResult = VRResult(),
                         selectVRResult = SelectVRResult.ChangeMessage
@@ -506,50 +501,50 @@ fun MainRoute(
 //                }
 //            )
 
-        PttButton(
-            modifier = Modifier
-                .fillMaxWidth(0.12f)
-                .fillMaxHeight(0.13f),
-            contentText = "VR Call Index List Result",
-            onClick = {
-                pttViewModel.onPttEvent(PttEvent.StartVR(SelectVRResult.CallIndexListResult))
-            }
-        )
-
-        PttButton(
-            modifier = Modifier
-                .fillMaxWidth(0.12f)
-                .fillMaxHeight(0.13f),
-            contentText = "VR Line Number Result",
-            onClick = {
-                scope.launch {
-                    viewModel.vrmwManager.setVRResult(VRResult(), SelectVRResult.ScrollIndexResult)
-                }
-            }
-        )
-
-        PttButton(
-            modifier = Modifier
-                .fillMaxWidth(0.12f)
-                .fillMaxHeight(0.13f),
-            contentText = "Change ScrollIndex 5",
-            onClick = {
-                viewModel.onDomainEvent(
-                    MainEvent.ChangeScrollIndexEvent(5)
-                )
-            }
-        )
-        PttButton(
-            modifier = Modifier
-                .fillMaxWidth(0.12f)
-                .fillMaxHeight(0.13f),
-            contentText = "Change ScrollIndex 10",
-            onClick = {
-                viewModel.onDomainEvent(
-                    MainEvent.ChangeScrollIndexEvent(10)
-                )
-            }
-        )
+//        PttButton(
+//            modifier = Modifier
+//                .fillMaxWidth(0.12f)
+//                .fillMaxHeight(0.13f),
+//            contentText = "VR Call Index List Result",
+//            onClick = {
+//                pttViewModel.onPttEvent(PttEvent.StartVR(SelectVRResult.CallIndexListResult))
+//            }
+//        )
+//
+//        PttButton(
+//            modifier = Modifier
+//                .fillMaxWidth(0.12f)
+//                .fillMaxHeight(0.13f),
+//            contentText = "VR Line Number Result",
+//            onClick = {
+//                scope.launch {
+//                    viewModel.vrmwManager.setVRResult(VRResult(), SelectVRResult.ScrollIndexResult)
+//                }
+//            }
+//        )
+//
+//        PttButton(
+//            modifier = Modifier
+//                .fillMaxWidth(0.12f)
+//                .fillMaxHeight(0.13f),
+//            contentText = "Change ScrollIndex 5",
+//            onClick = {
+//                viewModel.onDomainEvent(
+//                    MainEvent.ChangeScrollIndexEvent(5)
+//                )
+//            }
+//        )
+//        PttButton(
+//            modifier = Modifier
+//                .fillMaxWidth(0.12f)
+//                .fillMaxHeight(0.13f),
+//            contentText = "Change ScrollIndex 10",
+//            onClick = {
+//                viewModel.onDomainEvent(
+//                    MainEvent.ChangeScrollIndexEvent(10)
+//                )
+//            }
+//        )
     }
 }
 

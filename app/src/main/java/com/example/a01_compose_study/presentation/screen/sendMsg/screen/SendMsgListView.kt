@@ -57,7 +57,7 @@ fun MsgAllList(
 @Composable
 fun MsgNameList(
     lineIndex: Int,
-    isVrLineIndex: Boolean = false,
+    isVrInput: Boolean = false,
     contactList: List<Contact>,
     onItemClick: (Contact) -> Unit,
 ) {
@@ -69,7 +69,7 @@ fun MsgNameList(
                 id = index + 1,
                 contact = contact,
                 onItemClick = onItemClick,
-                clickedByVr = index == lineIndex-1 && isVrLineIndex
+                clickedByVr = index == lineIndex - 1 && isVrInput
             )
         })
 }
@@ -78,7 +78,7 @@ fun MsgNameList(
 @Composable
 fun MsgCategoryList(
     lineIndex: Int,
-    isVrLineIndex: Boolean = false,
+    isVrInput: Boolean = false,
     contactList: List<Contact>,
     onItemClick: (Contact) -> Unit,
 ) {
@@ -90,7 +90,7 @@ fun MsgCategoryList(
                 id = index + 1,
                 contact = contact,
                 onItemClick = onItemClick,
-                clickedByVr = index == lineIndex-1 && isVrLineIndex
+                clickedByVr = index == lineIndex - 1 && isVrInput
             )
         })
 }
