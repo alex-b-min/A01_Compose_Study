@@ -1,12 +1,20 @@
 package com.example.a01_compose_study.presentation.screen.sendMsg.screen
 
+import android.util.Log
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationVector1D
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,13 +23,21 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
@@ -32,6 +48,10 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintSet
 import com.example.a01_compose_study.R
+import com.example.a01_compose_study.presentation.data.UiState
+import com.example.a01_compose_study.presentation.data.UiState.isVrActive
+import kotlinx.coroutines.delay
+
 
 @Composable
 fun MessageView(
@@ -158,35 +178,179 @@ fun MsgTextField(
     }
 }
 
+//@Composable
+//fun MessageButton(isSayMessage: Boolean, onClick: () -> Unit) {
+//    Button(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .padding(horizontal = 50.dp)
+//            .height(45.dp),
+//        onClick = onClick,
+//        colors = ButtonDefaults.buttonColors(
+//            backgroundColor = colorResource(id = R.color.confirm_btn_bg_color)
+//        )
+//    ) {
+//        Text(
+//            text = if (isSayMessage) "NO" else "YES",
+//            style = MaterialTheme.typography.button,
+//            textAlign = TextAlign.Center,
+//            color = Color.White
+//        )
+//    }
+//}
+//@Composable
+//fun CustomButton(
+//    onClick: () -> Unit,
+//    modifier: Modifier = Modifier,
+//    content: @Composable () -> Unit
+//) {
+//    var isPressed by remember { mutableStateOf(false) }
+//
+//    Box(
+//        modifier = modifier
+//            .pointerInput(Unit) {
+//                detectTapGestures(
+//                    onPress = {
+//                        isPressed = true
+//                    },
+//                    onTap = {
+//                        isPressed = false
+//                        onClick()
+//                    }
+//                )
+//            }
+//    ) {
+//        ProvideTextStyle(MaterialTheme.typography.button) {
+//            content()
+//        }
+//        // 버튼이 눌린 상태일 때 배경색을 변경하는 효과 추가
+//        if (isPressed) {
+//            Box(
+//                modifier = Modifier
+//                    .fillMaxSize()
+//                    .background(Color.Gray.copy(alpha = 0.4f))
+//            )
+//        }
+//    }
+//}
+
 @Composable
 fun MessageButton(isSayMessage: Boolean, onClick: () -> Unit) {
+    var clicked by remember { mutableStateOf(false) }
+    val progress by animateFloatAsState(
+        if (clicked) 1f else 0f,
+        animationSpec = tween(durationMillis = 500)
+    )
+
     Button(
+        onClick = {
+            onClick()
+        },
+        colors = ButtonDefaults.buttonColors(
+            backgroundColor = Color.Gray.copy(alpha = 0.4f)
+        ),
+        elevation = ButtonDefaults.elevation(0.dp),
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 50.dp)
             .height(45.dp),
-        onClick = onClick,
-        colors = ButtonDefaults.buttonColors(
-            backgroundColor = colorResource(id = R.color.confirm_btn_bg_color)
-        )
+        contentPadding = PaddingValues(0.dp)
     ) {
-        if (isSayMessage) {
-            Text(
-                text = "NO",
-                style = MaterialTheme.typography.button,
-                textAlign = TextAlign.Center,
-                color = Color.White
+        Box(
+            modifier = Modifier.fillMaxSize()
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onPress = {
+                            UiState.isVrActive.value = false
+                            Log.d("sendMsg", "isVrActive.value: ${isVrActive}")
+                            clicked = true
+                        },
+                        onTap = {
+                            UiState.isVrActive.value = true
+                            Log.d("sendMsg", "isVrActive.value: ${isVrActive}")
+                        }
+                    )
+                }
+        ) {
+            LinearProgressIndicator(
+                progress = progress,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .align(Alignment.CenterStart),
+                color = colorResource(id = R.color.confirm_btn_bg_color)
             )
-        } else {
             Text(
-                text = "YES",
+                text = if (isSayMessage) "NO" else "YES",
                 style = MaterialTheme.typography.button,
                 textAlign = TextAlign.Center,
-                color = Color.White
+                color = Color.White,
+                modifier = Modifier.align(Alignment.Center)
             )
         }
     }
 }
+
+
+//@Composable
+//fun MessageButton(isSayMessage: Boolean, onClick: () -> Unit) {
+//    var clicked by remember { mutableStateOf(false) }
+//    val progress by animateFloatAsState(
+//        if (clicked) 1f else 0f,
+//        animationSpec = tween(durationMillis = 500)
+//    )
+//
+//    Button(
+//        onClick = {
+//            onClick()
+//            clicked = true
+//        },
+//        colors = ButtonDefaults.buttonColors(
+//            backgroundColor = colorResource(id = R.color.confirm_btn_bg_color)
+//        ),
+//        elevation = ButtonDefaults.elevation(0.dp),
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .padding(0.dp)
+//            .height(45.dp),
+//    ) {
+//        Box(
+//            modifier = Modifier.fillMaxSize()
+//        ) {
+//            LinearProgressIndicator(
+//                progress = progress,
+//                modifier = Modifier
+//                    .fillMaxSize()
+//                    .align(Alignment.CenterStart),
+//                color = colorResource(id = R.color.black_01)
+//            )
+//            Text(
+//                text = if (isSayMessage) "NO" else "YES",
+//                style = MaterialTheme.typography.button,
+//                textAlign = TextAlign.Center,
+//                color = Color.White,
+//                modifier = Modifier.align(Alignment.Center)
+//            )
+//        }
+//    }
+//}
+
+
+
+@Composable
+fun animateButton(currentAlpha: Animatable<Float, AnimationVector1D>) {
+    LaunchedEffect(Unit) {
+        currentAlpha.animateTo(
+            targetValue = 0.5f,
+            animationSpec = tween(durationMillis = 300, easing = LinearOutSlowInEasing)
+        )
+        delay(300)
+        currentAlpha.animateTo(
+            targetValue = 1f,
+            animationSpec = tween(durationMillis = 300, easing = LinearOutSlowInEasing)
+        )
+    }
+}
+
 
 @Preview
 @Composable

@@ -1,6 +1,7 @@
 package com.example.a01_compose_study.presentation.screen.main.route
 
 import android.util.Log
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,27 +10,25 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.a01_compose_study.R
-import com.example.a01_compose_study.data.Contact
-import com.example.a01_compose_study.data.HVRError
 import com.example.a01_compose_study.data.VRResult
-import com.example.a01_compose_study.data.custom.sendMsg.MsgData
-import com.example.a01_compose_study.data.custom.sendMsg.SendMsgDataType
-import com.example.a01_compose_study.domain.model.ScreenType
-import com.example.a01_compose_study.domain.model.SealedDomainType
-import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.components.button.PttButton
-import com.example.a01_compose_study.presentation.components.lottie.LottieAssetAnimationHandler
-import com.example.a01_compose_study.presentation.components.lottie.LottieRawAnimationHandler
+import com.example.a01_compose_study.presentation.compose.VrUiAnimationHandler
+import com.example.a01_compose_study.presentation.data.UiState
+import com.example.a01_compose_study.presentation.data.UiState.isVrActive
 import com.example.a01_compose_study.presentation.data.UiState.onVREvent
 import com.example.a01_compose_study.presentation.screen.SelectVRResult
 import com.example.a01_compose_study.presentation.screen.announce.AnnounceScreen
@@ -63,16 +62,9 @@ fun MainRoute(
 
     val announceString by pttViewModel.announceString.collectAsStateWithLifecycle()
 
-    /**
-     * 원래라고 하면은 Compose에서 뷰를 조작하는 변수(visible)는 remember 타입으로 선언해야 함..
-     * 그러나 이 방법은 각 뷰의 가시성을 개별적으로 관리해야 한다는 점임..
-     * 이 방식은 화면 전환 구조에는 적합하지만, 하나의 창 위에 여러 개의 뷰를 관리할 때 여러 개의 visible을 각각 관리를 해줘야 하므로 비효율적이라고 생각..
-     * 따라서 정확한 해결책은 아니지만, flow 타입의 visible 변수를 싱글톤으로 만들어 최상단의 뷰를 관리하려고 함..
-     * 이렇게 하면 하나의 AnimatedVisibility() 안에 여러 개의 창을 관리할 수 있다는 장점이 있음!
-     * 실제로 이렇게 사용하게 된다면,
-     * AnimatedVisibility() 안에서 UiState의 조건문을 타고 들어간 후
-     * 해당 Window를 닫기 위해선 가장 상단의 AnimatedVisibility()의 visible 변수를 false로 바꾸면 해당 Window를 닫을 수 있다..
-     */
+    val isVrActive by UiState.isVrActive.collectAsState()
+//    var isVrActive by remember { mutableStateOf(true) }
+
 
     WindowFrame(
         domainUiState = domainUiState,
@@ -81,61 +73,83 @@ fun MainRoute(
             viewModel.onDomainEvent(MainEvent.CloseDomainWindowEvent)
         }) {
         Box(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onPress = {
+                            UiState.isVrActive.value = false
+                            Log.d("sendMsg", "isVrActive.value: ${isVrActive}")
+                        },
+                        onTap = {
+                            UiState.isVrActive.value = true
+                            Log.d("sendMsg", "isVrActive.value: ${isVrActive}")
+                        }
+                    )
+                },
             contentAlignment = Alignment.BottomCenter
         ) {
-            VrUiAnimationHandler(vrUiState)
-        }
+            Log.d("sendMsg", "handler isVrActive.value: ${isVrActive}")
+//            if (isVrActive.value) VrUiAnimationHandler(vrUiState)
+//            LaunchedEffect(Unit) {
+//                UiState.isVrActive.collect { isVrActive ->
+//                    if (isVrActive) {
+//                        VrUiAnimationHandler(vrUiState)
+//                    }
+//                }
+//            }
+            if (isVrActive) VrUiAnimationHandler(vrUiState)
 
-        Log.d("@@ domainUiState When문 위에서 시작", "${domainUiState}")
-        Log.d("@@ domainUiState When문 위에서 시작", "${domainWindowVisibleState}")
-        when (domainUiState) {
-            is DomainUiState.NoneWindow -> {
-            }
 
-            is DomainUiState.PttWindow -> {
-                Log.d("@@ PttWindow 진입", "몇번 실행?")
-                ComposePttScreen(
-                    domainUiState = domainUiState as DomainUiState.PttWindow,
-                    contentColor = Color.White,
-                    displayText = announceString
-                )
-            }
+            Log.d("@@ domainUiState When문 위에서 시작", "${domainUiState}")
+            Log.d("@@ domainUiState When문 위에서 시작", "${domainWindowVisibleState}")
+            when (domainUiState) {
+                is DomainUiState.NoneWindow -> {
+                }
 
-            is DomainUiState.HelpWindow -> {
-                Log.d("@@ HelpWindow 진입", "몇번 실행?")
-                Box(modifier = Modifier.fillMaxSize()) {
-                    ComposeHelpScreen(
-                        domainUiState = domainUiState as DomainUiState.HelpWindow,
-                        vrUiState = vrUiState,
-                        contentColor = Color.Gray,
-                        backgroundColor = Black2
-                    )
-                    onVREvent(
-                        VREvent.ChangeVRUIEvent(
-                            VRUiState.PttLoading(
-                                active = true,
-                                isError = false
-                            )
-                        )
+                is DomainUiState.PttWindow -> {
+                    Log.d("@@ PttWindow 진입", "몇번 실행?")
+                    ComposePttScreen(
+                        domainUiState = domainUiState as DomainUiState.PttWindow,
+                        contentColor = Color.White,
+                        displayText = announceString
                     )
                 }
-            }
 
-            is DomainUiState.AnnounceWindow -> {
-                Log.d("@@ AnnounceWindow 진입", "몇번 실행?")
-                AnnounceScreen((domainUiState as DomainUiState.AnnounceWindow).text)
-            }
+                is DomainUiState.HelpWindow -> {
+                    Log.d("@@ HelpWindow 진입", "몇번 실행?")
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        ComposeHelpScreen(
+                            domainUiState = domainUiState as DomainUiState.HelpWindow,
+                            vrUiState = vrUiState,
+                            contentColor = Color.Gray,
+                            backgroundColor = Black2
+                        )
+                        onVREvent(
+                            VREvent.ChangeVRUIEvent(
+                                VRUiState.PttLoading(
+                                    active = true,
+                                    isError = false
+                                )
+                            )
+                        )
+                    }
+                }
 
-            is DomainUiState.CallWindow -> {
-                Log.d("@@ CallWindow 진입", "몇번 실행?")
-                Box(modifier = Modifier.fillMaxSize()) {
-                    CallScreen(
-                        domainUiState = domainUiState as DomainUiState.CallWindow,
-                        vrUiState = vrUiState,
-                        vrDynamicBackground = if (vrUiState.active) Color.Transparent else Color.Black,
-                        fixedBackground = Black2
-                    )
+                is DomainUiState.AnnounceWindow -> {
+                    Log.d("@@ AnnounceWindow 진입", "몇번 실행?")
+                    AnnounceScreen((domainUiState as DomainUiState.AnnounceWindow).text)
+                }
+
+                is DomainUiState.CallWindow -> {
+                    Log.d("@@ CallWindow 진입", "몇번 실행?")
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        CallScreen(
+                            domainUiState = domainUiState as DomainUiState.CallWindow,
+                            vrUiState = vrUiState,
+                            vrDynamicBackground = if (vrUiState.active) Color.Transparent else Color.Black,
+                            fixedBackground = Black2
+                        )
 //                    onVREvent(
 //                        VREvent.ChangeVRUIEvent(
 //                            VRUiState.PttLoading(
@@ -144,30 +158,30 @@ fun MainRoute(
 //                            )
 //                        )
 //                    )
+                    }
                 }
-            }
 
-            is DomainUiState.DomainMenuWindow -> {
+                is DomainUiState.DomainMenuWindow -> {
 
-            }
+                }
 
-            is DomainUiState.NavigationWindow -> {
+                is DomainUiState.NavigationWindow -> {
 
-            }
+                }
 
-            is DomainUiState.RadioWindow -> {
+                is DomainUiState.RadioWindow -> {
 
-            }
+                }
 
-            is DomainUiState.WeatherWindow -> {
+                is DomainUiState.WeatherWindow -> {
 
-            }
+                }
 
-            is DomainUiState.SendMessageWindow -> {
-                SendMsgScreen(
-                    vrUiState = vrUiState,
-                    domainUiState = domainUiState as DomainUiState.SendMessageWindow
-                )
+                is DomainUiState.SendMessageWindow -> {
+                    SendMsgScreen(
+                        domainUiState = domainUiState as DomainUiState.SendMessageWindow,
+                    )
+                }
             }
         }
     }
@@ -235,7 +249,10 @@ fun MainRoute(
             onClick = {
                 scope.launch {
 //                    pttViewModel.onPttEvent(PttEvent.StartVR(selectVRResult = SelectVRResult.NoResult))
-                    viewModel.vrmwManager.setVRResult( vrResult = VRResult(), selectVRResult = SelectVRResult.NoResult(isSayMessage = true))
+                    viewModel.vrmwManager.setVRResult(
+                        vrResult = VRResult(),
+                        selectVRResult = SelectVRResult.NoResult(isSayMessage = true)
+                    )
                 }
             }
         )
@@ -247,7 +264,10 @@ fun MainRoute(
             onClick = {
                 scope.launch {
 //                    pttViewModel.onPttEvent(PttEvent.StartVR(selectVRResult = SelectVRResult.NoResult))
-                    viewModel.vrmwManager.setVRResult( vrResult = VRResult(), selectVRResult = SelectVRResult.NoResult(isSayMessage = false))
+                    viewModel.vrmwManager.setVRResult(
+                        vrResult = VRResult(),
+                        selectVRResult = SelectVRResult.NoResult(isSayMessage = false)
+                    )
                 }
             }
         )
@@ -258,7 +278,10 @@ fun MainRoute(
             contentText = "Yes",
             onClick = {
                 scope.launch {
-                    viewModel.vrmwManager.setVRResult( vrResult = VRResult(), selectVRResult = SelectVRResult.YesResult)
+                    viewModel.vrmwManager.setVRResult(
+                        vrResult = VRResult(),
+                        selectVRResult = SelectVRResult.YesResult
+                    )
                 }
             }
         )
@@ -270,7 +293,11 @@ fun MainRoute(
             contentText = "say message",
             onClick = {
                 scope.launch {
-                    viewModel.vrmwManager.setVRResult( vrResult = VRResult(), selectVRResult = SelectVRResult.MessageReult)                }
+                    viewModel.vrmwManager.setVRResult(
+                        vrResult = VRResult(),
+                        selectVRResult = SelectVRResult.MessageReult
+                    )
+                }
             }
         )
         PttButton(
@@ -281,7 +308,11 @@ fun MainRoute(
             onClick = {
                 scope.launch {
 //                    viewModel.vrmwManager.setVRResult(VRResult(), SelectVRResult.ScrollIndexResult)
-                    viewModel.vrmwManager.setVRResult( vrResult = VRResult(), selectVRResult = SelectVRResult.ChangeMessage)                }
+                    viewModel.vrmwManager.setVRResult(
+                        vrResult = VRResult(),
+                        selectVRResult = SelectVRResult.ChangeMessage
+                    )
+                }
             }
         )
 //        PttButton(
@@ -560,70 +591,4 @@ fun MainRoute(
         )
     }
 }
-
-/**
- * 계속해서 리컴포지션이 발생되는 오류가 있음 추후 수정해야함..
- */
-@Composable
-fun VrUiAnimationHandler(vrUiState: VRUiState) {
-    when {
-        vrUiState.active && vrUiState.isError -> {
-            LottieAssetAnimationHandler(
-                modifier = Modifier.fillMaxSize(),
-                lottieJsonAssetPath = "bg_glow/frame_error_glow_l_lt.json",
-                lottieImageAssetFolder = "bg_glow/images/error",
-                infiniteLoop = true
-            )
-        }
-
-        vrUiState.active -> {
-            LottieAssetAnimationHandler(
-                modifier = Modifier.fillMaxSize(),
-                lottieJsonAssetPath = "bg_glow/09_tsd_frame_glow_l_lt.json",
-                lottieImageAssetFolder = "bg_glow/images/default",
-                infiniteLoop = true
-            )
-            when (vrUiState) {
-                is VRUiState.PttLoading -> {
-                    LottieRawAnimationHandler(
-                        modifier = Modifier.fillMaxSize(),
-                        rawResId = R.raw.tsd_thinking_loop_fix_lt_03_2,
-                        infiniteLoop = true,
-                        onFrameChanged = { currentFrame ->
-                            // 필요한 경우 처리
-                        }
-                    )
-                }
-
-                is VRUiState.PttListen -> {
-                    LottieRawAnimationHandler(
-                        modifier = Modifier
-                            .fillMaxSize(),
-                        rawResId = R.raw.tsd_listening_passive_loop_lt_01_2,
-                        infiniteLoop = true,
-                        onFrameChanged = { currentFrame ->
-                            // 필요한 경우 처리
-                        }
-                    )
-                }
-
-                is VRUiState.PttSpeak -> {
-                    LottieRawAnimationHandler(
-                        modifier = Modifier.fillMaxSize(),
-                        rawResId = R.raw.loop,
-                        infiniteLoop = true,
-                        onFrameChanged = { currentFrame ->
-                            // 필요한 경우 처리
-                        }
-                    )
-                }
-
-                else -> {
-                    // 다른 상태에 대한 처리
-                }
-            }
-        }
-    }
-}
-
 

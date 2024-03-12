@@ -5,8 +5,10 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
+import java.lang.reflect.Modifier
 
 
 @Composable
@@ -15,6 +17,7 @@ fun <T> LazyColumnList(
     list: List<T>,
     listContent: @Composable (index: Int, item: T) -> Unit,
     index: Int = 0,
+    onPressed: ((Boolean) -> Unit) = {},
 ) {
     val scope = rememberCoroutineScope()
 

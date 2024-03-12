@@ -419,11 +419,6 @@ class MainViewModel @Inject constructor(
                             _sendMsgUiData.emit(event.screenType to event.data)
                             Log.d("sendMsg", "emit 함")
                         }
-//                        CoroutineScope(Dispatchers.Default).launch {
-////                            _sendMsgData.collect(event.screenType to event.data)
-//                            _sendMsgData.collect { event.screenType to event.data }
-//                            Log.d("sendMsg","_sendMsgData: ${_sendMsgData}")
-//                        }
                     }
                     else -> {
 

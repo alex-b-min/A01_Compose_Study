@@ -2,6 +2,7 @@ package com.example.a01_compose_study.presentation.screen.sendMsg.screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -16,6 +17,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -34,10 +36,12 @@ fun MsgAllList(
     lineIndex: Int,
     contactList: List<Contact>,
     onItemClick: (Contact) -> Unit,
-) {
+    onPressed: ((Boolean) -> Unit) = {},
+    ) {
     LazyColumnList(
         list = contactList,
         index = lineIndex,
+        onPressed = onPressed,
         listContent = { index, contact ->
             MsgAllListItem(
                 contact = contact,
@@ -52,11 +56,13 @@ fun MsgNameList(
     lineIndex: Int,
     contactList: List<Contact>,
     onItemClick: (Contact) -> Unit,
+    onPressed: ((Boolean) -> Unit) = {},
 ) {
 //    val scrollState = rememberLazyListState()
     LazyColumnList(
         list = contactList,
         index = lineIndex,
+        onPressed = onPressed,
         listContent = { index, contact ->
             MsgNameListItem(
                 id = index + 1,
@@ -74,10 +80,12 @@ fun MsgCategoryList(
     lineIndex: Int,
     contactList: List<Contact>,
     onItemClick: (Contact) -> Unit,
+    onPressed: ((Boolean) -> Unit) = {},
 ) {
     LazyColumnList(
         list = contactList,
         index = lineIndex,
+        onPressed = onPressed,
         listContent = { index, contact ->
             MsgCategoryListItem(
                 id = index + 1,
@@ -119,13 +127,13 @@ fun MsgAllListItem(
 
     Box(modifier = Modifier
         .padding(4.dp)
-          .clickable {
-              scope.launch {
-                  isSelected = true
-                  delay(850)
-                  onItemClick(contact)
-              }
-          }) {
+        .clickable {
+            scope.launch {
+                isSelected = true
+                delay(850)
+                onItemClick(contact)
+            }
+        }) {
         ConstraintLayout(constraintSet, modifier = Modifier.fillMaxWidth()) {
             Text(
                 text = contact.name,
@@ -190,13 +198,15 @@ fun MsgNameListItem(
     }
     ConstraintLayout(
         constraintSet,
-        modifier = Modifier.fillMaxWidth()
-            . clickable {
-            scope.launch {
-                isSelected = true
-                delay(850)
-                onItemClick(contact)
-            }}
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                scope.launch {
+                    isSelected = true
+                    delay(850)
+                    onItemClick(contact)
+                }
+            }
     ) {
         Text(
             text = id.toString(),
@@ -207,7 +217,7 @@ fun MsgNameListItem(
                 .layoutId("num")
         )
         Text(
-            text =  contact.name,
+            text = contact.name,
             color = Color.White,
             style = MaterialTheme.typography.h6,
             maxLines = 1,
@@ -263,13 +273,15 @@ fun MsgCategoryListItem(
     }
     ConstraintLayout(
         constraintSet,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .clickable {
-            scope.launch {
-                isSelected = true
-                delay(850)
-                onItemClick(contact)
-            }}
+                scope.launch {
+                    isSelected = true
+                    delay(850)
+                    onItemClick(contact)
+                }
+            }
     ) {
         Text(
             text = id.toString(),
@@ -306,7 +318,7 @@ fun MsgAllListItemPreview() {
     list.add(Contact(id = "2", name = "kim", number = "010-0000"))
     MsgAllList(
         lineIndex = 0,
-         contactList = list,
+        contactList = list,
         onItemClick = {})
 }
 

@@ -95,16 +95,6 @@ class SendMsgViewModel @Inject constructor(
                 popUiState()
             }
 
-//            is SendMsgEvent.SayMessage -> {
-//                // procMessageNameIntention에 Message 발화 intention 보냄
-//                _domainUiState.update { domainUiState ->
-//                    val updatedState = (domainUiState as? DomainUiState.SendMessageWindow)?.copy(
-//                        screenType = ScreenType.SendMessage,
-//                    ) ?: domainUiState
-//
-//                    updatedState
-//                }
-//            }
 
             is SendMsgEvent.SayMessageNo -> {
                 // 버튼 터치 이벤트

@@ -36,24 +36,13 @@ object UiState {
     val _mwContext = MutableStateFlow<MWContext?>(null)
     val mwContext: StateFlow<MWContext?> = _mwContext
 
-    /**
-     * 화면을 스택에 쌓음
-     */
-//    fun pushUiState(domainUiState: DomainUiState,mwContext: MWContext? = null) {
-//        val domainUiPair:Pair<DomainUiState,MWContext?> = Pair(domainUiState,mwContext)
-//        _domainUiStateStack.add(domainUiPair)
-//        _domainUiStateStack.forEachIndexed { index, domainUiState ->
-//            Log.d("@@ _domainUiStateStack", "index: $index / data: $domainUiState")
-//        }
-//    }
+    val isVrActive = MutableStateFlow(true)
+
     fun pushUiState(domainUiPair: Pair<DomainUiState, MWContext?>) {
 //        val domainUiPair:Pair<DomainUiState,MWContext?> = Pair(domainUiState,mwContext)
         _domainUiStateStack.add(domainUiPair)
     }
 
-    /**
-     * 화면을 스택에 쌓지 않고 변화만 시킴
-     */
     fun changeUiState(domainUiPair: Pair<DomainUiState, MWContext?>) {
         val uiState = domainUiPair.first
         val mwContext = domainUiPair.second
