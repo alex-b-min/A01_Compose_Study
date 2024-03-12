@@ -1,6 +1,5 @@
 package com.example.a01_compose_study.presentation.screen.sendMsg.screen
 
-import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.LinearOutSlowInEasing
@@ -11,7 +10,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -25,7 +23,6 @@ import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -37,7 +34,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
@@ -48,8 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintSet
 import com.example.a01_compose_study.R
-import com.example.a01_compose_study.presentation.data.UiState
-import com.example.a01_compose_study.presentation.data.UiState.isVrActive
+import com.example.a01_compose_study.presentation.components.gauge.clickableWithTapGestures
 import kotlinx.coroutines.delay
 
 
@@ -239,7 +234,7 @@ fun MessageButton(isSayMessage: Boolean, onClick: () -> Unit) {
     var clicked by remember { mutableStateOf(false) }
     val progress by animateFloatAsState(
         if (clicked) 1f else 0f,
-        animationSpec = tween(durationMillis = 500)
+        animationSpec = tween(durationMillis = 3000)
     )
 
     Button(
@@ -257,20 +252,11 @@ fun MessageButton(isSayMessage: Boolean, onClick: () -> Unit) {
         contentPadding = PaddingValues(0.dp)
     ) {
         Box(
-            modifier = Modifier.fillMaxSize()
-                .pointerInput(Unit) {
-                    detectTapGestures(
-                        onPress = {
-                            UiState.isVrActive.value = false
-                            Log.d("sendMsg", "isVrActive.value: ${isVrActive}")
-                            clicked = true
-                        },
-                        onTap = {
-                            UiState.isVrActive.value = true
-                            Log.d("sendMsg", "isVrActive.value: ${isVrActive}")
-                        }
-                    )
-                }
+            modifier = Modifier
+                .fillMaxSize()
+                .clickableWithTapGestures(
+                    onClick = { clicked = true }
+                )
         ) {
             LinearProgressIndicator(
                 progress = progress,
@@ -333,7 +319,6 @@ fun MessageButton(isSayMessage: Boolean, onClick: () -> Unit) {
 //        }
 //    }
 //}
-
 
 
 @Composable

@@ -77,9 +77,6 @@ fun SendMsgScreen(
                             viewModel.onSendMsgEvent(SendMsgEvent.MsgAllListItemOnClick(contact))
                             Log.e("sendMsg", "Screen click 실행")
                         },
-                        onPressed = {
-
-                        }
                     )
                 }
             } else if (domainUiState.screenType is ScreenType.MessageSelectNameList) {
@@ -93,9 +90,6 @@ fun SendMsgScreen(
                             viewModel.onSendMsgEvent(SendMsgEvent.SelectNameListItemOnClick(contact))
                             Log.e("sendMsg", "Screen click 실행")
                         },
-                        onPressed = {
-
-                        }
                     )
                 }
             } else if (domainUiState.screenType is ScreenType.MessageSelectCategoryList) {
@@ -113,9 +107,6 @@ fun SendMsgScreen(
                             )
                             Log.e("sendMsg", "Screen click 실행")
                         },
-                        onPressed = {
-
-                        }
                     )
                 }
             }

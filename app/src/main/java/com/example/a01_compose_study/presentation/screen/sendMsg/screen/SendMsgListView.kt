@@ -1,12 +1,15 @@
 package com.example.a01_compose_study.presentation.screen.sendMsg.screen
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -16,8 +19,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -27,6 +30,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintSet
 import com.example.a01_compose_study.R
 import com.example.a01_compose_study.data.Contact
+import com.example.a01_compose_study.presentation.components.gauge.clickableWithTapGestures
 import com.example.a01_compose_study.presentation.components.list.LazyColumnList
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -36,12 +40,10 @@ fun MsgAllList(
     lineIndex: Int,
     contactList: List<Contact>,
     onItemClick: (Contact) -> Unit,
-    onPressed: ((Boolean) -> Unit) = {},
-    ) {
+) {
     LazyColumnList(
         list = contactList,
         index = lineIndex,
-        onPressed = onPressed,
         listContent = { index, contact ->
             MsgAllListItem(
                 contact = contact,
@@ -56,22 +58,18 @@ fun MsgNameList(
     lineIndex: Int,
     contactList: List<Contact>,
     onItemClick: (Contact) -> Unit,
-    onPressed: ((Boolean) -> Unit) = {},
 ) {
 //    val scrollState = rememberLazyListState()
     LazyColumnList(
         list = contactList,
         index = lineIndex,
-        onPressed = onPressed,
         listContent = { index, contact ->
             MsgNameListItem(
                 id = index + 1,
                 contact = contact,
-                onItemClick = onItemClick
+                onItemClick = onItemClick,
             )
         })
-
-
 }
 
 
@@ -80,12 +78,10 @@ fun MsgCategoryList(
     lineIndex: Int,
     contactList: List<Contact>,
     onItemClick: (Contact) -> Unit,
-    onPressed: ((Boolean) -> Unit) = {},
 ) {
     LazyColumnList(
         list = contactList,
         index = lineIndex,
-        onPressed = onPressed,
         listContent = { index, contact ->
             MsgCategoryListItem(
                 id = index + 1,
@@ -103,6 +99,11 @@ fun MsgAllListItem(
 ) {
     val scope = rememberCoroutineScope()
     var isSelected by remember { mutableStateOf(false) }
+    var clicked by remember { mutableStateOf(false) }
+    val progress by animateFloatAsState(
+        if (clicked) 1f else 0f,
+        animationSpec = tween(durationMillis = 3000)
+    )
 
     val constraintSet = ConstraintSet {
         val name = createRefFor("name")
@@ -127,13 +128,17 @@ fun MsgAllListItem(
 
     Box(modifier = Modifier
         .padding(4.dp)
-        .clickable {
-            scope.launch {
-                isSelected = true
-                delay(850)
-                onItemClick(contact)
+        .clickableWithTapGestures(
+            onClick = {
+                scope.launch {
+                    isSelected = true
+                    delay(3000)
+                    onItemClick(contact)
+                    clicked = true
+                }
+                clicked = true
             }
-        }) {
+        )) {
         ConstraintLayout(constraintSet, modifier = Modifier.fillMaxWidth()) {
             Text(
                 text = contact.name,
@@ -157,9 +162,18 @@ fun MsgAllListItem(
                     .layoutId("profileIcon")
                     .size(width = 40.dp, height = 50.dp)
             )
+            LinearProgressIndicator(
+                progress = progress,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .height(65.dp)
+                    .alpha(if (progress == 0f) 0f else 1f),
+                color = colorResource(id = R.color.confirm_btn_bg_color)
+            )
         }
     }
 }
+
 
 @Composable
 fun MsgNameListItem(
@@ -169,6 +183,11 @@ fun MsgNameListItem(
 ) {
     val scope = rememberCoroutineScope()
     var isSelected by remember { mutableStateOf(false) }
+    var clicked by remember { mutableStateOf(false) }
+    val progress by animateFloatAsState(
+        if (clicked) 1f else 0f,
+        animationSpec = tween(durationMillis = 3000)
+    )
 
     val constraintSet = ConstraintSet {
         val num = createRefFor("num")
@@ -200,13 +219,17 @@ fun MsgNameListItem(
         constraintSet,
         modifier = Modifier
             .fillMaxWidth()
-            .clickable {
-                scope.launch {
-                    isSelected = true
-                    delay(850)
-                    onItemClick(contact)
+            .clickableWithTapGestures(
+                onClick = {
+                    scope.launch {
+                        isSelected = true
+                        delay(3000)
+                        onItemClick(contact)
+                        clicked = true
+                    }
+                    clicked = true
                 }
-            }
+            )
     ) {
         Text(
             text = id.toString(),
@@ -238,8 +261,15 @@ fun MsgNameListItem(
                 .layoutId("profileIcon")
                 .size(width = 40.dp, height = 50.dp)
         )
+        LinearProgressIndicator(
+            progress = progress,
+            modifier = Modifier
+                .fillMaxSize()
+                .height(65.dp)
+                .alpha(if (progress == 0f) 0f else 1f),
+            color = colorResource(id = R.color.confirm_btn_bg_color)
+        )
     }
-
 }
 
 @Composable
@@ -250,6 +280,11 @@ fun MsgCategoryListItem(
 ) {
     val scope = rememberCoroutineScope()
     var isSelected by remember { mutableStateOf(false) }
+    var clicked by remember { mutableStateOf(false) }
+    val progress by animateFloatAsState(
+        if (clicked) 1f else 0f,
+        animationSpec = tween(durationMillis = 3000)
+    )
 
     val constraintSet = ConstraintSet {
         val num = createRefFor("num")
@@ -275,13 +310,17 @@ fun MsgCategoryListItem(
         constraintSet,
         modifier = Modifier
             .fillMaxWidth()
-            .clickable {
-                scope.launch {
-                    isSelected = true
-                    delay(850)
-                    onItemClick(contact)
+            .clickableWithTapGestures(
+                onClick = {
+                    scope.launch {
+                        isSelected = true
+                        delay(3000)
+                        onItemClick(contact)
+                        clicked = true
+                    }
+                    clicked = true
                 }
-            }
+            )
     ) {
         Text(
             text = id.toString(),
@@ -306,8 +345,15 @@ fun MsgCategoryListItem(
             modifier = Modifier
                 .layoutId("phoneNum")
         )
+        LinearProgressIndicator(
+            progress = progress,
+            modifier = Modifier
+                .fillMaxSize()
+                .height(65.dp)
+                .alpha(if (progress == 0f) 0f else 1f),
+            color = colorResource(id = R.color.confirm_btn_bg_color)
+        )
     }
-
 }
 
 @Preview

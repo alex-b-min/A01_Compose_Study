@@ -107,14 +107,10 @@ class SendMsgViewModel @Inject constructor(
                 sendMsgManager.requestBtPhoneAppRun()
             }
 
-//            is SendMsgEvent.SendMessageNo -> {
-//                UiState.popUiState()
-//            }
-
         }
     }
 
-    fun observeSendMsgData() {
+    private fun observeSendMsgData() {
         Log.d("sendMsg","observeSendMsgData 안")
 
         CoroutineScope(Dispatchers.Main).launch {
@@ -126,7 +122,7 @@ class SendMsgViewModel @Inject constructor(
     }
 
 
-    fun handleSendMsgData(sendMsgData: Pair<ScreenType, Any>) {
+    private fun handleSendMsgData(sendMsgData: Pair<ScreenType, Any>) {
         val screenType = sendMsgData.first
         val data = sendMsgData.second
         Log.d("sendMsg","handleSendMsgData:${screenType},${data}")
