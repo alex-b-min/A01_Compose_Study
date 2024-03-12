@@ -12,8 +12,10 @@ import com.example.a01_compose_study.presentation.data.UiState
 import com.example.a01_compose_study.presentation.data.UiState.pushUiStateMwContext
 import com.example.a01_compose_study.presentation.data.UiState.replaceTopUiStateMwContext
 import com.example.a01_compose_study.presentation.data.UiState.sealedParsedData
+import com.example.a01_compose_study.presentation.screen.call.screen.CallListEvent
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -30,8 +32,11 @@ class CallViewModel @Inject constructor(
     val domainUiState: StateFlow<DomainUiState> = UiState._domainUiState
 
     // VR 처리 결과를 관리하여 클릭 이벤트를 발생시키는 MutableStateFlow
-    private val _vrProcessingResultState = MutableStateFlow<VRProcessingResult>(VRProcessingResult.None)
-    val vrProcessingResultState: StateFlow<VRProcessingResult> = _vrProcessingResultState
+    private val _callYesNoEventState = MutableStateFlow<CallYesNoEvent>(CallYesNoEvent.None)
+    val callYesNoEventState: StateFlow<CallYesNoEvent> = _callYesNoEventState
+
+    private val _callListEventState = MutableStateFlow<CallListEvent>(CallListEvent.None)
+    val callListEventState: StateFlow<CallListEvent> = _callListEventState
 
     init {
         viewModelScope.launch {
@@ -47,21 +52,24 @@ class CallViewModel @Inject constructor(
     fun onCallEvent(event: CallEvent) {
         when (event) {
             is CallEvent.CloseButtonClick -> UiState.closeDomainWindow()
-            is CallEvent.BackButtonClick ->  UiState.popUiState()
+            is CallEvent.BackButtonClick ->  {
+                clearCallListEventState()
+                UiState.popUiState()
+            }
             is CallEvent.ContactListItemOnClick -> handleContactListItemClick(event)
             is CallEvent.OnYesButtonClick -> onCallBusinessEvent(CallBusinessEvent.Calling(event.phoneNumber))
             is CallEvent.OnOtherNumberButtonClick -> handleOtherNumberButtonClick()
         }
-        clearVRProcessingResultState() // VR 처리 결과 초기화
+        clearCallYesNoEventState() // VR 처리 결과 초기화
     }
 
     // Call 데이터를 처리하는 함수
     private fun handleCallData(procCallData: ProcCallData) {
         when (procCallData) {
             is ProcCallData.ScrollIndex -> handleScrollIndex(procCallData)
-            is ProcCallData.ProcYesResult -> handleProcResult(procCallData, VRProcessingResult.Yes)
-            is ProcCallData.ProcNoResult -> handleProcResult(procCallData, VRProcessingResult.No)
-            is ProcCallData.ProcOtherNumberResult -> handleProcResult(procCallData, VRProcessingResult.OtherNumber)
+            is ProcCallData.ProcYesResult -> handleProcResult(procCallData, CallYesNoEvent.Yes)
+            is ProcCallData.ProcNoResult -> handleProcResult(procCallData, CallYesNoEvent.No)
+            is ProcCallData.ProcOtherNumberResult -> handleProcResult(procCallData, CallYesNoEvent.OtherNumber)
 
             else -> {}
         }
@@ -88,13 +96,10 @@ class CallViewModel @Inject constructor(
     }
 
     // VR 처리 결과를 핸들링하는 함수, vrProcessingResult 값에 따라 클릭 이벤트(Yes, No, OtherNumber)가 발생됨.
-    private fun handleProcResult(
-        procCallData: ProcCallData,
-        vrProcessingResult: VRProcessingResult,
-    ) {
-        _vrProcessingResultState.update {
+    private fun handleProcResult(procCallData: ProcCallData, callYesNoEvent: CallYesNoEvent) {
+        _callYesNoEventState.update {
             replaceTopUiStateMwContext(domainUiState.value, procCallData.mwContext)
-            vrProcessingResult
+            callYesNoEvent
         }
     }
 
@@ -132,22 +137,28 @@ class CallViewModel @Inject constructor(
 
     // 스크롤 인덱스를 새로운 상태로 업데이트하는 함수
     private fun updateUiStateWithScrollIndex(procCallData: ProcCallData.ScrollIndex) {
-        UiState._domainUiState.update { domainUiState ->
-            val updatedState = domainUiState.copyWithNewScrollIndex(newScrollIndex = procCallData.index - 1, isClicked = true) // 클릭 후 상태 변경
-            /**
-             * domainUiState의 scrollIndex의 값이 null인 경우에만 스택에 추가
-             * null이 아닌 경우에는 기존에 쌓여있던 데이터를 쌓는게 아니라 데이터 교체를 해야하기 때문이다.
-             * [참고: 데이터 교체는 CallEvent.ContactListItemOnClick 에서 한다.]
-             */
-            if (domainUiState.scrollIndex == null) {
-                pushUiStateMwContext(
-                    Pair(
-                        first = updatedState,
-                        second = procCallData.mwContext
+        viewModelScope.launch {
+            UiState._domainUiState.update { domainUiState ->
+                val updatedState = domainUiState.copyWithNewScrollIndex(newScrollIndex = procCallData.index - 1, enableScroll = true) // 클릭 후 상태 변경
+                /**
+                 * domainUiState의 scrollIndex의 값이 null인 경우에만 스택에 추가
+                 * null이 아닌 경우에는 기존에 쌓여있던 데이터를 쌓는게 아니라 데이터 교체를 해야하기 때문이다.
+                 * [참고: 데이터 교체는 CallEvent.ContactListItemOnClick 에서 한다.]
+                 */
+                if (domainUiState.scrollIndex == null) {
+                    pushUiStateMwContext(
+                        Pair(
+                            first = updatedState,
+                            second = procCallData.mwContext
+                        )
                     )
-                )
+                }
+                updatedState
             }
-            updatedState
+
+            _callListEventState.update {
+                CallListEvent.Click
+            }
         }
     }
 
@@ -158,7 +169,7 @@ class CallViewModel @Inject constructor(
          * 직접 클릭할 때는 컴포저블 함수 내부에서 index 값을 외부로 전달을 해야만 index가 업데이트 가능하다.
          * ==> 따라서 음성 인식 발화를 통해 클릭 이벤트를 발생을 시키든, 실제로 클릭하든, 어떤 방법을 사용하든지 간에 클릭 시에는 index 데이터를 발행하도록 통일하였음
          */
-        val isClickResetState = currentUiState.copyWithNewScrollIndex(itemIndex, isClicked = false)
+        val isClickResetState = currentUiState.copyWithNewScrollIndex(newScrollIndex = itemIndex, enableScroll = false)
         /**
          * [마지막 스택에 저장되어 있는 데이터 교체하기]
          * 이유: 다음 화면으로 전환하기 전에 현재 마지막으로 쌓인 스택에는 scrollIndex 값이 할당되어 있지 않음
@@ -212,10 +223,16 @@ class CallViewModel @Inject constructor(
         }
     }
 
-    // VR 처리 결과 초기화 함수
-    // 만약 초기화를 하지 않는다면 어떠한 값으로 계속해서 값을 유지하기에 이벤트를 발생시켰다면 초기화를 해줘야함
-    private fun clearVRProcessingResultState() {
-        _vrProcessingResultState.update { VRProcessingResult.None }
+    // CallYesNo에서 발생될 이벤트를 관리하는 변수를 None 상태로 초기화 하는 함수
+    // 만약 초기화를 하지 않는다면 어떠한 값으로 계속해서 값을 유지하기에 계속해서 이벤트가 발생될 것이다. 그렇기에 이벤트를 발생시켰다면 초기화를 해줘야함
+    private fun clearCallYesNoEventState() {
+        _callYesNoEventState.update { CallYesNoEvent.None }
+    }
+
+    // CallList에서 발생될 이벤트를 관리하는 변수를 None 상태로 초기화 하는 함수
+    // 만약 초기화를 하지 않는다면 어떠한 값으로 계속해서 값을 유지하기에 계속해서 이벤트가 발생될 것이다. 그렇기에 이벤트를 발생시켰다면 초기화를 해줘야함
+    private fun clearCallListEventState() {
+        _callListEventState.update { CallListEvent.None }
     }
 
     // TTS 요청 함수

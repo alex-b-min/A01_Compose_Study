@@ -60,10 +60,8 @@ import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.components.text.TextView
-import com.example.a01_compose_study.presentation.data.UiState.closeDomainWindow
-import com.example.a01_compose_study.presentation.data.UiState.popUiState
 import com.example.a01_compose_study.presentation.screen.call.CallEvent
-import com.example.a01_compose_study.presentation.screen.call.VRProcessingResult
+import com.example.a01_compose_study.presentation.screen.call.CallYesNoEvent
 import com.example.a01_compose_study.presentation.screen.call.CallViewModel
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
 import com.example.a01_compose_study.presentation.screen.main.route.VRUiState
@@ -78,7 +76,8 @@ fun CallScreen(
     vrDynamicBackground: Color,
     fixedBackground: Color,
 ) {
-    val vrProcessingResult by callViewModel.vrProcessingResultState.collectAsStateWithLifecycle()
+    val callYesNoEventState by callViewModel.callYesNoEventState.collectAsStateWithLifecycle()
+    val callListEventState by callViewModel.callListEventState.collectAsStateWithLifecycle()
 
     if (domainUiState.screenType is ScreenType.CallList) {
         CallListWindow(
@@ -95,6 +94,7 @@ fun CallScreen(
     } else if (domainUiState.screenType is ScreenType.CallIndexedList) {
         CallIndexedListWindow(
             domainUiState = domainUiState,
+            callListEvent = callListEventState,
             vrUiState = vrUiState,
             vrDynamicBackground = vrDynamicBackground,
             fixedBackground = fixedBackground,
@@ -107,7 +107,7 @@ fun CallScreen(
     } else if (domainUiState.screenType is ScreenType.CallYesNo) {
         CallYesNoScreen(
             domainUiState = domainUiState,
-            vrProcessingResult = vrProcessingResult,
+            callYesNoEvent = callYesNoEventState,
             vrUiState = vrUiState,
             vrDynamicBackground = vrDynamicBackground,
             fixedBackground = fixedBackground,
@@ -185,6 +185,7 @@ fun CallListWindow(
 @Composable
 fun CallIndexedListWindow(
     domainUiState: DomainUiState.CallWindow,
+    callListEvent: CallListEvent,
     vrUiState: VRUiState,
     vrDynamicBackground: Color,
     fixedBackground: Color,
@@ -194,7 +195,7 @@ fun CallIndexedListWindow(
 ) {
     val contactList = domainUiState.data
     val currentIndex = domainUiState.scrollIndex
-    val isClicked = domainUiState.isClicked
+    val enableScroll = domainUiState.enableScroll
 
     Box(
         modifier = Modifier
@@ -232,9 +233,10 @@ fun CallIndexedListWindow(
             if (contactList != null) {
                 CallIndexedList(
                     contactList = contactList,
+                    callListEvent = callListEvent,
                     vrDynamicBackground = vrDynamicBackground,
                     currentIndex = currentIndex,
-                    isClicked = isClicked,
+                    enableScroll = enableScroll,
                     fixedBackground = fixedBackground,
                     onItemClick = { contact, itemIndex ->
                         onItemClick(contact, itemIndex)
@@ -253,7 +255,7 @@ fun CallIndexedListWindow(
 @Composable
 fun CallYesNoScreen(
     domainUiState: DomainUiState.CallWindow,
-    vrProcessingResult: VRProcessingResult,
+    callYesNoEvent: CallYesNoEvent,
     vrUiState: VRUiState,
     vrDynamicBackground: Color,
     fixedBackground: Color,
@@ -292,9 +294,9 @@ fun CallYesNoScreen(
      * 음성인식 결과값(rProcessingResult의 값)에 따라 수행될 로직을 수행함
      * ( 이해하기 쉽게 이 로직과 반대의 개념은 직접 클릭하여 로직 수행하는 것 )
      */
-    LaunchedEffect(vrProcessingResult) {
-        when(vrProcessingResult) {
-            VRProcessingResult.Yes -> { // Yes 버튼 게이지만 풀 애니메이션을 진행하고 그 외 버튼은 게이지를 0으로 초기화
+    LaunchedEffect(callYesNoEvent) {
+        when(callYesNoEvent) {
+            CallYesNoEvent.Yes -> { // Yes 버튼 게이지만 풀 애니메이션을 진행하고 그 외 버튼은 게이지를 0으로 초기화
                 isYesSelected = true
                 otherNumberAnimatableValue.animateTo(
                     targetValue = 0f,
@@ -309,7 +311,7 @@ fun CallYesNoScreen(
                     animationSpec = tween(durationMillis = 700)
                 )
             }
-            VRProcessingResult.No -> { // No 버튼 게이지만 풀 애니메이션을 진행하고 그 외 버튼은 게이지를 0으로 초기화
+            CallYesNoEvent.No -> { // No 버튼 게이지만 풀 애니메이션을 진행하고 그 외 버튼은 게이지를 0으로 초기화
                 isNoSelected = true
                 yesAnimatableValue.animateTo(
                     targetValue = 0f,
@@ -325,7 +327,7 @@ fun CallYesNoScreen(
                 )
                 isNoSelected = false
             }
-            VRProcessingResult.OtherNumber -> { // OtherNumber 버튼 게이지만 풀 애니메이션을 진행하고 그 외 버튼은 게이지를 0으로 초기화
+            CallYesNoEvent.OtherNumber -> { // OtherNumber 버튼 게이지만 풀 애니메이션을 진행하고 그 외 버튼은 게이지를 0으로 초기화
                 isOtherNumberSelected = true
                 yesAnimatableValue.animateTo(
                     targetValue = 0f,
@@ -340,7 +342,7 @@ fun CallYesNoScreen(
                     animationSpec = tween(durationMillis = 700)
                 )
             }
-            VRProcessingResult.None -> {
+            CallYesNoEvent.None -> {
             }
         }
     }
@@ -702,6 +704,7 @@ fun CallIndexedListWindowPreview() {
             screenType = ScreenType.CallIndexedList,
             screenSizeType = ScreenSizeType.Middle
         ),
+        callListEvent = CallListEvent.None,
         vrUiState = VRUiState.PttSpeak(active = true, isError = false),
         vrDynamicBackground = Color.Black,
         fixedBackground = Color.Black,
@@ -722,7 +725,7 @@ fun CallYesNoPreview() {
             screenType = ScreenType.CallIndexedList,
             screenSizeType = ScreenSizeType.Middle
         ),
-        vrProcessingResult = VRProcessingResult.None,
+        callYesNoEvent = CallYesNoEvent.None,
         vrUiState = VRUiState.PttSpeak(active = true, isError = false),
         vrDynamicBackground = Color.Black,
         fixedBackground = Color.Black,

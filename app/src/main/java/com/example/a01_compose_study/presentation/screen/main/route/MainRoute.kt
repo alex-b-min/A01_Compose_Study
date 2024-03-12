@@ -502,12 +502,12 @@ fun MainRoute(
             ) {
                 PttButton(
                     modifier = Modifier.fillMaxSize(),
-                    contentText = "VR Line Number Result(5)",
+                    contentText = "VR Line Number Result(7)",
                     onClick = {
                         scope.launch {
                             viewModel.vrmwManager.setVRResult(
                                 VRResult(),
-                                SelectVRResult.ScrollIndexResult(inputIndex = 5)
+                                SelectVRResult.ScrollIndexResult(inputIndex = 7)
                             )
                         }
                     }

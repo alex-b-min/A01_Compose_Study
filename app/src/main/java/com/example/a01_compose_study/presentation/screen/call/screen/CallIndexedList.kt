@@ -52,13 +52,13 @@ import kotlinx.coroutines.launch
 @Composable
 fun CallIndexedList(
     contactList: List<Contact>,
+    callListEvent: CallListEvent,
     currentIndex: Int? = null,
-    isClicked: Boolean,
+    enableScroll: Boolean,
     vrDynamicBackground: Color,
     fixedBackground: Color,
     onItemClick: (Contact, Int) -> Unit,
 ) {
-    Log.d("@@ selectedIndex 실행횟수", "${currentIndex}")
     val scrollState = rememberLazyListState()
 
     /**
@@ -74,11 +74,23 @@ fun CallIndexedList(
     }
 
     /**
-     * LazyColumn 스크롤 처리
+     * currentIndex의 값 변화에 따른 LazyColumn 스크롤 처리
      */
     LaunchedEffect(currentIndex) {
         val scrollIndex = currentIndex ?: 0
         scrollState.animateScrollToItem(scrollIndex)
+    }
+
+    /**
+     * LineNumber 음성인식 결과값 성공적으로 받아오면 scrollAble의 값을 true로 바꾸고 그 값에 따라 스크롤 위치 처리
+     * [LineNumber 음성인식 성공시] : scrollAble 값 true 할당하여 해당 애니메이션 재생된다.
+     * [다른 화면으로 갔다가 뒤로가기를 통해 되돌아올 때] : 해당 스택에 저장되어 있는 scrollAble의 값이 true로 되어 있을 것 이기에 false로 replace 한다.
+     */
+    LaunchedEffect(enableScroll) {
+        if (enableScroll) {
+            val scrollIndex = currentIndex ?: 0
+            scrollState.animateScrollToItem(scrollIndex)
+        }
     }
 
     LazyColumn(state = scrollState) {
@@ -89,11 +101,13 @@ fun CallIndexedList(
              * 일치하지 않는다면, 아무일도 벌어지지 않는다.
              */
             val isSelected = callItem.id == voiceMatchedContact?.id
+            Log.d("@@-- voiceMatchedContact" ,"${voiceMatchedContact}")
+            Log.d("@@-- isSelected" ,"${isSelected} / callItem: ${callItem.id} / voiceMatchedContact: ${voiceMatchedContact?.id}")
             CallIndexedListItem(
                 contactItem = callItem,
+                callListEvent = callListEvent,
                 itemIndex = index,
                 voiceMatchedContact = if (isSelected) voiceMatchedContact else null,
-                isClicked = isClicked,
                 vrDynamicBackground = vrDynamicBackground,
                 fixedBackground = fixedBackground,
                 onItemClick = onItemClick,
@@ -105,13 +119,14 @@ fun CallIndexedList(
 @Composable
 fun CallIndexedListItem(
     contactItem: Contact,
+    callListEvent: CallListEvent,
     itemIndex: Int,
     voiceMatchedContact: Contact? = null,
-    isClicked: Boolean,
     vrDynamicBackground: Color,
     fixedBackground: Color,
     onItemClick: (Contact, Int) -> Unit,
 ) {
+    Log.d("@@ voiceMatchedContact2222", "${voiceMatchedContact}")
     val scope = rememberCoroutineScope()
 
     var isSelected by remember { mutableStateOf(false) }
@@ -123,21 +138,23 @@ fun CallIndexedListItem(
         )
     }
 
-    /**
-     * 음성 인식을 통한 클릭 이벤트(직접 클릭 이벤트 로직은 따로 구현함)
-     */
-    LaunchedEffect(isClicked) {
-        /** isClicked가 true이면서 Line Number 음성인식 매칭 데이터(voiceMatchedContact)가 null이 아니라면
-         * 1. ProgressIndicator의 color를 관리하는 isSelected를 true로 변경
-         * 2. ProgressIndicator 실행
-         */
-        if (isClicked && voiceMatchedContact != null) {
-            Log.d("@@ SelectedContact", "${voiceMatchedContact}")
-            isSelected = true
-            selectAnimationResult = selectAnimatableValue.animateTo(
-                targetValue = 1f,
-                animationSpec = tween(durationMillis = 700)
-            )
+    LaunchedEffect(callListEvent) {
+        Log.d("@@ listProcessingResult", "${callListEvent}")
+        when (callListEvent) {
+            CallListEvent.Click -> {
+                Log.d("@@-- Click" ,"${isSelected} / callItem: ${contactItem.id} / voiceMatchedContact: ${voiceMatchedContact?.id}")
+                if (voiceMatchedContact != null) {
+                    Log.d("@@-- voiceMatchedContact not Null 33333", "${voiceMatchedContact}")
+                    isSelected = true
+                    selectAnimationResult = selectAnimatableValue.animateTo(
+                        targetValue = 1f,
+                        animationSpec = tween(durationMillis = 700)
+                    )
+                } else {
+                    Log.d("@@-- voiceMatchedContact null 4444", "${voiceMatchedContact}")
+                }
+            }
+            else -> { }
         }
     }
 
@@ -338,9 +355,9 @@ fun CallIndexedListItemPreview() {
 
     CallIndexedListItem(
         itemIndex = 1,
+        callListEvent = CallListEvent.None,
         contactItem = contact,
         voiceMatchedContact = null,
-        isClicked = false,
         vrDynamicBackground = Color.Black,
         fixedBackground = Color.Black,
         onItemClick = {contact: Contact, i: Int -> })

@@ -1,7 +1,6 @@
 package com.example.a01_compose_study.presentation.screen.main
 
 import com.example.a01_compose_study.data.Contact
-import com.example.a01_compose_study.data.custom.MWContext
 import com.example.a01_compose_study.data.custom.sendMsg.MsgData
 import com.example.a01_compose_study.data.custom.sendMsg.ScreenData
 import com.example.a01_compose_study.domain.model.HelpItemData
@@ -57,7 +56,7 @@ sealed class DomainUiState(
         override val domainType: SealedDomainType,
         val data: List<Contact>? = emptyList(),
         val detailData: Contact = Contact(),
-        val isClicked: Boolean = false, //클릭한 상태를 관리하는 변수로, scrollIndex 값이 존재한다면 게이지 애니메이션이 실행되는데 이를 적절히 관리하기 위해 이 변수를 사용하여 클릭 상태를 관리
+        val enableScroll: Boolean = false, //이 값에 따라 스크롤 애니메이션이 진행됨
         val isContactIdUnique: Boolean = false, // ContactId가 중복이 존재하는 지 여부
         val isError: Boolean = false,
         override val scrollIndex: Int? = null,
@@ -115,14 +114,14 @@ sealed class DomainUiState(
         }
     }
 
-    fun copyWithNewScrollIndex(newScrollIndex: Int?, isClicked: Boolean, mwContext: MWContext?= null): DomainUiState {
+    fun copyWithNewScrollIndex(newScrollIndex: Int?, enableScroll: Boolean): DomainUiState {
         return when (this) {
             is NoneWindow -> copy(scrollIndex = newScrollIndex)
             is PttWindow -> copy(scrollIndex = newScrollIndex)
             is HelpWindow -> copy(scrollIndex = newScrollIndex)
             is AnnounceWindow -> copy(scrollIndex = newScrollIndex)
             is DomainMenuWindow -> copy(scrollIndex = newScrollIndex)
-            is CallWindow -> copy(scrollIndex = newScrollIndex, isClicked = isClicked)
+            is CallWindow -> copy(scrollIndex = newScrollIndex, enableScroll = enableScroll)
             is NavigationWindow -> copy(scrollIndex = newScrollIndex)
             is RadioWindow -> copy(scrollIndex = newScrollIndex)
             is WeatherWindow -> copy(scrollIndex = newScrollIndex)

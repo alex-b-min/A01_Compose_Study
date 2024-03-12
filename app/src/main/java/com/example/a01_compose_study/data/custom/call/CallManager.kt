@@ -18,9 +18,7 @@ import com.example.a01_compose_study.data.pasing.CallModel
 import com.example.a01_compose_study.data.pasing.CommonModel
 import com.example.a01_compose_study.domain.model.NoticeModel
 import com.example.a01_compose_study.presentation.data.UiState
-import com.example.a01_compose_study.presentation.data.UiState.getCurrDomainUiState
 import com.example.a01_compose_study.presentation.screen.SelectVRResult
-import com.example.a01_compose_study.presentation.screen.main.DomainUiState
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
