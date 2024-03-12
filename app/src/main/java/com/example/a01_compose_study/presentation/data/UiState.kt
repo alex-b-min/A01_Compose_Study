@@ -86,6 +86,7 @@ object UiState {
      * 즉,
      * 화면 이동 시 UIState를 업데이트할 때는 클릭 여부 프로퍼티를 true로 설정하지만 이때 스택에는 저장하지 않습니다.
      * 그러나 현재 화면으로 돌아올 때는 게이지 클릭 이벤트가 발생하지 않도록 클릭 여부 프로퍼티를 false로 설정한 UIState를 스택에 저장합니다.
+     * [간단히 말해 상황에 맞게 스택을 추가하는게 아닌,마지막 인덱스에 저장되어 있는 스택(DomainUiState,MWCoontext)을 교체할 때 사용함]
      */
     fun replaceTopUiStateMwContext(newUiStateMwContext: Pair<DomainUiState, MWContext?>) {
         if (newUiStateMwContext.second == null) {
