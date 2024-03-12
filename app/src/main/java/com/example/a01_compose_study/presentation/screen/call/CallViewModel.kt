@@ -31,10 +31,11 @@ class CallViewModel @Inject constructor(
     private val _domainUiState = UiState._domainUiState
     val domainUiState: StateFlow<DomainUiState> = UiState._domainUiState
 
-    // VR 처리 결과를 관리하여 클릭 이벤트를 발생시키는 MutableStateFlow
+    // CallYesNo 화면에서 발생하는 Yes, No, OtherNumber 클릭 이벤트를 관리하는 MutableStateFlow
     private val _callYesNoEventState = MutableStateFlow<CallYesNoEvent>(CallYesNoEvent.None)
     val callYesNoEventState: StateFlow<CallYesNoEvent> = _callYesNoEventState
 
+    // CallList 화면에서 발생하는 Click 이벤트를 관리하는 MutableStateFlow
     private val _callListEventState = MutableStateFlow<CallListEvent>(CallListEvent.None)
     val callListEventState: StateFlow<CallListEvent> = _callListEventState
 
