@@ -54,7 +54,8 @@ class CallViewModel @Inject constructor(
                                             val updatedState = domainUiState.copyWithNewScrollIndex(newScrollIndex = sealedParsedData.procCallData.index - 1, isClicked = true) // 클릭 후 상태 변경
                                             /**
                                              * domainUiState의 scrollIndex의 값이 null인 경우에만 스택에 추가
-                                             * null이 아닌 경우에는 기존에 쌓여있던
+                                             * null이 아닌 경우에는 기존에 쌓여있던 데이터를 쌓는게 아니라 데이터 교체를 해야하기 때문이다.
+                                             * [참고: 데이터 교체는 CallEvent.ContactListItemOnClick 에서 한다.]
                                              */
                                             if (domainUiState.scrollIndex == null) {
                                                 UiState.pushUiStateMwContext(Pair(first = updatedState, second = sealedParsedData.procCallData.mwContext))
@@ -116,20 +117,25 @@ class CallViewModel @Inject constructor(
                         isContactIdUnique = isContactIdUnique
                     ) ?: domainUiState
 
+                    /**
+                     * LineNumber 음성 인식 결과를 collect할 때 바로 index를 업데이트할 수 있지만,
+                     * 직접 클릭할 때는 컴포저블 함수 내부에서 index 값을 외부로 전달을 해야만 index가 업데이트 가능하다.
+                     * ==> 따라서 음성 인식 발화를 통해 클릭 이벤트를 발생을 시키든, 실제로 클릭하든, 어떤 방법을 사용하든지 간에 클릭 시에는 index 데이터를 발행하도록 통일하였음
+                     */
                     val isClickResetState = domainUiState.copyWithNewScrollIndex(newScrollIndex = event.itemIndex, isClicked = false)// 클릭 전 상태(뒤로가기를 하여 이전 화면으로 돌아갈때는 클릭 전 상태로 돌아가야 한다.)
                     /**
-                     * 다음 화면으로 전환하기 전에 현재 마지막으로 쌓인 스택에는 scrollIndex 값이 할당되어 있지 않습니다.
-                     * 따라서 이벤트로 받아온 인덱스 데이터를 사용하여 마지막 스택에 있는 데이터의 scrollIndex 값을 업데이트 해줍니다.
+                     * [마지막 스택에 저장되어 있는 데이터 교체하기]
+                     * 이유: 다음 화면으로 전환하기 전에 현재 마지막으로 쌓인 스택에는 scrollIndex 값이 할당되어 있지 않음
+                     * ==> 그렇기에 뒤로가기를 했을 시에는 전에 위치하던 ScrollIndex 위치에 존재하지 않고 Index가 0인 곳에 위치한다.
+                     * 따라서 이벤트로 받아온 인덱스 데이터를 사용하여 마지막 스택에 있는 데이터의 scrollIndex 값을 업데이트 해준다.
+                     * ==> 최종적으로 뒤로가기를 했을 시에도 전에 위치하던 ScrollIndex 위치에 존재하게 한다.
+                     * [중요한 것은 화면을 나타내기 위한 데이터인 DomainUiState만 교체를 하고 마지막 스택의 MWContext의 값은 그대로 유지 시킨다.]
                      */
                     UiState.replaceTopUiStateMwContext(newUiStateMwContext = Pair(first = isClickResetState, second = null))
                     /**
-                     * 다음 화면으로 전환하기
+                     * [다음 화면으로 전환하기 및 스택에 쌓기]
                      */
-                    UiState.pushUiStateMwContext(
-                        pairUiStateMwContext = Pair(
-                            first = updatedState,
-                            second = null
-                        )
+                    UiState.pushUiStateMwContext(pairUiStateMwContext = Pair(first = updatedState, second = null)
                     )
                     updatedState
                 }
@@ -155,12 +161,7 @@ class CallViewModel @Inject constructor(
                                 detailData = it,
                             )
                         } ?: domainUiState
-                        UiState.pushUiStateMwContext(
-                            pairUiStateMwContext = Pair(
-                                first = updatedState,
-                                second = null
-                            )
-                        )
+                        UiState.replaceTopUiStateMwContext(newUiStateMwContext = Pair(first = updatedState, second = null))
                         updatedState
                     }
                 } else {
