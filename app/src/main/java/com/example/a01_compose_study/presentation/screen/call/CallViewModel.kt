@@ -15,7 +15,6 @@ import com.example.a01_compose_study.presentation.data.UiState.sealedParsedData
 import com.example.a01_compose_study.presentation.screen.call.screen.CallListEvent
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -53,15 +52,13 @@ class CallViewModel @Inject constructor(
     fun onCallEvent(event: CallEvent) {
         when (event) {
             is CallEvent.CloseButtonClick -> UiState.closeDomainWindow()
-            is CallEvent.BackButtonClick ->  {
-                clearCallListEventState()
-                UiState.popUiState()
-            }
+            is CallEvent.BackButtonClick ->  { UiState.popUiState() }
             is CallEvent.ContactListItemOnClick -> handleContactListItemClick(event)
             is CallEvent.OnYesButtonClick -> onCallBusinessEvent(CallBusinessEvent.Calling(event.phoneNumber))
             is CallEvent.OnOtherNumberButtonClick -> handleOtherNumberButtonClick()
         }
-        clearCallYesNoEventState() // VR 처리 결과 초기화
+        clearCallYesNoEventState() // CallYesNo Event 결과 초기화
+        clearCallListEventState() // CallList Event 결과 초기화
     }
 
     // Call 데이터를 처리하는 함수
