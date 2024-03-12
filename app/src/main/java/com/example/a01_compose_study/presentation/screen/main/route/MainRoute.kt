@@ -1,7 +1,6 @@
 package com.example.a01_compose_study.presentation.screen.main.route
 
 import android.util.Log
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,25 +9,21 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.a01_compose_study.data.VRResult
 import com.example.a01_compose_study.presentation.components.button.PttButton
+import com.example.a01_compose_study.presentation.components.clickableWithTapGestures
 import com.example.a01_compose_study.presentation.compose.VrUiAnimationHandler
 import com.example.a01_compose_study.presentation.data.UiState
-import com.example.a01_compose_study.presentation.data.UiState.isVrActive
 import com.example.a01_compose_study.presentation.data.UiState.onVREvent
 import com.example.a01_compose_study.presentation.screen.SelectVRResult
 import com.example.a01_compose_study.presentation.screen.announce.AnnounceScreen
@@ -63,7 +58,6 @@ fun MainRoute(
     val announceString by pttViewModel.announceString.collectAsStateWithLifecycle()
 
     val isVrActive by UiState.isVrActive.collectAsState()
-//    var isVrActive by remember { mutableStateOf(true) }
 
 
     WindowFrame(
@@ -75,40 +69,18 @@ fun MainRoute(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .pointerInput(Unit) {
-                    detectTapGestures(
-                        onPress = {
-                            UiState.isVrActive.value = false
-                            Log.d("sendMsg", "isVrActive.value: ${isVrActive}")
-                        },
-                        onTap = {
-                            UiState.isVrActive.value = true
-                            Log.d("sendMsg", "isVrActive.value: ${isVrActive}")
-                        }
-                    )
-                },
+                .clickableWithTapGestures(),
             contentAlignment = Alignment.BottomCenter
         ) {
             Log.d("sendMsg", "handler isVrActive.value: ${isVrActive}")
-//            if (isVrActive.value) VrUiAnimationHandler(vrUiState)
-//            LaunchedEffect(Unit) {
-//                UiState.isVrActive.collect { isVrActive ->
-//                    if (isVrActive) {
-//                        VrUiAnimationHandler(vrUiState)
-//                    }
-//                }
-//            }
+
             if (isVrActive) VrUiAnimationHandler(vrUiState)
 
-
-            Log.d("@@ domainUiState When문 위에서 시작", "${domainUiState}")
-            Log.d("@@ domainUiState When문 위에서 시작", "${domainWindowVisibleState}")
             when (domainUiState) {
                 is DomainUiState.NoneWindow -> {
                 }
 
                 is DomainUiState.PttWindow -> {
-                    Log.d("@@ PttWindow 진입", "몇번 실행?")
                     ComposePttScreen(
                         domainUiState = domainUiState as DomainUiState.PttWindow,
                         contentColor = Color.White,
@@ -117,7 +89,6 @@ fun MainRoute(
                 }
 
                 is DomainUiState.HelpWindow -> {
-                    Log.d("@@ HelpWindow 진입", "몇번 실행?")
                     Box(modifier = Modifier.fillMaxSize()) {
                         ComposeHelpScreen(
                             domainUiState = domainUiState as DomainUiState.HelpWindow,
@@ -137,12 +108,10 @@ fun MainRoute(
                 }
 
                 is DomainUiState.AnnounceWindow -> {
-                    Log.d("@@ AnnounceWindow 진입", "몇번 실행?")
                     AnnounceScreen((domainUiState as DomainUiState.AnnounceWindow).text)
                 }
 
                 is DomainUiState.CallWindow -> {
-                    Log.d("@@ CallWindow 진입", "몇번 실행?")
                     Box(modifier = Modifier.fillMaxSize()) {
                         CallScreen(
                             domainUiState = domainUiState as DomainUiState.CallWindow,
@@ -150,14 +119,6 @@ fun MainRoute(
                             vrDynamicBackground = if (vrUiState.active) Color.Transparent else Color.Black,
                             fixedBackground = Black2
                         )
-//                    onVREvent(
-//                        VREvent.ChangeVRUIEvent(
-//                            VRUiState.PttLoading(
-//                                active = true,
-//                                isError = false
-//                            )
-//                        )
-//                    )
                     }
                 }
 

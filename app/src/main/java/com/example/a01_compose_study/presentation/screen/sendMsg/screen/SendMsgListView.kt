@@ -13,6 +13,7 @@ import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,20 +31,20 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintSet
 import com.example.a01_compose_study.R
 import com.example.a01_compose_study.data.Contact
-import com.example.a01_compose_study.presentation.components.gauge.clickableWithTapGestures
+import com.example.a01_compose_study.presentation.components.clickableWithTapGestures
 import com.example.a01_compose_study.presentation.components.list.LazyColumnList
+import com.example.a01_compose_study.presentation.data.UiState
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @Composable
 fun MsgAllList(
-    lineIndex: Int,
     contactList: List<Contact>,
     onItemClick: (Contact) -> Unit,
 ) {
     LazyColumnList(
         list = contactList,
-        index = lineIndex,
         listContent = { index, contact ->
             MsgAllListItem(
                 contact = contact,
@@ -56,10 +57,10 @@ fun MsgAllList(
 @Composable
 fun MsgNameList(
     lineIndex: Int,
+    isVrLineIndex: Boolean = false,
     contactList: List<Contact>,
     onItemClick: (Contact) -> Unit,
 ) {
-//    val scrollState = rememberLazyListState()
     LazyColumnList(
         list = contactList,
         index = lineIndex,
@@ -68,6 +69,7 @@ fun MsgNameList(
                 id = index + 1,
                 contact = contact,
                 onItemClick = onItemClick,
+                clickedByVr = index == lineIndex-1 && isVrLineIndex
             )
         })
 }
@@ -76,6 +78,7 @@ fun MsgNameList(
 @Composable
 fun MsgCategoryList(
     lineIndex: Int,
+    isVrLineIndex: Boolean = false,
     contactList: List<Contact>,
     onItemClick: (Contact) -> Unit,
 ) {
@@ -86,7 +89,8 @@ fun MsgCategoryList(
             MsgCategoryListItem(
                 id = index + 1,
                 contact = contact,
-                onItemClick = onItemClick
+                onItemClick = onItemClick,
+                clickedByVr = index == lineIndex-1 && isVrLineIndex
             )
         })
 }
@@ -180,6 +184,7 @@ fun MsgNameListItem(
     id: Int,
     contact: Contact,
     onItemClick: (Contact) -> Unit,
+    clickedByVr: Boolean = false,
 ) {
     val scope = rememberCoroutineScope()
     var isSelected by remember { mutableStateOf(false) }
@@ -213,6 +218,17 @@ fun MsgNameListItem(
             end.linkTo(parent.end, 10.dp)
             top.linkTo(parent.top)
             bottom.linkTo(parent.bottom)
+        }
+    }
+    if (clickedByVr) {
+        LaunchedEffect(Unit) {
+            scope.launch {
+                isSelected = true
+                delay(3000)
+                onItemClick(contact)
+            }
+            clicked = true
+            UiState._isVrInput.update { false }
         }
     }
     ConstraintLayout(
@@ -277,6 +293,7 @@ fun MsgCategoryListItem(
     id: Int,
     contact: Contact,
     onItemClick: (Contact) -> Unit,
+    clickedByVr: Boolean = false,
 ) {
     val scope = rememberCoroutineScope()
     var isSelected by remember { mutableStateOf(false) }
@@ -306,6 +323,17 @@ fun MsgCategoryListItem(
             bottom.linkTo(parent.bottom, 10.dp)
         }
     }
+    if (clickedByVr) {
+        LaunchedEffect(Unit) {
+            scope.launch {
+                isSelected = true
+                delay(3000)
+                onItemClick(contact)
+            }
+            clicked = true
+            UiState._isVrInput.update { false }
+        }
+    }
     ConstraintLayout(
         constraintSet,
         modifier = Modifier
@@ -316,7 +344,6 @@ fun MsgCategoryListItem(
                         isSelected = true
                         delay(3000)
                         onItemClick(contact)
-                        clicked = true
                     }
                     clicked = true
                 }
@@ -363,7 +390,6 @@ fun MsgAllListItemPreview() {
     list.add(Contact(id = "1", name = "riley", number = "010-0000"))
     list.add(Contact(id = "2", name = "kim", number = "010-0000"))
     MsgAllList(
-        lineIndex = 0,
         contactList = list,
         onItemClick = {})
 }

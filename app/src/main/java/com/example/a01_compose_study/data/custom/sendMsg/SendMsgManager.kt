@@ -150,7 +150,7 @@ class SendMsgManager @Inject constructor(
                     type = 4
                 )
             )
-//            items.add(Contact(id = "3", name = "문재민", number = "456-789-0123", contact_id = "20"))
+            items.add(Contact(id = "3", name = "문재민", number = "456-789-0123", contact_id = "20"))
         }
 
 

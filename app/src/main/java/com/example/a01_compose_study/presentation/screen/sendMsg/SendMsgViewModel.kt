@@ -1,30 +1,22 @@
 package com.example.a01_compose_study.presentation.screen.sendMsg
 
 import android.util.Log
-import androidx.lifecycle.AbstractSavedStateViewModelFactory
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import com.example.a01_compose_study.data.Contact
 import com.example.a01_compose_study.data.custom.SealedParsedData
-import com.example.a01_compose_study.data.custom.sendMsg.MsgData
 import com.example.a01_compose_study.data.custom.sendMsg.ScreenData
 import com.example.a01_compose_study.data.custom.sendMsg.SendMsgEvent
 import com.example.a01_compose_study.data.custom.sendMsg.SendMsgManager
 import com.example.a01_compose_study.data.pasing.SendMsgModel
 import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.presentation.data.UiState
-import com.example.a01_compose_study.presentation.data.UiState._domainUiState
+import com.example.a01_compose_study.presentation.data.UiState._isVrInput
 import com.example.a01_compose_study.presentation.data.UiState._mwContext
 import com.example.a01_compose_study.presentation.data.UiState.handleScreenData
 import com.example.a01_compose_study.presentation.data.UiState.popUiState
-import com.example.a01_compose_study.presentation.screen.main.DomainUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -41,9 +33,8 @@ class SendMsgViewModel @Inject constructor(
     private var _lineIndex = MutableStateFlow(0)
     val lineIndex: StateFlow<Int> = _lineIndex
 
-
     init {
-        Log.d("sendMsg","SendMsgViewModel 생성됌")
+        Log.d("sendMsg", "SendMsgViewModel 생성됌")
         observeSendMsgData()
     }
 
@@ -52,7 +43,7 @@ class SendMsgViewModel @Inject constructor(
             // 카테고리 여러개인지 확인 로직
             is SendMsgEvent.MsgAllListItemOnClick -> {
                 // TODO sendMsgModel 받아오는 로직
-                Log.e("sendMsg","onSendMsgEvent MsgAllListItemOnClick 안")
+                Log.e("sendMsg", "onSendMsgEvent MsgAllListItemOnClick 안")
                 val sendMsgModel = SendMsgModel("")
                 sendMsgModel.getContactItems().add(event.selectedSendMsgItem)
                 val bundle = sendMsgManager.handleCategory(
@@ -63,6 +54,7 @@ class SendMsgViewModel @Inject constructor(
                     UiState._sealedParsedData.emit(SealedParsedData.SendMsgData(bundle))
                 }
             }
+
             is SendMsgEvent.SelectNameListItemOnClick -> {
                 // TODO sendMsgModel 받아오는 로직
                 //카테고리 여러개인지 매니저 로직 (위와 동일)
@@ -91,6 +83,7 @@ class SendMsgViewModel @Inject constructor(
                     UiState._sealedParsedData.emit(SealedParsedData.SendMsgData(bundle))
                 }
             }
+
             is SendMsgEvent.OnBack -> {
                 popUiState()
             }
@@ -111,11 +104,11 @@ class SendMsgViewModel @Inject constructor(
     }
 
     private fun observeSendMsgData() {
-        Log.d("sendMsg","observeSendMsgData 안")
+        Log.d("sendMsg", "observeSendMsgData 안")
 
         CoroutineScope(Dispatchers.Main).launch {
             UiState._sendMsgUiData.collect { data ->
-                Log.d("sendMsg","collect 함")
+                Log.d("sendMsg", "collect 함")
                 handleSendMsgData(data)
             }
         }
@@ -125,24 +118,28 @@ class SendMsgViewModel @Inject constructor(
     private fun handleSendMsgData(sendMsgData: Pair<ScreenType, Any>) {
         val screenType = sendMsgData.first
         val data = sendMsgData.second
-        Log.d("sendMsg","handleSendMsgData:${screenType},${data}")
+        Log.d("sendMsg", "handleSendMsgData:${screenType},${data}")
 
         when (screenType) {
             is ScreenType.List -> {
                 _lineIndex.update { data as Int }
-                Log.e("sendMsg","lineIndex:${_lineIndex}")
+                _isVrInput.update { true }
+                Log.e("sendMsg", "lineIndex:${_lineIndex}")
             }
 
             is ScreenType.ScreenStack -> {
-                Log.d("sendMsg","handleSendMsgData ScreenType.ScreenStack")
+                Log.d("sendMsg", "handleSendMsgData ScreenType.ScreenStack")
                 val screenData = data as? ScreenData
                 if (screenData != null) {
-                    handleScreenData(screenData, Pair(UiState._domainUiState.value, _mwContext.value))
+                    handleScreenData(
+                        screenData,
+                        Pair(UiState._domainUiState.value, _mwContext.value)
+                    )
                 }
             }
 
             else -> {
-                Log.d("sendMsg","handleSendMsgData Reject")
+                Log.d("sendMsg", "handleSendMsgData Reject")
                 // Reject
             }
         }

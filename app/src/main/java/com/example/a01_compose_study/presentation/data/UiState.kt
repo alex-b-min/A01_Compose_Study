@@ -36,6 +36,9 @@ object UiState {
     val _mwContext = MutableStateFlow<MWContext?>(null)
     val mwContext: StateFlow<MWContext?> = _mwContext
 
+    val _isVrInput = MutableStateFlow(false)
+    val isVrInput: StateFlow<Boolean> = _isVrInput
+
     val isVrActive = MutableStateFlow(true)
 
     fun pushUiState(domainUiPair: Pair<DomainUiState, MWContext?>) {

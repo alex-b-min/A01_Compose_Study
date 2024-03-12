@@ -10,7 +10,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.a01_compose_study.data.custom.sendMsg.SendMsgEvent
@@ -18,7 +17,6 @@ import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.presentation.components.top_bar.TopAppBarContent
 import com.example.a01_compose_study.presentation.data.UiState
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
-import com.example.a01_compose_study.presentation.screen.main.route.VRUiState
 import com.example.a01_compose_study.presentation.screen.sendMsg.SendMsgViewModel
 
 @Composable
@@ -26,9 +24,10 @@ fun SendMsgScreen(
     viewModel: SendMsgViewModel = hiltViewModel(),
     domainUiState: DomainUiState.SendMessageWindow,
 
-) {
+    ) {
     val lineIndex by viewModel.lineIndex.collectAsState()
     val isVrActive by UiState.isVrActive.collectAsState()
+    val isVrLineIndex by UiState.isVrInput.collectAsState()
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -67,15 +66,10 @@ fun SendMsgScreen(
             } else if (domainUiState.screenType is ScreenType.MessageAllList) {
                 Log.d("sendMsg", "MessageAllList")
                 domainUiState.contactList?.let {
-                    Log.e("sendMsg", "Screen contactList? 안")
-                    Log.e("sendMsg", "AllList:${viewModel.lineIndex}")
-
                     MsgAllList(
                         contactList = it,
-                        lineIndex = lineIndex,
                         onItemClick = { contact ->
                             viewModel.onSendMsgEvent(SendMsgEvent.MsgAllListItemOnClick(contact))
-                            Log.e("sendMsg", "Screen click 실행")
                         },
                     )
                 }
@@ -85,10 +79,9 @@ fun SendMsgScreen(
                     MsgNameList(
                         contactList = it,
                         lineIndex = lineIndex,
+                        isVrLineIndex = isVrLineIndex,
                         onItemClick = { contact ->
-//                            isVrActive = false
                             viewModel.onSendMsgEvent(SendMsgEvent.SelectNameListItemOnClick(contact))
-                            Log.e("sendMsg", "Screen click 실행")
                         },
                     )
                 }
@@ -98,14 +91,11 @@ fun SendMsgScreen(
                     MsgCategoryList(
                         contactList = it,
                         lineIndex = lineIndex,
+                        isVrLineIndex = isVrLineIndex,
                         onItemClick = { contact ->
-//                            isVrActive = false
                             viewModel.onSendMsgEvent(
-                                SendMsgEvent.SelectCategoryListItemOnClick(
-                                    contact
-                                )
+                                SendMsgEvent.SelectCategoryListItemOnClick(contact)
                             )
-                            Log.e("sendMsg", "Screen click 실행")
                         },
                     )
                 }

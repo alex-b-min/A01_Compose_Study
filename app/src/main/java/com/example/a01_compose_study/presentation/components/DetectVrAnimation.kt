@@ -1,4 +1,4 @@
-package com.example.a01_compose_study.presentation.components.gauge
+package com.example.a01_compose_study.presentation.components
 
 import android.util.Log
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -8,7 +8,7 @@ import com.example.a01_compose_study.presentation.data.UiState
 
 
 fun Modifier.clickableWithTapGestures(
-    onClick: () -> Unit,
+    onClick: () -> Unit = {},
 ): Modifier {
     return this.pointerInput(Unit) {
         detectTapGestures(

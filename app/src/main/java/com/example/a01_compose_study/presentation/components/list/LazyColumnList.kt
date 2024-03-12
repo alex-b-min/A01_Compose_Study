@@ -16,6 +16,7 @@ import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -28,6 +29,37 @@ import com.example.a01_compose_study.R
 import com.example.a01_compose_study.presentation.data.UiState
 import kotlinx.coroutines.launch
 
+
+//@Composable
+//fun <T> LazyColumnList(
+//    state: LazyListState = rememberLazyListState(),
+//    list: List<T>,
+//    listContent: @Composable (index: Int, item: T, onClick: () -> Unit) -> Unit,
+//    index: Int = 0,
+//) {
+//    val scope = rememberCoroutineScope()
+//
+//    val itemClickStates = remember { mutableStateListOf<Boolean>() }
+//
+//    if (itemClickStates.size != list.size) {
+//        itemClickStates.clear()
+//        repeat(list.size) {
+//            itemClickStates.add(false)
+//        }
+//    }
+//
+//    scope.launch {
+//        state.animateScrollToItem(index = index)
+//    }
+//
+//    LazyColumn(state = state) {
+//        itemsIndexed(list) { idx, item ->
+//            listContent(idx, item) {
+//                itemClickStates[idx] = true
+//            }
+//        }
+//    }
+//}
 
 
 @Composable
@@ -44,8 +76,8 @@ fun <T> LazyColumnList(
     }
 
     LazyColumn(state = state) {
-        itemsIndexed(list) { index, item ->
-            listContent(index,item)
+        itemsIndexed(list) { idx, item ->
+            listContent(idx,item)
         }
     }
 }

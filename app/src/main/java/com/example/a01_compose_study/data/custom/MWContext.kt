@@ -161,11 +161,6 @@ class MWContext(
             }
 
             SelectVRResult.ScrollIndexResult -> {
-//                ParserFactory().dataParsing(vrResult, dialogueMode = dialogueMode)
-//                    .also {
-//                        it?.type = ParseDomainType.CALL
-//                        it?.dialogueMode = DialogueMode.LIST
-//                    }
                 Log.e("sendMsg","MWContext안 ScrollIndexResult")
                 ParserFactory().dataParsing(vrResult, dialogueMode = dialogueMode)
                     .also {
