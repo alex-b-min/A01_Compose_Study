@@ -1,5 +1,6 @@
 package com.example.a01_compose_study.presentation.screen.call.screen
 
+import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.animation.core.AnimationResult
@@ -243,6 +244,12 @@ fun CallIndexedListWindow(
     }
 }
 
+/**
+ * Yes, No, OtherNumber의 버튼에 대한 로직을 실행하는 방법은 두가지 이다.
+ * 1. 음성인식 발화 결과를 통해 자동 실행
+ * 2. 직접 클릭으로 인한 실행
+ * ==> 아래의 코드는 각각 정의를 하여 구현하였다.
+ */
 @Composable
 fun CallYesNoScreen(
     domainUiState: DomainUiState.CallWindow,
@@ -258,9 +265,6 @@ fun CallYesNoScreen(
     val scope = rememberCoroutineScope()
 
     var isYesSelected by remember { mutableStateOf(false) }
-    var isNoSelected by remember { mutableStateOf(false) }
-    var isOtherNumberSelected by remember { mutableStateOf(false) }
-
     val yesAnimatableValue = remember { Animatable(0f) }
     var yesAnimationResult by remember {
         mutableStateOf<AnimationResult<Float, AnimationVector1D>?>(
@@ -268,6 +272,7 @@ fun CallYesNoScreen(
         )
     }
 
+    var isNoSelected by remember { mutableStateOf(false) }
     val noAnimatableValue = remember { Animatable(0f) }
     var noAnimationResult by remember {
         mutableStateOf<AnimationResult<Float, AnimationVector1D>?>(
@@ -275,6 +280,7 @@ fun CallYesNoScreen(
         )
     }
 
+    var isOtherNumberSelected by remember { mutableStateOf(false) }
     val otherNumberAnimatableValue = remember { Animatable(0f) }
     var otherNumberAnimationResult by remember {
         mutableStateOf<AnimationResult<Float, AnimationVector1D>?>(
@@ -284,31 +290,51 @@ fun CallYesNoScreen(
 
     /**
      * 음성인식 결과값(rProcessingResult의 값)에 따라 수행될 로직을 수행함
-     * ( 이해하기 쉽게 이 로직과 반대의 개념은 직접 클릭하여 로직 수행 )
+     * ( 이해하기 쉽게 이 로직과 반대의 개념은 직접 클릭하여 로직 수행하는 것 )
      */
     LaunchedEffect(vrProcessingResult) {
         when(vrProcessingResult) {
-            VRProcessingResult.Yes -> {
-                scope.launch {
-                    isYesSelected = true
-                    yesAnimationResult = yesAnimatableValue.animateTo(
-                        targetValue = 1f,
-                        animationSpec = tween(durationMillis = 700)
-                    )
-                }
+            VRProcessingResult.Yes -> { // Yes 버튼 게이지만 풀 애니메이션을 진행하고 그 외 버튼은 게이지를 0으로 초기화
+                isYesSelected = true
+                otherNumberAnimatableValue.animateTo(
+                    targetValue = 0f,
+                    animationSpec = tween(durationMillis = 0)
+                )
+                noAnimatableValue.animateTo(
+                    targetValue = 0f,
+                    animationSpec = tween(durationMillis = 0)
+                )
+                yesAnimationResult = yesAnimatableValue.animateTo(
+                    targetValue = 1f,
+                    animationSpec = tween(durationMillis = 700)
+                )
             }
-            VRProcessingResult.No -> {
-                scope.launch {
-                    isNoSelected = true
-                    noAnimationResult = noAnimatableValue.animateTo(
-                        targetValue = 1f,
-                        animationSpec = tween(durationMillis = 700)
-                    )
-                    isNoSelected = false
-                }
+            VRProcessingResult.No -> { // No 버튼 게이지만 풀 애니메이션을 진행하고 그 외 버튼은 게이지를 0으로 초기화
+                isNoSelected = true
+                yesAnimatableValue.animateTo(
+                    targetValue = 0f,
+                    animationSpec = tween(durationMillis = 0)
+                )
+                otherNumberAnimatableValue.animateTo(
+                    targetValue = 0f,
+                    animationSpec = tween(durationMillis = 0)
+                )
+                noAnimationResult = noAnimatableValue.animateTo(
+                    targetValue = 1f,
+                    animationSpec = tween(durationMillis = 700)
+                )
+                isNoSelected = false
             }
-            VRProcessingResult.OtherNumber -> {
+            VRProcessingResult.OtherNumber -> { // OtherNumber 버튼 게이지만 풀 애니메이션을 진행하고 그 외 버튼은 게이지를 0으로 초기화
                 isOtherNumberSelected = true
+                yesAnimatableValue.animateTo(
+                    targetValue = 0f,
+                    animationSpec = tween(durationMillis = 0)
+                )
+                noAnimatableValue.animateTo(
+                    targetValue = 0f,
+                    animationSpec = tween(durationMillis = 0)
+                )
                 otherNumberAnimationResult = otherNumberAnimatableValue.animateTo(
                     targetValue = 1f,
                     animationSpec = tween(durationMillis = 700)
@@ -323,10 +349,11 @@ fun CallYesNoScreen(
      * 화면에 처음 들어왔을 때 자동으로 yes 애니메이션 게이지가 차오르게 하는 코드
      */
     LaunchedEffect(Unit) {
+        Log.d("@@ 한번만 실행해야해", "yes 버튼 게이지 최초 실행")
         isYesSelected = true
         yesAnimationResult = yesAnimatableValue.animateTo(
             targetValue = 1f,
-            animationSpec = tween(durationMillis = 5000) // 여기에 duration을 설정
+            animationSpec = tween(durationMillis = 5000)
         )
     }
     /**
@@ -336,6 +363,7 @@ fun CallYesNoScreen(
         when (yesAnimationResult?.endReason) {
             AnimationEndReason.Finished -> {
                 // 애니메이션이 성공적으로 완료되었을 때 실행할 로직
+                Log.d("@@ Yes 게이지 끝", "yes yes")
                 onYesButton(domainUiState.detailData.number)
             }
 
@@ -353,6 +381,7 @@ fun CallYesNoScreen(
     LaunchedEffect(noAnimationResult) {
         when (noAnimationResult?.endReason) {
             AnimationEndReason.Finished -> {
+                Log.d("@@ No 게이지 끝", "No No")
                 // 애니메이션이 성공적으로 완료되었을 때 실행할 로직
                 onBackButton()
             }
@@ -372,6 +401,7 @@ fun CallYesNoScreen(
     LaunchedEffect(otherNumberAnimationResult) {
         when (otherNumberAnimationResult?.endReason) {
             AnimationEndReason.Finished -> {
+                Log.d("@@ OtherNumber 게이지 끝", "OtherNumber OtherNumber")
                 onOtherNumberButtonClick() // domainUiState.detailData를 이용하여 onOtherNameButtonClick()를 발생시킨다.(이 로직은 CallViewModel로부터 가지고 와서 사용함)
                 /**
                  * 위의 onOtherNameButtonClick()을 통해 카테고리를 여러개 가진 번호가,
@@ -482,6 +512,14 @@ fun CallYesNoScreen(
                                  * 직접 Yes 버튼 클릭 제어
                                  */
                                 isYesSelected = true
+                                otherNumberAnimatableValue.animateTo(
+                                    targetValue = 0f,
+                                    animationSpec = tween(durationMillis = 0)
+                                )
+                                noAnimatableValue.animateTo(
+                                    targetValue = 0f,
+                                    animationSpec = tween(durationMillis = 0)
+                                )
                                 yesAnimationResult = yesAnimatableValue.animateTo(
                                     targetValue = 1f,
                                     animationSpec = tween(durationMillis = 700)
@@ -529,10 +567,19 @@ fun CallYesNoScreen(
                                  * 직접 No 버튼 클릭 제어
                                  */
                                 isNoSelected = true
+                                yesAnimatableValue.animateTo(
+                                    targetValue = 0f,
+                                    animationSpec = tween(durationMillis = 0)
+                                )
+                                otherNumberAnimatableValue.animateTo(
+                                    targetValue = 0f,
+                                    animationSpec = tween(durationMillis = 0)
+                                )
                                 noAnimationResult = noAnimatableValue.animateTo(
                                     targetValue = 1f,
                                     animationSpec = tween(durationMillis = 700)
                                 )
+                                isNoSelected = false
                             }
                         },
                         modifier = Modifier
@@ -576,6 +623,14 @@ fun CallYesNoScreen(
                              * 직접 OtherNumber 버튼 클릭 제어
                              */
                             isOtherNumberSelected = true
+                            yesAnimatableValue.animateTo(
+                                targetValue = 0f,
+                                animationSpec = tween(durationMillis = 0)
+                            )
+                            noAnimatableValue.animateTo(
+                                targetValue = 0f,
+                                animationSpec = tween(durationMillis = 0)
+                            )
                             otherNumberAnimationResult = otherNumberAnimatableValue.animateTo(
                                 targetValue = 1f,
                                 animationSpec = tween(durationMillis = 700)
