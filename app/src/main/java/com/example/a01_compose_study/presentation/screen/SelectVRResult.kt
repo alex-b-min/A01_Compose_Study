@@ -17,4 +17,5 @@ sealed class SelectVRResult {
     object ChangeMessage: SelectVRResult()
     object ScrollIndexResult : SelectVRResult()
     object None : SelectVRResult()
+
 }

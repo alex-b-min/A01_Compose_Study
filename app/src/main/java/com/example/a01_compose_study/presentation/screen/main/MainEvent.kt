@@ -1,6 +1,7 @@
 package com.example.a01_compose_study.presentation.screen.main
 
 import com.example.a01_compose_study.data.custom.MWContext
+import com.example.a01_compose_study.data.custom.sendMsg.ScreenData
 import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.util.ScreenSizeType
@@ -23,6 +24,7 @@ sealed class MainEvent() {
         val data: Any,
         val isError: Boolean,
         val screenSizeType: ScreenSizeType,
+        val screenData: ScreenData = ScreenData.PUSH
     ) : MainEvent()
 
     data class ChangeDomainWindowSizeEvent(

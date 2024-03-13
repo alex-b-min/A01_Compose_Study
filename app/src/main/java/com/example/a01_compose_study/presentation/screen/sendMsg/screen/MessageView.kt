@@ -25,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,6 +42,10 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintSet
 import com.example.a01_compose_study.R
 import com.example.a01_compose_study.presentation.components.clickableWithTapGestures
+import com.example.a01_compose_study.presentation.data.UiState
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -86,7 +91,7 @@ fun ContactInfoView(
 
         constrain(name) {
             start.linkTo(parent.start, 50.dp)
-            top.linkTo(parent.top, 35.dp)
+            top.linkTo(parent.top)
         }
         constrain(phoneNum) {
             start.linkTo(parent.start, 50.dp)
@@ -152,7 +157,7 @@ fun MsgTextField(
     ) {
         if (isSayMessage) {
             Text(
-                text = "Say the Message",
+                text = "Say the Message.",
                 modifier = Modifier.align(Alignment.Center),
                 maxLines = 3,
                 color = Color.White,
@@ -177,6 +182,7 @@ fun MessageButton(
     onClick: () -> Unit,
     isVrInput: Boolean = false
 ) {
+    val scope = rememberCoroutineScope()
     var clicked by remember { mutableStateOf(false) }
     val progress by animateFloatAsState(
         if (clicked) 1f else 0f,
@@ -186,6 +192,7 @@ fun MessageButton(
     if (isVrInput) {
         clicked = true
         onClick()
+        UiState._isVrInput.update { false }
     }
 
     Button(
@@ -199,14 +206,21 @@ fun MessageButton(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 50.dp)
-            .height(45.dp),
+            .height(50.dp),
         contentPadding = PaddingValues(0.dp)
     ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .clickableWithTapGestures(
-                    onClick = { clicked = true }
+                    onClick = {
+                        scope.launch {
+                            delay(3000)
+                            onClick()
+                        }
+                        clicked = true
+
+                    }
                 )
         ) {
             LinearProgressIndicator(
@@ -217,7 +231,7 @@ fun MessageButton(
                 color = colorResource(id = R.color.confirm_btn_bg_color)
             )
             Text(
-                text = if (isSayMessage) "NO" else "YES",
+                text = if (isSayMessage) "No" else "Yes",
                 style = MaterialTheme.typography.button,
                 textAlign = TextAlign.Center,
                 color = Color.White,

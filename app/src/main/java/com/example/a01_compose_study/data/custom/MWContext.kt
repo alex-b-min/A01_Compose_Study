@@ -103,7 +103,6 @@ class MWContext(
                         it?.type = ParseDomainType.SEND_MESSAGE
                         it?.dialogueMode = DialogueMode.SEND_MESSAGE
                         it?.selectVRResult = SelectVRResult.SendMsgResult
-                        Log.d("sub","${it?.selectVRResult}")
                     }
             }
 
@@ -113,7 +112,6 @@ class MWContext(
                         it?.type = ParseDomainType.SEND_MESSAGE
                         it?.dialogueMode = DialogueMode.SEND_MESSAGE
                         it?.selectVRResult = SelectVRResult.SendMsgNameResult
-                        Log.d("sub","${it?.selectVRResult}")
                     }
             }
 
@@ -123,7 +121,6 @@ class MWContext(
                         it?.type = ParseDomainType.SEND_MESSAGE
                         it?.dialogueMode = DialogueMode.SEND_MESSAGE
                         it?.selectVRResult = SelectVRResult.SendMsgNameMsgResult
-                        Log.d("sub","${it?.selectVRResult}")
                     }
             }
 

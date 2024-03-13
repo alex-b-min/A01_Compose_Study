@@ -2,18 +2,15 @@ package com.example.a01_compose_study.presentation.screen.main
 
 import android.app.Application
 import android.util.Log
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.a01_compose_study.data.Contact
 import com.example.a01_compose_study.data.HVRError
 import com.example.a01_compose_study.data.custom.MWContext
 import com.example.a01_compose_study.data.custom.SealedParsedData
 import com.example.a01_compose_study.data.custom.call.ProcCallData
+import com.example.a01_compose_study.data.custom.sendMsg.ScreenData
 import com.example.a01_compose_study.data.custom.sendMsg.SendMsgDataType
-import com.example.a01_compose_study.data.custom.sendMsg.SendMsgEvent
 import com.example.a01_compose_study.domain.model.HelpItemData
 import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.domain.model.SealedDomainType
@@ -204,6 +201,7 @@ class MainViewModel @Inject constructor(
                                     "sendMsg",
                                     "ProcSendMsgData.SendMsgData - data: ${sealedParsedData.procSendMsgData.data}"
                                 )
+                                Log.d("sendMsg", "MVM SealedParsedData.msgData: {${sealedParsedData.procSendMsgData.data.msgData?.msg}}")
                                 UiState.onVREvent(
                                     VREvent.ChangeVRUIEvent(
                                         VRUiState.PttLoading(
@@ -219,6 +217,7 @@ class MainViewModel @Inject constructor(
                                         mwContext = sealedParsedData.procSendMsgData.mwContext,
                                         data = sealedParsedData.procSendMsgData.data,
                                         isError = false,
+                                        screenData = sealedParsedData.procSendMsgData.data.screenData,
                                         screenSizeType = ScreenSizeType.Large
                                     )
                                 )
@@ -258,14 +257,6 @@ class MainViewModel @Inject constructor(
                                     "ProcSendMsgData.SendMsgData - data: ${sealedParsedData.procSendMsgData.data}"
                                 )
                                 onDomainEvent(
-//                                    event = MainEvent.OpenDomainWindowEvent(
-//                                        domainType = sealedParsedData.procSendMsgData.domainType,
-//                                        screenType = sealedParsedData.procSendMsgData.screenType,
-//                                        mwContext = sealedParsedData.procSendMsgData.mwContext,
-//                                        data = sealedParsedData.procSendMsgData.data.notice,
-//                                        isError = false,
-//                                        screenSizeType = ScreenSizeType.Large
-//                                    )
                                     event = MainEvent.SendDataEvent(
                                         domainType = SealedDomainType.SendMessage,
                                         screenType = sealedParsedData.procSendMsgData.screenType,
@@ -356,7 +347,8 @@ class MainViewModel @Inject constructor(
 
                         SealedDomainType.SendMessage -> {
                             val eventData = event.data as SendMsgDataType.SendMsgData
-                            Log.d("sendMsg", "contactList: {${eventData.contacts}}")
+                            Log.d("sendMsg", "MVM contactList: {${eventData.contacts}}")
+                            Log.d("sendMsg", "MVM eventData.msgData: {${eventData.msgData?.msg}}")
                             DomainUiState.SendMessageWindow(
                                 domainType = event.domainType,
                                 screenType = event.screenType,
@@ -394,7 +386,8 @@ class MainViewModel @Inject constructor(
                     }
                     domainUiState
                 }
-                UiState.pushUiState(Pair(domainUiState.value, mwContext.value))
+                if (event.screenData != ScreenData.CHANGE)
+                    UiState.pushUiState(Pair(domainUiState.value, mwContext.value))
             }
 
             is MainEvent.ChangeScrollIndexEvent -> {
@@ -420,6 +413,7 @@ class MainViewModel @Inject constructor(
                             Log.d("sendMsg", "emit 함")
                         }
                     }
+
                     else -> {
 
                     }

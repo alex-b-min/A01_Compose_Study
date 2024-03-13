@@ -13,6 +13,7 @@ import com.example.a01_compose_study.presentation.data.UiState._isVrInput
 import com.example.a01_compose_study.presentation.data.UiState._mwContext
 import com.example.a01_compose_study.presentation.data.UiState.handleScreenData
 import com.example.a01_compose_study.presentation.data.UiState.popUiState
+import com.example.a01_compose_study.presentation.screen.main.DomainUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -40,31 +41,28 @@ class SendMsgViewModel @Inject constructor(
 
     fun onSendMsgEvent(event: SendMsgEvent) {
         when (event) {
-            // 카테고리 여러개인지 확인 로직
             is SendMsgEvent.MsgAllListItemOnClick -> {
-                // TODO sendMsgModel 받아오는 로직
                 Log.e("sendMsg", "onSendMsgEvent MsgAllListItemOnClick 안")
                 val sendMsgModel = SendMsgModel("")
                 sendMsgModel.getContactItems().add(event.selectedSendMsgItem)
                 val bundle = sendMsgManager.handleCategory(
-                    sendMsgModel = sendMsgModel,
-                    contactId = event.selectedSendMsgItem.contact_id
+                    sendMsgModel = sendMsgModel, contactId = event.selectedSendMsgItem.contact_id
                 )
                 job.launch {
                     UiState._sealedParsedData.emit(SealedParsedData.SendMsgData(bundle))
                 }
+
             }
 
             is SendMsgEvent.SelectNameListItemOnClick -> {
-                // TODO sendMsgModel 받아오는 로직
-                //카테고리 여러개인지 매니저 로직 (위와 동일)
                 Log.e("sendMsg", "아이템 clickEvent 실행}")
                 val sendMsgModel = SendMsgModel("")
                 sendMsgModel.getContactItems().add(event.selectedSendMsgItem)
-                sendMsgModel.messageValue = "hello"
+                sendMsgModel.messageValue =
+                    (_domainUiState.value as DomainUiState.SendMessageWindow).msgData?.msg ?: ""
+
                 val bundle = sendMsgManager.handleCategory(
-                    sendMsgModel = sendMsgModel,
-                    contactId = event.selectedSendMsgItem.contact_id
+                    sendMsgModel = sendMsgModel, contactId = event.selectedSendMsgItem.contact_id
                 )
                 job.launch {
                     UiState._sealedParsedData.emit(SealedParsedData.SendMsgData(bundle))
@@ -73,10 +71,10 @@ class SendMsgViewModel @Inject constructor(
 
             is SendMsgEvent.SelectCategoryListItemOnClick -> {
                 // TODO sendMsgModel 받아오는 로직
-                // 메세지 유무에 따라 화면 전환
                 val sendMsgModel = SendMsgModel("")
                 sendMsgModel.getContactItems().add(event.selectedSendMsgItem)
-                sendMsgModel.messageValue = "hello"
+                sendMsgModel.messageValue =
+                    (_domainUiState.value as DomainUiState.SendMessageWindow).msgData?.msg ?: ""
                 val bundle = sendMsgManager.handleMsgExistence(sendMsgModel)
 
                 job.launch {
@@ -132,8 +130,7 @@ class SendMsgViewModel @Inject constructor(
                 val screenData = data as? ScreenData
                 if (screenData != null) {
                     handleScreenData(
-                        screenData,
-                        Pair(UiState._domainUiState.value, _mwContext.value)
+                        screenData, Pair(UiState._domainUiState.value, _mwContext.value)
                     )
                 }
             }
