@@ -41,6 +41,7 @@ class SendMsgManager @Inject constructor(
     private var messageValue = MutableStateFlow("")
     private var isCategoryListScreen = MutableStateFlow(false)
     private var firstRecogMessage = MutableStateFlow(false)
+    private var firstCheckName = MutableStateFlow(true)
     private var changeMsgInitiated: Boolean = false
     override fun onReceiveBundle(bundle: ParseBundle<out Any>) {
         job.launch {
@@ -109,6 +110,7 @@ class SendMsgManager @Inject constructor(
 
 
     private fun procSendMsgIntention(realBundle: ParseBundle<out Any?>): ProcSendMsgData {
+        initSendMsgValue()
         Log.d("sendMsg", "procSendMsgIntention 안")
         Log.e("sendMsg", "procSendMsgIntention :${realBundle.selectVRResult}" )
 
@@ -128,8 +130,6 @@ class SendMsgManager @Inject constructor(
         // 기존 코드
 //        val sendMsgModel = bundle.model as? SendMsgModel
         val sendMsgModel = bundle as? SendMsgModel
-
-        initSendMsgValue()
 
 //        val errorNotice = contactsManager.preConditionCheck(DomainType.SendMessage)
         val errorNotice: NoticeModel? = null
@@ -157,8 +157,9 @@ class SendMsgManager @Inject constructor(
             }
 
             if (sendMsgModel.items.isEmpty()) {
-
-//                sendMsgContactList = contactsManager.makePhoneBookContactList()
+                // Send Message <Name, Msg> 발화 시 없는 이름인 경우
+                // 이름을 다시 발화하면서 procSendMsgIntention이 메세지 유지를 위한 분기 처리
+                if (firstRecogMessage.value) firstCheckName.value = false
                 sendMsgContactList = fetchAllContacts()
                 return ProcSendMsgData(
                     screenType = ScreenType.MessageAllList,
@@ -556,19 +557,21 @@ private fun handlePopIntention(): ProcSendMsgData {
     }
 
     private fun initSendMsgValue() {
-        CustomLogger.i("initSendMsgValue")
+        Log.e("sendMsg","initSendMsgValue")
         selectedPhonebookItem = null
         sendMsgContactList = mutableListOf()
         // PTT에서 시나리오를 처음 탔을 경우만 초기화 시키려고 사용
         // Send Message <Name, Msg> 발화 시 없는 이름인 경우 이름을 다시 발화하면서 procSendMsgIntention이 탐
         // initSendMsgValue를 타면서 messageValue 초기화도 시켜버림
         // screenDeque를 보고 시나리오가 처음 시작된 경우만 messageValue 초기화
-        if (UiState._domainUiStateStack.isEmpty()) {
+
+        if (firstCheckName.value){
             messageClear()
             Log.e("sendMsg","initSendMsgValue -messageClear()")
-
             firstRecogMessage.value = false
         }
+
+
         isCategoryListScreen.value = false
     }
 
