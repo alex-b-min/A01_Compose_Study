@@ -56,7 +56,13 @@ class SendMsgViewModel @Inject constructor(
             is SendMsgEvent.SelectNameListItemOnClick -> {
                 Log.e("sendMsg", "아이템 clickEvent 실행}")
                 val sendMsgModel = SendMsgModel("")
-                sendMsgModel.getContactItems().add(event.selectedSendMsgItem)
+                val allList = sendMsgManager.fetchAllContacts()
+
+                for (item in allList) {
+                    if ( item.contact_id == event.selectedSendMsgItem.contact_id) {
+                        sendMsgModel.getContactItems().add(item)
+                    }
+                }
                 sendMsgModel.messageValue =
                     (_domainUiState.value as DomainUiState.SendMessageWindow).msgData?.msg ?: ""
 

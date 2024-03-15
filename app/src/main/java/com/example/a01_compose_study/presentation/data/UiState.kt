@@ -1,11 +1,13 @@
 package com.example.a01_compose_study.presentation.data
 
 import android.util.Log
+import com.example.a01_compose_study.data.DialogueMode
 import com.example.a01_compose_study.data.custom.MWContext
 import com.example.a01_compose_study.data.custom.SealedParsedData
 import com.example.a01_compose_study.data.custom.sendMsg.ScreenData
 import com.example.a01_compose_study.domain.model.ScreenType
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
+import com.example.a01_compose_study.presentation.screen.main.MainEvent
 import com.example.a01_compose_study.presentation.screen.main.VREvent
 import com.example.a01_compose_study.presentation.screen.main.route.VRUiState
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -96,8 +98,42 @@ object UiState {
             ScreenData.PUSH -> domainUiPair?.let { pushUiState(it) }
             ScreenData.POP -> popUiState()
             ScreenData.CHANGE -> domainUiPair?.let { changeUiState(it) }
-            ScreenData.REJECT -> TODO()
+            ScreenData.REJECT -> reject()
             ScreenData.BtPhoneAppRun -> Log.d("sendMsg","requestBtPhoneAppRun")
         }
     }
+
+    fun reject(){
+        mwContext?.let{
+            when(it.value?.dialogueMode) {
+                DialogueMode.LIST -> {
+//                    procListReject(it)
+                    listReject()
+                }
+                else -> {
+//                    procReject(it)
+                    listReject()
+                }
+            }
+        }
+    }
+
+    fun listReject(){
+        mwContext.value!!.rejectCnt++
+        when(mwContext.value!!.rejectCnt) {
+            1 -> {
+
+            }
+
+            2 -> {
+
+            }
+            3 -> {
+                mwContext.value!!.rejectCnt = 0
+                _domainWindowVisible.value = false
+                clearUiState()
+            }
+        }
+    }
+
 }

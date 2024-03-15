@@ -23,9 +23,11 @@ class MWContext(
     var vrState = HVRState.IDLE
     var ttsState = HTextToSpeechState.IDLE
     var promptId = mutableListOf<String>()
+    var rejectCnt = 0
 
     var isSubContext = false
     var contextId = this.hashCode()
+
 
     /**
      * 파싱된 데이터를 하나로 묶기 위한 StateFlow 타입의 sealedParsedData 전역변수

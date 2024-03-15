@@ -47,7 +47,7 @@ fun <T> LazyColumnList(
             isClickable.value = false
         } else {
             isClickable.value = true
-            UiState.isVrActive.value = true 
+            UiState.isVrActive.value = true
         }
     }
 

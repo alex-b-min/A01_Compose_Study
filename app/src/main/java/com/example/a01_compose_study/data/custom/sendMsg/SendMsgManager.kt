@@ -201,6 +201,7 @@ class SendMsgManager @Inject constructor(
 
                     1 -> {
                         val contactId = nameCheckList[0].contact_id
+                        Log.d("sendMsg","sendMsgModel get : ${sendMsgModel.getContactItems()}")
                         return handleCategory(sendMsgModel, contactId)
                     }
                     // 검색된 이름 여러개
@@ -475,6 +476,7 @@ class SendMsgManager @Inject constructor(
         Log.d("sendMsg", "handleCategory 안")
 
         Log.d("sendMsg", "contactId: ${contactId}")
+        Log.d("sendMsg", "sendMsgModel.getContactItems(): ${sendMsgModel.getContactItems()}")
         sendMsgContactList = contactsManager.makeContactList(
             items = sendMsgModel.getContactItems(),
             contactsList = fetchAllContacts(),
@@ -587,7 +589,7 @@ class SendMsgManager @Inject constructor(
         }
     }
 
-    private fun fetchAllContacts(): ArrayList<Contact> {
+    fun fetchAllContacts(): ArrayList<Contact> {
         val result = arrayListOf<Contact>()
         result.add(
             Contact(
@@ -684,42 +686,10 @@ class SendMsgManager @Inject constructor(
             return SendMsgModel("sample intent").apply {
                 enableIndex = true
                 prompt = "Prompt message"
-
-                items.add(
-                    Contact(
-                        id = "1",
-                        name = "문재민",
-                        number = "010-1111-2222",
-                        contact_id = "200",
-                        type = 1
-                    )
-                )
-                items.add(
-                    Contact(
-                        id = "2",
-                        name = "문재민",
-                        number = "010-1111-2223",
-                        contact_id = "200",
-                        type = 2
-                    )
-                )
-                items.add(
-                    Contact(
-                        id = "3",
-                        name = "문재민",
-                        number = "010-1111-2224",
-                        contact_id = "200",
-                        type = 3
-                    )
-                )
-                items.add(
-                    Contact(
-                        id = "3",
-                        name = "문재민",
-                        number = "456-789-0123",
-                        contact_id = "20"
-                    )
-                )
+                items.add(Contact(id = "1", name = "문재민", number = "010-1111-2222", contact_id = "200", type = 1))
+                items.add(Contact(id = "2", name = "문재민", number = "010-1111-2223", contact_id = "200",type = 2))
+                items.add(Contact(id = "3", name = "문재민", number = "010-1111-2224", contact_id = "200", type = 3))
+                items.add(Contact(id = "4", name = "문재민", number = "456-789-0123", contact_id = "20"))
             }
 
         }
