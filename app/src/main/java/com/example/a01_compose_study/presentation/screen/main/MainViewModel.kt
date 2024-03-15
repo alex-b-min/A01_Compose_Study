@@ -349,6 +349,8 @@ class MainViewModel @Inject constructor(
                             val eventData = event.data as SendMsgDataType.SendMsgData
                             Log.d("sendMsg", "MVM contactList: {${eventData.contacts}}")
                             Log.d("sendMsg", "MVM eventData.msgData: {${eventData.msgData?.msg}}")
+                            UiState.isVrActive.value = true
+                            Log.d("isVrActive", "MVM.OpenDomainWindowEvent")
                             DomainUiState.SendMessageWindow(
                                 domainType = event.domainType,
                                 screenType = event.screenType,
@@ -398,19 +400,12 @@ class MainViewModel @Inject constructor(
             }
 
             is MainEvent.SendDataEvent -> {
-//                val sendMsgViewModel: SendMsgViewModel by lazy {
-//                    ViewModelProvider.AndroidViewModelFactory.getInstance(application)
-//                        .create(SendMsgViewModel::class.java)
-//                }
-
                 when (event.domainType) {
                     is SealedDomainType.SendMessage -> {
-                        val sendMsgViewModel: SendMsgViewModel
-                        Log.d("sendMsg", "수행 /${event.screenType} ,${event.data}")
-                        Log.d("sendMsg", "_sendMsgData: ${_sendMsgData}")
                         viewModelScope.launch {
                             _sendMsgUiData.emit(event.screenType to event.data)
-                            Log.d("sendMsg", "emit 함")
+                            Log.d("sendMsg", "수행 /${event.screenType} ,${event.data}")
+                            Log.d("sendMsg", "_sendMsgData: ${_sendMsgData}")
                         }
                     }
 

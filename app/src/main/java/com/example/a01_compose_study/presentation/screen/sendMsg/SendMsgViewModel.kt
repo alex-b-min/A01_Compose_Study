@@ -29,7 +29,6 @@ class SendMsgViewModel @Inject constructor(
     val sendMsgManager: SendMsgManager,
 ) : ViewModel() {
     private val _domainUiState = UiState._domainUiState
-    private val sealedParsedData = UiState.sealedParsedData
 
     private var _lineIndex = MutableStateFlow(0)
     val lineIndex: StateFlow<Int> = _lineIndex

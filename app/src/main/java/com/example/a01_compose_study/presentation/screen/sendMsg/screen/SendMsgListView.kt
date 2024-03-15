@@ -1,5 +1,6 @@
 package com.example.a01_compose_study.presentation.screen.sendMsg.screen
 
+import android.util.Log
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -45,10 +46,11 @@ fun MsgAllList(
 ) {
     LazyColumnList(
         list = contactList,
-        listContent = { index, contact ->
+        listContent = { index, contact, isClickable ->
             MsgAllListItem(
                 contact = contact,
-                onItemClick = onItemClick
+                onItemClick = onItemClick,
+                isClickable = isClickable
 
             )
         })
@@ -64,14 +66,16 @@ fun MsgNameList(
     LazyColumnList(
         list = contactList,
         index = lineIndex,
-        listContent = { index, contact ->
+        listContent = { index, contact, isClickable ->
             MsgNameListItem(
                 id = index + 1,
                 contact = contact,
                 onItemClick = onItemClick,
-                clickedByVr = index == lineIndex - 1 && isVrInput
+                clickedByVr = index == lineIndex - 1 && isVrInput,
+                isClickable = isClickable
             )
-        })
+        },
+    )
 }
 
 
@@ -85,12 +89,13 @@ fun MsgCategoryList(
     LazyColumnList(
         list = contactList,
         index = lineIndex,
-        listContent = { index, contact ->
+        listContent = { index, contact, isClickable ->
             MsgCategoryListItem(
                 id = index + 1,
                 contact = contact,
                 onItemClick = onItemClick,
-                clickedByVr = index == lineIndex - 1 && isVrInput
+                clickedByVr = index == lineIndex - 1 && isVrInput,
+                isClickable = isClickable
             )
         })
 }
@@ -100,6 +105,8 @@ fun MsgCategoryList(
 fun MsgAllListItem(
     contact: Contact,
     onItemClick: (Contact) -> Unit,
+    isClickable: Boolean
+
 ) {
     val scope = rememberCoroutineScope()
     var isSelected by remember { mutableStateOf(false) }
@@ -134,13 +141,16 @@ fun MsgAllListItem(
         .padding(4.dp)
         .clickableWithTapGestures(
             onClick = {
-                scope.launch {
-                    isSelected = true
-                    delay(3000)
-                    onItemClick(contact)
+                if (isClickable) {
+                    Log.e("isVrActive", "MsgAllListItem - click")
+                    scope.launch {
+                        isSelected = true
+                        delay(3000)
+                        onItemClick(contact)
+                        clicked = true
+                    }
                     clicked = true
                 }
-                clicked = true
             }
         )) {
         ConstraintLayout(constraintSet, modifier = Modifier.fillMaxWidth()) {
@@ -185,6 +195,8 @@ fun MsgNameListItem(
     contact: Contact,
     onItemClick: (Contact) -> Unit,
     clickedByVr: Boolean = false,
+    isClickable: Boolean
+
 ) {
     val scope = rememberCoroutineScope()
     var isSelected by remember { mutableStateOf(false) }
@@ -237,13 +249,15 @@ fun MsgNameListItem(
             .fillMaxWidth()
             .clickableWithTapGestures(
                 onClick = {
-                    scope.launch {
-                        isSelected = true
-                        delay(3000)
-                        onItemClick(contact)
+                    if (isClickable) {
+                        scope.launch {
+                            isSelected = true
+                            delay(3000)
+                            onItemClick(contact)
+                            clicked = true
+                        }
                         clicked = true
                     }
-                    clicked = true
                 }
             )
     ) {
@@ -294,6 +308,7 @@ fun MsgCategoryListItem(
     contact: Contact,
     onItemClick: (Contact) -> Unit,
     clickedByVr: Boolean = false,
+    isClickable: Boolean
 ) {
     val scope = rememberCoroutineScope()
     var isSelected by remember { mutableStateOf(false) }
@@ -340,12 +355,14 @@ fun MsgCategoryListItem(
             .fillMaxWidth()
             .clickableWithTapGestures(
                 onClick = {
-                    scope.launch {
-                        isSelected = true
-                        delay(3000)
-                        onItemClick(contact)
+                    if (isClickable) {
+                        scope.launch {
+                            isSelected = true
+                            delay(3000)
+                            onItemClick(contact)
+                        }
+                        clicked = true
                     }
-                    clicked = true
                 }
             )
     ) {

@@ -70,6 +70,7 @@ class BtCall @Inject constructor(
 
     // 1001(Call Log), 1003(Contact), 1004(Dial), 1005(Message)
     fun requestBtPhoneAppRun(tabId: Int) {
+        Log.d("sendMsg","requestBtPhoneAppRun")
 //        try {
 //            Intent(ReceiveAction.ACTION_PBV_REQUEST_BTPHONE_OPEN.action).apply {
 //                when (BuildConfig.INSTALL_TYPE) {

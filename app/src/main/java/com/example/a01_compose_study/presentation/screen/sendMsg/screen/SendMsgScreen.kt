@@ -34,7 +34,6 @@ fun SendMsgScreen(
             .clip(RoundedCornerShape(10.dp))
     ) {
         Column {
-            Log.d("sendMsg", "TopAppBarContent")
             TopAppBarContent(
                 showNavigationIcon = false,
                 onActionIconClick = { viewModel.onSendMsgEvent(SendMsgEvent.OnBack) }

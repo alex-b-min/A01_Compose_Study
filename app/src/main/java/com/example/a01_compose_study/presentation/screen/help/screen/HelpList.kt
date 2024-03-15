@@ -73,7 +73,7 @@ fun HelpList(
 @Composable
 fun HelpDetailList(helpItemData: HelpItemData) {
     LazyColumnList(list = helpItemData.commandsDetail,
-        listContent = { index, commandDeatail ->
+        listContent = { index, commandDeatail, isClickable ->
         HelpDetailListItem(
             commandDetail = commandDeatail
         )

@@ -72,9 +72,9 @@ fun MainRoute(
                 .clickableWithTapGestures(),
             contentAlignment = Alignment.BottomCenter
         ) {
-            Log.d("sendMsg", "handler isVrActive.value: ${isVrActive}")
 
             if (isVrActive) VrUiAnimationHandler(vrUiState)
+            Log.d("isVrActive", "mainRoute - handler isVrActive.value: ${isVrActive}")
 
             when (domainUiState) {
                 is DomainUiState.NoneWindow -> {
