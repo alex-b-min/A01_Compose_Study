@@ -125,7 +125,8 @@ class MainViewModel @Inject constructor(
                     /**
                      * MainViewModel이 collect 하는 정보는 reject,tts요청, CallScreen를 처음 띄우기 위한 값만을 collect한다.
                      * CallViewModel은 CallScreen이 띄워진 후 구체적인 로직을 위한 값들을 collect 한다.
-                     * *참고: CallViewModel은 CallScreen이 띄워진 상태에서만 생성된다.
+                     * [참고] CallViewModel은 CallScreen이 띄워진 상태에서만 생성되기 때문에..
+                     * ==> 이유는 DomainUiState의 값이 CallWindow로 변경이 되면서 CallScreen이 들어갔을 때 생성이 되기 때문이다.
                      */
                     is SealedParsedData.CallData -> {
                         when (sealedParsedData.procCallData) {
@@ -141,6 +142,10 @@ class MainViewModel @Inject constructor(
                                 Log.d("@@ ProcCallData", "NoticeTTSRequest - Notice Model: ${sealedParsedData.procCallData.noticeModel}")
                             }
 
+                            /**
+                             * 인식된 이름과 매칭되는 연락처가 1개인 경우
+                             * ==> YesNoOtherNumber 화면을 표시
+                             */
                             is ProcCallData.ProcCallNameScreen -> {
                                 Log.d("@@ ProcCallData", "ProcCallNameScreen - Contact: ${sealedParsedData.procCallData.data}")
                                 onDomainEvent(
@@ -165,6 +170,10 @@ class MainViewModel @Inject constructor(
                                 )
                             }
 
+                            /**
+                             * 인식된 이름과 매칭되는 연락처가 2개 이상인 경우
+                             * ==> index가 존재하는 List 화면을 표시
+                             */
                             is ProcCallData.RecognizedContactListScreen -> {
                                 Log.d("@@ ProcCallData", "ContactListScreen - Contact List: ${sealedParsedData.procCallData.data}")
                                 onDomainEvent(
@@ -189,6 +198,10 @@ class MainViewModel @Inject constructor(
                                 )
                             }
 
+                            /**
+                             * 인식된 이름과 매칭되는 연락처가 없는 경우
+                             * ==> 연락처 목록에서 상위 20개 항목만을 보여주는 List 화면을 표시
+                             */
                             is ProcCallData.AllContactListScreen -> {
                                 Log.d("@@ ProcCallData", "FullContactListScreen - Full Contact List: ${sealedParsedData.procCallData.data}")
                                 onDomainEvent(
@@ -333,7 +346,8 @@ class MainViewModel @Inject constructor(
                                     domainType = event.domainType,
                                     screenType = event.screenType,
                                     screenSizeType = event.screenSizeType,
-                                    detailData = contactDetail
+                                    detailData = contactDetail,
+                                    isContactIdUnique = true
                                 )
                             } else {
                                 DomainUiState.CallWindow(

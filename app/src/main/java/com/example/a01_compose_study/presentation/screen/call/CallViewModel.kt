@@ -31,8 +31,8 @@ class CallViewModel @Inject constructor(
     val domainUiState: StateFlow<DomainUiState> = UiState._domainUiState
 
     // CallYesNo 화면에서 발생하는 Yes, No, OtherNumber 클릭 이벤트를 관리하는 MutableStateFlow
-    private val _callYesNoEventState = MutableStateFlow<CallYesNoEvent>(CallYesNoEvent.None)
-    val callYesNoEventState: StateFlow<CallYesNoEvent> = _callYesNoEventState
+    private val _callYesNoOtherNumberEventState = MutableStateFlow<CallYesNoOtherNumberEvent>(CallYesNoOtherNumberEvent.None)
+    val callYesNoOtherNumberEventState: StateFlow<CallYesNoOtherNumberEvent> = _callYesNoOtherNumberEventState
 
     // CallList 화면에서 발생하는 Click 이벤트를 관리하는 MutableStateFlow
     private val _callListEventState = MutableStateFlow<CallListEvent>(CallListEvent.None)
@@ -42,13 +42,40 @@ class CallViewModel @Inject constructor(
         viewModelScope.launch {
             sealedParsedData.collect { sealedParsedData -> // Call 데이터 수집
                 if (sealedParsedData is SealedParsedData.CallData) {
-                    handleCallData(sealedParsedData.procCallData) //Call 데이터 처리
+                    handleCallData(sealedParsedData.procCallData) // Call 데이터 처리
                 }
             }
         }
     }
 
-    // 사용자 이벤트에 대한 처리를 담당하는 함수
+    /**
+     * CallManager로부터 데이터를 받아 각 상황에 맞게 처리하는 함수
+     */
+    private fun handleCallData(procCallData: ProcCallData) {
+        when (procCallData) {
+            /**
+             * ScrollIndex를 받아 처리함
+             */
+            is ProcCallData.ScrollIndex -> handleScrollIndex(procCallData)
+            /**
+             * Yes 결과를 받아 실제 Yes 버튼을 클릭 했을 시의 로직을 처리함
+             */
+            is ProcCallData.ProcYesResult -> updateCallYesNoOtherNumberEventState(procCallData, CallYesNoOtherNumberEvent.Yes)
+            /**
+             * No 결과를 받아 실제 Yes 버튼을 클릭 했을 시의 로직을 처리함
+             */
+            is ProcCallData.ProcNoResult -> updateCallYesNoOtherNumberEventState(procCallData, CallYesNoOtherNumberEvent.No)
+            /**
+             * OtherNumber 결과를 받아 실제 Yes 버튼을 클릭 했을 시의 로직을 처리함
+             */
+            is ProcCallData.ProcOtherNumberResult -> updateCallYesNoOtherNumberEventState(procCallData, CallYesNoOtherNumberEvent.OtherNumber)
+            else -> {}
+        }
+    }
+
+    /**
+     * 사용자 버튼 클릭 시의 이벤트에 대한 처리를 담당하는 함수
+     */
     fun onCallEvent(event: CallEvent) {
         when (event) {
             is CallEvent.CloseButtonClick -> UiState.closeDomainWindow()
@@ -57,83 +84,97 @@ class CallViewModel @Inject constructor(
             is CallEvent.OnYesButtonClick -> onCallBusinessEvent(CallBusinessEvent.Calling(event.phoneNumber))
             is CallEvent.OnOtherNumberButtonClick -> handleOtherNumberButtonClick()
         }
-        clearCallYesNoEventState() // CallYesNo Event 결과 초기화
+        /**
+         * 아래는 이벤트가 발생했다면 해당 이벤트를 계속 유지하지 않고 초기화 주는 코드
+         */
+        clearCallYesNoOtherNumberEventState() // CallYesNo Event 결과 초기화
         clearCallListEventState() // CallList Event 결과 초기화
     }
 
-    // Call 데이터를 처리하는 함수
-    private fun handleCallData(procCallData: ProcCallData) {
-        when (procCallData) {
-            is ProcCallData.ScrollIndex -> handleScrollIndex(procCallData)
-            is ProcCallData.ProcYesResult -> handleProcResult(procCallData, CallYesNoEvent.Yes)
-            is ProcCallData.ProcNoResult -> handleProcResult(procCallData, CallYesNoEvent.No)
-            is ProcCallData.ProcOtherNumberResult -> handleProcResult(procCallData, CallYesNoEvent.OtherNumber)
-
-            else -> {}
-        }
-    }
-
-    // 스크롤 인덱스 처리 함수
+    /**
+     * 스크롤 인덱스 처리 함수
+     */
     private fun handleScrollIndex(procCallData: ProcCallData.ScrollIndex) {
         val voiceRecognitionIndex = procCallData.index
         domainUiState.value.let { currDomainUiState ->
             val currCallModel = currDomainUiState as? DomainUiState.CallWindow
             currCallModel?.let { callModel ->
                 val currentCallWindowContactListLastIndex = callModel.data?.lastIndex ?: 0
-                // 음성 인식 인덱스가 현재 UI에 표시된 마지막 인덱스보다 크면 TTS 요청
+
+                /**
+                 * 음성 인식 결과인 index가 현재 스크린을 구성하는 List의 인덱스보다 큰 경우 (이동 불가능한 경우)
+                 * ==> "몇 번째 연락처를 선택할까요?" TTS 요청
+                 */
                 if (currentCallWindowContactListLastIndex < voiceRecognitionIndex) {
                     requestTTs(promptId = "PID_CMN_COMM_02_31") {
                         pttManager.vrmwManager.resumeVR()
                     }
+                    /**
+                     * 음성 인식 결과인 index가 현재 스크린을 구성하는 List의 인덱스보다 작은 경우 (이동 가능한 경우)
+                     * ==>  음성 인식 결과인 index의 위치로 스크롤 이동
+                     */
                 } else {
-                    // 스크롤 인덱스 업데이트
-                    updateUiStateWithScrollIndex(procCallData)
+                    updateUiStateWithScrollIndex(procCallData) // 스크롤 인덱스 업데이트
                 }
             }
         }
     }
 
-    // VR 처리 결과를 핸들링하는 함수, vrProcessingResult 값에 따라 클릭 이벤트(Yes, No, OtherNumber)가 발생됨.
-    private fun handleProcResult(procCallData: ProcCallData, callYesNoEvent: CallYesNoEvent) {
-        _callYesNoEventState.update {
-            replaceTopUiStateMwContext(domainUiState.value, procCallData.mwContext)
-            callYesNoEvent
+    /**
+     * Yes/No Other Number (클릭이 되었는지) 이벤트 상태를 업데이트 하는 함수
+     */
+    private fun updateCallYesNoOtherNumberEventState(procCallData: ProcCallData, callYesNoOtherNumberEvent: CallYesNoOtherNumberEvent) {
+        _callYesNoOtherNumberEventState.update {
+            replaceTopUiStateMwContext(domainUiState.value, procCallData.mwContext) //현재 스택의 마지막에 쌓여 있는 UI를 유지한 체 MWContext의 값만 교체
+            callYesNoOtherNumberEvent// 인자로 들어온 이벤트 값으로 업데이트
         }
     }
 
-    // 연락처 아이템 클릭 이벤트 처리 함수
+    /**
+     * 연락처 List 화면에서의 아이템 클릭 시 실행 될 상세 로직 함수
+     * ==> 클릭 후 OtherNumber에 따라 YesNo / YesNoOtherNumber 화면으로 이동함
+     */
     private fun handleContactListItemClick(event: CallEvent.ContactListItemOnClick) {
-        val isContactIdUnique = callManager.isContactIdUnique(event.selectedContactItem)
+        val isContactIdUnique = callManager.isContactIdUnique(event.selectedContactItem) //클릭으로 선택된 연락처가 고유한 값인지(OtherNumber가 존재하지 않는지) Boolean 값
+        /**
+         * 선택된 연락처가 고유한 값인지 여부를 현재 UI를 구성하고 있는 DomainUiState.CallWindow에 업데이트
+         */
         _domainUiState.update { currentUiState ->
             val updatedState = (currentUiState as? DomainUiState.CallWindow)?.copy(
                 screenType = ScreenType.CallYesNo,
                 detailData = event.selectedContactItem,
                 isContactIdUnique = isContactIdUnique
             ) ?: currentUiState
-            // 연락처 아이템 클릭 시 UI 상태 업데이트
+            /**
+             * 스택을 관리와 함께 UI 업데이트
+             */
             updateUiStateForContactListItemClick(itemIndex = event.itemIndex, currentUiState = currentUiState, updatedState = updatedState)
             updatedState
         }
     }
 
-    // OtherNumber 버튼 클릭 처리 함수
+    /**
+     * OtherNumber 버튼 클릭 시 살행 될 상세 로직 함수
+     */
     private fun handleOtherNumberButtonClick() {
-        val currentContact = (domainUiState.value as? DomainUiState.CallWindow)?.detailData
-        val matchingContacts = currentContact?.let { callManager.findContactsByContactId(it) }
+        val currentContact = (domainUiState.value as? DomainUiState.CallWindow)?.detailData // 현재 선택된 Contact 정보
+        val matchingContacts = currentContact?.let { callManager.findContactsByContactId(it) } // 현재 선택된 연락처의 contactId와 일치하는 연락처 목록을 전체 연락처에서 비교하여 반환
 
-        if (matchingContacts?.size == 2) { // 일치하는 cotact_id가 2개라면 다른 번호로 교체
+        if (matchingContacts?.size == 2) { // 일치하는 contact_id가 2개라면 다른 번호로 교체
             val differentContact = matchingContacts.find { it.number != currentContact.number }
             differentContact?.let { contact ->
                 updateUiStateForDifferentContact(contact)
             }
-        } else { // 일치하는 cotact_id가 2개가 아니라면(3개 이상) 동일한 contact_id를 가진 연락처 목록을 띄워줌
+        } else { // 일치하는 cotact_id가 2개가 아니라면(3개 이상) 동일한 contact_id를 가진 연락처 목록(Contact List)을 띄워줌
             matchingContacts?.let { contacts ->
                 updateUiStateForMatchingContacts(contacts)
             }
         }
     }
 
-    // 스크롤 인덱스를 새로운 상태로 업데이트하는 함수
+    /**
+     * 음성 인식 결과인 Scroll Index를 받아와 현재 UIState의 scrollIndex 프로퍼티를 업데이트
+     */
     private fun updateUiStateWithScrollIndex(procCallData: ProcCallData.ScrollIndex) {
         viewModelScope.launch {
             UiState._domainUiState.update { domainUiState ->
@@ -141,7 +182,7 @@ class CallViewModel @Inject constructor(
                 /**
                  * domainUiState의 scrollIndex의 값이 null인 경우에만 스택에 추가
                  * null이 아닌 경우에는 기존에 쌓여있던 데이터를 쌓는게 아니라 데이터 교체를 해야하기 때문이다.
-                 * [참고: 데이터 교체는 CallEvent.ContactListItemOnClick 에서 한다.]
+                 * [참고: 데이터 교체는 클릭 이벤트에 대한 로직을 구현하는 CallEvent.ContactListItemOnClick 에서 한다.]
                  */
                 if (domainUiState.scrollIndex == null) {
                     pushUiStateMwContext(
@@ -154,13 +195,22 @@ class CallViewModel @Inject constructor(
                 updatedState
             }
 
+            /**
+             * 스크롤을 업데이트 시키고 클릭 이벤트를 발생
+             */
             _callListEventState.update {
                 CallListEvent.Click
             }
         }
     }
 
-    // 연락처 아이템 클릭 이벤트에 대한 UI 상태 업데이트 함수
+    /**
+     * 연락처 목록에서 항목을 클릭했을 때 UI 상태를 업데이트합니다.
+     *
+     * @param itemIndex 클릭한 항목의 인덱스
+     * @param currentUiState 현재 UI 상태
+     * @param updatedState 업데이트된 UI 상태
+     */
     private fun updateUiStateForContactListItemClick(itemIndex: Int, currentUiState: DomainUiState, updatedState: DomainUiState) {
         /**
          * LineNumber 음성 인식 결과를 collect할 때 바로 index를 업데이트할 수 있지만,
@@ -183,19 +233,23 @@ class CallViewModel @Inject constructor(
         pushUiStateMwContext(updatedState, null)
     }
 
-    // 다른 연락처 정보로 UI 상태 업데이트 함수
+    /**
+     * OtherNumber가 1개인 상황에서, 해당 OtherNumber로 UI를 교체
+     */
     private fun updateUiStateForDifferentContact(differentContact: Contact) {
         _domainUiState.update { domainUiState ->
             val updatedState = (domainUiState as? DomainUiState.CallWindow)?.copy(
                 detailData = differentContact
             ) ?: domainUiState
-            // 스택에 추가하지 않고 마지막 index에 존재하는 데이터와 교체
+            // 스택에 추가하지 않고 스택의 마지막 index에 존재하는 데이터와 교체
             replaceTopUiStateMwContext(newUiStateMwContext = Pair(first = updatedState, second = null))
             updatedState
         }
     }
 
-    // 동일한 연락처 목록으로 UI 상태 업데이트 함수
+    /**
+     * contact_id가 동일한 인덱스가 존재하는 연락처 목록으로 UI 업데이트
+     */
     private fun updateUiStateForMatchingContacts(matchingContacts: List<Contact>) {
         _domainUiState.update { domainUiState ->
             val updatedState = (domainUiState as? DomainUiState.CallWindow)?.copy(
@@ -214,26 +268,36 @@ class CallViewModel @Inject constructor(
         }
     }
 
-    // 전화 비즈니스 이벤트 처리 함수
+    /**
+     * 전화 비즈니스 이벤트(실제 전화) 처리 함수
+     */
     private fun onCallBusinessEvent(event: CallBusinessEvent) {
         when (event) {
             is CallBusinessEvent.Calling -> callManager.makeCall(event.phoneNumber)
         }
     }
 
-    // CallYesNo에서 발생될 이벤트를 관리하는 변수를 None 상태로 초기화 하는 함수
-    // 만약 초기화를 하지 않는다면 어떠한 값으로 계속해서 값을 유지하기에 계속해서 이벤트가 발생될 것이다. 그렇기에 이벤트를 발생시켰다면 초기화를 해줘야함
-    private fun clearCallYesNoEventState() {
-        _callYesNoEventState.update { CallYesNoEvent.None }
+    /**
+     * YesNoOtherNumber 에서 발생될 이벤트를 관리하는 변수를 None 상태로 초기화 하는 함수
+     *  ==> 이벤트 발생 후 만약 초기화를 하지 않는다면 어떠한 값으로 계속해서 값을 유지하기에 계속해서 이벤트가 발생될 것이다.
+     *  ==> 그렇기에 이벤트를 발생시켰다면 초기화를 해줘야함
+     */
+    private fun clearCallYesNoOtherNumberEventState() {
+        _callYesNoOtherNumberEventState.update { CallYesNoOtherNumberEvent.None }
     }
 
-    // CallList에서 발생될 이벤트를 관리하는 변수를 None 상태로 초기화 하는 함수
-    // 만약 초기화를 하지 않는다면 어떠한 값으로 계속해서 값을 유지하기에 계속해서 이벤트가 발생될 것이다. 그렇기에 이벤트를 발생시켰다면 초기화를 해줘야함
+    /**
+     * CallList에서 발생될 이벤트를 관리하는 변수를 None 상태로 초기화 하는 함수
+     *  ==> 이벤트 발생 후 만약 초기화를 하지 않는다면 Click 이벤트로 계속해서 값을 유지하기에 계속해서 이벤트가 발생될 것이다.
+     *  ==> 그렇기에 이벤트를 발생시켰다면 초기화를 해줘야함
+     */
     private fun clearCallListEventState() {
         _callListEventState.update { CallListEvent.None }
     }
 
-    // TTS 요청 함수
+    /**
+     * TTS 요청 함수
+     */
     private fun requestTTs(promptId: String, onCompleted: () -> Unit) {
         pttManager.vrmwManager.requestTTs(
             promptId = listOf(promptId),

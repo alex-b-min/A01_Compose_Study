@@ -61,7 +61,7 @@ import com.example.a01_compose_study.domain.model.SealedDomainType
 import com.example.a01_compose_study.domain.util.ScreenSizeType
 import com.example.a01_compose_study.presentation.components.text.TextView
 import com.example.a01_compose_study.presentation.screen.call.CallEvent
-import com.example.a01_compose_study.presentation.screen.call.CallYesNoEvent
+import com.example.a01_compose_study.presentation.screen.call.CallYesNoOtherNumberEvent
 import com.example.a01_compose_study.presentation.screen.call.CallViewModel
 import com.example.a01_compose_study.presentation.screen.main.DomainUiState
 import com.example.a01_compose_study.presentation.screen.main.route.VRUiState
@@ -76,7 +76,7 @@ fun CallScreen(
     vrDynamicBackground: Color,
     fixedBackground: Color,
 ) {
-    val callYesNoEventState by callViewModel.callYesNoEventState.collectAsStateWithLifecycle()
+    val callYesNoEventState by callViewModel.callYesNoOtherNumberEventState.collectAsStateWithLifecycle()
     val callListEventState by callViewModel.callListEventState.collectAsStateWithLifecycle()
 
     if (domainUiState.screenType is ScreenType.CallList) {
@@ -107,7 +107,7 @@ fun CallScreen(
     } else if (domainUiState.screenType is ScreenType.CallYesNo) {
         CallYesNoScreen(
             domainUiState = domainUiState,
-            callYesNoEvent = callYesNoEventState,
+            callYesNoOtherNumberEvent = callYesNoEventState,
             vrUiState = vrUiState,
             vrDynamicBackground = vrDynamicBackground,
             fixedBackground = fixedBackground,
@@ -255,7 +255,7 @@ fun CallIndexedListWindow(
 @Composable
 fun CallYesNoScreen(
     domainUiState: DomainUiState.CallWindow,
-    callYesNoEvent: CallYesNoEvent,
+    callYesNoOtherNumberEvent: CallYesNoOtherNumberEvent,
     vrUiState: VRUiState,
     vrDynamicBackground: Color,
     fixedBackground: Color,
@@ -294,9 +294,12 @@ fun CallYesNoScreen(
      * 음성인식 결과값(rProcessingResult의 값)에 따라 수행될 로직을 수행함
      * ( 이해하기 쉽게 이 로직과 반대의 개념은 직접 클릭하여 로직 수행하는 것 )
      */
-    LaunchedEffect(callYesNoEvent) {
-        when(callYesNoEvent) {
-            CallYesNoEvent.Yes -> { // Yes 버튼 게이지만 풀 애니메이션을 진행하고 그 외 버튼은 게이지를 0으로 초기화
+    LaunchedEffect(callYesNoOtherNumberEvent) {
+        when(callYesNoOtherNumberEvent) {
+            /**
+             * Yes 버튼 게이지만 풀 애니메이션을 진행하고 그 외 버튼은 게이지를 0으로 초기화
+             */
+            CallYesNoOtherNumberEvent.Yes -> {
                 isYesSelected = true
                 otherNumberAnimatableValue.animateTo(
                     targetValue = 0f,
@@ -311,7 +314,10 @@ fun CallYesNoScreen(
                     animationSpec = tween(durationMillis = 700)
                 )
             }
-            CallYesNoEvent.No -> { // No 버튼 게이지만 풀 애니메이션을 진행하고 그 외 버튼은 게이지를 0으로 초기화
+            /**
+             * No 버튼 게이지만 풀 애니메이션을 진행하고 그 외 버튼은 게이지를 0으로 초기화
+             */
+            CallYesNoOtherNumberEvent.No -> {
                 isNoSelected = true
                 yesAnimatableValue.animateTo(
                     targetValue = 0f,
@@ -327,7 +333,10 @@ fun CallYesNoScreen(
                 )
                 isNoSelected = false
             }
-            CallYesNoEvent.OtherNumber -> { // OtherNumber 버튼 게이지만 풀 애니메이션을 진행하고 그 외 버튼은 게이지를 0으로 초기화
+            /**
+             * OtherNumber 버튼 게이지만 풀 애니메이션을 진행하고 그 외 버튼은 게이지를 0으로 초기화
+             */
+            CallYesNoOtherNumberEvent.OtherNumber -> {
                 isOtherNumberSelected = true
                 yesAnimatableValue.animateTo(
                     targetValue = 0f,
@@ -342,8 +351,10 @@ fun CallYesNoScreen(
                     animationSpec = tween(durationMillis = 700)
                 )
             }
-            CallYesNoEvent.None -> {
-            }
+            /**
+             * None 상태일 때는 아무것도 실행하지 않음
+             */
+            CallYesNoOtherNumberEvent.None -> {}
         }
     }
 
@@ -351,7 +362,6 @@ fun CallYesNoScreen(
      * 화면에 처음 들어왔을 때 자동으로 yes 애니메이션 게이지가 차오르게 하는 코드
      */
     LaunchedEffect(Unit) {
-        Log.d("@@ 한번만 실행해야해", "yes 버튼 게이지 최초 실행")
         isYesSelected = true
         yesAnimationResult = yesAnimatableValue.animateTo(
             targetValue = 1f,
@@ -359,13 +369,12 @@ fun CallYesNoScreen(
         )
     }
     /**
-     * yes 게이지 애니메이션 결과값에 대한 처리
+     * Yes 게이지 애니메이션 결과값에 대한 처리
      */
     LaunchedEffect(yesAnimationResult) {
         when (yesAnimationResult?.endReason) {
             AnimationEndReason.Finished -> {
                 // 애니메이션이 성공적으로 완료되었을 때 실행할 로직
-                Log.d("@@ Yes 게이지 끝", "yes yes")
                 onYesButton(domainUiState.detailData.number)
             }
 
@@ -378,12 +387,11 @@ fun CallYesNoScreen(
         }
     }
     /**
-     * no 게이지 애니메이션 결과값에 대한 처리
+     * No 게이지 애니메이션 결과값에 대한 처리
      */
     LaunchedEffect(noAnimationResult) {
         when (noAnimationResult?.endReason) {
             AnimationEndReason.Finished -> {
-                Log.d("@@ No 게이지 끝", "No No")
                 // 애니메이션이 성공적으로 완료되었을 때 실행할 로직
                 onBackButton()
             }
@@ -403,14 +411,13 @@ fun CallYesNoScreen(
     LaunchedEffect(otherNumberAnimationResult) {
         when (otherNumberAnimationResult?.endReason) {
             AnimationEndReason.Finished -> {
-                Log.d("@@ OtherNumber 게이지 끝", "OtherNumber OtherNumber")
-                onOtherNumberButtonClick() // domainUiState.detailData를 이용하여 onOtherNameButtonClick()를 발생시킨다.(이 로직은 CallViewModel로부터 가지고 와서 사용함)
+                onOtherNumberButtonClick() // 현재 UI에서 사용되고 있는 domainUiState.detailData를 활용하여 onOtherNameButtonClick() 이벤트를 발생시킵니다. (이 동작은 CallViewModel에 정의되 있으며, 가져와 사용됩니다.)
                 /**
                  * 위의 onOtherNameButtonClick()을 통해 카테고리를 여러개 가진 번호가,
                  * 아니라면 다른 화면으로 이동하여 강제로 아래의 로직을 실행하지 않는다.(의도)
                  * 맞다면 다른 화면으로 이동하지 않아 아래의 로직을 실행한다.
                  */
-                otherNumberAnimatableValue.animateTo( //현재 꽉찬 OtherNumber 게이지를 0으로 초기화
+                otherNumberAnimatableValue.animateTo( //현재 꽉찬 OtherNumber 게이지를 0으로 초기화(OtherNumber가 1개라서 Number만 바뀌는 경우 게이지 애니메이션이 초기화 되지 않기 때문)
                     targetValue = 0f,
                     animationSpec = tween(durationMillis = 0)
                 )
@@ -617,7 +624,10 @@ fun CallYesNoScreen(
             }
             Spacer(modifier = Modifier.height(15.dp))
 
-            if (domainUiState.isContactIdUnique.not()) { //유니크 하지 않을때(중복 이름이 존재할 때 == OtherNumber가 존재할 때)
+            /**
+             * contactId가 고유하지 않을때(중복 이름이 존재할 때 == OtherNumber가 존재할 때)
+             */
+            if (domainUiState.isContactIdUnique.not()) {
                 OutlinedButton(
                     onClick = {
                         scope.launch {
@@ -725,7 +735,7 @@ fun CallYesNoPreview() {
             screenType = ScreenType.CallIndexedList,
             screenSizeType = ScreenSizeType.Middle
         ),
-        callYesNoEvent = CallYesNoEvent.None,
+        callYesNoOtherNumberEvent = CallYesNoOtherNumberEvent.None,
         vrUiState = VRUiState.PttSpeak(active = true, isError = false),
         vrDynamicBackground = Color.Black,
         fixedBackground = Color.Black,

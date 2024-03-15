@@ -491,11 +491,29 @@ fun MainRoute(
     ) {
         Column(
             modifier = Modifier
-                .fillMaxHeight(0.25f)
+                .fillMaxHeight(0.35f)
                 .fillMaxWidth(0.1f)
                 .wrapContentWidth(Alignment.End),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+            ) {
+                PttButton(
+                    modifier = Modifier.fillMaxSize(),
+                    contentText = "VR Line Number Result(3)",
+                    onClick = {
+                        scope.launch {
+                            viewModel.vrmwManager.setVRResult(
+                                VRResult(),
+                                SelectVRResult.ScrollIndexResult(inputIndex = 3)
+                            )
+                        }
+                    }
+                )
+            }
+
             Box(
                 modifier = Modifier
                     .weight(1f)

@@ -83,7 +83,6 @@ class PttManager @Inject constructor(
 
     fun pttEvent(selectVRResult: SelectVRResult) {
         val mwContext = MWContext(DialogueMode.MAINMENU, this)
-        Log.d("@@ PttManager pttEvent", "${mwContext}")
         vrmwManager.startVR(mwContext = mwContext, selectVRResult = selectVRResult)
     }
 
@@ -119,11 +118,7 @@ class PttManager @Inject constructor(
 
         makeRandomCommands()
 
-        val randomCommand = "추후 온라인/오프라인에 대한 명령어를 넣어야함"
-
-        /**
-         * 반환값을
-         */
+        val randomCommand = "추후 온라인/오프라인에 따라 랜덤 커멘드 명령어를 넣어야함"
 
         return randomCommand
     }
