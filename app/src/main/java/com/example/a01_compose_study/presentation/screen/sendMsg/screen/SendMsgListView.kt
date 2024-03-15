@@ -15,6 +15,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -105,7 +106,7 @@ fun MsgCategoryList(
 fun MsgAllListItem(
     contact: Contact,
     onItemClick: (Contact) -> Unit,
-    isClickable: Boolean
+    isClickable: MutableState<Boolean>
 
 ) {
     val scope = rememberCoroutineScope()
@@ -141,7 +142,7 @@ fun MsgAllListItem(
         .padding(4.dp)
         .clickableWithTapGestures(
             onClick = {
-                if (isClickable) {
+                if (isClickable.value) {
                     Log.e("isVrActive", "MsgAllListItem - click")
                     scope.launch {
                         isSelected = true
@@ -195,7 +196,7 @@ fun MsgNameListItem(
     contact: Contact,
     onItemClick: (Contact) -> Unit,
     clickedByVr: Boolean = false,
-    isClickable: Boolean
+    isClickable: MutableState<Boolean>
 
 ) {
     val scope = rememberCoroutineScope()
@@ -249,7 +250,7 @@ fun MsgNameListItem(
             .fillMaxWidth()
             .clickableWithTapGestures(
                 onClick = {
-                    if (isClickable) {
+                    if (isClickable.value) {
                         scope.launch {
                             isSelected = true
                             delay(3000)
@@ -308,7 +309,7 @@ fun MsgCategoryListItem(
     contact: Contact,
     onItemClick: (Contact) -> Unit,
     clickedByVr: Boolean = false,
-    isClickable: Boolean
+    isClickable: MutableState<Boolean>
 ) {
     val scope = rememberCoroutineScope()
     var isSelected by remember { mutableStateOf(false) }
@@ -355,7 +356,7 @@ fun MsgCategoryListItem(
             .fillMaxWidth()
             .clickableWithTapGestures(
                 onClick = {
-                    if (isClickable) {
+                    if (isClickable.value) {
                         scope.launch {
                             isSelected = true
                             delay(3000)

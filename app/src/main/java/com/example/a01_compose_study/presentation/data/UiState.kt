@@ -90,18 +90,14 @@ object UiState {
         return domainUiState
     }
 
-    fun handleScreenData(screenData: ScreenData, domainUiPair: Pair<DomainUiState, MWContext?>) {
+    fun handleScreenData(screenData: ScreenData, domainUiPair: Pair<DomainUiState, MWContext?>? = null) {
         Log.d("sendMsg", "handleScreenData : ${screenData}")
         when (screenData) {
-            ScreenData.PUSH -> pushUiState(domainUiPair)
-            ScreenData.POP -> {
-                Log.d("sendMsg", "popUiState 실행함")
-                popUiState()
-            }
-
-            ScreenData.CHANGE -> popUiState()
+            ScreenData.PUSH -> domainUiPair?.let { pushUiState(it) }
+            ScreenData.POP -> popUiState()
+            ScreenData.CHANGE -> domainUiPair?.let { changeUiState(it) }
             ScreenData.REJECT -> TODO()
-            ScreenData.BtPhoneAppRun -> TODO()
+            ScreenData.BtPhoneAppRun -> Log.d("sendMsg","requestBtPhoneAppRun")
         }
     }
 }

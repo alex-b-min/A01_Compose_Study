@@ -2,6 +2,8 @@ package com.example.a01_compose_study.data.custom.sendMsg
 
 
 import android.util.Log
+import android.widget.Toast
+import androidx.compose.material.Snackbar
 import com.example.a01_compose_study.data.Contact
 import com.example.a01_compose_study.data.DialogueMode
 import com.example.a01_compose_study.data.HVRError
@@ -295,8 +297,6 @@ class SendMsgManager @Inject constructor(
                     "procMessageNameIntention sendMsgModel? 안 Message: ${it.messageValue}"
                 )
                 messageValue.value = it.messageValue
-                // TODO selectedPhonebookItem
-//                selectedPhonebookItem = sendMsgContactList[0]
                 // Send Message <Name, Msg> 시나리오에서 Change Message 후 Message 발화하여 다시 MessageChange 화면
                 // "No" 발화 시 MessageName이 아닌 상황별 List나 PTT를 띄워야 함
                 if (firstRecogMessage.value) {
@@ -390,7 +390,6 @@ class SendMsgManager @Inject constructor(
             printSttString(commonModel.prompt)
 
             if (Intentions.Yes.isEqual(intention)) {
-                // TODO BtPhoneAppRun 실행 처리
                 Log.d("sendMsg", "BtPhoneAppRun 실행")
                 return ProcSendMsgData(
                     screenType = ScreenType.ScreenStack,
@@ -580,10 +579,6 @@ class SendMsgManager @Inject constructor(
         isCategoryListScreen.value = false
     }
 
-    fun requestBtPhoneAppRun(tabId: Int = 1) {
-        CustomLogger.d("requestBtPhoneAppRun: tabId:$tabId")
-        btCall.requestBtPhoneAppRun(tabId)
-    }
 
     private fun sendMessage(name: String, phoneNumber: String, message: String) {
         CoroutineScope(Dispatchers.IO).launch {

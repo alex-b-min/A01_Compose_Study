@@ -94,7 +94,7 @@ class SendMsgViewModel @Inject constructor(
 
             is SendMsgEvent.SendMessageYes -> {
                 // BtPhoneAppRun
-                sendMsgManager.requestBtPhoneAppRun()
+               UiState.handleScreenData(ScreenData.REJECT)
             }
 
         }
